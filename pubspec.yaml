@@ -1,0 +1,86 @@
+name: meditation_app
+description: A new Flutter Meditation App project.
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.5 <4.0.0"
+  flutter: "3.10.5"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.3.6 # [State Management]
+  go_router: ^9.0.0 # [Navigation]
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/image/
+    - assets/icons/image/
+    - assets/icons/svg/
+  fonts:
+    - family: Mulish
+      fonts:
+        - asset: assets/fonts/mulish/Mulish-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/mulish/Mulish-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+
+        - asset: assets/fonts/mulish/Mulish-Light.ttf
+          weight: 300
+        - asset: assets/fonts/mulish/Mulish-LightItalic.ttf
+          weight: 300
+          style: italic
+
+        - asset: assets/fonts/mulish/Mulish-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/mulish/Mulish-Italic.ttf
+          weight: 400
+          style: italic
+
+        - asset: assets/fonts/mulish/Mulish-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/mulish/Mulish-MediumItalic.ttf
+          weight: 500
+          style: italic
+
+        - asset: assets/fonts/mulish/Mulish-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/mulish/Mulish-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+
+        - asset: assets/fonts/mulish/Mulish-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/mulish/Mulish-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+        - asset: assets/fonts/mulish/Mulish-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/mulish/Mulish-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+
+        - asset: assets/fonts/mulish/Mulish-Black.ttf
+          weight: 900
+        - asset: assets/fonts/mulish/Mulish-BlackItalic.ttf
+          weight: 900
+          style: italic
+
+    - family: Brandon Grotesque Medium
+      fonts:
+        - asset: assets/fonts/brandon/BrandonGrotesque-Medium.otf
+          weight: 500
+
+    - family: Brandon Grotesque
+      fonts:
+        - asset: assets/fonts/brandon/BrandonGrotesque-Bold.otf
+          weight: 700
