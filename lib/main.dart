@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meditation_app/helper/router.dart';
-import 'package:meditation_app/theme/dark_theme.dart';
+import 'package:meditation_app/theme/theme.dart';
+import 'package:meditation_app/theme/styles.dart';
+import 'package:meditation_app/ui/app_scaffold.dart';
 import 'package:meditation_app/util/constants.dart';
 
 void main() {
@@ -26,10 +28,9 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       darkTheme: darkTheme,
       themeMode: ThemeMode.dark,
-      routerConfig: router,
-      // routeInformationParser: router.routeInformationParser,
-      // routeInformationProvider: router.routeInformationProvider,
-      // routerDelegate: router.routerDelegate,
+      routerConfig: appRouter,
     );
   }
 }
+
+AppStyle get $style => AppScaffold.style;

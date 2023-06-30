@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../util/app_images.dart';
+import 'package:meditation_app/util/assets.dart';
 
 class BackgroundImage extends StatelessWidget {
   final Widget? child;
@@ -23,13 +22,13 @@ class BackgroundImage extends StatelessWidget {
       alignment: alignment,
       children: [
         Image.asset(
-          AppImages.bg,
+          ImagePaths.bg,
           fit: BoxFit.cover,
           height: double.infinity,
           width: double.infinity,
           opacity: opacity == null ? null : AlwaysStoppedAnimation(opacity!),
         ),
-        if (child != null) child!,
+        if (child != null) SafeArea(child: child!),
       ],
     );
   }

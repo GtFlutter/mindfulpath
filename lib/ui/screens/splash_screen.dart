@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/route_helper.dart';
+import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/text_style.dart';
-import 'package:meditation_app/views/base/background_image.dart';
-
-import '../util/app_images.dart';
+import 'package:meditation_app/ui/common/background_image.dart';
+import 'package:meditation_app/util/assets.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -14,7 +14,7 @@ class SplashScreen extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     Future.delayed(
       const Duration(seconds: 3),
-      () => context.replace(RouteHelper.signInUp),
+      () => context.go(ScreenPaths.signInUp),
     );
     return Scaffold(
       backgroundColor: Colors.black,
@@ -24,7 +24,7 @@ class SplashScreen extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           children: [
             Image.asset(
-              AppImages.splashLogo,
+              ImagePaths.splashLogo,
               width: size.shortestSide * 0.3,
               fit: BoxFit.cover,
             ),
@@ -32,7 +32,7 @@ class SplashScreen extends StatelessWidget {
               padding: EdgeInsets.only(bottom: (size.shortestSide * 0.3) * 0.15),
               child: Text(
                 'Calm Oasis',
-                style: mulishLight300.copyWith(fontSize: 40, letterSpacing: 4.5),
+                style: $style.text.font(mulishLight300, sizePx: 40, spacingPc: 4.5),
               ),
             ),
           ],
