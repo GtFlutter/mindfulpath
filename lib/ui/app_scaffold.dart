@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/styles.dart';
-import 'package:meditation_app/theme/theme.dart';
-
 import '../theme/text_style.dart';
 
 class AppScaffold extends StatelessWidget {
@@ -13,6 +11,7 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Rebuilding App Scaffold');
     var query = MediaQuery.of(context);
 
     _style = AppStyle(screenSize: query.size);
@@ -25,7 +24,7 @@ class AppScaffold extends StatelessWidget {
             // iconTheme: IconThemeData(color: AppColors.secondaryClr),
             elevation: 0,
             titleTextStyle: $style.text.font(mulishMedium500, sizePx: 22.5),
-            toolbarHeight: kToolbarHeight + ($style.scale * 28.5),
+            toolbarHeight: kToolbarHeight + ($style.scale * query.size.height < 800 ? 0.0 : 28.5),
           ),
         ),
         child: child,

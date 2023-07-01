@@ -21,7 +21,7 @@ class AppStyle {
     } else if (shortestSide > tabletLg) {
       scale = 2.5;
     } else if (shortestSide > tabletSm) {
-      scale = 2;
+      scale = 1.5;
     } else if (shortestSide > phoneLg) {
       scale = 1; // phone
     } else {

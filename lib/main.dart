@@ -6,6 +6,8 @@ import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/app_scaffold.dart';
 import 'package:meditation_app/util/constants.dart';
 
+// TODO See Size height and minHeight For Custome Scrollabe;l column layout
+// TODO also see extra code remove
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
@@ -20,7 +22,6 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
-  // TODO Create a Provider For AppStyle
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

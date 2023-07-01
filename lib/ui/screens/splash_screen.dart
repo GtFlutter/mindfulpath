@@ -12,10 +12,9 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    Future.delayed(
-      const Duration(seconds: 3),
-      () => context.go(ScreenPaths.signInUp),
-    );
+    Future.delayed(const Duration(seconds: 3), () {
+      context.go(ScreenPaths.signInUp, extra: true);
+    });
     return Scaffold(
       backgroundColor: Colors.black,
       body: BackgroundImage(

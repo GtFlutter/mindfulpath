@@ -21,6 +21,9 @@ class CustomeTextFieldStyle {
       border: const OutlineInputBorder(),
       enabledBorder: _outlineInputBorder(),
       focusedBorder: _outlineInputBorder(),
+      errorBorder: _outlineInputBorder(),
+      errorStyle: $style.text.font(mulishRegular400, sizePx: 11, color: Colors.white),
+      focusedErrorBorder: _outlineInputBorder(),
       labelStyle: $style.text.font(
         mulishSemiBold600,
         sizePx: 17,
