@@ -1,51 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meditation_app/theme/colors.dart';
 
 import '../../main.dart';
 import '../../theme/text_style.dart';
 
-class CustomAppBar extends StatelessWidget {
-  final String title;
-  final String? subTitle;
-  final Color? subTitleColor;
-  final double? subTitleFontSize;
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String? title;
 
-  final EdgeInsetsGeometry? padding;
+  final bool automaticallyImplyLeading;
+  final Color? surfaceTintColor;
+  final Size screenSize;
+  final VoidCallback? onDonePressed;
 
-  const CustomAppBar({
+  @override
+  final Size preferredSize;
+
+  CustomAppBar({
     super.key,
-    required this.title,
-    this.subTitle,
-    this.padding,
-    this.subTitleColor,
-    this.subTitleFontSize,
-  });
+    this.title,
+    this.automaticallyImplyLeading = true,
+    this.surfaceTintColor,
+    required this.screenSize,
+    this.onDonePressed,
+  }) : preferredSize = Size.fromHeight(kToolbarHeight + ($style.scale * screenSize.height < 800 ? 0.0 : 10));
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: padding ?? EdgeInsets.symmetric(horizontal: $style.scale * 25, vertical: $style.scale * 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: $style.text.font(mulishMedium500, sizePx: 22.5, color: Colors.white),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (subTitle != null) ...[
-            SizedBox(height: $style.scale * 5),
-            Text(
-              subTitle!,
-              style: $style.text.font(mulishMedium500, sizePx: subTitleFontSize ?? 17, color: subTitleColor),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+    return AppBar(
+      title: title != null
+          ? Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.appBarBorderColor, width: $style.scale * 0.50),
+                borderRadius: BorderRadius.circular($style.scale * 25),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: $style.scale * 20, vertical: $style.scale * 6),
+              child: Text(title!, maxLines: 1, overflow: TextOverflow.ellipsis),
+            )
+          : null,
+      centerTitle: true,
+      automaticallyImplyLeading: false,
+      surfaceTintColor: surfaceTintColor,
+      leadingWidth: $style.scale * (30 + 30),
+      leading: automaticallyImplyLeading
+          ? IconButton.outlined(
+              constraints: BoxConstraints(maxWidth: $style.scale * 30, maxHeight: $style.scale * 30),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                }
+              },
+              icon: const Icon(Icons.arrow_back_ios_rounded),
+              iconSize: $style.scale * 15,
+              style: IconButton.styleFrom(
+                side: const BorderSide(color: AppColors.appBarBorderColor),
+              ),
+            )
+          : null,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      titleTextStyle: $style.text.font(mulishSemiBold600, sizePx: 15, color: Colors.white),
+      toolbarHeight: kToolbarHeight + ($style.scale * MediaQuery.of(context).size.height < 800 ? 0.0 : 28.5),
+      actions: [
+        if (onDonePressed != null)
+          Padding(
+            padding: EdgeInsets.only(right: $style.scale * 9),
+            child: IconButton.outlined(
+              constraints: BoxConstraints(maxWidth: $style.scale * 30, maxHeight: $style.scale * 30),
+              onPressed: onDonePressed,
+              icon: const Icon(Icons.done_rounded),
+              iconSize: $style.scale * 15,
+              style: IconButton.styleFrom(
+                side: const BorderSide(color: AppColors.appBarBorderColor),
+              ),
             ),
-          ],
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

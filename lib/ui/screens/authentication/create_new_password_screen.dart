@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/main.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/password_text_field.dart';
 
 import '../../../helper/screen_paths.dart';
 import '../../../theme/colors.dart';
+import '../../../util/constants.dart';
 
 class CreateNewPasswordScreen extends StatefulWidget {
   const CreateNewPasswordScreen({super.key});
@@ -22,6 +24,10 @@ class CreateNewPasswordScreen extends StatefulWidget {
 class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _confirmPasswordCtrl = TextEditingController();
+
+  final FocusNode _pwdFocusNode = FocusNode();
+  final FocusNode _cPwdFocusNode = FocusNode();
+
   String? _pwdErrorText;
   String? _cnfPwdErrorText;
 
@@ -38,6 +44,15 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
   }
 
   @override
+  void dispose() {
+    _pwdFocusNode.dispose();
+    _cPwdFocusNode.dispose();
+    _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
@@ -45,28 +60,20 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       extendBody: true,
-      appBar: AppBar(),
+      appBar: CustomAuthAppBar(screenSize: size),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
           child: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomAppBar(
-                      title: 'Create a new password',
-                      subTitle: 'Your new password must be different from the previous password',
-                      subTitleColor: AppColors.textFieldValueColor,
-                      padding: EdgeInsets.symmetric(horizontal: $style.scale * 25),
-                    ),
-                  ],
+                CustomHeader(
+                  title: 'Create a new password',
+                  subTitle: 'Your new password must be different from the previous password',
+                  subTitleColor: AppColors.textFieldValueColor,
+                  padding: EdgeInsets.symmetric(horizontal: $style.scale * 25),
                 ),
                 Expanded(
                   child: CustomScrollableColumnLayout(
-                    // testScreenHeight: 100,
                     minHeight: 250 * $style.scale,
                     children: [
                       Spacer(flex: 1),
@@ -74,21 +81,29 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           PasswordTextField(
-                            key: ValueKey('np'),
+                            key: ValueKey('p1'),
+                            focusNode: _pwdFocusNode,
                             controller: _passwordCtrl,
+                            textInputAction: TextInputAction.next,
                             errorText: _pwdErrorText,
-                            onChanged: (value) {
+                            onChanged: (_) {
                               if (_pwdErrorText != null) {
                                 setPwdError(null);
                               }
                             },
+                            onSubmitted: (_) {
+                              _cPwdFocusNode.requestFocus();
+                            },
                           ),
                           SizedBox(height: size.height * 0.05),
                           PasswordTextField(
-                            key: ValueKey('cnp'),
+                            key: ValueKey('p2'),
+                            focusNode: _cPwdFocusNode,
+                            textInputAction: TextInputAction.done,
                             controller: _confirmPasswordCtrl,
+                            labelText: 'Confirm Password',
                             errorText: _cnfPwdErrorText,
-                            onChanged: (value) {
+                            onChanged: (_) {
                               if (_cnfPwdErrorText != null) {
                                 setCnfPwdError(null);
                               }
@@ -102,11 +117,17 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                         onPressed: () {
                           String password = _passwordCtrl.text.trim();
                           String confirmPassword = _confirmPasswordCtrl.text.trim();
-                          if (password.isEmpty || password.length < 8) {
-                            setPwdError('Password must be atleast 8 character');
+                          if (password.isEmpty) {
+                            setPwdError('Please enter a Password');
                             return;
-                          } else if (confirmPassword.isEmpty || confirmPassword.length < 8) {
-                            setCnfPwdError('Password must be atleast 8 character');
+                          } else if (confirmPassword.isEmpty) {
+                            setCnfPwdError('Please enter a Confirm Password');
+                            return;
+                          } else if (password.length < AppConstants.PWD_MIN_LENGTH) {
+                            setPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+                            return;
+                          } else if (confirmPassword.length < 8) {
+                            setCnfPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
                             return;
                           } else if (password != confirmPassword) {
                             setCnfPwdError('Both password must match');

@@ -12,7 +12,6 @@ class AppColors {
 
   static const textFieldEnableBorderColor = Color(0xFFADA996);
 
-  /// static const textFieldFocusedBorderColor = Color(0xFFFFC865);
   static const textFieldLableColor = Color(0xFF5A5A5A);
   static const textFieldValueColor = Color(0xFFE1E1E1);
 
@@ -26,4 +25,7 @@ class AppColors {
 
   ///  OTP Verification msg color
   static const otpMsgTextColor = Color(0xFFBBBBBB);
+
+  /// App Bar Border Color
+  static const appBarBorderColor = Color(0xFFFFC865);
 }

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/main.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/contact_number_text_field.dart';
@@ -23,8 +24,10 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _numberCtrl = TextEditingController();
 
-  final String initCountryCode = '+91';
+  final String _initCountryCode = '+91';
   String _countryCode = '+91';
+
+  String? _numberErrorText;
 
   void setCountryCode(String code) {
     if (code != _countryCode) {
@@ -34,13 +37,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
   }
 
+  void setNumberErrorText([String? error]) {
+    setState(() => _numberErrorText = error);
+  }
+
+  @override
+  void dispose() {
+    _numberCtrl.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       extendBody: true,
-      appBar: AppBar(
+      appBar: CustomAuthAppBar(
         leadingWidth: $style.scale * 65,
         leading: Row(
           mainAxisSize: MainAxisSize.min,
@@ -60,6 +75,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ],
         ),
+        screenSize: size,
       ),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
@@ -71,7 +87,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomAppBar(
+                    CustomHeader(
                       title: 'Forgot password',
                       subTitle: 'Please enter your number to request a password reset.',
                       subTitleColor: AppColors.textFieldValueColor,
@@ -81,17 +97,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 Expanded(
                   child: CustomScrollableColumnLayout(
-                    // testScreenHeight: 100,
-                    minHeight: 250 * $style.scale,
+                    minHeight: 200 * $style.scale,
                     children: [
                       Spacer(flex: 1),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ContactNumberTextField(
+                          MobileNumberTextField(
                             onCountryCodeChanged: setCountryCode,
                             controller: _numberCtrl,
-                            initialCountryCodeSelection: initCountryCode,
+                            initialCountryCodeSelection: _initCountryCode,
                           ),
                         ],
                       ),
@@ -102,15 +117,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           String number = _numberCtrl.text.trim();
                           String code = _countryCode;
                           if (number.isEmpty) {
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Please enter a number')),
-                            );
+                            setNumberErrorText('Please enter a number');
+                            return;
                           } else if (code.isEmpty) {
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Please select country code')),
-                            );
+                            setNumberErrorText('Please select country code');
+                            return;
                           } else {
                             context.push(
                               ScreenPaths.otpVerificationScreen,

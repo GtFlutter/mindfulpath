@@ -17,9 +17,11 @@ class AppStyle {
     const tabletSm = 600;
     const phoneLg = 400;
     if (shortestSide > tabletXl) {
-      scale = 3;
+      scale = 1.7;
+      // scale = 3;
     } else if (shortestSide > tabletLg) {
-      scale = 2.5;
+      scale = 1.6;
+      // scale = 2.5;
     } else if (shortestSide > tabletSm) {
       scale = 1.5;
     } else if (shortestSide > phoneLg) {

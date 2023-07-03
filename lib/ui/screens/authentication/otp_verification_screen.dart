@@ -9,11 +9,13 @@ import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
-import 'package:meditation_app/util/string_extension.dart';
+import 'package:meditation_app/helper/string_converter.dart';
 import 'package:pinput/pinput.dart';
+
+import '../../../util/constants.dart';
 
 enum OtpVerificationType {
   signIn,
@@ -39,6 +41,19 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final TextEditingController _pinController = TextEditingController();
+
+  String? _pinErrorText;
+
+  void setPinErrorText([String? error]) {
+    setState(() => _pinErrorText = error);
+  }
+
+  @override
+  void dispose() {
+    _pinController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +66,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CustomAppBar(
+                CustomHeader(
                   title: 'OTP has been sent to',
                   subTitle: '${widget.model.countryCode} ${widget.model.number.mask()}',
                 ),
@@ -65,6 +80,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         children: [
                           Pinput(
                             controller: _pinController,
+                            errorTextStyle: $style.text.font(mulishRegular400, sizePx: 11, color: Colors.white),
+                            errorText: _pinErrorText,
+                            forceErrorState: true,
+                            onChanged: (_) {
+                              setPinErrorText();
+                            },
                             defaultPinTheme: PinTheme(
                               width: $style.scale * 50,
                               height: $style.scale * 50,
@@ -122,20 +143,24 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         text: 'Next',
                         onPressed: () {
                           String otp = _pinController.text.trim();
-                          if (otp.isEmpty || otp.length < 4) {
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Please enter a otp')),
-                            );
+                          if (otp.isEmpty) {
+                            setPinErrorText('Please enter an otp');
+                            return;
+                          } else if (otp.length < AppConstants.OTP_LENGTH) {
+                            setPinErrorText('OTP must be atleast ${AppConstants.OTP_LENGTH} digit');
+                            return;
                           } else {
                             ScaffoldMessenger.of(context).clearSnackBars();
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('OTP Verified')),
+                              SnackBar(content: Text('OTP Verified Successfully')),
                             );
                             if (widget.model.type == OtpVerificationType.forgotPassword) {
                               context.pop();
                               context.pop();
-                              context.go(ScreenPaths.createNewPasswordScreen);
+                              context.push(ScreenPaths.createNewPasswordScreen);
+                            } else if (widget.model.type == OtpVerificationType.signUp) {
+                              context.pop();
+                              context.push(ScreenPaths.createNewProfileScreen);
                             } else {
                               context.go(ScreenPaths.splash);
                             }

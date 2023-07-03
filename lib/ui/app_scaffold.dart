@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/styles.dart';
-import '../theme/text_style.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({super.key, required this.child});
@@ -17,18 +16,19 @@ class AppScaffold extends StatelessWidget {
     _style = AppStyle(screenSize: query.size);
     return KeyedSubtree(
       key: ValueKey($style.scale),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          appBarTheme: AppBarTheme(
-            backgroundColor: Colors.transparent,
-            // iconTheme: IconThemeData(color: AppColors.secondaryClr),
-            elevation: 0,
-            titleTextStyle: $style.text.font(mulishMedium500, sizePx: 22.5),
-            toolbarHeight: kToolbarHeight + ($style.scale * query.size.height < 800 ? 0.0 : 28.5),
-          ),
-        ),
-        child: child,
-      ),
+      child: child,
+      // child: Theme(
+      // data: Theme.of(context).copyWith(
+      // appBarTheme: AppBarTheme(
+      //   backgroundColor: Colors.transparent,
+      //   // iconTheme: IconThemeData(color: AppColors.secondaryClr),
+      //   elevation: 0,
+      //   titleTextStyle: $style.text.font(mulishMedium500, sizePx: 22.5),
+      //   toolbarHeight: kToolbarHeight + ($style.scale * query.size.height < 800 ? 0.0 : 28.5),
+      // ),
+      // ),
+      // child: child,
+      // ),
     );
   }
 }

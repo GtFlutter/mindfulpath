@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:meditation_app/theme/text_style.dart';
 
 import '../../../../main.dart';
 import '../../../../theme/text_field_style.dart';
@@ -14,8 +13,21 @@ class PasswordTextField extends StatefulWidget {
 
   final String? errorText;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
 
-  const PasswordTextField({super.key, required this.controller, this.labelText, this.errorText, this.onChanged});
+  final TextInputAction? textInputAction;
+  final FocusNode? focusNode;
+
+  const PasswordTextField({
+    super.key,
+    required this.controller,
+    this.labelText,
+    this.errorText,
+    this.onChanged,
+    this.onSubmitted,
+    this.textInputAction,
+    this.focusNode,
+  });
 
   @override
   State<PasswordTextField> createState() => _PasswordTextFieldState();
@@ -31,10 +43,12 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      focusNode: widget.focusNode,
       textAlignVertical: TextAlignVertical.bottom,
       controller: widget.controller,
       onChanged: widget.onChanged,
       cursorColor: CustomeTextFieldStyle.cursorColor,
+      textInputAction: widget.textInputAction,
       decoration: CustomeTextFieldStyle.inputDecoration().copyWith(
         labelText: widget.labelText ?? 'Password',
         errorText: widget.errorText,
@@ -55,6 +69,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
       style: CustomeTextFieldStyle.valueStyle(spacingPc: 50),
       obscureText: _obscureText,
       keyboardType: TextInputType.visiblePassword,
+      onSubmitted: widget.onSubmitted,
     );
   }
 }

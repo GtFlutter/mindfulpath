@@ -6,16 +6,16 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/colors.dart';
-import 'package:meditation_app/theme/text_field_style.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/contact_number_text_field.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/password_text_field.dart';
 import 'package:meditation_app/util/assets.dart';
+import 'package:meditation_app/util/constants.dart';
 
 import '../../../helper/screen_paths.dart';
-import 'widget/custom_country_code_picker.dart';
 import '../../common/custom_next_button.dart';
 import 'otp_verification_screen.dart';
 
@@ -30,15 +30,34 @@ class SignInUpScreen extends StatefulWidget {
 class _SignInUpScreenState extends State<SignInUpScreen> {
   final TextEditingController _numberCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
+  final FocusNode _pwdFocusNode = FocusNode();
+
   final String initCountryCode = '+91';
   String _countryCode = '+91';
 
+  String? _numberErrorText;
+  String? _pwdErrorText;
+
   void setCountryCode(String code) {
     if (code != _countryCode) {
-      setState(() {
-        _countryCode = code;
-      });
+      setState(() => _countryCode = code);
     }
+  }
+
+  void setNumberErrorText([String? error]) {
+    setState(() => _numberErrorText = error);
+  }
+
+  void setPwdErrorText([String? error]) {
+    setState(() => _pwdErrorText = error);
+  }
+
+  @override
+  void dispose() {
+    _pwdFocusNode.dispose();
+    _numberCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,29 +67,41 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       extendBody: true,
-      appBar: AppBar(
-        title: Text(widget.isSignIn ? 'Sign in' : 'Sign up'),
+      appBar: CustomAuthAppBar(
+        title: widget.isSignIn ? 'Sign in' : 'Sign up',
         centerTitle: false,
         automaticallyImplyLeading: false,
+        screenSize: size,
       ),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
           child: SafeArea(
             child: CustomScrollableColumnLayout(
-              minHeight: 500 * $style.scale,
+              minHeight: 440 * $style.scale,
               children: [
                 Spacer(flex: 2),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ContactNumberTextField(
+                    MobileNumberTextField(
                       onCountryCodeChanged: setCountryCode,
                       controller: _numberCtrl,
                       initialCountryCodeSelection: initCountryCode,
+                      errorText: _numberErrorText,
+                      textInputAction: TextInputAction.next,
+                      onChanged: (_) {
+                        setNumberErrorText();
+                      },
                     ),
                     SizedBox(height: size.height * 0.05),
                     PasswordTextField(
+                      key: ValueKey('siusp1'),
+                      focusNode: _pwdFocusNode,
                       controller: _passwordCtrl,
+                      errorText: _pwdErrorText,
+                      onChanged: (_) {
+                        setPwdErrorText();
+                      },
                     ),
                     if (widget.isSignIn) ...[
                       SizedBox(height: size.height * 0.015),
@@ -177,31 +208,42 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                 CustomNextButton(
                   text: 'Next',
                   onPressed: () {
-                    if (widget.isSignIn) {
+                    String number = _numberCtrl.text.trim();
+                    String code = _countryCode.trim();
+                    String password = _passwordCtrl.text.trim();
+                    if (number.isEmpty) {
+                      setNumberErrorText('Please enter a number');
+                      return;
+                    } else if (code.isEmpty) {
+                      setNumberErrorText('Please select country code');
+                      return;
+                    } else if (password.isEmpty) {
+                      setPwdErrorText('Please enter a password');
+                      return;
+                    }
+
+                    /// This is For Sign Up
+                    else if (!widget.isSignIn && password.length < AppConstants.PWD_MIN_LENGTH) {
+                      setPwdErrorText('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+                      return;
+                    }
+
+                    /// TODO IF this is sign then get error from api and show
+                    else if (widget.isSignIn) {
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Login Successfully')),
+                      );
                       context.push(ScreenPaths.signInUp, extra: !widget.isSignIn);
                     } else {
-                      String number = _numberCtrl.text.trim();
-                      String code = _countryCode;
-                      if (number.isEmpty) {
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please enter a number')),
-                        );
-                      } else if (code.isEmpty) {
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Please select country code')),
-                        );
-                      } else {
-                        context.push(
-                          ScreenPaths.otpVerificationScreen,
-                          extra: TempOtpModel(
-                            countryCode: code,
-                            number: number,
-                            type: OtpVerificationType.signUp,
-                          ),
-                        );
-                      }
+                      context.push(
+                        ScreenPaths.otpVerificationScreen,
+                        extra: TempOtpModel(
+                          countryCode: code,
+                          number: number,
+                          type: OtpVerificationType.signUp,
+                        ),
+                      );
                     }
                   },
                 ),

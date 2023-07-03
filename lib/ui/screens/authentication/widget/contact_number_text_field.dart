@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../theme/text_field_style.dart';
 import 'custom_country_code_picker.dart';
 
-class ContactNumberTextField extends StatelessWidget {
+class MobileNumberTextField extends StatelessWidget {
   final String initialCountryCodeSelection;
   final ValueChanged<String> onCountryCodeChanged;
   final TextEditingController controller;
@@ -11,12 +11,20 @@ class ContactNumberTextField extends StatelessWidget {
   /// Default [labelText] is 'Number'
   final String? labelText;
 
-  const ContactNumberTextField({
+  final String? errorText;
+  final ValueChanged<String>? onChanged;
+
+  final TextInputAction? textInputAction;
+
+  const MobileNumberTextField({
     super.key,
     required this.onCountryCodeChanged,
     required this.controller,
     required this.initialCountryCodeSelection,
     this.labelText,
+    this.errorText,
+    this.onChanged,
+    this.textInputAction,
   });
 
   @override
@@ -24,8 +32,11 @@ class ContactNumberTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       cursorColor: CustomeTextFieldStyle.cursorColor,
+      onChanged: onChanged,
+      textInputAction: textInputAction,
       decoration: CustomeTextFieldStyle.inputDecoration().copyWith(
         labelText: labelText ?? 'Number',
+        errorText: errorText,
         prefix: CustomCountryCodePicker(
           showDropDown: true,
           initialSelection: initialCountryCodeSelection,
