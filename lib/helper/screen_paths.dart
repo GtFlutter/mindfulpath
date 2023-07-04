@@ -10,4 +10,7 @@ class ScreenPaths {
 
   /// Settings Flow
   static const String tCPpScreen = '/tc-pp';
+
+  ///
+  static const String dashboardScreen = '/dashboard-screen';
 }

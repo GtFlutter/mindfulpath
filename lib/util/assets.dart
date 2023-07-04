@@ -7,6 +7,10 @@ class SvgPaths {
   static const String passwordHide = 'assets/icons/svg/password_hide.svg';
   static const String calendar = 'assets/icons/svg/calendar.svg';
   static const String arrowDown = 'assets/icons/svg/arrow_down.svg';
+
+  // Dashboard
+  static const String profile = 'assets/icons/svg/profile.svg';
+  static const String search = 'assets/icons/svg/search.svg';
 }
 
 class ImagePaths {

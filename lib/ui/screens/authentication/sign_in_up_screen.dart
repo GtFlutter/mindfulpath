@@ -130,7 +130,9 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                             Text('By signing, you agree to Calm oasis',
                                 style: $style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                             CupertinoButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                context.push(ScreenPaths.tCPpScreen, extra: false);
+                              },
                               padding: EdgeInsets.zero,
                               minSize: 10,
                               child: Text(
@@ -141,7 +143,9 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                             Text('and',
                                 style: $style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                             CupertinoButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  context.push(ScreenPaths.tCPpScreen, extra: true);
+                                },
                                 padding: EdgeInsets.zero,
                                 minSize: 10,
                                 child: Text(

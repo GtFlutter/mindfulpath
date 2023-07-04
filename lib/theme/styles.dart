@@ -1,7 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:ui';
-import 'package:flutter/material.dart' show Colors, TextStyle, immutable;
+import 'package:flutter/material.dart' show Colors, TextStyle, debugPrint, immutable;
 import 'colors.dart';
 
 @immutable
@@ -29,7 +29,7 @@ class AppStyle {
     } else {
       scale = .85; // small phone
     }
-    // debugPrint('screenSize=$screenSize, scale=$scale');
+    debugPrint('screenSize=$screenSize, scale=$scale');
   }
 
   late final double scale;

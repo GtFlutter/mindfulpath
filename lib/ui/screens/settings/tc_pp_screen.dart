@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meditation_app/main.dart';
+import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
@@ -8,11 +9,21 @@ import 'package:meditation_app/ui/common/custom_app_bar.dart';
 
 /// Terms & Conditions And Privacy Policy Screen
 class TCPPScreen extends StatelessWidget {
-  const TCPPScreen({super.key});
+  final bool isTermsAndConditions;
+  const TCPPScreen({super.key, required this.isTermsAndConditions});
 
   @override
   Widget build(BuildContext context) {
+    /// [isTerms] True If This is For Terms & Conditions And False For Privacy Policy
+
     String termsAndConditions =
+        '''Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
+
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.Lorem Ipsum has been the industry's standard .
+''';
+    String privacyPolicy =
         '''Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
 
 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
@@ -25,16 +36,23 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
       extendBody: true,
       appBar: CustomAppBar(
         screenSize: size,
-        title: 'Terms & Conditions',
+        title: isTermsAndConditions ? 'Terms & Conditions' : 'Privacy Policy',
+        onDonePressed: () {},
       ),
       body: BackgroundImage(
         child: SingleChildScrollView(
+          padding: EdgeInsets.all($style.scale * 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                termsAndConditions,
-                style: $style.text.font(mulishSemiBold600, sizePx: 10),
+                isTermsAndConditions ? termsAndConditions : privacyPolicy,
+                style: $style.text.font(
+                  isTermsAndConditions ? mulishSemiBold600 : mulishMedium500,
+                  sizePx: 10,
+                  heightPx: 18,
+                  color: isTermsAndConditions ? AppColors.tcContentColor : AppColors.ppContentColor,
+                ),
               ),
             ],
           ),

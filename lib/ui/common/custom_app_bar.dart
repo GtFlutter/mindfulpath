@@ -30,11 +30,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: title != null
           ? Container(
+              constraints: BoxConstraints(maxWidth: screenSize.shortestSide * 0.5),
+              alignment: Alignment.center,
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.appBarBorderColor, width: $style.scale * 0.50),
                 borderRadius: BorderRadius.circular($style.scale * 25),
               ),
-              padding: EdgeInsets.symmetric(horizontal: $style.scale * 20, vertical: $style.scale * 6),
+              padding: EdgeInsets.symmetric(horizontal: $style.scale * 10, vertical: $style.scale * 6),
               child: Text(title!, maxLines: 1, overflow: TextOverflow.ellipsis),
             )
           : null,
