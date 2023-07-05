@@ -33,4 +33,7 @@ class AppColors {
 
   ///Dashboard
   static const cardTextColor = Color(0xFFFBFBFB);
+
+  /// Bottom Nav Background Color
+  static const bottomNavBgColor = Color(0xFF070707);
 }

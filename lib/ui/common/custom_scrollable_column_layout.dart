@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../main.dart';
+import 'package:meditation_app/theme/styles.dart';
 
 class CustomScrollableColumnLayout extends StatelessWidget {
   final List<Widget> children;
@@ -8,6 +8,7 @@ class CustomScrollableColumnLayout extends StatelessWidget {
   /// This only for testing minimum height
   final double? testScreenHeight;
   final EdgeInsetsGeometry? padding;
+  final AppStyle style;
 
   const CustomScrollableColumnLayout({
     super.key,
@@ -15,6 +16,7 @@ class CustomScrollableColumnLayout extends StatelessWidget {
     this.children = const <Widget>[],
     this.padding,
     this.testScreenHeight,
+    required this.style,
   });
 
   @override
@@ -22,7 +24,7 @@ class CustomScrollableColumnLayout extends StatelessWidget {
     // var query = MediaQuery.of(context);
     // This removing already occupi by some ui like appbar,statusbar notch, bottom navigation button (back,home,recent)
     // var alredyOccupiedHeight = kToolbarHeight +
-    //     ($style.scale * query.size.height < 800 ? 0.0 : 28.5) +
+    //     (style.scale * query.size.height < 800 ? 0.0 : 28.5) +
     //     query.viewPadding.top +
     //     query.viewPadding.bottom +
     //     24;
@@ -30,12 +32,12 @@ class CustomScrollableColumnLayout extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      constraints: BoxConstraints(maxWidth: 500 * $style.scale),
+      constraints: BoxConstraints(maxWidth: 500 * style.scale),
       child: LayoutBuilder(
         builder: (context, constraints) {
           var height = testScreenHeight ?? constraints.biggest.height;
           return SingleChildScrollView(
-            padding: padding ?? EdgeInsets.symmetric(horizontal: $style.scale * 25),
+            padding: padding ?? EdgeInsets.symmetric(horizontal: style.scale * 25),
             child: Column(
               children: [
                 SizedBox(

@@ -11,6 +11,16 @@ class SvgPaths {
   // Dashboard
   static const String profile = 'assets/icons/svg/profile.svg';
   static const String search = 'assets/icons/svg/search.svg';
+
+  /// ShellNavigation / BottomNavigation
+  static const String analyticsSelected = 'assets/icons/svg/analytics_selected.svg';
+  static const String analyticsUnselected = 'assets/icons/svg/analytics_unselected.svg';
+
+  static const String discoverSelected = 'assets/icons/svg/discover_selected.svg';
+  static const String discoverUnselected = 'assets/icons/svg/discover_unselected.svg';
+
+  static const String librarySelected = 'assets/icons/svg/library_selected.svg';
+  static const String libraryUnselected = 'assets/icons/svg/library_unselected.svg';
 }
 
 class ImagePaths {

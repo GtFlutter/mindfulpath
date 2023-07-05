@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
+
+import '../../../theme/styles.dart';
 
 /// TODO : Working On Terms And Conditions
 
@@ -11,9 +12,13 @@ import 'package:meditation_app/ui/common/custom_app_bar.dart';
 class TCPPScreen extends StatelessWidget {
   final bool isTermsAndConditions;
   const TCPPScreen({super.key, required this.isTermsAndConditions});
+  static AppStyle _style = AppStyle();
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    _style = AppStyle(screenSize: size);
+
     /// [isTerms] True If This is For Terms & Conditions And False For Privacy Policy
 
     String termsAndConditions =
@@ -30,7 +35,7 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
 
 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.Lorem Ipsum has been the industry's standard .
 ''';
-    Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
@@ -38,16 +43,17 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
         screenSize: size,
         title: isTermsAndConditions ? 'Terms & Conditions' : 'Privacy Policy',
         onDonePressed: () {},
+        style: _style,
       ),
       body: BackgroundImage(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all($style.scale * 20),
+          padding: EdgeInsets.all(_style.scale * 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 isTermsAndConditions ? termsAndConditions : privacyPolicy,
-                style: $style.text.font(
+                style: _style.text.font(
                   isTermsAndConditions ? mulishSemiBold600 : mulishMedium500,
                   sizePx: 10,
                   heightPx: 18,

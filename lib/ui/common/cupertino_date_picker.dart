@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../main.dart';
+import 'package:meditation_app/theme/styles.dart';
 
 class CupertinoDatePickerWidget extends StatefulWidget {
   final DateTime lastDate;
   final DateTime firstDate;
   final DateTime initialDate;
+  final AppStyle style;
 
   const CupertinoDatePickerWidget({
     super.key,
     required this.lastDate,
     required this.firstDate,
     required this.initialDate,
+    required this.style,
   });
 
   @override
@@ -32,8 +33,8 @@ class _CupertinoDatePickerWidgetState extends State<CupertinoDatePickerWidget> {
     return SafeArea(
       top: false,
       child: Container(
-        padding: EdgeInsets.only(top: $style.scale * 6.0),
-        margin: EdgeInsets.only(bottom: $style.scale * MediaQuery.of(context).viewInsets.bottom),
+        padding: EdgeInsets.only(top: widget.style.scale * 6.0),
+        margin: EdgeInsets.only(bottom: widget.style.scale * MediaQuery.of(context).viewInsets.bottom),
         color: CupertinoColors.systemBackground.resolveFrom(context),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -60,7 +61,7 @@ class _CupertinoDatePickerWidgetState extends State<CupertinoDatePickerWidget> {
               ],
             ),
             SizedBox(
-              height: $style.scale * 216,
+              height: widget.style.scale * 216,
               child: CupertinoDatePicker(
                 initialDateTime: widget.initialDate,
                 minimumDate: widget.firstDate,

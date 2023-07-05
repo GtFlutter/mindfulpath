@@ -1,22 +1,25 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
+
+import '../../../../theme/styles.dart';
 
 class CustomCountryCodePicker extends StatelessWidget {
   final bool showDropDown;
 
-  final TextStyle? style;
+  final TextStyle? textStyle;
   final String? initialSelection;
   final ValueChanged<String> onChanged;
+  final AppStyle style;
 
   const CustomCountryCodePicker({
     super.key,
     this.showDropDown = true,
-    this.style,
+    this.textStyle,
     required this.onChanged,
     this.initialSelection,
+    required this.style,
   });
 
   @override
@@ -38,8 +41,8 @@ class CustomCountryCodePicker extends StatelessWidget {
       },
       initialSelection: initialSelection,
       flagWidth: 32,
-      dialogTextStyle: $style.text.font(mulishRegular400, sizePx: 15, color: AppColors.textFieldValueColor),
-      searchStyle: $style.text.font(mulishRegular400, sizePx: 15, color: AppColors.textFieldValueColor),
+      dialogTextStyle: style.text.font(mulishRegular400, sizePx: 15, color: AppColors.textFieldValueColor),
+      searchStyle: style.text.font(mulishRegular400, sizePx: 15, color: AppColors.textFieldValueColor),
       searchDecoration: const InputDecoration(
         enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.secondaryColor)),
         focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.secondaryColor)),
@@ -50,15 +53,15 @@ class CustomCountryCodePicker extends StatelessWidget {
           children: [
             Text(
               selectedCode!.dialCode.toString(),
-              style: style,
+              style: textStyle,
             ),
             if (showDropDown)
               Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: style != null ? style!.color : Colors.white,
-                size: $style.scale * 20,
+                color: textStyle != null ? textStyle!.color : Colors.white,
+                size: style.scale * 20,
               ),
-            SizedBox(width: $style.scale * 10),
+            SizedBox(width: style.scale * 10),
           ],
         );
       },

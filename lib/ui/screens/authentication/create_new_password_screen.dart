@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/main.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
@@ -12,6 +11,7 @@ import 'package:meditation_app/ui/screens/authentication/widget/password_text_fi
 
 import '../../../helper/screen_paths.dart';
 import '../../../theme/colors.dart';
+import '../../../theme/styles.dart';
 import '../../../util/constants.dart';
 
 class CreateNewPasswordScreen extends StatefulWidget {
@@ -22,6 +22,8 @@ class CreateNewPasswordScreen extends StatefulWidget {
 }
 
 class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
+  static AppStyle _style = AppStyle();
+
   final TextEditingController _passwordCtrl = TextEditingController();
   final TextEditingController _confirmPasswordCtrl = TextEditingController();
 
@@ -54,13 +56,18 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    var size = MediaQuery.of(context).size;
+
+    _style = AppStyle(screenSize: size);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       extendBody: true,
-      appBar: CustomAuthAppBar(screenSize: size),
+      appBar: CustomAuthAppBar(
+        screenSize: size,
+        style: _style,
+      ),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
           child: SafeArea(
@@ -70,11 +77,13 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                   title: 'Create a new password',
                   subTitle: 'Your new password must be different from the previous password',
                   subTitleColor: AppColors.textFieldValueColor,
-                  padding: EdgeInsets.symmetric(horizontal: $style.scale * 25),
+                  padding: EdgeInsets.symmetric(horizontal: _style.scale * 25),
+                  style: _style,
                 ),
                 Expanded(
                   child: CustomScrollableColumnLayout(
-                    minHeight: 250 * $style.scale,
+                    minHeight: 250 * _style.scale,
+                    style: _style,
                     children: [
                       Spacer(flex: 1),
                       Column(
@@ -94,6 +103,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                             onSubmitted: (_) {
                               _cPwdFocusNode.requestFocus();
                             },
+                            style: _style,
                           ),
                           SizedBox(height: size.height * 0.05),
                           PasswordTextField(
@@ -108,6 +118,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                                 setCnfPwdError(null);
                               }
                             },
+                            style: _style,
                           ),
                         ],
                       ),
@@ -140,8 +151,9 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                             context.go(ScreenPaths.splash);
                           }
                         },
+                        style: _style,
                       ),
-                      SizedBox(height: $style.scale * 20),
+                      SizedBox(height: _style.scale * 20),
                     ],
                   ),
                 ),

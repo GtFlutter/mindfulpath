@@ -53,6 +53,8 @@ class AppStyle {
 
   /// Shared sizes
   late final _Sizes sizes = _Sizes();
+
+  double scaleX(double value) => scale * value;
 }
 
 @immutable

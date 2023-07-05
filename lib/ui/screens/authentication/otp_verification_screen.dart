@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/screen_paths.dart';
-import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
@@ -15,6 +14,7 @@ import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:pinput/pinput.dart';
 
+import '../../../theme/styles.dart';
 import '../../../util/constants.dart';
 
 enum OtpVerificationType {
@@ -40,6 +40,7 @@ class OtpVerificationScreen extends StatefulWidget {
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+  static AppStyle _style = AppStyle();
   final TextEditingController _pinController = TextEditingController();
 
   String? _pinErrorText;
@@ -56,6 +57,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    _style = AppStyle(screenSize: size);
     return Scaffold(
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
@@ -69,10 +72,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 CustomHeader(
                   title: 'OTP has been sent to',
                   subTitle: '${widget.model.countryCode} ${widget.model.number.mask()}',
+                  style: _style,
                 ),
                 Expanded(
                   child: CustomScrollableColumnLayout(
-                    minHeight: 150 * $style.scale,
+                    minHeight: 150 * _style.scale,
+                    style: _style,
                     children: [
                       Spacer(flex: 1),
                       Column(
@@ -80,45 +85,45 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         children: [
                           Pinput(
                             controller: _pinController,
-                            errorTextStyle: $style.text.font(mulishRegular400, sizePx: 11, color: Colors.white),
+                            errorTextStyle: _style.text.font(mulishRegular400, sizePx: 11, color: Colors.white),
                             errorText: _pinErrorText,
                             forceErrorState: true,
                             onChanged: (_) {
                               setPinErrorText();
                             },
                             defaultPinTheme: PinTheme(
-                              width: $style.scale * 50,
-                              height: $style.scale * 50,
+                              width: _style.scale * 50,
+                              height: _style.scale * 50,
                               decoration: BoxDecoration(
                                 border:
-                                    Border.all(color: AppColors.textFieldEnableBorderColor, width: $style.scale * 0.9),
+                                    Border.all(color: AppColors.textFieldEnableBorderColor, width: _style.scale * 0.9),
                                 shape: BoxShape.circle,
                               ),
-                              textStyle: $style.text.font(mulishLight300, sizePx: 25, color: Colors.white),
+                              textStyle: _style.text.font(mulishLight300, sizePx: 25, color: Colors.white),
                             ),
                             focusedPinTheme: PinTheme(
-                              width: $style.scale * 50,
-                              height: $style.scale * 50,
+                              width: _style.scale * 50,
+                              height: _style.scale * 50,
                               decoration: BoxDecoration(
                                 border:
-                                    Border.all(color: AppColors.textFieldEnableBorderColor, width: $style.scale * 0.9),
+                                    Border.all(color: AppColors.textFieldEnableBorderColor, width: _style.scale * 0.9),
                                 shape: BoxShape.circle,
                               ),
-                              textStyle: $style.text.font(mulishLight300, sizePx: 25, color: Colors.white),
+                              textStyle: _style.text.font(mulishLight300, sizePx: 25, color: Colors.white),
                             ),
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             inputFormatters: <TextInputFormatter>[
                               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                             ],
                           ),
-                          SizedBox(height: $style.scale * 21.5),
+                          SizedBox(height: _style.scale * 21.5),
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Wrap(
-                              runSpacing: $style.scale * 8,
+                              runSpacing: _style.scale * 8,
                               children: [
                                 Text('Didn\'t Receive the OTP?',
-                                    style: $style.text.font(
+                                    style: _style.text.font(
                                       mulishMedium500,
                                       sizePx: 12,
                                       color: AppColors.otpMsgTextColor,
@@ -129,13 +134,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                   minSize: 10,
                                   child: Text(
                                     '  RESEND ',
-                                    style: $style.text.font(mulishBold700, sizePx: 12, color: Colors.white),
+                                    style: _style.text.font(mulishBold700, sizePx: 12, color: Colors.white),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: $style.scale * 10),
+                          SizedBox(height: _style.scale * 10),
                         ],
                       ),
                       Spacer(flex: 3),
@@ -166,8 +171,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             }
                           }
                         },
+                        style: _style,
                       ),
-                      SizedBox(height: $style.scale * 20),
+                      SizedBox(height: _style.scale * 20),
                     ],
                   ),
                 ),

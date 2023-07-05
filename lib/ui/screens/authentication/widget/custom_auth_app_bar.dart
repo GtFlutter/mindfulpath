@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../main.dart';
+import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 
 class CustomAuthAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -11,6 +11,7 @@ class CustomAuthAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double? leadingWidth;
   final Widget? leading;
   final Size screenSize;
+  final AppStyle style;
 
   @override
   final Size preferredSize;
@@ -24,7 +25,8 @@ class CustomAuthAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leadingWidth,
     this.leading,
     required this.screenSize,
-  }) : preferredSize = Size.fromHeight(kToolbarHeight + ($style.scale * screenSize.height < 800 ? 0.0 : 28.5));
+    required this.style,
+  }) : preferredSize = Size.fromHeight(kToolbarHeight + (style.scale * screenSize.height < 800 ? 0.0 : 28.5));
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +40,8 @@ class CustomAuthAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.transparent,
       // iconTheme: IconThemeData(color: AppColors.secondaryClr),
       elevation: 0,
-      titleTextStyle: $style.text.font(mulishMedium500, sizePx: 22.5),
-      toolbarHeight: kToolbarHeight + ($style.scale * MediaQuery.of(context).size.height < 800 ? 0.0 : 28.5),
+      titleTextStyle: style.text.font(mulishMedium500, sizePx: 22.5),
+      toolbarHeight: kToolbarHeight + (style.scale * MediaQuery.of(context).size.height < 800 ? 0.0 : 28.5),
     );
   }
 }

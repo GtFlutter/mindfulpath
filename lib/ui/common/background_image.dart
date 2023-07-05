@@ -28,7 +28,7 @@ class BackgroundImage extends StatelessWidget {
           width: double.infinity,
           opacity: opacity == null ? null : AlwaysStoppedAnimation(opacity!),
         ),
-        if (child != null) SafeArea(child: child!),
+        if (child != null) child!,
       ],
     );
   }

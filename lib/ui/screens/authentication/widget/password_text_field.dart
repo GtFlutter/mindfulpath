@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:meditation_app/theme/styles.dart';
 
-import '../../../../main.dart';
 import '../../../../theme/text_field_style.dart';
 import '../../../../util/assets.dart';
 
@@ -17,6 +17,7 @@ class PasswordTextField extends StatefulWidget {
 
   final TextInputAction? textInputAction;
   final FocusNode? focusNode;
+  final AppStyle style;
 
   const PasswordTextField({
     super.key,
@@ -27,6 +28,7 @@ class PasswordTextField extends StatefulWidget {
     this.onSubmitted,
     this.textInputAction,
     this.focusNode,
+    required this.style,
   });
 
   @override
@@ -49,7 +51,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
       onChanged: widget.onChanged,
       cursorColor: CustomeTextFieldStyle.cursorColor,
       textInputAction: widget.textInputAction,
-      decoration: CustomeTextFieldStyle.inputDecoration().copyWith(
+      decoration: CustomeTextFieldStyle.inputDecoration(style: widget.style).copyWith(
         labelText: widget.labelText ?? 'Password',
         errorText: widget.errorText,
         suffix: MaterialButton(
@@ -58,15 +60,15 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
           padding: EdgeInsets.zero,
           visualDensity: const VisualDensity(vertical: -4),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          minWidth: $style.scale * 30,
+          minWidth: widget.style.scale * 30,
           child: SvgPicture.asset(
             _obscureText ? SvgPaths.passwordHide : SvgPaths.passwordVisible,
-            width: $style.scale * 20,
-            height: $style.scale * 20,
+            width: widget.style.scale * 20,
+            height: widget.style.scale * 20,
           ),
         ),
       ),
-      style: CustomeTextFieldStyle.valueStyle(spacingPc: 50),
+      style: CustomeTextFieldStyle.valueStyle(spacingPc: 50, style: widget.style),
       obscureText: _obscureText,
       keyboardType: TextInputType.visiblePassword,
       onSubmitted: widget.onSubmitted,

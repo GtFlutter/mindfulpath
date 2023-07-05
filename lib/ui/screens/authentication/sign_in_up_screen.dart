@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart' show CupertinoButton;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/main.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
@@ -16,6 +15,7 @@ import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/constants.dart';
 
 import '../../../helper/screen_paths.dart';
+import '../../../theme/styles.dart';
 import '../../common/custom_next_button.dart';
 import 'otp_verification_screen.dart';
 
@@ -28,6 +28,7 @@ class SignInUpScreen extends StatefulWidget {
 }
 
 class _SignInUpScreenState extends State<SignInUpScreen> {
+  static AppStyle _style = AppStyle();
   final TextEditingController _numberCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
   final FocusNode _pwdFocusNode = FocusNode();
@@ -62,7 +63,8 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    var size = MediaQuery.of(context).size;
+    _style = AppStyle(screenSize: size);
     return Scaffold(
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
@@ -72,12 +74,14 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
         centerTitle: false,
         automaticallyImplyLeading: false,
         screenSize: size,
+        style: _style,
       ),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
           child: SafeArea(
             child: CustomScrollableColumnLayout(
-              minHeight: 440 * $style.scale,
+              minHeight: 440 * _style.scale,
+              style: _style,
               children: [
                 Spacer(flex: 2),
                 Column(
@@ -92,6 +96,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                       onChanged: (_) {
                         setNumberErrorText();
                       },
+                      style: _style,
                     ),
                     SizedBox(height: size.height * 0.05),
                     PasswordTextField(
@@ -102,6 +107,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                       onChanged: (_) {
                         setPwdErrorText();
                       },
+                      style: _style,
                     ),
                     if (widget.isSignIn) ...[
                       SizedBox(height: size.height * 0.015),
@@ -115,20 +121,20 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                           minSize: 10,
                           child: Text(
                             'Forgot Password ?',
-                            style: $style.text.font(mulishSemiBold600, sizePx: 12, color: Colors.white),
+                            style: _style.text.font(mulishSemiBold600, sizePx: 12, color: Colors.white),
                           ),
                         ),
                       ),
-                      SizedBox(height: $style.scale * 20),
+                      SizedBox(height: _style.scale * 20),
                     ] else ...[
                       SizedBox(height: size.height * 0.05),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Wrap(
-                          runSpacing: $style.scale * 8,
+                          runSpacing: _style.scale * 8,
                           children: [
                             Text('By signing, you agree to Calm oasis',
-                                style: $style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
+                                style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                             CupertinoButton(
                               onPressed: () {
                                 context.push(ScreenPaths.tCPpScreen, extra: false);
@@ -137,11 +143,11 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                               minSize: 10,
                               child: Text(
                                 ' Privacy Policy ',
-                                style: $style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
+                                style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
                               ),
                             ),
                             Text('and',
-                                style: $style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
+                                style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                             CupertinoButton(
                                 onPressed: () {
                                   context.push(ScreenPaths.tCPpScreen, extra: true);
@@ -150,12 +156,12 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                                 minSize: 10,
                                 child: Text(
                                   ' Terms & Conditions',
-                                  style: $style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
+                                  style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
                                 )),
                           ],
                         ),
                       ),
-                      SizedBox(height: $style.scale * 10),
+                      SizedBox(height: _style.scale * 10),
                     ],
                   ],
                 ),
@@ -165,12 +171,12 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                     Flexible(
                         child: Divider(
                       color: AppColors.dividerColor,
-                      endIndent: $style.scale * 15,
-                      indent: $style.scale * 15,
+                      endIndent: _style.scale * 15,
+                      indent: _style.scale * 15,
                     )),
                     Text(
                       'OR SIGN UP WITH',
-                      style: $style.text.font(
+                      style: _style.text.font(
                         mulishSemiBold600,
                         sizePx: 13,
                       ),
@@ -178,12 +184,12 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                     Flexible(
                         child: Divider(
                       color: AppColors.dividerColor,
-                      indent: $style.scale * 15,
-                      endIndent: $style.scale * 15,
+                      indent: _style.scale * 15,
+                      endIndent: _style.scale * 15,
                     )),
                   ],
                 ),
-                // SizedBox(height: $style.scale * 28),
+                // SizedBox(height: _style.scale * 28),
                 SizedBox(height: size.height * 0.05),
                 Row(
                   children: [
@@ -192,17 +198,17 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                       onPressed: () {},
                       icon: SvgPicture.asset(
                         SvgPaths.googleLogo,
-                        width: $style.scale * 36,
-                        height: $style.scale * 36,
+                        width: _style.scale * 36,
+                        height: _style.scale * 36,
                       ),
                     ),
-                    SizedBox(width: $style.scale * 40),
+                    SizedBox(width: _style.scale * 40),
                     IconButton.outlined(
                       onPressed: () {},
                       icon: SvgPicture.asset(
                         SvgPaths.facebookLogo,
-                        width: $style.scale * 36,
-                        height: $style.scale * 36,
+                        width: _style.scale * 36,
+                        height: _style.scale * 36,
                       ),
                     ),
                     Spacer(),
@@ -250,9 +256,10 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                       );
                     }
                   },
+                  style: _style,
                 ),
 
-                SizedBox(height: $style.scale * 20),
+                SizedBox(height: _style.scale * 20),
               ],
             ),
           )),

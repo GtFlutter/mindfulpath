@@ -12,5 +12,7 @@ class ScreenPaths {
   static const String tCPpScreen = '/tc-pp';
 
   ///
-  static const String dashboardScreen = '/dashboard-screen';
+  static const String libraryScreen = '/library';
+  static const String discoverScreen = '/discover';
+  static const String analyticsScreen = '/analytics';
 }

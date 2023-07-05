@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../main.dart';
 import '../../../../theme/colors.dart';
+import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 
 class DBTempModel {
@@ -12,10 +12,11 @@ class DBTempModel {
   DBTempModel(this.title, this.subTitle, this.imgUrl, this.btnText);
 }
 
-class DashboardCard extends StatelessWidget {
+class DiscoverCard extends StatelessWidget {
   final DBTempModel model;
+  final AppStyle style;
 
-  const DashboardCard({super.key, required this.model});
+  const DiscoverCard({super.key, required this.model, required this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class DashboardCard extends StatelessWidget {
           ),
         ),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: $style.scale * 23),
+          padding: EdgeInsets.symmetric(horizontal: style.scale * 23),
           width: double.infinity,
           decoration: ShapeDecoration(
             gradient: LinearGradient(
@@ -56,13 +57,13 @@ class DashboardCard extends StatelessWidget {
               const Spacer(flex: 2),
               Text(
                 model.title,
-                style: $style.text.font(mulishBold700, sizePx: 20, color: AppColors.cardTextColor),
+                style: style.text.font(mulishBold700, sizePx: 20, color: AppColors.cardTextColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 model.subTitle,
-                style: $style.text.font(mulishRegular400, sizePx: 20, color: AppColors.cardTextColor),
+                style: style.text.font(mulishRegular400, sizePx: 20, color: AppColors.cardTextColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -70,7 +71,12 @@ class DashboardCard extends StatelessWidget {
               FilledButton(
                 onPressed: () {},
                 style: FilledButton.styleFrom(
-                  textStyle: $style.text.font(mulishSemiBold600, sizePx: 12.5, color: Colors.black),
+                  textStyle: style.text.font(
+                    mulishSemiBold600,
+                    sizePx: 12.5,
+                    color: Colors.black,
+                    spacingPc: 2.50,
+                  ),
                   visualDensity: const VisualDensity(vertical: -1),
                 ),
                 child: Text(model.btnText, maxLines: 1, overflow: TextOverflow.ellipsis),

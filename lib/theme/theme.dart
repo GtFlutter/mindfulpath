@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:meditation_app/main.dart';
-import 'package:meditation_app/theme/text_style.dart';
 import 'colors.dart';
 
 Color _color = AppColors.primaryColor;

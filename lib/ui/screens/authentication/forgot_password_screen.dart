@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/main.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
@@ -12,6 +11,7 @@ import 'package:meditation_app/ui/screens/authentication/widget/contact_number_t
 
 import '../../../helper/screen_paths.dart';
 import '../../../theme/colors.dart';
+import '../../../theme/styles.dart';
 import 'otp_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -22,6 +22,8 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  static AppStyle _style = AppStyle();
+
   final TextEditingController _numberCtrl = TextEditingController();
 
   final String _initCountryCode = '+91';
@@ -49,19 +51,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-
+    var size = MediaQuery.of(context).size;
+    _style = AppStyle(screenSize: size);
     return Scaffold(
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       extendBody: true,
       appBar: CustomAuthAppBar(
-        leadingWidth: $style.scale * 65,
+        leadingWidth: _style.scale * 65,
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: EdgeInsets.only(left: $style.scale * 15),
+              padding: EdgeInsets.only(left: _style.scale * 15),
               child: IconButton.outlined(
                 onPressed: () {
                   if (context.canPop()) {
@@ -69,13 +71,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   }
                 },
                 icon: Icon(Icons.arrow_back_ios_new_rounded),
-                iconSize: $style.scale * 15,
-                constraints: BoxConstraints(maxWidth: $style.scale * 30, maxHeight: $style.scale * 30),
+                iconSize: _style.scale * 15,
+                constraints: BoxConstraints(maxWidth: _style.scale * 30, maxHeight: _style.scale * 30),
               ),
             ),
           ],
         ),
         screenSize: size,
+        style: _style,
       ),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
@@ -91,13 +94,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       title: 'Forgot password',
                       subTitle: 'Please enter your number to request a password reset.',
                       subTitleColor: AppColors.textFieldValueColor,
-                      padding: EdgeInsets.symmetric(horizontal: $style.scale * 25),
+                      padding: EdgeInsets.symmetric(horizontal: _style.scale * 25),
+                      style: _style,
                     ),
                   ],
                 ),
                 Expanded(
                   child: CustomScrollableColumnLayout(
-                    minHeight: 200 * $style.scale,
+                    minHeight: 200 * _style.scale,
+                    style: _style,
                     children: [
                       Spacer(flex: 1),
                       Column(
@@ -107,6 +112,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             onCountryCodeChanged: setCountryCode,
                             controller: _numberCtrl,
                             initialCountryCodeSelection: _initCountryCode,
+                            errorText: _numberErrorText,
+                            onChanged: (_) {
+                              setNumberErrorText();
+                            },
+                            style: _style,
                           ),
                         ],
                       ),
@@ -133,8 +143,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             );
                           }
                         },
+                        style: _style,
                       ),
-                      SizedBox(height: $style.scale * 20),
+                      SizedBox(height: _style.scale * 20),
                     ],
                   ),
                 ),

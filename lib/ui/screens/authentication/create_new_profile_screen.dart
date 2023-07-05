@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meditation_app/helper/date_converter.dart';
 import 'package:meditation_app/helper/string_converter.dart';
-import 'package:meditation_app/main.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/cupertino_date_picker.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
@@ -16,6 +15,7 @@ import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/util/assets.dart';
 
+import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
 
 class CreateNewProfileScreen extends StatefulWidget {
@@ -26,6 +26,8 @@ class CreateNewProfileScreen extends StatefulWidget {
 }
 
 class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
+  static AppStyle _style = AppStyle();
+
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _dateCtrl = TextEditingController();
@@ -78,13 +80,18 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    var size = MediaQuery.of(context).size;
+    _style = AppStyle(screenSize: size);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       extendBody: true,
-      appBar: CustomAuthAppBar(surfaceTintColor: Colors.transparent, screenSize: size),
+      appBar: CustomAuthAppBar(
+        surfaceTintColor: Colors.transparent,
+        screenSize: size,
+        style: _style,
+      ),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
           child: SafeArea(
@@ -98,16 +105,18 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
                     CustomHeader(
                       title: 'Create a new profile',
                       padding: EdgeInsets.only(
-                        left: $style.scale * 25,
-                        right: $style.scale * 25,
-                        bottom: $style.scale * 5,
+                        left: _style.scale * 25,
+                        right: _style.scale * 25,
+                        bottom: _style.scale * 5,
                       ),
+                      style: _style,
                     ),
                   ],
                 ),
                 Expanded(
                   child: CustomScrollableColumnLayout(
-                    minHeight: 400 * $style.scale,
+                    minHeight: 400 * _style.scale,
+                    style: _style,
                     children: [
                       Spacer(flex: 1),
                       Column(
@@ -120,15 +129,15 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
                               setNameError();
                             },
                             textInputAction: TextInputAction.next,
-                            decoration: CustomeTextFieldStyle.inputDecoration().copyWith(
+                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                               labelText: 'Full name',
                               errorText: _nameErrorText,
                             ),
                             keyboardType: TextInputType.text,
                             textCapitalization: TextCapitalization.words,
-                            style: CustomeTextFieldStyle.valueStyle(),
+                            style: CustomeTextFieldStyle.valueStyle(style: _style),
                           ),
-                          SizedBox(height: $style.scale * 27.5),
+                          SizedBox(height: _style.scale * 27.5),
                           TextField(
                             controller: _emailCtrl,
                             cursorColor: CustomeTextFieldStyle.cursorColor,
@@ -136,45 +145,45 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
                               setEmailError();
                             },
                             textInputAction: TextInputAction.done,
-                            decoration: CustomeTextFieldStyle.inputDecoration().copyWith(
+                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                               labelText: 'Email',
                               errorText: _emailErrorText,
                             ),
                             keyboardType: TextInputType.emailAddress,
-                            style: CustomeTextFieldStyle.valueStyle(),
+                            style: CustomeTextFieldStyle.valueStyle(style: _style),
                           ),
-                          SizedBox(height: $style.scale * 27.5),
+                          SizedBox(height: _style.scale * 27.5),
                           TextField(
                             controller: _dateCtrl,
                             readOnly: true,
                             canRequestFocus: false,
                             onTap: selectDate,
-                            decoration: CustomeTextFieldStyle.inputDecoration().copyWith(
+                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                               labelText: 'Date of birth',
                               errorText: _dateErrorText,
                               suffixIcon: Padding(
-                                padding: EdgeInsets.only(right: $style.scale * 25),
+                                padding: EdgeInsets.only(right: _style.scale * 25),
                                 child: SvgPicture.asset(SvgPaths.calendar),
                               ),
                               suffixIconConstraints: BoxConstraints(
-                                maxWidth: ($style.scale * 20) + ($style.scale * 25),
-                                maxHeight: $style.scale * 20,
+                                maxWidth: (_style.scale * 20) + (_style.scale * 25),
+                                maxHeight: _style.scale * 20,
                               ),
                             ),
-                            style: CustomeTextFieldStyle.valueStyle(),
+                            style: CustomeTextFieldStyle.valueStyle(style: _style),
                           ),
-                          SizedBox(height: $style.scale * 27.5),
+                          SizedBox(height: _style.scale * 27.5),
                           DropdownButtonFormField(
                             value: _gender,
-                            style: CustomeTextFieldStyle.valueStyle(),
-                            borderRadius: BorderRadius.circular($style.scale * 10),
+                            style: CustomeTextFieldStyle.valueStyle(style: _style),
+                            borderRadius: BorderRadius.circular(_style.scale * 10),
                             dropdownColor: Color.fromARGB(255, 93, 53, 20),
-                            decoration: CustomeTextFieldStyle.inputDecoration().copyWith(
+                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                               errorText: _genderErrorText,
                               labelText: 'Gender',
                             ),
                             icon: SvgPicture.asset(SvgPaths.arrowDown),
-                            iconSize: $style.scale * 20,
+                            iconSize: _style.scale * 20,
                             items: List.generate(_genders.length, (index) {
                               return DropdownMenuItem(
                                 child: Text(_genders[index]),
@@ -194,8 +203,9 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
                       CustomNextButton(
                         text: 'Next',
                         onPressed: onNext,
+                        style: _style,
                       ),
-                      SizedBox(height: $style.scale * 20),
+                      SizedBox(height: _style.scale * 20),
                     ],
                   ),
                 ),
@@ -279,6 +289,7 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
         firstDate: firstDate,
         lastDate: lastDate,
         initialDate: initialDate,
+        style: _style,
       ),
     );
   }
