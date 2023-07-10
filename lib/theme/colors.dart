@@ -36,4 +36,9 @@ class AppColors {
 
   /// Bottom Nav Background Color
   static const bottomNavBgColor = Color(0xFF070707);
+
+  /// Detail Profile Screen
+  static const autherNameColor = Color(0xFF8A8A8A);
+  static const categoryNameColor = Color(0xFFE3E3E3);
+  static const detailItemBgColor = Color(0xFF0F0F0F);
 }

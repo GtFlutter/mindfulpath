@@ -13,6 +13,12 @@ class ScreenPaths {
 
   ///
   static const String libraryScreen = '/library';
+
+  ///
   static const String discoverScreen = '/discover';
+  static const String detailScreen = 'detail-category';
+  static const String detailScreenPath = '$discoverScreen/$detailScreen';
+
+  ///
   static const String analyticsScreen = '/analytics';
 }

@@ -27,7 +27,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       body: BackgroundImage(child: child),
-      bottomNavigationBar: BottomNav(style: _style),
+      bottomNavigationBar: CustomBottomNa(style: _style),
     );
   }
 }

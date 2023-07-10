@@ -7,6 +7,7 @@ import 'package:meditation_app/ui/screens/authentication/create_new_profile_scre
 import 'package:meditation_app/ui/screens/authentication/forgot_password_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/sign_in_up_screen.dart';
+import 'package:meditation_app/ui/screens/category/detail_category_screen.dart';
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
 import 'package:meditation_app/ui/screens/shellnav/shell_route.dart';
@@ -92,11 +93,18 @@ final appRouter = GoRouter(
           },
         ),
         GoRoute(
-          path: ScreenPaths.discoverScreen,
-          builder: (context, state) {
-            return DiscoverScreen(key: state.pageKey);
-          },
-        ),
+            path: ScreenPaths.discoverScreen,
+            builder: (context, state) {
+              return DiscoverScreen(key: state.pageKey);
+            },
+            routes: [
+              GoRoute(
+                path: ScreenPaths.detailScreen,
+                builder: (context, state) {
+                  return DetailCategoryScreen(key: state.pageKey);
+                },
+              ),
+            ]),
         GoRoute(
           path: ScreenPaths.analyticsScreen,
           builder: (context, state) {

@@ -1,5 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:meditation_app/util/assets.dart';
+
+import '../../theme/colors.dart';
 
 class BackgroundImage extends StatelessWidget {
   final Widget? child;
@@ -9,24 +13,52 @@ class BackgroundImage extends StatelessWidget {
   /// [opacity] should be between 0 to 1
   final double? opacity;
 
+  final String imgUrl;
+
   const BackgroundImage({
     super.key,
     this.child,
     this.alignment = AlignmentDirectional.topStart,
     this.opacity,
-  });
+  }) : imgUrl = '';
+
+  const BackgroundImage.network({
+    super.key,
+    this.child,
+    this.alignment = AlignmentDirectional.topStart,
+    required this.imgUrl,
+  }) : opacity = null;
 
   @override
   Widget build(BuildContext context) {
+    // return child != null ? ColoredBox(color: Colors.grey, child: child) : const SizedBox.shrink();
     return Stack(
       alignment: alignment,
       children: [
+        if (imgUrl.isNotEmpty) ...[
+          Image.network(
+            imgUrl,
+            fit: BoxFit.cover,
+            height: double.infinity,
+            width: double.infinity,
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
+            child: Container(
+              color: AppColors.bottomNavBgColor.withOpacity(0.80),
+            ),
+          ),
+        ],
         Image.asset(
           ImagePaths.bg,
           fit: BoxFit.cover,
           height: double.infinity,
           width: double.infinity,
-          opacity: opacity == null ? null : AlwaysStoppedAnimation(opacity!),
+          opacity: imgUrl.isNotEmpty
+              ? const AlwaysStoppedAnimation(0.50)
+              : opacity == null
+                  ? null
+                  : AlwaysStoppedAnimation(opacity!),
         ),
         if (child != null) child!,
       ],

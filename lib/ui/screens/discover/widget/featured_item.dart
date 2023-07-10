@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
-import 'featured_card_painter.dart';
+import 'featured_item_painter.dart';
 
 class FCTempModel {
   final String title;
@@ -10,11 +10,11 @@ class FCTempModel {
   FCTempModel(this.title, this.imgUrl);
 }
 
-class FeaturedCard extends StatelessWidget {
+class FeaturedItem extends StatelessWidget {
   final FCTempModel model;
   final DashboardCustomImageClipper clipper;
   final AppStyle style;
-  const FeaturedCard(this.model, this.clipper, {super.key, required this.style});
+  const FeaturedItem(this.model, this.clipper, {super.key, required this.style});
 
   @override
   Widget build(BuildContext context) {

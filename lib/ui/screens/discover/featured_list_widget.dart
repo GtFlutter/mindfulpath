@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:meditation_app/ui/screens/discover/widget/featured_card.dart';
-import 'package:meditation_app/ui/screens/discover/widget/featured_card_painter.dart';
+import 'package:meditation_app/ui/screens/discover/widget/featured_item.dart';
+import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.dart';
 
 import '../../../theme/styles.dart';
 
@@ -25,7 +25,7 @@ class FeaturedListWidget extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: style.scale * 22),
         itemCount: list.length,
         itemBuilder: (context, index) {
-          return FeaturedCard(
+          return FeaturedItem(
             list[index],
             clipper,
             style: style,

@@ -27,4 +27,14 @@ extension OnString on String {
   bool get isEmail => RegExp(
           r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
       .hasMatch(this);
+
+  String firstWord() {
+    List<String> words = split(' ');
+    return words.isNotEmpty ? "${words.first} " : '';
+  }
+
+  String removeFirstWord() {
+    List<String> words = split(' ');
+    return words.length > 1 ? words.sublist(1).join(' ') : '';
+  }
 }
