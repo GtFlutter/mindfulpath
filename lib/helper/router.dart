@@ -99,6 +99,7 @@ final appRouter = GoRouter(
             },
             routes: [
               GoRoute(
+                parentNavigatorKey: rootNavigator,
                 path: ScreenPaths.detailScreen,
                 builder: (context, state) {
                   return DetailCategoryScreen(key: state.pageKey);

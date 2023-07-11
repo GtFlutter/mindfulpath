@@ -14,19 +14,22 @@ class BackgroundImage extends StatelessWidget {
   final double? opacity;
 
   final String imgUrl;
+  final bool hideImage;
 
   const BackgroundImage({
     super.key,
     this.child,
     this.alignment = AlignmentDirectional.topStart,
     this.opacity,
-  }) : imgUrl = '';
+  })  : imgUrl = '',
+        hideImage = false;
 
   const BackgroundImage.network({
     super.key,
     this.child,
     this.alignment = AlignmentDirectional.topStart,
     required this.imgUrl,
+    this.hideImage = false,
   }) : opacity = null;
 
   @override
@@ -35,7 +38,7 @@ class BackgroundImage extends StatelessWidget {
     return Stack(
       alignment: alignment,
       children: [
-        if (imgUrl.isNotEmpty) ...[
+        if (imgUrl.isNotEmpty && !hideImage) ...[
           Image.network(
             imgUrl,
             fit: BoxFit.cover,
@@ -54,11 +57,13 @@ class BackgroundImage extends StatelessWidget {
           fit: BoxFit.cover,
           height: double.infinity,
           width: double.infinity,
-          opacity: imgUrl.isNotEmpty
-              ? const AlwaysStoppedAnimation(0.50)
-              : opacity == null
-                  ? null
-                  : AlwaysStoppedAnimation(opacity!),
+          opacity: hideImage
+              ? null
+              : imgUrl.isNotEmpty
+                  ? const AlwaysStoppedAnimation(0.50)
+                  : opacity == null
+                      ? null
+                      : AlwaysStoppedAnimation(opacity!),
         ),
         if (child != null) child!,
       ],

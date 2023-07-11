@@ -23,10 +23,16 @@ class SvgPaths {
   static const String libraryUnselected = 'assets/icons/svg/library_unselected.svg';
 
   /// Destail Category Screen
-  static const String play = 'assets/icons/svg/play.svg';
   static const String addToPlaylist = 'assets/icons/svg/add-playlist.svg';
   static const String bookmarkUnselected = 'assets/icons/svg/bookmark_unselected.svg';
   static const String bookmarkSelected = 'assets/icons/svg/bookmark_selected.svg';
+
+  /// Video Player
+  static const String play = 'assets/icons/svg/play.svg';
+  static const String pause = 'assets/icons/svg/pause.svg';
+  static const String audioOn = 'assets/icons/svg/audio_on.svg';
+  static const String audioMute = 'assets/icons/svg/audio_mute.svg';
+  static const String maximize = 'assets/icons/svg/maximize.svg';
 }
 
 class ImagePaths {

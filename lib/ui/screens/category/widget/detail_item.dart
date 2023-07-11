@@ -33,15 +33,13 @@ class DetailItem extends StatelessWidget {
   Widget build(BuildContext context) {
     TextStyle textStyle = appStyle.text.font(mulishRegular400, sizePx: 9);
     return Container(
-      alignment: Alignment.center,
-      constraints: BoxConstraints(maxWidth: appStyle.scaleX(350)),
-      margin: EdgeInsets.only(bottom: appStyle.scaleX(25), right: appStyle.scaleX(15)),
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(appStyle.scaleX(10)),
         ),
       ),
+      alignment: Alignment.center,
       child: IntrinsicHeight(
         child: Row(
           children: [
@@ -115,18 +113,22 @@ class DetailItem extends StatelessWidget {
               ),
             ),
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               mainAxisSize: MainAxisSize.max,
               children: [
+                const Spacer(),
                 OutlinedIconButton(
                   appStyle: appStyle,
                   // svgIconSrc: SvgPaths.bookmarkSelected,
                   svgIconSrc: SvgPaths.bookmarkUnselected,
+                  onTap: () {},
                 ),
+                const Spacer(flex: 2),
                 OutlinedIconButton(
                   appStyle: appStyle,
                   svgIconSrc: SvgPaths.addToPlaylist,
+                  onTap: () {},
                 ),
+                const Spacer(),
               ],
             ),
             SizedBox(width: appStyle.scaleX(10)),
