@@ -9,20 +9,32 @@ class OutlinedIconButton extends StatelessWidget {
   final double padding;
   final double stroke;
   final double iconSize;
-  final String svgIconSrc;
+  final String? svgIconSrc;
+  final Widget? icon;
   final GestureTapCallback? onTap;
   final bool hideBorder;
 
-  const OutlinedIconButton({
+  const OutlinedIconButton.svg(
+    String src, {
     super.key,
     required this.appStyle,
     this.padding = 5,
     this.stroke = 1,
     this.iconSize = 15,
-    required this.svgIconSrc,
     this.hideBorder = false,
     this.onTap,
-  });
+  })  : icon = null,
+        svgIconSrc = src;
+  const OutlinedIconButton.icon({
+    super.key,
+    required this.appStyle,
+    this.padding = 5,
+    this.stroke = 1,
+    required this.icon,
+    this.hideBorder = false,
+    this.onTap,
+  })  : svgIconSrc = null,
+        iconSize = 15;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +46,7 @@ class OutlinedIconButton extends StatelessWidget {
         splashColor: Colors.white.withOpacity(0.2),
         onTap: onTap,
         child: Container(
-          alignment: Alignment.center,
+          // alignment: Alignment.center,
           padding: EdgeInsets.all(appStyle.scaleX(padding)),
           decoration: ShapeDecoration(
             shape: CircleBorder(
@@ -46,11 +58,13 @@ class OutlinedIconButton extends StatelessWidget {
                     ),
             ),
           ),
-          child: SvgPicture.asset(
-            svgIconSrc,
-            height: appStyle.scaleX(iconSize),
-            fit: BoxFit.fitHeight,
-          ),
+          child: svgIconSrc != null
+              ? SvgPicture.asset(
+                  svgIconSrc!,
+                  height: appStyle.scaleX(iconSize),
+                  fit: BoxFit.fitHeight,
+                )
+              : icon,
         ),
       ),
     );

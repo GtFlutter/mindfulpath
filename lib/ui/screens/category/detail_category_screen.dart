@@ -107,6 +107,7 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
                       alignment: !isLandscape ? null : Alignment.topCenter,
                       constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                       child: AppVideoPlayer(
+                        key: const ValueKey('value'),
                         url: link,
                         style: _style,
                         isLandscape: isLandscape,

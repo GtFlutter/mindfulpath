@@ -116,16 +116,16 @@ class DetailItem extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: [
                 const Spacer(),
-                OutlinedIconButton(
+                OutlinedIconButton.svg(
+                  SvgPaths.bookmarkUnselected,
                   appStyle: appStyle,
                   // svgIconSrc: SvgPaths.bookmarkSelected,
-                  svgIconSrc: SvgPaths.bookmarkUnselected,
                   onTap: () {},
                 ),
                 const Spacer(flex: 2),
-                OutlinedIconButton(
+                OutlinedIconButton.svg(
+                  SvgPaths.addToPlaylist,
                   appStyle: appStyle,
-                  svgIconSrc: SvgPaths.addToPlaylist,
                   onTap: () {},
                 ),
                 const Spacer(),

@@ -49,6 +49,13 @@ class _AppVideoPlaterState extends State<AppVideoPlayer> {
       );
   }
 
+  @override
+  void didUpdateWidget(covariant AppVideoPlayer oldWidget) {
+    debugPrint('Yashvant Video UpdateWidget');
+
+    super.didUpdateWidget(oldWidget);
+  }
+
   void listner() {
     double newValue = _controller.value.position.inMilliseconds / _controller.value.duration.inMilliseconds;
     if (_progress != newValue) {
@@ -110,7 +117,7 @@ class _AppVideoPlaterState extends State<AppVideoPlayer> {
             IconButton(
               onPressed: toggleVideo,
               icon: const Icon(Icons.replay_rounded),
-              iconSize: widget.style.scaleX(35),
+              iconSize: widget.style.scaleX(widget.isLandscape ? 40 : 35),
             ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -119,17 +126,11 @@ class _AppVideoPlaterState extends State<AppVideoPlayer> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: EdgeInsets.only(left: widget.style.scaleX(10), top: widget.style.scaleX(5)),
-                    child: IconButton.outlined(
-                      constraints:
-                          BoxConstraints(maxWidth: widget.style.scale * 30, maxHeight: widget.style.scale * 30),
-                      onPressed: widget.onBackPress,
-                      icon: const Icon(Icons.arrow_back_ios_rounded),
-                      iconSize: widget.style.scale * 15,
-                      style: IconButton.styleFrom(
-                        side: const BorderSide(color: AppColors.appBarBorderColor),
-                        backgroundColor: Colors.black.withOpacity(0.2),
-                      ),
+                    padding: EdgeInsets.only(left: widget.style.scaleX(15), top: widget.style.scaleX(10)),
+                    child: OutlinedIconButton.icon(
+                      icon: Icon(Icons.arrow_back_ios_rounded, size: widget.style.scaleX(widget.isLandscape ? 20 : 15)),
+                      appStyle: widget.style,
+                      onTap: widget.onBackPress,
                     ),
                   ),
                 ),
@@ -168,35 +169,34 @@ class _AppVideoPlaterState extends State<AppVideoPlayer> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
-                        // crossAxisAlignment: CrossAxisAlignment.center,
-                        // mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           if (!_showReload)
-                            OutlinedIconButton(
+                            OutlinedIconButton.svg(
+                              isPlaying ? SvgPaths.pause : SvgPaths.play,
                               appStyle: widget.style,
-                              svgIconSrc: isPlaying ? SvgPaths.pause : SvgPaths.play,
                               hideBorder: true,
-                              iconSize: 20,
+                              iconSize: widget.isLandscape ? 23 : 20,
                               onTap: toggleVideo,
                             ),
                           const Spacer(),
-                          OutlinedIconButton(
+                          OutlinedIconButton.svg(
+                            isMute ? SvgPaths.audioMute : SvgPaths.audioOn,
                             appStyle: widget.style,
-                            svgIconSrc: isMute ? SvgPaths.audioMute : SvgPaths.audioOn,
                             hideBorder: true,
-                            iconSize: 20,
+                            iconSize: widget.isLandscape ? 23 : 20,
                             onTap: toggleAudio,
                           ),
-                          OutlinedIconButton(
+                          if (widget.isLandscape) SizedBox(width: widget.style.scaleX(15)),
+                          OutlinedIconButton.svg(
+                            SvgPaths.maximize,
                             appStyle: widget.style,
-                            svgIconSrc: SvgPaths.maximize,
                             hideBorder: true,
-                            iconSize: 20,
+                            iconSize: widget.isLandscape ? 23 : 20,
                             onTap: () {},
                           ),
                         ],
                       ),
-                      SizedBox(height: widget.style.scaleX(5)),
+                      SizedBox(height: widget.style.scaleX(widget.isLandscape ? 10 : 5)),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: widget.style.scaleX(8)),
                         child: SliderTheme(
@@ -216,6 +216,7 @@ class _AppVideoPlaterState extends State<AppVideoPlayer> {
                           ),
                         ),
                       ),
+                      if (widget.isLandscape) SizedBox(height: widget.style.scaleX(15)),
                     ],
                   ),
                 ),
