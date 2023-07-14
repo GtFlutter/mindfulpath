@@ -6,29 +6,13 @@ import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
-import '../../../common/cutom_media_card.dart';
+import '../../category/widget/detail_item.dart';
 
-class DIModel {
-  final String imgUrl;
-  final String duration;
-  final String title;
-  final String auther;
-  final String category;
-
-  DIModel({
-    required this.imgUrl,
-    required this.duration,
-    required this.title,
-    required this.auther,
-    required this.category,
-  });
-}
-
-class DetailItem extends StatelessWidget {
+class BookmarkItem extends StatelessWidget {
   final AppStyle appStyle;
   final DIModel model;
   final String index;
-  const DetailItem({super.key, required this.appStyle, required this.model, required this.index});
+  const BookmarkItem({super.key, required this.appStyle, required this.model, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +24,10 @@ class DetailItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(appStyle.scaleX(10)),
         ),
       ),
+      padding: EdgeInsets.symmetric(
+        horizontal: appStyle.scaleX(16),
+        vertical: appStyle.scaleX(16),
+      ),
       alignment: Alignment.center,
       child: IntrinsicHeight(
         child: Row(
@@ -49,7 +37,7 @@ class DetailItem extends StatelessWidget {
               imgUrl: model.imgUrl,
               duration: model.duration,
               imgRadius: appStyle.scaleX(10),
-              imgSize: appStyle.scaleX(97),
+              imgSize: appStyle.scaleX(90),
             ),
             SizedBox(width: appStyle.scaleX(20)),
             Expanded(

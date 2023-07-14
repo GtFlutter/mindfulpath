@@ -26,53 +26,11 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
 
   String description =
       'Nutrition is essential for maintaining good health and preventing chronic diseases. A balanced and varied diet that includes a variety of whole foods. ';
-  List<List<DIModel>> mainList = [];
-
-  static List<List<DIModel>> getList(List<DIModel> listDiModel) {
-    List<List<DIModel>> subLists = [];
-
-    for (var i = 0; i < listDiModel.length; i += 3) {
-      var endIndex = i + 3;
-      if (endIndex > listDiModel.length) {
-        endIndex = listDiModel.length;
-      }
-      var subList = listDiModel.sublist(i, endIndex);
-      subLists.add(subList);
-    }
-
-    return subLists;
-  }
-
-  @override
-  void initState() {
-    mainList.addAll(getList(TempData.listDiModel));
-    controller.addListener(listner);
-    super.initState();
-  }
 
   @override
   void dispose() {
-    controller.removeListener(listner);
     controller.dispose();
     super.dispose();
-  }
-
-  void resetList() {
-    setState(() {
-      mainList.clear();
-      mainList.addAll(getList(TempData.listDiModel));
-    });
-    controller.jumpTo(0);
-  }
-
-  void listner() {
-    if (controller.position.pixels == controller.position.maxScrollExtent) {
-      if (mounted) {
-        setState(() {
-          mainList.addAll(getList(TempData.listDiModel));
-        });
-      }
-    }
   }
 
   @override
@@ -172,7 +130,6 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
                       description: description,
                       title: 'Nutrution',
                       style: _style,
-                      onTap: resetList,
                     ),
                   ),
                 if (!isLandscape || !_showVideo)
@@ -256,14 +213,12 @@ class IntroWidget extends StatelessWidget {
   final String title;
   final String description;
   final AppStyle style;
-  final GestureTapCallback? onTap;
 
   const IntroWidget({
     super.key,
     required this.title,
     required this.description,
     required this.style,
-    this.onTap,
   });
 
   @override
@@ -274,17 +229,14 @@ class IntroWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           const Spacer(flex: 3),
-          GestureDetector(
-            onTap: onTap,
-            child: Text(
-              title,
-              style: style.text.font(
-                brandonMedium500,
-                sizePx: 30,
-                color: AppColors.primaryColor,
-              ),
-              textAlign: TextAlign.center,
+          Text(
+            title,
+            style: style.text.font(
+              brandonMedium500,
+              sizePx: 30,
+              color: AppColors.primaryColor,
             ),
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: style.scaleX(25)),
           Text.rich(

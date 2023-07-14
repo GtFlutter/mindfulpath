@@ -3,15 +3,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../../../theme/colors.dart';
-import '../../../../theme/styles.dart';
-import '../../../../theme/text_style.dart';
-import '../../../../util/assets.dart';
+import '../../theme/colors.dart';
+import '../../theme/styles.dart';
+import '../../theme/text_style.dart';
+import '../../util/assets.dart';
 
-class CustomMediaButton extends StatelessWidget {
+class CustomMediaCard extends StatelessWidget {
   final String duration;
   final AppStyle appStyle;
-  const CustomMediaButton({super.key, required this.appStyle, required this.duration});
+  const CustomMediaCard({super.key, required this.appStyle, required this.duration});
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +26,7 @@ class CustomMediaButton extends StatelessWidget {
         ),
       ),
       child: Stack(
+        alignment: AlignmentDirectional.center,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(appStyle.scaleX(25)),

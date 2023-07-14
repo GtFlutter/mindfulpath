@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/shellnav/widget/bottom_nav.dart';
 
 import '../../../theme/styles.dart';
@@ -26,7 +25,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
     _style = AppStyle(screenSize: size);
     return Scaffold(
       extendBody: true,
-      body: BackgroundImage(child: child),
+      body: child,
       bottomNavigationBar: CustomBottomNa(style: _style),
     );
   }
