@@ -33,6 +33,15 @@ class SvgPaths {
   static const String audioOn = 'assets/icons/svg/audio_on.svg';
   static const String audioMute = 'assets/icons/svg/audio_mute.svg';
   static const String maximize = 'assets/icons/svg/maximize.svg';
+
+  /// Library
+  static const String remove = 'assets/icons/svg/remove_icon.svg';
+  static const String share = 'assets/icons/svg/share_icon.svg';
+  static const String download = 'assets/icons/svg/download_icon.svg';
+
+  static const String arrowRight = 'assets/icons/svg/arrow_right_icon.svg';
+
+  static const String bgShape = 'assets/icons/svg/bg_shape.svg';
 }
 
 class ImagePaths {

@@ -3,7 +3,6 @@ import 'package:meditation_app/ui/screens/bookmark/widget/bookmark_item.dart';
 
 import '../../../theme/styles.dart';
 import '../category/temp_data_file.dart';
-import '../category/widget/detail_item.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});

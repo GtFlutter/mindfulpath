@@ -8,6 +8,7 @@ import 'package:meditation_app/ui/screens/authentication/forgot_password_screen.
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/sign_in_up_screen.dart';
 import 'package:meditation_app/ui/screens/category/detail_category_screen.dart';
+import 'package:meditation_app/ui/screens/courses_list/courses_list_screen.dart';
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
 import 'package:meditation_app/ui/screens/shellnav/shell_route.dart';
@@ -87,11 +88,21 @@ final appRouter = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-          path: ScreenPaths.libraryScreen,
-          builder: (context, state) {
-            return LibraryScreen(key: state.pageKey);
-          },
-        ),
+            path: ScreenPaths.libraryScreen,
+            builder: (context, state) {
+              return LibraryScreen(key: state.pageKey);
+            },
+            routes: [
+              GoRoute(
+                path: ScreenPaths.coursesListScreen,
+                builder: (context, state) {
+                  return CoursesListScreen(
+                    key: state.pageKey,
+                    title: state.extra as String? ?? 'Router Extra Not Found',
+                  );
+                },
+              ),
+            ]),
         GoRoute(
             path: ScreenPaths.discoverScreen,
             builder: (context, state) {
