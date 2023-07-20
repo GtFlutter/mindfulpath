@@ -7,6 +7,7 @@ class SvgPaths {
   static const String passwordHide = 'assets/icons/svg/password_hide.svg';
   static const String calendar = 'assets/icons/svg/calendar.svg';
   static const String arrowDown = 'assets/icons/svg/arrow_down.svg';
+  static const String arrowRight = 'assets/icons/svg/arrow_right_icon.svg';
 
   // Dashboard
   static const String profile = 'assets/icons/svg/profile.svg';
@@ -39,9 +40,16 @@ class SvgPaths {
   static const String share = 'assets/icons/svg/share_icon.svg';
   static const String download = 'assets/icons/svg/download_icon.svg';
 
-  static const String arrowRight = 'assets/icons/svg/arrow_right_icon.svg';
+  static const String arrowGoRight = 'assets/icons/svg/arrow_go_right_icon.svg';
 
   static const String bgShape = 'assets/icons/svg/bg_shape.svg';
+
+  /// Profile
+  static const String profileEdit = 'assets/icons/svg/profile_edit_icon.svg';
+  static const String subscription = 'assets/icons/svg/subscription_icon.svg';
+  static const String notification = 'assets/icons/svg/notification_icon.svg';
+  static const String support = 'assets/icons/svg/support_icon.svg';
+  static const String settings = 'assets/icons/svg/settings_icon.svg';
 }
 
 class ImagePaths {

@@ -92,7 +92,7 @@ class CoursesItem extends StatelessWidget {
                     ),
                     SizedBox(height: style.scaleX(10)),
                     SvgPicture.asset(
-                      SvgPaths.arrowRight,
+                      SvgPaths.arrowGoRight,
                       height: style.scaleX(17.5),
                       fit: BoxFit.contain,
                     ),

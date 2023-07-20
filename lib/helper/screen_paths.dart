@@ -18,8 +18,15 @@ class ScreenPaths {
 
   ///
   static const String discoverScreen = '/discover';
-  static const String detailScreen = 'detail-category';
-  static const String detailScreenPath = '$discoverScreen/$detailScreen';
+  // [detail-category]
+  static const String detailCategoryScreen = 'detail-category';
+  static const String detailCategoryScreenPath = '$discoverScreen/$detailCategoryScreen';
+  // [Profile]
+  static const String profileScreen = 'profile';
+  static const String profileScreenPath = '$discoverScreen/$profileScreen';
+  // [Edit Profile]
+  static const String editProfileScreen = 'edit-profile';
+  static const String editProfileScreenPath = '$discoverScreen/$profileScreen/$editProfileScreen';
 
   ///
   static const String analyticsScreen = '/analytics';

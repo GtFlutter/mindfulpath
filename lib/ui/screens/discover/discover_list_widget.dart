@@ -63,7 +63,7 @@ class DiscoverLayout extends StatelessWidget {
           model: list[index],
           style: style,
           onPressed: () {
-            context.go(ScreenPaths.detailScreenPath);
+            context.go(ScreenPaths.detailCategoryScreenPath);
           },
         );
       },

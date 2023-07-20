@@ -83,7 +83,7 @@ class PlaylistItem extends StatelessWidget {
               ),
               SizedBox(width: style.scaleX(15)),
               SvgPicture.asset(
-                SvgPaths.arrowRight,
+                SvgPaths.arrowGoRight,
                 height: style.scaleX(17.5),
                 fit: BoxFit.contain,
               ),
