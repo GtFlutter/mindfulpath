@@ -50,6 +50,10 @@ class SvgPaths {
   static const String notification = 'assets/icons/svg/notification_icon.svg';
   static const String support = 'assets/icons/svg/support_icon.svg';
   static const String settings = 'assets/icons/svg/settings_icon.svg';
+
+
+  /// Support
+  static const String ticket = 'assets/icons/svg/ticket_icon.svg';
 }
 
 class ImagePaths {

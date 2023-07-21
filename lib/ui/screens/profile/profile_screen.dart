@@ -84,7 +84,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 src: list[index].src,
                 appStyle: _style,
                 onTap: () {
-                  context.go(ScreenPaths.editProfileScreenPath);
+                  if (index == 0) {
+                    context.go(ScreenPaths.editProfileScreenPath);
+                  } else if (index == 3) {
+                    context.go(ScreenPaths.supportScreenPath);
+                  } else if (index == 4) {
+                    context.go(ScreenPaths.settingsScreenPath);
+                  }
                 },
               );
             },

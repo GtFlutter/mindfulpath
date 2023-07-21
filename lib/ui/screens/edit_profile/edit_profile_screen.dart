@@ -15,6 +15,7 @@ import 'package:meditation_app/util/assets.dart';
 import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
 import '../../../theme/text_style.dart';
+import '../../../util/constants.dart';
 import '../../common/custom_app_bar.dart';
 import '../authentication/widget/password_text_field.dart';
 
@@ -155,6 +156,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 TextField(
                   controller: _numberCtrl,
                   cursorColor: CustomeTextFieldStyle.cursorColor,
+                  showCursor: _disableField,
+                  magnifierConfiguration: TextMagnifierConfiguration.disabled,
                   decoration: CustomeTextFieldStyle.inputDecoration(
                     style: _style,
                     enabled: _disableField,
@@ -232,6 +235,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 TextField(
                   readOnly: !_disableField,
                   canRequestFocus: _disableField,
+                  showCursor: _disableField,
+                  magnifierConfiguration: TextMagnifierConfiguration.disabled,
                   onTap: () {
                     changePassword();
                   },
@@ -296,7 +301,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     DateTime firstDate = DateTime(currentDate.year - maxAge, currentDate.month, currentDate.day);
     DateTime initialDate = lastDate;
 
-    DateTime? result = !Platform.isAndroid
+    DateTime? result = Platform.isAndroid
         ? await androidDateTimePicker(initialDate, firstDate, lastDate)
         : await iosDateTimePicker(initialDate, firstDate, lastDate);
     if (result != null) {
@@ -417,7 +422,7 @@ class _ChnagePasswordSheetState extends State<ChnagePasswordSheet> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: onSave,
                     child: Text('Save'),
                     style: TextButton.styleFrom(
                       textStyle: _style.text.font(mulishMedium500, sizePx: 12),
@@ -476,5 +481,34 @@ class _ChnagePasswordSheetState extends State<ChnagePasswordSheet> {
         ),
       ),
     );
+  }
+
+  void onSave() {
+    String password = _passwordCtrl.text.trim();
+    String confirmPassword = _confirmPasswordCtrl.text.trim();
+    if (password.isEmpty) {
+      setPwdError('Please enter a Password');
+      return;
+    } else if (confirmPassword.isEmpty) {
+      setCnfPwdError('Please enter a Confirm Password');
+      return;
+    } else if (password.length < AppConstants.PWD_MIN_LENGTH) {
+      setPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+      return;
+    } else if (confirmPassword.length < 8) {
+      setCnfPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+      return;
+    } else if (password != confirmPassword) {
+      setCnfPwdError('Both password must match');
+      return;
+    } else {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password Changed Successfully')),
+      );
+      if (context.canPop()) {
+        context.pop();
+      }
+    }
   }
 }

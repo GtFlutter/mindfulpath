@@ -6,17 +6,27 @@ import 'colors.dart';
 class CustomeTextFieldStyle {
   static const Color cursorColor = Colors.white;
 
-  static TextStyle valueStyle({double? spacingPc, required AppStyle style, bool? enabled}) {
+  static TextStyle valueStyle({
+    double? spacingPc,
+    required AppStyle style,
+    bool? enabled,
+    double valueSize = 15,
+  }) {
     return style.text.font(
       mulishMedium500,
-      sizePx: 15,
+      sizePx: valueSize,
       color:
           enabled != null && !enabled ? AppColors.textFieldValueColor.withOpacity(0.54) : AppColors.textFieldValueColor,
       spacingPc: spacingPc,
     );
   }
 
-  static InputDecoration inputDecoration({required AppStyle style, bool? enabled}) {
+  static InputDecoration inputDecoration({
+    required AppStyle style,
+    bool? enabled,
+    double labelSize = 17,
+    double floatingLabelSize = 16,
+  }) {
     return InputDecoration(
       border: const OutlineInputBorder(),
       enabledBorder: _outlineInputBorder(style: style),
@@ -26,13 +36,13 @@ class CustomeTextFieldStyle {
       focusedErrorBorder: _outlineInputBorder(style: style),
       labelStyle: style.text.font(
         mulishSemiBold600,
-        sizePx: 17,
+        sizePx: labelSize,
         color: AppColors.textFieldLableColor,
       ),
       disabledBorder: _outlineInputBorder(style: style),
       floatingLabelStyle: style.text.font(
         mulishBold700,
-        sizePx: 16,
+        sizePx: floatingLabelSize,
         color: enabled != null && !enabled ? Colors.white54 : Colors.white,
       ),
       contentPadding: EdgeInsets.fromLTRB(

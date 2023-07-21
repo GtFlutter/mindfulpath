@@ -13,16 +13,19 @@ import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
 import 'package:meditation_app/ui/screens/edit_profile/edit_profile_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
 import 'package:meditation_app/ui/screens/profile/profile_screen.dart';
+import 'package:meditation_app/ui/screens/settings/settings_screen.dart';
 import 'package:meditation_app/ui/screens/shellnav/shell_route.dart';
 import 'package:meditation_app/ui/screens/splash_screen.dart';
 import 'package:meditation_app/ui/screens/settings/tc_pp_screen.dart';
+import 'package:meditation_app/ui/screens/support/support_screen.dart';
+import 'package:meditation_app/ui/screens/support/support_section_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigator = GlobalKey(debugLabel: 'root');
 final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: ScreenPaths.editProfileScreenPath,
+  initialLocation: ScreenPaths.settingsScreenPath,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(
@@ -123,6 +126,29 @@ final appRouter = GoRouter(
                       path: ScreenPaths.editProfileScreen,
                       builder: (context, state) {
                         return EditProfileScreen(key: state.pageKey);
+                      },
+                    ),
+                    GoRoute(
+                      parentNavigatorKey: rootNavigator,
+                      path: ScreenPaths.supportScreen,
+                      builder: (context, state) {
+                        return SupportScreen(key: state.pageKey);
+                      },
+                      routes: [
+                        GoRoute(
+                          parentNavigatorKey: rootNavigator,
+                          path: ScreenPaths.supportSectionScreen,
+                          builder: (context, state) {
+                            return SupportSectionScreen(key: state.pageKey);
+                          },
+                        ),
+                      ],
+                    ),
+                    GoRoute(
+                      parentNavigatorKey: rootNavigator,
+                      path: ScreenPaths.settingsScreen,
+                      builder: (context, state) {
+                        return SettingsScreen(key: state.pageKey);
                       },
                     ),
                   ]),
