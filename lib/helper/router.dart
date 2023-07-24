@@ -12,6 +12,7 @@ import 'package:meditation_app/ui/screens/courses_list/courses_list_screen.dart'
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
 import 'package:meditation_app/ui/screens/edit_profile/edit_profile_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
+import 'package:meditation_app/ui/screens/notifications/notifications_screen.dart';
 import 'package:meditation_app/ui/screens/profile/profile_screen.dart';
 import 'package:meditation_app/ui/screens/settings/settings_screen.dart';
 import 'package:meditation_app/ui/screens/shellnav/shell_route.dart';
@@ -25,7 +26,7 @@ final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: ScreenPaths.settingsScreenPath,
+  initialLocation: ScreenPaths.analyticsScreen,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(
@@ -149,6 +150,13 @@ final appRouter = GoRouter(
                       path: ScreenPaths.settingsScreen,
                       builder: (context, state) {
                         return SettingsScreen(key: state.pageKey);
+                      },
+                    ),
+                    GoRoute(
+                      parentNavigatorKey: rootNavigator,
+                      path: ScreenPaths.notifications,
+                      builder: (context, state) {
+                        return NotificationsScreens(key: state.pageKey);
                       },
                     ),
                   ]),

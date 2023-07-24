@@ -42,25 +42,26 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
       appBar: CustomAppBar(
         screenSize: size,
         title: isTermsAndConditions ? 'Terms & Conditions' : 'Privacy Policy',
-        onDonePressed: () {},
         style: _style,
       ),
       body: BackgroundImage(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(_style.scale * 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                isTermsAndConditions ? termsAndConditions : privacyPolicy,
-                style: _style.text.font(
-                  isTermsAndConditions ? mulishSemiBold600 : mulishMedium500,
-                  sizePx: 10,
-                  heightPx: 18,
-                  color: isTermsAndConditions ? AppColors.tcContentColor : AppColors.ppContentColor,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(_style.scale * 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isTermsAndConditions ? termsAndConditions : privacyPolicy,
+                  style: _style.text.font(
+                    isTermsAndConditions ? mulishSemiBold600 : mulishMedium500,
+                    sizePx: 10,
+                    heightPx: 18,
+                    color: isTermsAndConditions ? AppColors.tcContentColor : AppColors.ppContentColor,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

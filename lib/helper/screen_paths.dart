@@ -37,6 +37,9 @@ class ScreenPaths {
   //         [Settings]
   /*         */ static const String settingsScreen = 'settings';
   /*         */ static const String settingsScreenPath = '$discoverScreen/$profileScreen/$settingsScreen';
+  //         [Notifications]
+  /*         */ static const String notifications = 'notifications';
+  /*         */ static const String notificationsPath = '$discoverScreen/$profileScreen/$notifications';
 
   ///
   static const String analyticsScreen = '/analytics';

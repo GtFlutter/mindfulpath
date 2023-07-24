@@ -86,6 +86,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   if (index == 0) {
                     context.go(ScreenPaths.editProfileScreenPath);
+                  } else if (index == 2) {
+                    context.go(ScreenPaths.notificationsPath);
                   } else if (index == 3) {
                     context.go(ScreenPaths.supportScreenPath);
                   } else if (index == 4) {

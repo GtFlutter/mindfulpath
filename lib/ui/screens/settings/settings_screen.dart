@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
+import 'package:meditation_app/ui/screens/settings/widget/custom_switch.dart';
 import 'package:meditation_app/ui/screens/settings/widget/settings_listtile.dart';
 import 'package:meditation_app/util/assets.dart';
 
@@ -30,7 +34,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         screenSize: size,
         style: _style,
         title: 'Settings',
-        onDonePressed: () {},
       ),
       body: BackgroundImage(
         alignment: Alignment.topCenter,
@@ -42,29 +45,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 SettingsListTile(
                   style: _style,
-                  onPressed: () {},
-                  tralling: Switch(
+                  onPressed: () {
+                    setState(() {
+                      notification = !notification;
+                    });
+                  },
+                  tralling: FlutterSwitch(
                     value: notification,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    onChanged: (value) {
+                    width: _style.scaleX(35),
+                    height: _style.scaleX(22),
+                    borderRadius: _style.scaleX(20),
+                    toggleSize: _style.scaleX(15),
+                    activeToggleColor: const Color(0xFFEADDFF),
+                    inactiveToggleColor: const Color(0xFF49454F),
+                    inactiveSwitchBorder: Border.all(color: const Color(0xFF79747E), width: _style.scaleX(1.5)),
+                    activeSwitchBorder: Border.all(color: const Color(0xFF5A5A5A), width: _style.scaleX(1.5)),
+                    activeColor: const Color(0xFF5A5A5A),
+                    inactiveColor: const Color(0xFFE6E0E9),
+                    onToggle: (value) {
                       setState(() {
                         notification = value;
                       });
                     },
+                    toggleMargin: _style.scaleX(4),
                   ),
                   title: 'Notification',
                 ),
                 SizedBox(height: _style.scaleX(25)),
                 SettingsListTile(
                   style: _style,
-                  onPressed: () {},
+                  onPressed: () {
+                    context.push(ScreenPaths.tCPpScreen, extra: false);
+                  },
                   tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
                   title: 'Privacy Policy',
                 ),
                 SizedBox(height: _style.scaleX(25)),
                 SettingsListTile(
                   style: _style,
-                  onPressed: () {},
+                  onPressed: () {
+                    context.push(ScreenPaths.tCPpScreen, extra: true);
+                  },
                   tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
                   title: 'Terms & Conditions',
                 ),
@@ -77,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SizedBox(height: _style.scaleX(25)),
                 SettingsListTile(
                   style: _style,
-                  onPressed: () {},
+                  onPressed: logout,
                   title: 'Logout',
                 ),
                 SizedBox(height: _style.scaleX(25)),
@@ -86,6 +107,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void logout() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        Size size = MediaQuery.of(context).size;
+        AppStyle style = AppStyle(screenSize: size);
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: style.scaleX(330)),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                style.scaleX(12.5),
+                style.scaleX(26.5),
+                style.scaleX(12.5),
+                style.scaleX(18),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Log out',
+                    style: style.text.font(mulishSemiBold600, sizePx: 20),
+                  ),
+                  SizedBox(height: style.scaleX(10)),
+                  Text(
+                    'Are you sure, you want to Logout?',
+                    style: style.text.font(mulishRegular400, sizePx: 13),
+                  ),
+                  SizedBox(height: style.scaleX(37.5)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            if (context.canPop()) {
+                              context.pop();
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
+                            padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                      SizedBox(width: style.scaleX(21)),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: () {
+                            context.go(ScreenPaths.splash);
+                          },
+                          style: FilledButton.styleFrom(
+                            textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
+                            padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
+                          ),
+                          child: const Text('Log out'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
