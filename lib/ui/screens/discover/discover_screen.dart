@@ -92,7 +92,9 @@ class DiscoverScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(right: _style.scale * 9),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                context.push(ScreenPaths.search);
+              },
               icon: SvgPicture.asset(
                 SvgPaths.search,
                 width: _style.scale * 20,

@@ -17,6 +17,7 @@ dependencies:
   go_router: ^9.0.0 # [Navigation]
   intl: ^0.18.1
   pinput: ^2.2.31
+  syncfusion_flutter_charts: ^22.1.39
   video_player: ^2.7.0
 
 dev_dependencies:

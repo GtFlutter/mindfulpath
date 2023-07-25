@@ -11,6 +11,9 @@ class ScreenPaths {
   /// Settings Flow
   static const String tCPpScreen = '/tc-pp';
 
+  /// Search Screen
+  static const String search = '/search';
+
   ///
   static const String libraryScreen = '/library';
   static const String coursesListScreen = 'courses-list';
