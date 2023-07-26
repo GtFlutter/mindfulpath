@@ -27,7 +27,7 @@ final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: ScreenPaths.discoverScreen,
+  initialLocation: ScreenPaths.search,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(

@@ -4,6 +4,7 @@ import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 
 import '../../theme/text_style.dart';
+import 'outlined_icon_button.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
@@ -29,13 +30,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    var borderWidth = style.scaleX(0.50);
+    var borderColor = AppColors.appBarBorderColor;
     return AppBar(
       title: title != null
           ? Container(
               constraints: BoxConstraints(maxWidth: screenSize.shortestSide * 0.5),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.appBarBorderColor, width: style.scale * 0.50),
+                border: Border.all(color: borderColor, width: borderWidth),
                 borderRadius: BorderRadius.circular(style.scale * 25),
               ),
               padding: EdgeInsets.symmetric(horizontal: style.scale * 10, vertical: style.scale * 6),
@@ -45,10 +48,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       automaticallyImplyLeading: false,
       surfaceTintColor: surfaceTintColor,
-      leadingWidth: style.scale * (30 + 30),
+      leadingWidth: style.scaleX((60)),
       leading: automaticallyImplyLeading
           ? IconButton.outlined(
-              constraints: BoxConstraints(maxWidth: style.scale * 30, maxHeight: style.scale * 30),
+              constraints: BoxConstraints(maxWidth: style.scaleX(40), maxHeight: style.scaleX(40)),
               onPressed: () {
                 if (context.canPop()) {
                   context.pop();
@@ -57,7 +60,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               icon: const Icon(Icons.arrow_back_ios_rounded),
               iconSize: style.scale * 15,
               style: IconButton.styleFrom(
-                side: const BorderSide(color: AppColors.appBarBorderColor),
+                side: BorderSide(color: borderColor, width: borderWidth),
+                padding: EdgeInsets.all(style.scaleX(10)),
               ),
             )
           : null,
@@ -70,13 +74,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Padding(
             padding: EdgeInsets.only(right: style.scale * 9),
             child: IconButton.outlined(
-              constraints: BoxConstraints(maxWidth: style.scale * 30, maxHeight: style.scale * 30),
+              constraints: BoxConstraints(maxWidth: style.scaleX(40), maxHeight: style.scaleX(40)),
+              style: IconButton.styleFrom(
+                side: BorderSide(color: borderColor, width: borderWidth),
+                padding: EdgeInsets.all(style.scaleX(10)),
+              ),
               onPressed: onDonePressed,
               icon: const Icon(Icons.done_rounded),
               iconSize: style.scale * 15,
-              style: IconButton.styleFrom(
-                side: const BorderSide(color: AppColors.appBarBorderColor),
-              ),
             ),
           ),
       ],

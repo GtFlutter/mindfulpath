@@ -70,7 +70,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       extendBody: true,
       appBar: CustomAppBar(
         screenSize: size,

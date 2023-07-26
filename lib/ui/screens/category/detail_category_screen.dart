@@ -3,6 +3,7 @@ import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
+import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import 'package:meditation_app/ui/screens/category/temp_data_file.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
@@ -42,6 +43,13 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
     TextStyle textStyle = _style.text.font(mulishRegular400, sizePx: 14);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: _showVideo
+          ? null
+          : CustomAppBar(
+              screenSize: size,
+              style: _style,
+            ),
       body: BackgroundImage.network(
         imgUrl:
             'https://images.pexels.com/photos/6740518/pexels-photo-6740518.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',

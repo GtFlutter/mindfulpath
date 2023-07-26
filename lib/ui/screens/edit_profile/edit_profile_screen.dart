@@ -16,6 +16,7 @@ import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
 import '../../../theme/text_style.dart';
 import '../../../util/constants.dart';
+import '../../common/common_bottom_sheet_widget.dart';
 import '../../common/custom_app_bar.dart';
 import '../authentication/widget/password_text_field.dart';
 
@@ -99,6 +100,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       isScrollControlled: true,
       isDismissible: false,
       useSafeArea: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(_style.scaleX(15)),
+          topRight: Radius.circular(_style.scaleX(15)),
+        ),
+      ),
       backgroundColor: Color(0xFF2D251F),
       builder: (context) {
         return ChnagePasswordSheet();
@@ -395,47 +402,21 @@ class _ChnagePasswordSheetState extends State<ChnagePasswordSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: EdgeInsets.all(_style.scaleX(20)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      }
-                    },
-                    icon: SvgPicture.asset(
-                      SvgPaths.remove,
-                      width: _style.scaleX(20),
-                      fit: BoxFit.fitWidth,
-                    ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      'Change password',
-                      style: _style.text.font(mulishSemiBold600, sizePx: 15),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 5,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: onSave,
-                    child: Text('Save'),
-                    style: TextButton.styleFrom(
-                      textStyle: _style.text.font(mulishMedium500, sizePx: 12),
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
+            CommonBottomSheetWidget(
+              style: _style,
+              title: 'Change password',
+              doneLable: 'Save',
+              onCancle: () {
+                if (context.canPop()) {
+                  context.pop();
+                }
+              },
+              onDone: onSave,
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                left: 40,
-                right: 40,
+              padding: EdgeInsets.only(
+                left: _style.scaleX(25),
+                right: _style.scaleX(25),
                 bottom: 20,
                 top: 20,
               ),
