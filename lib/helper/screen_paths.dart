@@ -18,6 +18,8 @@ class ScreenPaths {
   static const String libraryScreen = '/library';
   static const String coursesListScreen = 'courses-list';
   static const String coursesListScreenPath = '$libraryScreen/$coursesListScreen';
+  static const String subPlaylistScreen = 'sub-play-list';
+  static const String subPlaylistScreenPath = '$libraryScreen/$subPlaylistScreen';
 
   /// [Discover]
   static const String discoverScreen = '/discover';

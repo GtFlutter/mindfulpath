@@ -3,7 +3,7 @@ import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
 
 import '../../../theme/styles.dart';
-import 'course_item.dart';
+import 'widget/course_item.dart';
 
 List<CITempModel> list = [
   CITempModel(

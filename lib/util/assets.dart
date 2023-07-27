@@ -42,6 +42,8 @@ class SvgPaths {
 
   static const String arrowGoRight = 'assets/icons/svg/arrow_go_right_icon.svg';
 
+  static const String drag = 'assets/icons/svg/drag_icon.svg';
+
   static const String bgShape = 'assets/icons/svg/bg_shape.svg';
 
   /// Profile
@@ -50,7 +52,6 @@ class SvgPaths {
   static const String notification = 'assets/icons/svg/notification_icon.svg';
   static const String support = 'assets/icons/svg/support_icon.svg';
   static const String settings = 'assets/icons/svg/settings_icon.svg';
-
 
   /// Support
   static const String ticket = 'assets/icons/svg/ticket_icon.svg';

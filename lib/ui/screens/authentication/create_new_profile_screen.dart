@@ -5,7 +5,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart' show showCupertinoModalPopup;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/date_converter.dart';
+import 'package:meditation_app/helper/screen_paths.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/cupertino_date_picker.dart';
@@ -91,6 +93,7 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
         surfaceTintColor: Colors.transparent,
         screenSize: size,
         style: _style,
+        automaticallyImplyLeading: false,
       ),
       body: BackgroundImage(
           alignment: Alignment.topCenter,
@@ -241,6 +244,7 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile Created Successfully')),
       );
+      context.go(ScreenPaths.discoverScreen);
     }
   }
 

@@ -8,11 +8,12 @@ import 'package:meditation_app/ui/screens/authentication/forgot_password_screen.
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/sign_in_up_screen.dart';
 import 'package:meditation_app/ui/screens/category/detail_category_screen.dart';
-import 'package:meditation_app/ui/screens/courses_list/courses_list_screen.dart';
+import 'package:meditation_app/ui/screens/courses/courses_list_screen.dart';
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
 import 'package:meditation_app/ui/screens/edit_profile/edit_profile_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
 import 'package:meditation_app/ui/screens/notifications/notifications_screen.dart';
+import 'package:meditation_app/ui/screens/playlist/sub_playlist_screen.dart';
 import 'package:meditation_app/ui/screens/profile/profile_screen.dart';
 import 'package:meditation_app/ui/screens/search/search_screen.dart';
 import 'package:meditation_app/ui/screens/settings/settings_screen.dart';
@@ -27,7 +28,7 @@ final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: ScreenPaths.search,
+  initialLocation: ScreenPaths.splash,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(
@@ -41,8 +42,7 @@ final appRouter = GoRouter(
       parentNavigatorKey: rootNavigator,
       path: ScreenPaths.signInUp,
       builder: (context, state) {
-        return SignInUpScreen(key: state.pageKey, isSignIn: false);
-        // return SignInUpScreen(key: state.pageKey, isSignIn: state.extra as bool);
+        return SignInUpScreen(key: state.pageKey, isSignIn: state.extra as bool? ?? true);
       },
     ),
     GoRoute(
@@ -112,6 +112,15 @@ final appRouter = GoRouter(
                 path: ScreenPaths.coursesListScreen,
                 builder: (context, state) {
                   return CoursesListScreen(
+                    key: state.pageKey,
+                    title: state.extra as String? ?? 'Router Extra Not Found',
+                  );
+                },
+              ),
+              GoRoute(
+                path: ScreenPaths.subPlaylistScreen,
+                builder: (context, state) {
+                  return SubPlayListScreen(
                     key: state.pageKey,
                     title: state.extra as String? ?? 'Router Extra Not Found',
                   );

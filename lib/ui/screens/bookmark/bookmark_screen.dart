@@ -26,7 +26,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
           scrollDirection: Axis.vertical,
           padding: EdgeInsets.only(
             bottom: _style.scale * 100,
-            top: _style.scale * 25,
+            top: _style.scale * 12.5,
             right: _style.scale * 22,
             left: _style.scale * 22,
           ),

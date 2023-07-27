@@ -211,6 +211,15 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                         height: _style.scale * 36,
                       ),
                     ),
+                    ...[
+                      SizedBox(width: _style.scale * 40),
+                      TextButton(
+                        onPressed: () {
+                          context.go(ScreenPaths.signInUp, extra: !widget.isSignIn);
+                        },
+                        child: Text(widget.isSignIn ? 'Sign Up' : 'Sign In'),
+                      ),
+                    ],
                     Spacer(),
                   ],
                 ),
@@ -244,7 +253,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Login Successfully')),
                       );
-                      context.push(ScreenPaths.signInUp, extra: !widget.isSignIn);
+                      context.go(ScreenPaths.discoverScreen);
                     } else {
                       context.push(
                         ScreenPaths.otpVerificationScreen,

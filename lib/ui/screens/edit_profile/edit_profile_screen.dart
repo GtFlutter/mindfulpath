@@ -100,13 +100,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       isScrollControlled: true,
       isDismissible: false,
       useSafeArea: true,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(_style.scaleX(15)),
           topRight: Radius.circular(_style.scaleX(15)),
         ),
       ),
-      backgroundColor: Color(0xFF2D251F),
       builder: (context) {
         return ChnagePasswordSheet();
       },
@@ -396,8 +396,9 @@ class _ChnagePasswordSheetState extends State<ChnagePasswordSheet> {
 
     _style = AppStyle(screenSize: size);
 
-    return Padding(
+    return Container(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      color: Color(0xFF2D251F),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
