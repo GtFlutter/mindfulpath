@@ -215,7 +215,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                       SizedBox(width: _style.scale * 40),
                       TextButton(
                         onPressed: () {
-                          context.go(ScreenPaths.signInUp, extra: !widget.isSignIn);
+                          context.go(widget.isSignIn ? ScreenPaths.signUp : ScreenPaths.signUp);
                         },
                         child: Text(widget.isSignIn ? 'Sign Up' : 'Sign In'),
                       ),
@@ -224,6 +224,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                   ],
                 ),
                 Spacer(flex: 2),
+                // Don't have an account? Sign up
                 CustomNextButton(
                   text: 'Next',
                   onPressed: () {
@@ -242,8 +243,19 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                     }
 
                     /// This is For Sign Up
-                    else if (!widget.isSignIn && password.length < AppConstants.PWD_MIN_LENGTH) {
-                      setPwdErrorText('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+                    else if (password.length < AppConstants.PWD_MIN_LENGTH) {
+                      if (widget.isSignIn) {
+                        setPwdErrorText('Invalid Password');
+                      } else {
+                        setPwdErrorText('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+                      }
+                      return;
+                    }
+
+                    /// This is For Both Sign Up And Sign In
+                    else if (password.length > AppConstants.PWD_MAX_LENGTH) {
+                      setPwdErrorText(
+                          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
                       return;
                     }
 

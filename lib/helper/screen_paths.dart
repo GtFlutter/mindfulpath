@@ -2,7 +2,8 @@ class ScreenPaths {
   static const String splash = '/';
 
   /// Sign Up and Sign In Flow
-  static const String signInUp = '/sign-in-up';
+  static const String signIn = '/sign-in';
+  static const String signUp = '/sign-up';
   static const String otpVerificationScreen = '/otp-verification';
   static const String forgotPasswordScreen = '/forgot-password';
   static const String createNewPasswordScreen = '/create-new-password';

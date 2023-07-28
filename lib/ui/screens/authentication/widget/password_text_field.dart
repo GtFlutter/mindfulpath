@@ -4,6 +4,7 @@ import 'package:meditation_app/theme/styles.dart';
 
 import '../../../../theme/text_field_style.dart';
 import '../../../../util/assets.dart';
+import '../../../../util/constants.dart';
 
 class PasswordTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -67,7 +68,9 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
             height: widget.style.scale * 20,
           ),
         ),
+        counterText: '',
       ),
+      maxLength: AppConstants.PWD_MAX_LENGTH,
       style: CustomeTextFieldStyle.valueStyle(spacingPc: 50, style: widget.style),
       obscureText: _obscureText,
       keyboardType: TextInputType.visiblePassword,

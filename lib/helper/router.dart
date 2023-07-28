@@ -40,9 +40,16 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.signInUp,
+      path: ScreenPaths.signIn,
       builder: (context, state) {
-        return SignInUpScreen(key: state.pageKey, isSignIn: state.extra as bool? ?? true);
+        return SignInUpScreen(key: state.pageKey, isSignIn: true);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigator,
+      path: ScreenPaths.signUp,
+      builder: (context, state) {
+        return SignInUpScreen(key: state.pageKey, isSignIn: false);
       },
     ),
     GoRoute(

@@ -477,8 +477,16 @@ class _ChnagePasswordSheetState extends State<ChnagePasswordSheet> {
     } else if (password.length < AppConstants.PWD_MIN_LENGTH) {
       setPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
       return;
-    } else if (confirmPassword.length < 8) {
+    } else if (password.length > AppConstants.PWD_MAX_LENGTH) {
+      setPwdError(
+          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
+      return;
+    } else if (confirmPassword.length < AppConstants.PWD_MIN_LENGTH) {
       setCnfPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+      return;
+    } else if (confirmPassword.length > AppConstants.PWD_MAX_LENGTH) {
+      setCnfPwdError(
+          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
       return;
     } else if (password != confirmPassword) {
       setCnfPwdError('Both password must match');

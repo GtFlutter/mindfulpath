@@ -17,7 +17,7 @@ class SplashScreen extends StatelessWidget {
     _style = AppStyle(screenSize: size);
 
     Future.delayed(const Duration(seconds: 3), () {
-      context.go(ScreenPaths.signInUp, extra: true);
+      context.go(ScreenPaths.signIn);
     });
     return Scaffold(
       backgroundColor: Colors.black,

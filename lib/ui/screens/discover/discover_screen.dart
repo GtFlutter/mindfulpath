@@ -87,6 +87,7 @@ class DiscoverScreen extends StatelessWidget {
             width: _style.scale * 20,
             fit: BoxFit.contain,
           ),
+          style: IconButton.styleFrom(splashFactory: InkSplash.splashFactory),
         ),
         actions: [
           Padding(

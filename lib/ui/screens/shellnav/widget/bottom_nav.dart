@@ -94,7 +94,7 @@ class CustomBottomNa extends StatelessWidget {
   }
 
   static int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).location;
+    final String location = GoRouterState.of(context).uri.toString();
     if (location.startsWith(ScreenPaths.libraryScreen)) {
       return 0;
     }
@@ -108,7 +108,7 @@ class CustomBottomNa extends StatelessWidget {
   }
 
   void _onItemTapped(int index, BuildContext context) {
-    final String location = GoRouterState.of(context).location;
+    final String location = GoRouterState.of(context).uri.toString();
     switch (index) {
       case 0:
         if (location != ScreenPaths.libraryScreen) {
