@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
 import 'package:flutter/cupertino.dart' show CupertinoButton;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -80,7 +81,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
           alignment: Alignment.topCenter,
           child: SafeArea(
             child: CustomScrollableColumnLayout(
-              minHeight: 440 * _style.scale,
+              minHeight: widget.isSignIn ? 460 : 480 * _style.scale,
               style: _style,
               children: [
                 Spacer(flex: 2),
@@ -211,22 +212,26 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                         height: _style.scale * 36,
                       ),
                     ),
-                    ...[
-                      SizedBox(width: _style.scale * 40),
-                      TextButton(
-                        onPressed: () {
-                          context.go(widget.isSignIn ? ScreenPaths.signUp : ScreenPaths.signUp);
-                        },
-                        child: Text(widget.isSignIn ? 'Sign Up' : 'Sign In'),
-                      ),
-                    ],
                     Spacer(),
                   ],
                 ),
                 Spacer(flex: 2),
                 // Don't have an account? Sign up
+                Text.rich(
+                  TextSpan(
+                    text: '${widget.isSignIn ? 'Don\'t' : 'Already'} have an account?',
+                    style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppTextColor),
+                    children: [
+                      TextSpan(
+                          text: widget.isSignIn ? ' Sign Up' : ' Sign In ',
+                          recognizer: TapGestureRecognizer()..onTap = onSign,
+                          style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.primaryColor)),
+                    ],
+                  ),
+                ),
+                SizedBox(height: _style.scale * 10),
                 CustomNextButton(
-                  text: 'Next',
+                  text: widget.isSignIn ? 'Login' : 'Next',
                   onPressed: () {
                     String number = _numberCtrl.text.trim();
                     String code = _countryCode.trim();
@@ -285,5 +290,9 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
             ),
           )),
     );
+  }
+
+  void onSign() {
+    context.go(widget.isSignIn ? ScreenPaths.signUp : ScreenPaths.signIn);
   }
 }
