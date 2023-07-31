@@ -4,7 +4,8 @@ import 'package:flutter/cupertino.dart' show CupertinoButton;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/data/repositories/auth_repo.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
@@ -17,18 +18,18 @@ import 'package:pinput/pinput.dart';
 import '../../../theme/styles.dart';
 import '../../../util/constants.dart';
 
-enum OtpVerificationType {
-  signIn,
-  signUp,
-  forgotPassword,
-}
-
 class TempOtpModel {
   final String countryCode;
-  final String number;
-  final OtpVerificationType type;
+  final String phoneNo;
+  final SendOTP type;
+  final int otp;
 
-  TempOtpModel({required this.type, required this.countryCode, required this.number});
+  TempOtpModel({
+    required this.otp,
+    required this.type,
+    required this.countryCode,
+    required this.phoneNo,
+  });
 }
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -71,7 +72,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               children: [
                 CustomHeader(
                   title: 'OTP has been sent to',
-                  subTitle: '${widget.model.countryCode} ${widget.model.number.mask()}',
+                  subTitle: '${widget.model.countryCode} ${widget.model.phoneNo.mask()}',
                   style: _style,
                 ),
                 Expanded(
@@ -159,15 +160,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('OTP Verified Successfully')),
                             );
-                            if (widget.model.type == OtpVerificationType.forgotPassword) {
+                            if (widget.model.type == SendOTP.forgotPwd) {
                               context.pop();
                               context.pop();
-                              context.push(ScreenPaths.createNewPasswordScreen);
-                            } else if (widget.model.type == OtpVerificationType.signUp) {
+                              context.push(RoutePath.createNewPasswordScreen);
+                            } else if (widget.model.type == SendOTP.register) {
                               context.pop();
-                              context.push(ScreenPaths.createNewProfileScreen);
+                              context.push(RoutePath.createNewProfileScreen);
                             } else {
-                              context.go(ScreenPaths.splash);
+                              context.go(RoutePath.splash);
                             }
                           }
                         },

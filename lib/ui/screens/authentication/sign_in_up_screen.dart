@@ -15,7 +15,7 @@ import 'package:meditation_app/ui/screens/authentication/widget/password_text_fi
 import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/constants.dart';
 
-import '../../../helper/screen_paths.dart';
+import '../../../helper/route/route_paths.dart';
 import '../../../theme/styles.dart';
 import '../../common/custom_next_button.dart';
 import 'otp_verification_screen.dart';
@@ -116,7 +116,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                         alignment: Alignment.centerLeft,
                         child: CupertinoButton(
                           onPressed: () {
-                            context.push(ScreenPaths.forgotPasswordScreen, extra: !widget.isSignIn);
+                            context.push(RoutePath.forgotPasswordScreen, extra: !widget.isSignIn);
                           },
                           padding: EdgeInsets.zero,
                           minSize: 10,
@@ -138,7 +138,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                                 style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                             CupertinoButton(
                               onPressed: () {
-                                context.push(ScreenPaths.tCPpScreen, extra: false);
+                                context.push(RoutePath.tCPpScreen, extra: false);
                               },
                               padding: EdgeInsets.zero,
                               minSize: 10,
@@ -151,7 +151,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                                 style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                             CupertinoButton(
                                 onPressed: () {
-                                  context.push(ScreenPaths.tCPpScreen, extra: true);
+                                  context.push(RoutePath.tCPpScreen, extra: true);
                                 },
                                 padding: EdgeInsets.zero,
                                 minSize: 10,
@@ -196,7 +196,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                   children: [
                     Spacer(),
                     IconButton.outlined(
-                      onPressed: () {},
+                      onPressed: onGoogleLogin,
                       icon: SvgPicture.asset(
                         SvgPaths.googleLogo,
                         width: _style.scale * 36,
@@ -205,7 +205,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                     ),
                     SizedBox(width: _style.scale * 40),
                     IconButton.outlined(
-                      onPressed: () {},
+                      onPressed: onFacebookLogin,
                       icon: SvgPicture.asset(
                         SvgPaths.facebookLogo,
                         width: _style.scale * 36,
@@ -232,56 +232,7 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
                 SizedBox(height: _style.scale * 10),
                 CustomNextButton(
                   text: widget.isSignIn ? 'Login' : 'Next',
-                  onPressed: () {
-                    String number = _numberCtrl.text.trim();
-                    String code = _countryCode.trim();
-                    String password = _passwordCtrl.text.trim();
-                    if (number.isEmpty) {
-                      setNumberErrorText('Please enter a number');
-                      return;
-                    } else if (code.isEmpty) {
-                      setNumberErrorText('Please select country code');
-                      return;
-                    } else if (password.isEmpty) {
-                      setPwdErrorText('Please enter a password');
-                      return;
-                    }
-
-                    /// This is For Sign Up
-                    else if (password.length < AppConstants.PWD_MIN_LENGTH) {
-                      if (widget.isSignIn) {
-                        setPwdErrorText('Invalid Password');
-                      } else {
-                        setPwdErrorText('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
-                      }
-                      return;
-                    }
-
-                    /// This is For Both Sign Up And Sign In
-                    else if (password.length > AppConstants.PWD_MAX_LENGTH) {
-                      setPwdErrorText(
-                          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
-                      return;
-                    }
-
-                    /// TODO IF this is sign then get error from api and show
-                    else if (widget.isSignIn) {
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Login Successfully')),
-                      );
-                      context.go(ScreenPaths.discoverScreen);
-                    } else {
-                      context.push(
-                        ScreenPaths.otpVerificationScreen,
-                        extra: TempOtpModel(
-                          countryCode: code,
-                          number: number,
-                          type: OtpVerificationType.signUp,
-                        ),
-                      );
-                    }
-                  },
+                  onPressed: onNext,
                   style: _style,
                 ),
 
@@ -292,7 +243,60 @@ class _SignInUpScreenState extends State<SignInUpScreen> {
     );
   }
 
-  void onSign() {
-    context.go(widget.isSignIn ? ScreenPaths.signUp : ScreenPaths.signIn);
+  void onNext() {
+    String number = _numberCtrl.text.trim();
+    String code = _countryCode.trim();
+    String password = _passwordCtrl.text.trim();
+    if (number.isEmpty) {
+      setNumberErrorText('Please enter a number');
+      return;
+    } else if (code.isEmpty) {
+      setNumberErrorText('Please select country code');
+      return;
+    } else if (password.isEmpty) {
+      setPwdErrorText('Please enter a password');
+      return;
+    } else if (password.length < AppConstants.PWD_MIN_LENGTH) {
+      if (widget.isSignIn) {
+        setPwdErrorText('Invalid Password');
+      } else {
+        setPwdErrorText('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+      }
+      return;
+    } else if (password.length > AppConstants.PWD_MAX_LENGTH) {
+      setPwdErrorText(
+          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
+      return;
+    } else if (!widget.isSignIn && password.contains(RegExp(r'\s'))) {
+      setPwdErrorText('Password should not contain space...');
+      return;
+    }
+
+    /// TODO IF this is sign then get error from api and show
+    else if (widget.isSignIn) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login Successfully')),
+      );
+      context.go(RoutePath.discoverScreen);
+    } else {
+      context.push(
+        RoutePath.otpVerificationScreen,
+        extra: TempOtpModel(
+          countryCode: code,
+          phoneNo: number,
+          type: OtpVerificationType.signUp,
+          otp: 0000,
+        ),
+      );
+    }
   }
+
+  void onSign() {
+    context.go(widget.isSignIn ? RoutePath.signUp : RoutePath.signIn);
+  }
+
+  void onGoogleLogin() {}
+
+  void onFacebookLogin() {}
 }

@@ -9,7 +9,7 @@ import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/contact_number_text_field.dart';
 
-import '../../../helper/screen_paths.dart';
+import '../../../helper/route/route_paths.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/styles.dart';
 import 'otp_verification_screen.dart';
@@ -134,11 +134,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             return;
                           } else {
                             context.push(
-                              ScreenPaths.otpVerificationScreen,
+                              RoutePath.otpVerificationScreen,
                               extra: TempOtpModel(
                                 countryCode: code,
-                                number: number,
+                                phoneNo: number,
                                 type: OtpVerificationType.forgotPassword,
+                                otp: 5555,
                               ),
                             );
                           }

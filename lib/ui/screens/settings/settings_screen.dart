@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/settings/widget/custom_switch.dart';
@@ -75,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsListTile(
                   style: _style,
                   onPressed: () {
-                    context.push(ScreenPaths.tCPpScreen, extra: false);
+                    context.push(RoutePath.tCPpScreen, extra: false);
                   },
                   tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
                   title: 'Privacy Policy',
@@ -84,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsListTile(
                   style: _style,
                   onPressed: () {
-                    context.push(ScreenPaths.tCPpScreen, extra: true);
+                    context.push(RoutePath.tCPpScreen, extra: true);
                   },
                   tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
                   title: 'Terms & Conditions',
@@ -162,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Expanded(
                         child: FilledButton(
                           onPressed: () {
-                            context.go(ScreenPaths.splash);
+                            context.go(RoutePath.splash);
                           },
                           style: FilledButton.styleFrom(
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),

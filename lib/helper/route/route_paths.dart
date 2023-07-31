@@ -1,4 +1,4 @@
-class ScreenPaths {
+class RoutePath {
   static const String splash = '/';
 
   /// Sign Up and Sign In Flow

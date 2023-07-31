@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/discover/widget/discover_item.dart';
 
@@ -63,7 +63,7 @@ class DiscoverLayout extends StatelessWidget {
           model: list[index],
           style: style,
           onPressed: () {
-            context.go(ScreenPaths.detailCategoryScreenPath);
+            context.go(RoutePath.detailCategoryScreenPath);
           },
         );
       },

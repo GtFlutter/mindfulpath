@@ -5,7 +5,7 @@ import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/playlist_item.dart';
 import 'package:meditation_app/util/assets.dart';
 
-import '../../../helper/screen_paths.dart';
+import '../../../helper/route/route_paths.dart';
 import '../../../theme/styles.dart';
 import '../courses/courses_list_screen.dart';
 
@@ -47,7 +47,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 title: list[index],
                 style: _style,
                 onTap: () {
-                  context.go(ScreenPaths.subPlaylistScreenPath, extra: list[index]);
+                  context.go(RoutePath.subPlaylistScreenPath, extra: list[index]);
                 },
               );
             },

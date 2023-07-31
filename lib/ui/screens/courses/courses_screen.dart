@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 
 import '../../../theme/styles.dart';
 import '../../../theme/text_style.dart';
@@ -44,7 +44,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
                 title: list[index],
                 style: _style,
                 onTap: () {
-                  context.go(ScreenPaths.coursesListScreenPath, extra: list[index]);
+                  context.go(RoutePath.coursesListScreenPath, extra: list[index]);
                 },
               );
             },

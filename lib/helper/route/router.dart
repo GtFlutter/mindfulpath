@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/ui/screens/analytics/analytics_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/create_new_password_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/create_new_profile_screen.dart';
@@ -28,56 +28,59 @@ final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: ScreenPaths.splash,
+  initialLocation: RoutePath.createNewProfileScreen,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.splash,
+      path: RoutePath.splash,
       builder: (context, state) {
         return SplashScreen(key: state.pageKey);
       },
     ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.signIn,
+      path: RoutePath.signIn,
       builder: (context, state) {
         return SignInUpScreen(key: state.pageKey, isSignIn: true);
       },
     ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.signUp,
+      path: RoutePath.signUp,
       builder: (context, state) {
         return SignInUpScreen(key: state.pageKey, isSignIn: false);
       },
     ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.otpVerificationScreen,
+      path: RoutePath.otpVerificationScreen,
       builder: (context, state) {
         return OtpVerificationScreen(key: state.pageKey, model: state.extra as TempOtpModel);
       },
     ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.forgotPasswordScreen,
+      path: RoutePath.forgotPasswordScreen,
       builder: (context, state) {
         return ForgotPasswordScreen(key: state.pageKey);
       },
     ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.createNewPasswordScreen,
+      path: RoutePath.createNewPasswordScreen,
       builder: (context, state) {
         return CreateNewPasswordScreen(key: state.pageKey);
       },
     ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.createNewProfileScreen,
+      path: RoutePath.createNewProfileScreen,
       builder: (context, state) {
-        return CreateNewProfileScreen(key: state.pageKey);
+        return CreateNewProfileScreen(
+          key: state.pageKey,
+          value: state.extra != null ? state.extra as (String, String) : ('', ''),
+        );
       },
     ),
 
@@ -85,7 +88,7 @@ final appRouter = GoRouter(
     /// Fals For Privacy Policy And True Terms And Conditions
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.tCPpScreen,
+      path: RoutePath.tCPpScreen,
       builder: (context, state) {
         return TCPPScreen(
           key: state.pageKey,
@@ -96,7 +99,7 @@ final appRouter = GoRouter(
 
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: ScreenPaths.search,
+      path: RoutePath.search,
       builder: (context, state) {
         return SearchScreen(key: state.pageKey);
       },
@@ -110,13 +113,13 @@ final appRouter = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-            path: ScreenPaths.libraryScreen,
+            path: RoutePath.libraryScreen,
             builder: (context, state) {
               return LibraryScreen(key: state.pageKey);
             },
             routes: [
               GoRoute(
-                path: ScreenPaths.coursesListScreen,
+                path: RoutePath.coursesListScreen,
                 builder: (context, state) {
                   return CoursesListScreen(
                     key: state.pageKey,
@@ -125,7 +128,7 @@ final appRouter = GoRouter(
                 },
               ),
               GoRoute(
-                path: ScreenPaths.subPlaylistScreen,
+                path: RoutePath.subPlaylistScreen,
                 builder: (context, state) {
                   return SubPlayListScreen(
                     key: state.pageKey,
@@ -135,35 +138,35 @@ final appRouter = GoRouter(
               ),
             ]),
         GoRoute(
-            path: ScreenPaths.discoverScreen,
+            path: RoutePath.discoverScreen,
             builder: (context, state) {
               return DiscoverScreen(key: state.pageKey);
             },
             routes: [
               GoRoute(
                   parentNavigatorKey: rootNavigator,
-                  path: ScreenPaths.profileScreen,
+                  path: RoutePath.profileScreen,
                   builder: (context, state) {
                     return ProfileScreen(key: state.pageKey);
                   },
                   routes: [
                     GoRoute(
                       parentNavigatorKey: rootNavigator,
-                      path: ScreenPaths.editProfileScreen,
+                      path: RoutePath.editProfileScreen,
                       builder: (context, state) {
                         return EditProfileScreen(key: state.pageKey);
                       },
                     ),
                     GoRoute(
                       parentNavigatorKey: rootNavigator,
-                      path: ScreenPaths.supportScreen,
+                      path: RoutePath.supportScreen,
                       builder: (context, state) {
                         return SupportScreen(key: state.pageKey);
                       },
                       routes: [
                         GoRoute(
                           parentNavigatorKey: rootNavigator,
-                          path: ScreenPaths.supportSectionScreen,
+                          path: RoutePath.supportSectionScreen,
                           builder: (context, state) {
                             return SupportSectionScreen(key: state.pageKey);
                           },
@@ -172,14 +175,14 @@ final appRouter = GoRouter(
                     ),
                     GoRoute(
                       parentNavigatorKey: rootNavigator,
-                      path: ScreenPaths.settingsScreen,
+                      path: RoutePath.settingsScreen,
                       builder: (context, state) {
                         return SettingsScreen(key: state.pageKey);
                       },
                     ),
                     GoRoute(
                       parentNavigatorKey: rootNavigator,
-                      path: ScreenPaths.notifications,
+                      path: RoutePath.notifications,
                       builder: (context, state) {
                         return NotificationsScreens(key: state.pageKey);
                       },
@@ -187,14 +190,14 @@ final appRouter = GoRouter(
                   ]),
               GoRoute(
                 parentNavigatorKey: rootNavigator,
-                path: ScreenPaths.detailCategoryScreen,
+                path: RoutePath.detailCategoryScreen,
                 builder: (context, state) {
                   return DetailCategoryScreen(key: state.pageKey);
                 },
               ),
             ]),
         GoRoute(
-          path: ScreenPaths.analyticsScreen,
+          path: RoutePath.analyticsScreen,
           builder: (context, state) {
             return AnalyticsScreen(key: state.pageKey);
           },

@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/shellnav/widget/custom_bottom_nav_item.dart';
@@ -95,13 +95,13 @@ class CustomBottomNa extends StatelessWidget {
 
   static int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith(ScreenPaths.libraryScreen)) {
+    if (location.startsWith(RoutePath.libraryScreen)) {
       return 0;
     }
-    if (location.startsWith(ScreenPaths.discoverScreen)) {
+    if (location.startsWith(RoutePath.discoverScreen)) {
       return 1;
     }
-    if (location.startsWith(ScreenPaths.analyticsScreen)) {
+    if (location.startsWith(RoutePath.analyticsScreen)) {
       return 2;
     }
     return 0;
@@ -111,18 +111,18 @@ class CustomBottomNa extends StatelessWidget {
     final String location = GoRouterState.of(context).uri.toString();
     switch (index) {
       case 0:
-        if (location != ScreenPaths.libraryScreen) {
-          GoRouter.of(context).go(ScreenPaths.libraryScreen);
+        if (location != RoutePath.libraryScreen) {
+          GoRouter.of(context).go(RoutePath.libraryScreen);
         }
         break;
       case 1:
-        if (location != ScreenPaths.discoverScreen) {
-          GoRouter.of(context).go(ScreenPaths.discoverScreen);
+        if (location != RoutePath.discoverScreen) {
+          GoRouter.of(context).go(RoutePath.discoverScreen);
         }
         break;
       case 2:
-        if (location != ScreenPaths.analyticsScreen) {
-          GoRouter.of(context).go(ScreenPaths.analyticsScreen);
+        if (location != RoutePath.analyticsScreen) {
+          GoRouter.of(context).go(RoutePath.analyticsScreen);
         }
         break;
     }

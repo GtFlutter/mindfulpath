@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/ui/screens/profile/widget/profile_item.dart';
 
 import '../../../theme/styles.dart';
@@ -85,13 +85,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 appStyle: _style,
                 onTap: () {
                   if (index == 0) {
-                    context.go(ScreenPaths.editProfileScreenPath);
+                    context.go(RoutePath.editProfileScreenPath);
                   } else if (index == 2) {
-                    context.go(ScreenPaths.notificationsPath);
+                    context.go(RoutePath.notificationsPath);
                   } else if (index == 3) {
-                    context.go(ScreenPaths.supportScreenPath);
+                    context.go(RoutePath.supportScreenPath);
                   } else if (index == 4) {
-                    context.go(ScreenPaths.settingsScreenPath);
+                    context.go(RoutePath.settingsScreenPath);
                   }
                 },
               );

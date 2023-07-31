@@ -9,7 +9,7 @@ import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/password_text_field.dart';
 
-import '../../../helper/screen_paths.dart';
+import '../../../helper/route/route_paths.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/styles.dart';
 import '../../../util/constants.dart';
@@ -141,12 +141,18 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                             setPwdError(
                                 'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
                             return;
+                          } else if (password.contains(RegExp(r'\s'))) {
+                            setPwdError('Password should not contain space...');
+                            return;
                           } else if (confirmPassword.length < AppConstants.PWD_MIN_LENGTH) {
                             setCnfPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
                             return;
                           } else if (confirmPassword.length > AppConstants.PWD_MAX_LENGTH) {
                             setCnfPwdError(
                                 'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
+                            return;
+                          } else if (confirmPassword.contains(RegExp(r'\s'))) {
+                            setCnfPwdError('Password should not contain space...');
                             return;
                           } else if (password != confirmPassword) {
                             setCnfPwdError('Both password must match');
@@ -156,7 +162,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Password Changed Successfully')),
                             );
-                            context.go(ScreenPaths.splash);
+                            context.go(RoutePath.splash);
                           }
                         },
                         style: _style,

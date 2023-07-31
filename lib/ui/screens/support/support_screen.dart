@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/util/assets.dart';
@@ -160,7 +160,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     showCursor: _disableField,
                     magnifierConfiguration: TextMagnifierConfiguration.disabled,
                     onTap: () {
-                      context.go(ScreenPaths.supportSectionScreenPath);
+                      context.go(RoutePath.supportSectionScreenPath);
                     },
                     keyboardType: TextInputType.none,
                     decoration: CustomeTextFieldStyle.inputDecoration(

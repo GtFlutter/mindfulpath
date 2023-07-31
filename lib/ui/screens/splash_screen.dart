@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/util/assets.dart';
@@ -17,7 +17,7 @@ class SplashScreen extends StatelessWidget {
     _style = AppStyle(screenSize: size);
 
     Future.delayed(const Duration(seconds: 3), () {
-      context.go(ScreenPaths.signIn);
+      context.go(RoutePath.signIn);
     });
     return Scaffold(
       backgroundColor: Colors.black,

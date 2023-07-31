@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/date_converter.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/cupertino_date_picker.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
@@ -19,9 +20,18 @@ import 'package:meditation_app/util/assets.dart';
 
 import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
+import '../../../util/constants.dart';
 
 class CreateNewProfileScreen extends StatefulWidget {
-  const CreateNewProfileScreen({super.key});
+  final String phoneNo;
+  final String password;
+
+  /// First Variable [PhoneNo] and Second Variable [Password]
+  CreateNewProfileScreen({
+    super.key,
+    required (String, String) value,
+  })  : phoneNo = value.$1,
+        password = value.$2;
 
   @override
   State<CreateNewProfileScreen> createState() => _CreateNewProfileScreenState();
@@ -36,7 +46,7 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
   DateTime? _date;
   String? _gender;
 
-  final List<String> _genders = ['Male', 'Female', 'Other'];
+  final List<String> _genderList = List.unmodifiable(['Male', 'Female', 'Other']);
 
   String? _nameErrorText;
   String? _emailErrorText;
@@ -187,10 +197,10 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
                             ),
                             icon: SvgPicture.asset(SvgPaths.arrowDown),
                             iconSize: _style.scale * 20,
-                            items: List.generate(_genders.length, (index) {
+                            items: List.generate(_genderList.length, (index) {
                               return DropdownMenuItem(
-                                child: Text(_genders[index]),
-                                value: _genders[index],
+                                child: Text(_genderList[index]),
+                                value: _genderList[index],
                               );
                             }).toList(),
                             onChanged: (value) {
@@ -220,11 +230,23 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
 
   void onNext() {
     String name = _nameCtrl.text.trim();
-    String email = _emailCtrl.text.trim().toLowerCase();
+    String email = _emailCtrl.text.trim();
     DateTime? dateTime = _date;
     String? gender = _gender == null ? null : _gender!.trim();
+    String phoneNo = widget.phoneNo.trim();
+    String password = widget.password.trim();
 
-    if (name.isEmpty) {
+    if (phoneNo.isEmpty ||
+        password.isEmpty ||
+        password.contains(RegExp(r'\s')) ||
+        password.length < AppConstants.PWD_MIN_LENGTH ||
+        password.length > AppConstants.PWD_MAX_LENGTH) {
+      showCustomSnackBar('Something went wrong! Please try again');
+      if (context.canPop()) {
+        context.pop();
+      }
+      return;
+    } else if (name.isEmpty) {
       setNameError('Please enter a full name');
       return;
     } else if (email.isEmpty) {
@@ -244,7 +266,7 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile Created Successfully')),
       );
-      context.go(ScreenPaths.discoverScreen);
+      context.go(RoutePath.discoverScreen);
     }
   }
 

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meditation_app/helper/router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/provider/shared_preferences_provider.dart';
+import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/theme/theme.dart';
+import 'package:meditation_app/util/app_config.dart';
 import 'package:meditation_app/util/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO See Size height and minHeight For Custome Scrollabel column layout
 // TODO also see extra code remove
 // TODO For IOS Number keyboard show Done Using Scaffold
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -15,7 +19,14 @@ void main() {
       statusBarColor: Colors.transparent,
     ),
   );
-  runApp(const MainApp());
+  final prefs = await SharedPreferences.getInstance();
+
+  return runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -24,7 +35,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: AppConstants.APP_NAME,
+      title: AppConfigs.APP_NAME,
       debugShowCheckedModeBanner: false,
       darkTheme: darkTheme,
       themeMode: ThemeMode.dark,

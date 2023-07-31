@@ -50,7 +50,11 @@ class ApiClient {
     }
   }
 
-  Future<http.Response> postData(String uri, dynamic body, {Map<String, String>? headers}) async {
+  Future<http.Response> postData(
+    String uri,
+    dynamic body, {
+    Map<String, String>? headers,
+  }) async {
     try {
       log('===> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
       log('===> API Body: $body');
@@ -67,8 +71,12 @@ class ApiClient {
     }
   }
 
-  Future<http.Response> postMultipartData(String uri, Map<String, String> body, List<MultipartBody> multipartBody,
-      {Map<String, String>? headers}) async {
+  Future<http.Response> postMultipartData(
+    String uri,
+    Map<String, String> body,
+    List<MultipartBody> multipartBody, {
+    Map<String, String>? headers,
+  }) async {
     try {
       log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
       log('====> API Body: $body with ${multipartBody.length} files');
@@ -86,6 +94,45 @@ class ApiClient {
       }
       request.fields.addAll(body);
       http.Response response = await http.Response.fromStream(await request.send());
+      return handleResponse(response, uri);
+    } catch (_) {
+      return _errorResponse;
+    }
+  }
+
+  Future<http.Response> putData(
+    String uri,
+    dynamic body, {
+    Map<String, String>? headers,
+  }) async {
+    try {
+      log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+      log('====> API Body: $body');
+      http.Response response = await http
+          .put(
+            Uri.parse(appBaseUrl + uri),
+            body: jsonEncode(body),
+            headers: headers ?? _mainHeaders,
+          )
+          .timeout(_timeoutIn);
+      return handleResponse(response, uri);
+    } catch (_) {
+      return _errorResponse;
+    }
+  }
+
+  Future<http.Response> deleteData(
+    String uri, {
+    Map<String, String>? headers,
+  }) async {
+    try {
+      log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+      http.Response response = await http
+          .delete(
+            Uri.parse(appBaseUrl + uri),
+            headers: headers ?? _mainHeaders,
+          )
+          .timeout(_timeoutIn);
       return handleResponse(response, uri);
     } catch (_) {
       return _errorResponse;

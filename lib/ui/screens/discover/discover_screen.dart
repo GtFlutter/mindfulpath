@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/screen_paths.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/discover/widget/discover_header.dart';
@@ -80,7 +80,7 @@ class DiscoverScreen extends StatelessWidget {
         leadingWidth: _style.scale * 60,
         leading: IconButton(
           onPressed: () {
-            context.go(ScreenPaths.profileScreenPath);
+            context.go(RoutePath.profileScreenPath);
           },
           icon: SvgPicture.asset(
             SvgPaths.profile,
@@ -94,7 +94,7 @@ class DiscoverScreen extends StatelessWidget {
             padding: EdgeInsets.only(right: _style.scale * 9),
             child: IconButton(
               onPressed: () {
-                context.push(ScreenPaths.search);
+                context.push(RoutePath.search);
               },
               icon: SvgPicture.asset(
                 SvgPaths.search,
