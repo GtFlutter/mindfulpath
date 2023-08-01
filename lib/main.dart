@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meditation_app/provider/shared_preferences_provider.dart';
+import 'package:meditation_app/provider/base/shared_preferences_provider.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/theme/theme.dart';
 import 'package:meditation_app/util/app_config.dart';

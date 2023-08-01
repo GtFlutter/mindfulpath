@@ -28,7 +28,7 @@ final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: RoutePath.createNewProfileScreen,
+  initialLocation: RoutePath.splash,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(
@@ -56,7 +56,7 @@ final appRouter = GoRouter(
       parentNavigatorKey: rootNavigator,
       path: RoutePath.otpVerificationScreen,
       builder: (context, state) {
-        return OtpVerificationScreen(key: state.pageKey, model: state.extra as TempOtpModel);
+        return OtpVerificationScreen(key: state.pageKey, model: state.extra as OTPModel);
       },
     ),
     GoRoute(
@@ -70,7 +70,10 @@ final appRouter = GoRouter(
       parentNavigatorKey: rootNavigator,
       path: RoutePath.createNewPasswordScreen,
       builder: (context, state) {
-        return CreateNewPasswordScreen(key: state.pageKey);
+        return CreateNewPasswordScreen(
+          key: state.pageKey,
+          phoneNo: state.extra as String? ?? '',
+        );
       },
     ),
     GoRoute(

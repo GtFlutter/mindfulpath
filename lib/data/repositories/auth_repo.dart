@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
 import 'package:meditation_app/data/model/body/create_user_profile_model.dart';
@@ -37,5 +38,36 @@ class AuthRepo {
 
   Future<Response> loginUser(String phoneNo, String password) async {
     return await apiClient.postData(AppConfigs.login, {'phone_no': phoneNo, 'password': password});
+  }
+
+  /// Forgot Password : Only OTP Verification Require, No Auth Require
+  Future<Response> resetPassword(String phoneNo, String password) async {
+    return await apiClient.postData(AppConfigs.resetPassword, {'phone_no': phoneNo, 'password': password});
+  }
+
+  Future<Response> logoutUser() async {
+    return await apiClient.getData(AppConfigs.logout);
+  }
+
+  Future<bool> saveUserToken(String token) async {
+    debugPrint('Yashvant New Token :::: $token');
+    apiClient.token = token;
+    apiClient.updateHeader(token);
+    return await sharedPreferences.setString(AppConfigs.TOKEN, token);
+  }
+
+  Future<bool> clearUserData() async {
+    debugPrint('Yashvant Clearing User Token');
+    apiClient.token = null;
+    apiClient.updateHeader(null);
+    return sharedPreferences.clear();
+  }
+
+  String getUserToken() {
+    return sharedPreferences.getString(AppConfigs.TOKEN) ?? "";
+  }
+
+  bool isLoggedIn() {
+    return sharedPreferences.containsKey(AppConfigs.TOKEN);
   }
 }

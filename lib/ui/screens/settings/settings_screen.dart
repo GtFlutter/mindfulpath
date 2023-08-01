@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/settings/widget/custom_switch.dart';
@@ -11,14 +13,14 @@ import 'package:meditation_app/util/assets.dart';
 import '../../../theme/styles.dart';
 import '../../common/custom_app_bar.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static AppStyle _style = AppStyle();
   bool notification = false;
 
@@ -114,21 +116,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
-        Size size = MediaQuery.of(context).size;
+      builder: (c) {
+        Size size = MediaQuery.of(c).size;
         AppStyle style = AppStyle(screenSize: size);
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: style.scaleX(330)),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                style.scaleX(12.5),
-                style.scaleX(26.5),
-                style.scaleX(12.5),
-                style.scaleX(18),
-              ),
-              child: Column(
+        return ProviderScope(
+          parent: ProviderScope.containerOf(context),
+          child: Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
+            child: LogoutDialog(style),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class LogoutDialog extends ConsumerWidget {
+  const LogoutDialog(this.style, {super.key});
+
+  final AppStyle style;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var authP = ref.watch(authProvider);
+    return AbsorbPointer(
+      absorbing: authP.isLoading,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: style.scaleX(330)),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            style.scaleX(12.5),
+            style.scaleX(26.5),
+            style.scaleX(12.5),
+            style.scaleX(18),
+          ),
+          child: Stack(
+            alignment: AlignmentDirectional.topEnd,
+            children: [
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
@@ -145,11 +170,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: () {
-                            if (context.canPop()) {
-                              context.pop();
-                            }
-                          },
+                          onPressed: authP.isLoading
+                              ? null
+                              : () {
+                                  if (context.canPop()) {
+                                    context.pop();
+                                  }
+                                },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.white,
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
@@ -161,24 +188,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SizedBox(width: style.scaleX(21)),
                       Expanded(
                         child: FilledButton(
-                          onPressed: () {
-                            context.go(RoutePath.splash);
-                          },
+                          onPressed: authP.isLoading
+                              ? null
+                              : () {
+                                  authP.logoutUser();
+                                },
                           style: FilledButton.styleFrom(
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
                             padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
                           ),
-                          child: const Text('Log out'),
+                          child: Text(authP.isLoading ? 'Loging out..' : 'Log out'),
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
+              if (authP.isLoading)
+                Container(
+                  alignment: Alignment.center,
+                  margin: EdgeInsets.symmetric(horizontal: style.scaleX(10)),
+                  constraints: BoxConstraints(maxHeight: style.scaleX(20), maxWidth: style.scaleX(20)),
+                  child: CircularProgressIndicator.adaptive(
+                    strokeWidth: style.scaleX(2),
+                    backgroundColor: Colors.white,
+                    valueColor: AlwaysStoppedAnimation(Colors.green.shade900),
+                  ),
+                ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

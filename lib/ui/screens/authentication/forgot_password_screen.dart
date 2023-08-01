@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meditation_app/data/repositories/auth_repo.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
@@ -14,14 +17,14 @@ import '../../../theme/colors.dart';
 import '../../../theme/styles.dart';
 import 'otp_verification_screen.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   static AppStyle _style = AppStyle();
 
   final TextEditingController _numberCtrl = TextEditingController();
@@ -53,106 +56,111 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: false,
-      extendBody: true,
-      appBar: CustomAuthAppBar(
-        leadingWidth: _style.scale * 65,
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: _style.scale * 15),
-              child: IconButton.outlined(
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  }
-                },
-                icon: Icon(Icons.arrow_back_ios_new_rounded),
-                iconSize: _style.scale * 15,
-                constraints: BoxConstraints(maxWidth: _style.scale * 30, maxHeight: _style.scale * 30),
-              ),
-            ),
-          ],
-        ),
-        screenSize: size,
-        style: _style,
-      ),
-      body: BackgroundImage(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomHeader(
-                      title: 'Forgot password',
-                      subTitle: 'Please enter your number to request a password reset.',
-                      subTitleColor: AppColors.textFieldValueColor,
-                      padding: EdgeInsets.symmetric(horizontal: _style.scale * 25),
-                      style: _style,
-                    ),
-                  ],
+
+    var authP = ref.watch(authProvider);
+
+    return AbsorbPointer(
+      absorbing: authP.isLoading,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        resizeToAvoidBottomInset: false,
+        extendBody: true,
+        appBar: CustomAuthAppBar(
+          leadingWidth: _style.scale * 65,
+          leading: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: _style.scale * 15),
+                child: IconButton.outlined(
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    }
+                  },
+                  icon: Icon(Icons.arrow_back_ios_new_rounded),
+                  iconSize: _style.scale * 15,
+                  constraints: BoxConstraints(maxWidth: _style.scale * 30, maxHeight: _style.scale * 30),
                 ),
-                Expanded(
-                  child: CustomScrollableColumnLayout(
-                    minHeight: 200 * _style.scale,
-                    style: _style,
+              ),
+            ],
+          ),
+          screenSize: size,
+          style: _style,
+        ),
+        body: BackgroundImage(
+            alignment: Alignment.topCenter,
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Spacer(flex: 1),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          MobileNumberTextField(
-                            onCountryCodeChanged: setCountryCode,
-                            controller: _numberCtrl,
-                            initialCountryCodeSelection: _initCountryCode,
-                            errorText: _numberErrorText,
-                            onChanged: (_) {
-                              setNumberErrorText();
-                            },
-                            style: _style,
-                          ),
-                        ],
-                      ),
-                      Spacer(flex: 3),
-                      CustomNextButton(
-                        text: 'Next',
-                        onPressed: () {
-                          String number = _numberCtrl.text.trim();
-                          String code = _countryCode;
-                          if (number.isEmpty) {
-                            setNumberErrorText('Please enter a number');
-                            return;
-                          } else if (code.isEmpty) {
-                            setNumberErrorText('Please select country code');
-                            return;
-                          } else {
-                            context.push(
-                              RoutePath.otpVerificationScreen,
-                              extra: TempOtpModel(
-                                countryCode: code,
-                                phoneNo: number,
-                                type: OtpVerificationType.forgotPassword,
-                                otp: 5555,
-                              ),
-                            );
-                          }
-                        },
+                      CustomHeader(
+                        title: 'Forgot password',
+                        subTitle: 'Please enter your number to request a password reset.',
+                        subTitleColor: AppColors.textFieldValueColor,
+                        padding: EdgeInsets.symmetric(horizontal: _style.scale * 25),
                         style: _style,
                       ),
-                      SizedBox(height: _style.scale * 20),
                     ],
                   ),
-                ),
-              ],
-            ),
-          )),
+                  Expanded(
+                    child: CustomScrollableColumnLayout(
+                      minHeight: 200 * _style.scale,
+                      style: _style,
+                      children: [
+                        Spacer(flex: 1),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            MobileNumberTextField(
+                              onCountryCodeChanged: setCountryCode,
+                              controller: _numberCtrl,
+                              initialCountryCodeSelection: _initCountryCode,
+                              errorText: _numberErrorText,
+                              onChanged: (_) {
+                                setNumberErrorText();
+                              },
+                              style: _style,
+                            ),
+                          ],
+                        ),
+                        Spacer(flex: 3),
+                        CustomNextButton(
+                          text: 'Next',
+                          onPressed: !authP.isLoading ? onNext : null,
+                          style: _style,
+                          inProgress: authP.isLoading,
+                        ),
+                        SizedBox(height: _style.scale * 20),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )),
+      ),
     );
+  }
+
+  void onNext() {
+    String number = _numberCtrl.text.trim();
+    String code = _countryCode;
+    if (number.isEmpty) {
+      setNumberErrorText('Please enter a number');
+      return;
+    } else if (code.isEmpty) {
+      setNumberErrorText('Please select country code');
+      return;
+    } else {
+      ref.read(authProvider).requestOTP(
+            countryCode: code,
+            phoneNo: number,
+            type: SendOTP.forgotPwd,
+          );
+    }
   }
 }

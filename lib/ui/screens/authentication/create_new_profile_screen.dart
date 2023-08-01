@@ -4,11 +4,13 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart' show showCupertinoModalPopup;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meditation_app/data/model/body/create_user_profile_model.dart';
 import 'package:meditation_app/helper/date_converter.dart';
-import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/user_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/cupertino_date_picker.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
@@ -22,7 +24,7 @@ import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
 import '../../../util/constants.dart';
 
-class CreateNewProfileScreen extends StatefulWidget {
+class CreateNewProfileScreen extends ConsumerStatefulWidget {
   final String phoneNo;
   final String password;
 
@@ -34,51 +36,24 @@ class CreateNewProfileScreen extends StatefulWidget {
         password = value.$2;
 
   @override
-  State<CreateNewProfileScreen> createState() => _CreateNewProfileScreenState();
+  ConsumerState<CreateNewProfileScreen> createState() => _CreateNewProfileScreenState();
 }
 
-class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
+class _CreateNewProfileScreenState extends ConsumerState<CreateNewProfileScreen> {
   static AppStyle _style = AppStyle();
 
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _dateCtrl = TextEditingController();
-  DateTime? _date;
+  DateTime? _dateOfBirth;
   String? _gender;
 
   final List<String> _genderList = List.unmodifiable(['Male', 'Female', 'Other']);
 
-  String? _nameErrorText;
-  String? _emailErrorText;
-  String? _dateErrorText;
-  String? _genderErrorText;
-
-  void setNameError([String? error]) {
-    if (error == null && _nameErrorText == null) {
-      return;
-    }
-    setState(() => _nameErrorText = error);
-  }
-
-  void setEmailError([String? error]) {
-    if (error == null && _emailErrorText == null) {
-      return;
-    }
-    setState(() => _emailErrorText = error);
-  }
-
-  void setDateError([String? error]) {
-    if (error == null && _dateErrorText == null) {
-      return;
-    }
-    setState(() => _dateErrorText = error);
-  }
-
-  void setGenderError([String? error]) {
-    if (error == null && _genderErrorText == null) {
-      return;
-    }
-    setState(() => _genderErrorText = error);
+  @override
+  void initState() {
+    ref.read(userProvider).clearAllErrorText(notifie: false);
+    super.initState();
   }
 
   @override
@@ -95,143 +70,149 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: false,
-      extendBody: true,
-      appBar: CustomAuthAppBar(
-        surfaceTintColor: Colors.transparent,
-        screenSize: size,
-        style: _style,
-        automaticallyImplyLeading: false,
-      ),
-      body: BackgroundImage(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomHeader(
-                      title: 'Create a new profile',
-                      padding: EdgeInsets.only(
-                        left: _style.scale * 25,
-                        right: _style.scale * 25,
-                        bottom: _style.scale * 5,
-                      ),
-                      style: _style,
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: CustomScrollableColumnLayout(
-                    minHeight: 400 * _style.scale,
-                    style: _style,
+    var userP = ref.watch(userProvider);
+
+    return AbsorbPointer(
+      absorbing: userP.isLoading,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        resizeToAvoidBottomInset: false,
+        extendBody: true,
+        appBar: CustomAuthAppBar(
+          surfaceTintColor: Colors.transparent,
+          screenSize: size,
+          style: _style,
+          automaticallyImplyLeading: false,
+        ),
+        body: BackgroundImage(
+            alignment: Alignment.topCenter,
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Spacer(flex: 1),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            controller: _nameCtrl,
-                            cursorColor: CustomeTextFieldStyle.cursorColor,
-                            onChanged: (_) {
-                              setNameError();
-                            },
-                            textInputAction: TextInputAction.next,
-                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
-                              labelText: 'Full name',
-                              errorText: _nameErrorText,
-                            ),
-                            keyboardType: TextInputType.text,
-                            textCapitalization: TextCapitalization.words,
-                            style: CustomeTextFieldStyle.valueStyle(style: _style),
-                          ),
-                          SizedBox(height: _style.scale * 27.5),
-                          TextField(
-                            controller: _emailCtrl,
-                            cursorColor: CustomeTextFieldStyle.cursorColor,
-                            onChanged: (_) {
-                              setEmailError();
-                            },
-                            textInputAction: TextInputAction.done,
-                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
-                              labelText: 'Email',
-                              errorText: _emailErrorText,
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            style: CustomeTextFieldStyle.valueStyle(style: _style),
-                          ),
-                          SizedBox(height: _style.scale * 27.5),
-                          TextField(
-                            controller: _dateCtrl,
-                            readOnly: true,
-                            canRequestFocus: false,
-                            onTap: selectDate,
-                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
-                              labelText: 'Date of birth',
-                              errorText: _dateErrorText,
-                              suffixIcon: Padding(
-                                padding: EdgeInsets.only(right: _style.scale * 25),
-                                child: SvgPicture.asset(SvgPaths.calendar),
-                              ),
-                              suffixIconConstraints: BoxConstraints(
-                                maxWidth: (_style.scale * 20) + (_style.scale * 25),
-                                maxHeight: _style.scale * 20,
-                              ),
-                            ),
-                            style: CustomeTextFieldStyle.valueStyle(style: _style),
-                          ),
-                          SizedBox(height: _style.scale * 27.5),
-                          DropdownButtonFormField(
-                            value: _gender,
-                            style: CustomeTextFieldStyle.valueStyle(style: _style),
-                            borderRadius: BorderRadius.circular(_style.scale * 10),
-                            dropdownColor: Color.fromARGB(255, 93, 53, 20),
-                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
-                              errorText: _genderErrorText,
-                              labelText: 'Gender',
-                            ),
-                            icon: SvgPicture.asset(SvgPaths.arrowDown),
-                            iconSize: _style.scale * 20,
-                            items: List.generate(_genderList.length, (index) {
-                              return DropdownMenuItem(
-                                child: Text(_genderList[index]),
-                                value: _genderList[index],
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setGenderError();
-                              setState(() {
-                                _gender = value;
-                              });
-                            },
-                          )
-                        ],
-                      ),
-                      Spacer(flex: 3),
-                      CustomNextButton(
-                        text: 'Next',
-                        onPressed: onNext,
+                      CustomHeader(
+                        title: 'Create a new profile',
+                        padding: EdgeInsets.only(
+                          left: _style.scale * 25,
+                          right: _style.scale * 25,
+                          bottom: _style.scale * 5,
+                        ),
                         style: _style,
                       ),
-                      SizedBox(height: _style.scale * 20),
                     ],
                   ),
-                ),
-              ],
-            ),
-          )),
+                  Expanded(
+                    child: CustomScrollableColumnLayout(
+                      minHeight: 400 * _style.scale,
+                      style: _style,
+                      children: [
+                        Spacer(flex: 1),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: _nameCtrl,
+                              cursorColor: CustomeTextFieldStyle.cursorColor,
+                              onChanged: (_) {
+                                userP.setNameError();
+                              },
+                              textInputAction: TextInputAction.next,
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                                labelText: 'Full name',
+                                errorText: userP.nameErrorText,
+                              ),
+                              keyboardType: TextInputType.text,
+                              textCapitalization: TextCapitalization.words,
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                            ),
+                            SizedBox(height: _style.scale * 27.5),
+                            TextField(
+                              controller: _emailCtrl,
+                              cursorColor: CustomeTextFieldStyle.cursorColor,
+                              onChanged: (_) {
+                                userP.setEmailError();
+                              },
+                              textInputAction: TextInputAction.done,
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                                labelText: 'Email',
+                                errorText: userP.emailErrorText,
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                            ),
+                            SizedBox(height: _style.scale * 27.5),
+                            TextField(
+                              controller: _dateCtrl,
+                              readOnly: true,
+                              canRequestFocus: false,
+                              onTap: selectDate,
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                                labelText: 'Date of birth',
+                                errorText: userP.dateErrorText,
+                                suffixIcon: Padding(
+                                  padding: EdgeInsets.only(right: _style.scale * 25),
+                                  child: SvgPicture.asset(SvgPaths.calendar),
+                                ),
+                                suffixIconConstraints: BoxConstraints(
+                                  maxWidth: (_style.scale * 20) + (_style.scale * 25),
+                                  maxHeight: _style.scale * 20,
+                                ),
+                              ),
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                            ),
+                            SizedBox(height: _style.scale * 27.5),
+                            DropdownButtonFormField(
+                              value: _gender,
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                              borderRadius: BorderRadius.circular(_style.scale * 10),
+                              dropdownColor: Color.fromARGB(255, 93, 53, 20),
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                                errorText: userP.genderErrorText,
+                                labelText: 'Gender',
+                              ),
+                              icon: SvgPicture.asset(SvgPaths.arrowDown),
+                              iconSize: _style.scale * 20,
+                              items: List.generate(_genderList.length, (index) {
+                                return DropdownMenuItem(
+                                  child: Text(_genderList[index]),
+                                  value: _genderList[index],
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                userP.setGenderError();
+                                setState(() {
+                                  _gender = value;
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                        Spacer(flex: 3),
+                        CustomNextButton(
+                          text: 'Next',
+                          onPressed: !userP.isLoading ? onNext : null,
+                          style: _style,
+                          inProgress: userP.isLoading,
+                        ),
+                        SizedBox(height: _style.scale * 20),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )),
+      ),
     );
   }
 
   void onNext() {
     String name = _nameCtrl.text.trim();
     String email = _emailCtrl.text.trim();
-    DateTime? dateTime = _date;
+    DateTime? dateOfBirth = _dateOfBirth;
     String? gender = _gender == null ? null : _gender!.trim();
     String phoneNo = widget.phoneNo.trim();
     String password = widget.password.trim();
@@ -241,32 +222,30 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
         password.contains(RegExp(r'\s')) ||
         password.length < AppConstants.PWD_MIN_LENGTH ||
         password.length > AppConstants.PWD_MAX_LENGTH) {
-      showCustomSnackBar('Something went wrong! Please try again');
+      showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
       if (context.canPop()) {
         context.pop();
       }
       return;
     } else if (name.isEmpty) {
-      setNameError('Please enter a full name');
+      ref.read(userProvider).setNameError(error: 'Please enter a full name');
       return;
     } else if (email.isEmpty) {
-      setEmailError('Please enter an email');
+      ref.read(userProvider).setEmailError(error: 'Please enter an email');
       return;
     } else if (!email.isEmail) {
-      setEmailError('Invalid email');
+      ref.read(userProvider).setEmailError(error: 'Invalid email');
       return;
-    } else if (dateTime == null) {
-      setDateError('Please select date of birth');
+    } else if (dateOfBirth == null) {
+      ref.read(userProvider).setDateError(error: 'Please select date of birth');
       return;
     } else if (gender == null || gender.isEmpty) {
-      setGenderError('Please select gender');
+      ref.read(userProvider).setGenderError(error: 'Please select gender');
       return;
     } else {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Profile Created Successfully')),
-      );
-      context.go(RoutePath.discoverScreen);
+      ref.read(userProvider).createUserProfile(
+            CreateUserProfileModel(name, email, phoneNo, dateOfBirth, gender, password),
+          );
     }
   }
 
@@ -284,9 +263,9 @@ class _CreateNewProfileScreenState extends State<CreateNewProfileScreen> {
         : await iosDateTimePicker(initialDate, firstDate, lastDate);
     if (result != null) {
       _dateCtrl.text = result.toStringFormat1;
-      setDateError();
+      ref.read(userProvider).setDateError();
       setState(() {
-        _date = result;
+        _dateOfBirth = result;
       });
     }
   }

@@ -18,9 +18,9 @@ class ApiChecker {
       try {
         dynamic body = jsonDecode(response.body);
         ErrorResponse error = ErrorResponse.fromJson(body);
-        if (error.message != null && error.message!.isNotEmpty) showCustomSnackBar(error.message!);
+        if (error.message != null && error.message!.isNotEmpty) showCustomSnackBar(error.message!, type: false);
       } catch (e) {
-        showCustomSnackBar(e.toString());
+        showCustomSnackBar(e.toString(), type: false);
       }
     }
   }
