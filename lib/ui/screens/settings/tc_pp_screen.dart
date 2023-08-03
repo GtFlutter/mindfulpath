@@ -1,40 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/data/model/response/static_data_model.dart';
+import 'package:meditation_app/provider/static_data_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
 
-/// TODO : Working On Terms And Conditions
-
 /// Terms & Conditions And Privacy Policy Screen
-class TCPPScreen extends StatelessWidget {
+class TCPPScreen extends ConsumerWidget {
   final bool isTermsAndConditions;
   const TCPPScreen({super.key, required this.isTermsAndConditions});
   static AppStyle _style = AppStyle();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
     /// [isTerms] True If This is For Terms & Conditions And False For Privacy Policy
 
-    String termsAndConditions =
-        '''Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
-
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.Lorem Ipsum has been the industry's standard .
-''';
-    String privacyPolicy =
-        '''Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
-
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.Lorem Ipsum has been the industry's standard .
-''';
+    AsyncValue<List<StaticData>> data = ref.watch(getStaticDataProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -46,23 +36,92 @@ Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
       ),
       body: BackgroundImage(
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(_style.scale * 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  isTermsAndConditions ? termsAndConditions : privacyPolicy,
-                  style: _style.text.font(
-                    isTermsAndConditions ? mulishSemiBold600 : mulishMedium500,
-                    sizePx: 10,
-                    heightPx: 18,
-                    color: isTermsAndConditions ? AppColors.tcContentColor : AppColors.ppContentColor,
-                  ),
-                ),
-              ],
+          child: RefreshIndicator(
+            onRefresh: () => ref.refresh(getStaticDataProvider.future),
+            child: data.when(
+              // skipLoadingOnRefresh: false,
+              data: (data) {
+                int index = data.indexWhere(
+                  (element) {
+                    return element.key == (isTermsAndConditions ? 'terms_condition' : 'privacy_policy');
+                  },
+                );
+                if (index != -1 && data[index].value != null) {
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.all(_style.scale * 20),
+                    child: Html(
+                      shrinkWrap: true,
+                      data: data[index].value ?? '',
+                      style: {
+                        "p.fancy": Style(
+                          textAlign: TextAlign.center,
+                          padding: HtmlPaddings.all(16),
+                          backgroundColor: Colors.grey,
+                          margin: Margins(left: Margin(50, Unit.px), right: Margin.auto()),
+                          width: Width(300, Unit.px),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      },
+                    ),
+                  );
+                } else {
+                  return WentWrong(
+                    style: _style,
+                    onPressed: () {
+                      ref.refresh(getStaticDataProvider.future);
+                    },
+                  );
+                }
+              },
+              error: (Object error, StackTrace stackTrace) {
+                return WentWrong(
+                  style: _style,
+                  onPressed: () {
+                    ref.refresh(getStaticDataProvider.future);
+                  },
+                );
+              },
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class WentWrong extends StatelessWidget {
+  final VoidCallback? onPressed;
+
+  const WentWrong({
+    super.key,
+    required this.style,
+    this.onPressed,
+  });
+
+  final AppStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(style.scaleX(20)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              AppConstants.WENT_WRONG,
+              maxLines: 10,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            TextButton(
+              onPressed: onPressed,
+              child: const Text('Retry'),
+            ),
+          ],
         ),
       ),
     );

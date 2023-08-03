@@ -26,6 +26,8 @@ class AuthNotifier extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool get isLoggedIn => repo.isLoggedIn();
+
   void startProgress() {
     if (!_isLoading) {
       _isLoading = true;
@@ -102,10 +104,6 @@ class AuthNotifier extends ChangeNotifier {
         context.pushReplacement(RoutePath.createNewPasswordScreen, extra: countryCode + phoneNo);
       }
     }
-  }
-
-  bool isLoggedIn() {
-    return repo.isLoggedIn();
   }
 
   Future<void> loginUser(String phoneNo, String password) async {

@@ -37,4 +37,9 @@ extension OnString on String {
     List<String> words = split(' ');
     return words.length > 1 ? words.sublist(1).join(' ') : '';
   }
+
+  String get capitalizeFirstLetter {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1);
+  }
 }

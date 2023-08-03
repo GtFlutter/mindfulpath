@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
-import 'package:meditation_app/data/model/body/create_user_profile_model.dart';
+import 'package:meditation_app/data/model/body/user_body.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,12 +32,24 @@ class AuthRepo {
     );
   }
 
-  Future<Response> createUserProfile(CreateUserProfileModel model) async {
+  Future<Response> createUserProfile(UserBody model) async {
     return await apiClient.postData(AppConfigs.register, model.toMap);
+  }
+
+  Future<Response> updateUserProfile(UserBody model) async {
+    return await apiClient.postData(AppConfigs.updateProfile, model.toMap);
   }
 
   Future<Response> loginUser(String phoneNo, String password) async {
     return await apiClient.postData(AppConfigs.login, {'phone_no': phoneNo, 'password': password});
+  }
+
+  Future<Response> logoutUser() async {
+    return await apiClient.getData(AppConfigs.logout);
+  }
+
+  Future<Response> getUserProfile() async {
+    return await apiClient.getData(AppConfigs.userProfile);
   }
 
   /// Forgot Password : Only OTP Verification Require, No Auth Require
@@ -45,8 +57,12 @@ class AuthRepo {
     return await apiClient.postData(AppConfigs.resetPassword, {'phone_no': phoneNo, 'password': password});
   }
 
-  Future<Response> logoutUser() async {
-    return await apiClient.getData(AppConfigs.logout);
+  Future<Response> changePassword(String oldPassword, String password) async {
+    return await apiClient.postData(AppConfigs.changePassword, {'old_password': oldPassword, 'new_password': password});
+  }
+
+  Future<Response> getStaticPage() async {
+    return await apiClient.getData(AppConfigs.getStaticPage);
   }
 
   Future<bool> saveUserToken(String token) async {

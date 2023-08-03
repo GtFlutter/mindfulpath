@@ -5,12 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
-import 'package:meditation_app/data/model/body/create_user_profile_model.dart';
+import 'package:meditation_app/data/model/body/user_body.dart';
 import 'package:meditation_app/data/model/response/new_user_response_error_model.dart';
+import 'package:meditation_app/data/model/response/user_response.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
 import 'package:meditation_app/provider/repo_provider/auth_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 
+import '../data/model/response/error_res_model.dart';
 import '../helper/route/route_paths.dart';
 import '../helper/route/router.dart';
 import '../util/constants.dart';
@@ -27,6 +29,9 @@ class UserNotifier extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  UserResponse? _user;
+  UserResponse? get user => _user;
 
   String? _nameErrorText;
   String? _emailErrorText;
@@ -94,7 +99,7 @@ class UserNotifier extends ChangeNotifier {
 
   /// Use Router Extensions For Type Safe Routing
   /// ///
-  Future<void> createUserProfile(CreateUserProfileModel model) async {
+  Future<void> createUserProfile(UserBody model) async {
     startProgress();
     Response response = await repo.createUserProfile(model);
     if (response.statusCode == 200) {
@@ -144,4 +149,65 @@ class UserNotifier extends ChangeNotifier {
       context.go(RoutePath.signIn);
     }
   }
+
+  Future<void> updateUserProfile(UserBody model) async {
+    startProgress();
+    showCustomSnackBar('Updating Profile...');
+    Response response = await repo.updateUserProfile(model);
+    stopProgress();
+    if (response.statusCode == 200) {
+      showCustomSnackBar('Profile Updated Successfully', type: true);
+      // _contextPopIfAvailable();
+      return;
+    }
+    if (response.statusCode == 403 && jsonDecode(response.body)['data'] != null) {
+      NewUserResponseErrorModel errorModel = NewUserResponseErrorModel.fromJson(jsonDecode(response.body)['data']);
+      if (errorModel.phoneNo.isNotEmpty) {
+        showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+        _contextPopIfAvailable();
+      } else {
+        if (errorModel.name.isNotEmpty) setNameError(error: errorModel.name.first, notifie: false);
+        if (errorModel.email.isNotEmpty) setEmailError(error: errorModel.email.first, notifie: false);
+        if (errorModel.birthDate.isNotEmpty) setDateError(error: errorModel.birthDate.first, notifie: false);
+        if (errorModel.gender.isNotEmpty) setGenderError(error: errorModel.gender.first, notifie: false);
+      }
+      return;
+    }
+    ApiChecker.checkApi(response);
+    _contextPopIfAvailable();
+  }
+
+  void _contextPopIfAvailable() {
+    BuildContext? context = rootNavigator.currentContext;
+    if (context != null && context.mounted && context.canPop()) {
+      context.pop();
+    }
+  }
 }
+
+class ResponseError {
+  final int statusCode;
+  final String error;
+  ResponseError(this.statusCode, this.error);
+}
+
+final getUserProfileProvider = FutureProvider<UserResponse>((ref) async {
+  var repo = ref.read(authRepoProvider);
+
+  Response response = await repo.getUserProfile();
+
+  if (response.statusCode == 200) {
+    return UserResponse.fromJson(jsonDecode(response.body)['data']['user_data']);
+  } else if (response.statusCode == 401) {
+    throw ResponseError(response.statusCode, 'Unauthenticated');
+  } else {
+    try {
+      dynamic body = jsonDecode(response.body);
+      ErrorResponse error = ErrorResponse.fromJson(body);
+      String errorMessage = error.message ?? AppConstants.WENT_WRONG;
+      throw ResponseError(response.statusCode, errorMessage);
+    } catch (e) {
+      throw ResponseError(response.statusCode, AppConstants.WENT_WRONG);
+    }
+  }
+});

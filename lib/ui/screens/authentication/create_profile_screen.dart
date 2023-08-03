@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:meditation_app/data/model/body/create_user_profile_model.dart';
+import 'package:meditation_app/data/model/body/user_body.dart';
 import 'package:meditation_app/helper/date_converter.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/user_provider.dart';
+import 'package:meditation_app/ui/common/adaptive_date_picker.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/cupertino_date_picker.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
@@ -24,22 +25,22 @@ import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
 import '../../../util/constants.dart';
 
-class CreateNewProfileScreen extends ConsumerStatefulWidget {
+class CreateProfileScreen extends ConsumerStatefulWidget {
   final String phoneNo;
   final String password;
 
   /// First Variable [PhoneNo] and Second Variable [Password]
-  CreateNewProfileScreen({
+  CreateProfileScreen({
     super.key,
     required (String, String) value,
   })  : phoneNo = value.$1,
         password = value.$2;
 
   @override
-  ConsumerState<CreateNewProfileScreen> createState() => _CreateNewProfileScreenState();
+  ConsumerState<CreateProfileScreen> createState() => _CreateNewProfileScreenState();
 }
 
-class _CreateNewProfileScreenState extends ConsumerState<CreateNewProfileScreen> {
+class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   static AppStyle _style = AppStyle();
 
   final TextEditingController _nameCtrl = TextEditingController();
@@ -244,23 +245,21 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateNewProfileScreen>
       return;
     } else {
       ref.read(userProvider).createUserProfile(
-            CreateUserProfileModel(name, email, phoneNo, dateOfBirth, gender, password),
+            UserBody.register(
+              name,
+              email,
+              phoneNo,
+              dateOfBirth,
+              gender,
+              password,
+            ),
           );
     }
   }
 
   void selectDate() async {
-    const int minAge = 16;
-    const int maxAge = 150;
+    DateTime? result = await AdaptiveDatePicker.pick(context);
 
-    DateTime currentDate = DateTime.now();
-    DateTime lastDate = DateTime(currentDate.year - minAge, currentDate.month, currentDate.day);
-    DateTime firstDate = DateTime(currentDate.year - maxAge, currentDate.month, currentDate.day);
-    DateTime initialDate = lastDate;
-
-    DateTime? result = Platform.isAndroid
-        ? await androidDateTimePicker(initialDate, firstDate, lastDate)
-        : await iosDateTimePicker(initialDate, firstDate, lastDate);
     if (result != null) {
       _dateCtrl.text = result.toStringFormat1;
       ref.read(userProvider).setDateError();
@@ -268,34 +267,5 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateNewProfileScreen>
         _dateOfBirth = result;
       });
     }
-  }
-
-  Future<DateTime?> androidDateTimePicker(
-    DateTime initialDate,
-    DateTime firstDate,
-    DateTime lastDate,
-  ) {
-    return showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-    );
-  }
-
-  Future<DateTime?> iosDateTimePicker(
-    DateTime initialDate,
-    DateTime firstDate,
-    DateTime lastDate,
-  ) async {
-    return await showCupertinoModalPopup<DateTime?>(
-      context: context,
-      builder: (BuildContext context) => CupertinoDatePickerWidget(
-        firstDate: firstDate,
-        lastDate: lastDate,
-        initialDate: initialDate,
-        style: _style,
-      ),
-    );
   }
 }

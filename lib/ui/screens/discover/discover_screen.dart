@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/discover/widget/discover_header.dart';
@@ -58,13 +60,13 @@ List<FCTempModel> recentlyCardList = [
   ),
 ];
 
-class DiscoverScreen extends StatelessWidget {
+class DiscoverScreen extends ConsumerWidget {
   const DiscoverScreen({super.key});
 
   static AppStyle _style = AppStyle();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
@@ -80,7 +82,11 @@ class DiscoverScreen extends StatelessWidget {
         leadingWidth: _style.scale * 60,
         leading: IconButton(
           onPressed: () {
-            context.go(RoutePath.profileScreenPath);
+            if (ref.read(authProvider).isLoggedIn) {
+              context.go(RoutePath.profileScreenPath);
+            } else {
+              context.push(RoutePath.signIn);
+            }
           },
           icon: SvgPicture.asset(
             SvgPaths.profile,

@@ -3,14 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/ui/screens/analytics/analytics_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/create_new_password_screen.dart';
-import 'package:meditation_app/ui/screens/authentication/create_new_profile_screen.dart';
+import 'package:meditation_app/ui/screens/authentication/create_profile_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/forgot_password_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/sign_in_up_screen.dart';
 import 'package:meditation_app/ui/screens/category/detail_category_screen.dart';
 import 'package:meditation_app/ui/screens/courses/courses_list_screen.dart';
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
-import 'package:meditation_app/ui/screens/edit_profile/edit_profile_screen.dart';
+import 'package:meditation_app/ui/screens/update_profile/update_profile_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
 import 'package:meditation_app/ui/screens/notifications/notifications_screen.dart';
 import 'package:meditation_app/ui/screens/playlist/sub_playlist_screen.dart';
@@ -28,7 +28,7 @@ final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: RoutePath.splash,
+  initialLocation: RoutePath.discoverScreen,
   debugLogDiagnostics: true,
   routes: [
     GoRoute(
@@ -80,7 +80,7 @@ final appRouter = GoRouter(
       parentNavigatorKey: rootNavigator,
       path: RoutePath.createNewProfileScreen,
       builder: (context, state) {
-        return CreateNewProfileScreen(
+        return CreateProfileScreen(
           key: state.pageKey,
           value: state.extra != null ? state.extra as (String, String) : ('', ''),
         );
@@ -157,7 +157,7 @@ final appRouter = GoRouter(
                       parentNavigatorKey: rootNavigator,
                       path: RoutePath.editProfileScreen,
                       builder: (context, state) {
-                        return EditProfileScreen(key: state.pageKey);
+                        return UpdateProfileScreen(key: state.pageKey);
                       },
                     ),
                     GoRoute(

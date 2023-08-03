@@ -7,7 +7,7 @@
 
 import 'package:meditation_app/helper/date_converter.dart';
 
-class CreateUserProfileModel {
+class UserBody {
   final String name;
   final String email;
   final String phoneNo;
@@ -15,7 +15,7 @@ class CreateUserProfileModel {
   final String gender;
   final String password;
 
-  CreateUserProfileModel(
+  UserBody.register(
     this.name,
     this.email,
     this.phoneNo,
@@ -24,6 +24,14 @@ class CreateUserProfileModel {
     this.password,
   );
 
+  UserBody.update(
+    this.name,
+    this.email,
+    this.phoneNo,
+    this.birthDate,
+    this.gender,
+  ) : password = '';
+
   Map<String, String> get toMap {
     return {
       'name': name.trim(),
@@ -31,7 +39,7 @@ class CreateUserProfileModel {
       'phone_no': phoneNo.trim(),
       'birth_date': birthDate.toStringFormat3.trim(),
       'gender': gender.trim().toLowerCase(),
-      'password': password.trim(),
+      if (password.trim().isNotEmpty) 'password': password.trim(),
     };
   }
 }
