@@ -7,7 +7,6 @@ import 'package:http/http.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
 import 'package:meditation_app/provider/repo_provider/auth_repo_provider.dart';
 
-import '../data/api/api_checker.dart';
 import '../data/model/response/error_res_model.dart';
 import '../helper/route/router.dart';
 import '../ui/common/custom_snackbar.dart';

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meditation_app/data/model/support_ticket_body_model.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/support_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/util/assets.dart';
 
@@ -13,45 +16,30 @@ import '../../common/custom_app_bar.dart';
 import '../../common/custom_next_button.dart';
 import '../../common/custom_scrollable_column_layout.dart';
 
-class SupportScreen extends StatefulWidget {
+class SupportScreen extends ConsumerStatefulWidget {
   const SupportScreen({super.key});
 
   @override
-  State<SupportScreen> createState() => _SupportScreenState();
+  ConsumerState<SupportScreen> createState() => _SupportScreenState();
 }
 
-class _SupportScreenState extends State<SupportScreen> {
+class _SupportScreenState extends ConsumerState<SupportScreen> {
   static AppStyle _style = AppStyle();
 
   final TextEditingController _nameCtrl = TextEditingController();
   final TextEditingController _emailCtrl = TextEditingController();
   final TextEditingController _descriptionCtrl = TextEditingController();
 
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _descriptionFocusNode = FocusNode();
+
   final _disableField = false;
 
-  String? _nameErrorText;
-  String? _emailErrorText;
-  String? _descriptionErrorText;
-
-  void setNameError([String? error]) {
-    if (error == null && _nameErrorText == null) {
-      return;
-    }
-    setState(() => _nameErrorText = error);
-  }
-
-  void setEmailError([String? error]) {
-    if (error == null && _emailErrorText == null) {
-      return;
-    }
-    setState(() => _emailErrorText = error);
-  }
-
-  void setDescriptionError([String? error]) {
-    if (error == null && _descriptionErrorText == null) {
-      return;
-    }
-    setState(() => _descriptionErrorText = error);
+  @override
+  void initState() {
+    ref.read(supportProvider).clearAllErrorText(notifie: false);
+    super.initState();
   }
 
   @override
@@ -59,7 +47,9 @@ class _SupportScreenState extends State<SupportScreen> {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _descriptionCtrl.dispose();
-
+    _nameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _descriptionFocusNode.dispose();
     super.dispose();
   }
 
@@ -68,133 +58,142 @@ class _SupportScreenState extends State<SupportScreen> {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      // resizeToAvoidBottomInset: false,
-      extendBody: true,
-      appBar: CustomAppBar(
-        screenSize: size,
-        style: _style,
-        title: 'Support',
-      ),
-      body: BackgroundImage(
-        alignment: Alignment.topCenter,
-        child: SafeArea(
-          bottom: false,
-          child: CustomScrollableColumnLayout(
-            padding: EdgeInsets.only(
-              left: _style.scaleX(25),
-              right: _style.scaleX(25),
-            ),
-            minHeight: 550,
-            style: _style,
-            children: [
-              SizedBox(height: _style.scaleX(25)),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _nameCtrl,
-                    cursorColor: CustomeTextFieldStyle.cursorColor,
-                    onChanged: (_) {
-                      setNameError();
-                    },
-                    textInputAction: TextInputAction.next,
-                    decoration: CustomeTextFieldStyle.inputDecoration(
-                      style: _style,
-                      labelSize: 15,
-                      floatingLabelSize: 15,
-                    ).copyWith(
-                      labelText: 'Name',
-                      errorText: _nameErrorText,
-                    ),
-                    keyboardType: TextInputType.text,
-                    textCapitalization: TextCapitalization.words,
-                    style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
-                  ),
-                  SizedBox(height: _style.scale * 27.5),
-                  TextField(
-                    controller: _emailCtrl,
-                    cursorColor: CustomeTextFieldStyle.cursorColor,
-                    onChanged: (_) {
-                      setEmailError();
-                    },
-                    textInputAction: TextInputAction.next,
-                    decoration: CustomeTextFieldStyle.inputDecoration(
-                      style: _style,
-                      labelSize: 15,
-                      floatingLabelSize: 15,
-                    ).copyWith(
-                      labelText: 'Email',
-                      errorText: _emailErrorText,
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
-                  ),
-                  SizedBox(height: _style.scale * 27.5),
-                  TextField(
-                    controller: _descriptionCtrl,
-                    cursorColor: CustomeTextFieldStyle.cursorColor,
-                    onChanged: (_) {
-                      setDescriptionError();
-                    },
-                    decoration: CustomeTextFieldStyle.inputDecoration(
-                      style: _style,
-                      labelSize: 15,
-                      floatingLabelSize: 15,
-                    ).copyWith(
-                      labelText: 'Description',
-                      alignLabelWithHint: true,
-                      errorText: _descriptionErrorText,
-                    ),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 6,
-                    maxLength: 200,
-                    textAlignVertical: TextAlignVertical.top,
-                    style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
-                  ),
-                  SizedBox(height: _style.scale * 27.5),
-                  TextField(
-                    readOnly: !_disableField,
-                    canRequestFocus: _disableField,
-                    showCursor: _disableField,
-                    magnifierConfiguration: TextMagnifierConfiguration.disabled,
-                    onTap: () {
-                      context.go(RoutePath.supportSectionScreenPath);
-                    },
-                    keyboardType: TextInputType.none,
-                    decoration: CustomeTextFieldStyle.inputDecoration(
-                      style: _style,
-                      labelSize: 15,
-                      floatingLabelSize: 15,
-                    ).copyWith(
-                      labelText: 'Support section',
-                      labelStyle: _style.text.font(
-                        mulishSemiBold600,
-                        sizePx: 15,
-                        color: Colors.white,
+    var supportP = ref.watch(supportProvider);
+
+    return AbsorbPointer(
+      absorbing: supportP.isLoading,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        // resizeToAvoidBottomInset: false,
+        extendBody: true,
+        appBar: CustomAppBar(
+          screenSize: size,
+          style: _style,
+          title: 'Support',
+        ),
+        body: BackgroundImage(
+          alignment: Alignment.topCenter,
+          child: SafeArea(
+            bottom: false,
+            child: CustomScrollableColumnLayout(
+              padding: EdgeInsets.only(
+                left: _style.scaleX(25),
+                right: _style.scaleX(25),
+              ),
+              minHeight: 550,
+              style: _style,
+              children: [
+                SizedBox(height: _style.scaleX(25)),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      focusNode: _nameFocusNode,
+                      controller: _nameCtrl,
+                      cursorColor: CustomeTextFieldStyle.cursorColor,
+                      onChanged: (_) {
+                        supportP.setNameError();
+                      },
+                      textInputAction: TextInputAction.next,
+                      decoration: CustomeTextFieldStyle.inputDecoration(
+                        style: _style,
+                        labelSize: 15,
+                        floatingLabelSize: 15,
+                      ).copyWith(
+                        labelText: 'Name',
+                        errorText: supportP.nameErrorText,
                       ),
-                      suffixIcon: UnconstrainedBox(
-                        child: SvgPicture.asset(
-                          SvgPaths.arrowRight,
-                          height: _style.scaleX(20),
-                          width: _style.scaleX(20),
-                          fit: BoxFit.contain,
+                      keyboardType: TextInputType.text,
+                      textCapitalization: TextCapitalization.words,
+                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
+                    ),
+                    SizedBox(height: _style.scale * 27.5),
+                    TextField(
+                      focusNode: _emailFocusNode,
+                      controller: _emailCtrl,
+                      cursorColor: CustomeTextFieldStyle.cursorColor,
+                      onChanged: (_) {
+                        supportP.setEmailError();
+                      },
+                      textInputAction: TextInputAction.next,
+                      decoration: CustomeTextFieldStyle.inputDecoration(
+                        style: _style,
+                        labelSize: 15,
+                        floatingLabelSize: 15,
+                      ).copyWith(
+                        labelText: 'Email',
+                        errorText: supportP.emailErrorText,
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
+                    ),
+                    SizedBox(height: _style.scale * 27.5),
+                    TextField(
+                      focusNode: _descriptionFocusNode,
+                      controller: _descriptionCtrl,
+                      cursorColor: CustomeTextFieldStyle.cursorColor,
+                      onChanged: (_) {
+                        supportP.setDescriptionError();
+                      },
+                      decoration: CustomeTextFieldStyle.inputDecoration(
+                        style: _style,
+                        labelSize: 15,
+                        floatingLabelSize: 15,
+                      ).copyWith(
+                        labelText: 'Description',
+                        alignLabelWithHint: true,
+                        errorText: supportP.descriptionErrorText,
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 6,
+                      maxLength: 200,
+                      textAlignVertical: TextAlignVertical.top,
+                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
+                    ),
+                    SizedBox(height: _style.scale * 27.5),
+                    TextField(
+                      readOnly: !_disableField,
+                      canRequestFocus: _disableField,
+                      showCursor: _disableField,
+                      magnifierConfiguration: TextMagnifierConfiguration.disabled,
+                      onTap: () {
+                        context.go(RoutePath.supportSectionScreenPath);
+                      },
+                      keyboardType: TextInputType.none,
+                      decoration: CustomeTextFieldStyle.inputDecoration(
+                        style: _style,
+                        labelSize: 15,
+                        floatingLabelSize: 15,
+                      ).copyWith(
+                        labelText: 'Support section',
+                        labelStyle: _style.text.font(
+                          mulishSemiBold600,
+                          sizePx: 15,
+                          color: Colors.white,
+                        ),
+                        suffixIcon: UnconstrainedBox(
+                          child: SvgPicture.asset(
+                            SvgPaths.arrowRight,
+                            height: _style.scaleX(20),
+                            width: _style.scaleX(20),
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
+                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
                     ),
-                    style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              CustomNextButton(
-                text: 'Submit',
-                onPressed: onNext,
-                style: _style,
-              ),
-              SizedBox(height: _style.scale * 20),
-            ],
+                  ],
+                ),
+                const Spacer(),
+                CustomNextButton(
+                  text: 'Submit',
+                  onPressed: !supportP.isLoading ? onNext : null,
+                  style: _style,
+                  inProgress: supportP.isLoading,
+                ),
+                SizedBox(height: _style.scale * 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -207,22 +206,29 @@ class _SupportScreenState extends State<SupportScreen> {
     String description = _descriptionCtrl.text.trim();
 
     if (name.isEmpty) {
-      setNameError('Please enter a name');
+      ref.read(supportProvider).setNameError(error: 'Please enter a name');
       return;
     } else if (email.isEmpty) {
-      setEmailError('Please enter an email');
+      ref.read(supportProvider).setEmailError(error: 'Please enter an email');
       return;
     } else if (!email.isEmail) {
-      setEmailError('Invalid email');
+      ref.read(supportProvider).setEmailError(error: 'Invalid email');
       return;
     } else if (description.isEmpty) {
-      setEmailError('Please enter an description');
+      ref.read(supportProvider).setDescriptionError(error: 'Please enter an description');
       return;
     } else {
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Submited Successfully')),
-      );
+      FocusManager.instance.primaryFocus?.unfocus();
+      ref.read(supportProvider).raiseSupportTicket(
+            SupportTicket.body(
+              name: name,
+              email: email,
+              description: description,
+            ),
+            nameCtrl: _nameCtrl,
+            emailCtrl: _emailCtrl,
+            descriptionCtrl: _descriptionCtrl,
+          );
     }
   }
 }

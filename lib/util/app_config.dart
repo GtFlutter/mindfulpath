@@ -2,27 +2,39 @@
 
 // TODO : Resend OTP Pending For All Like Registeration and Forgot Password etc
 class AppConfigs {
+  /// START [API_CONFIG]
+
   static const String APP_NAME = 'Meditation';
   static const String baseUrl = 'https://gurutechnolabs.co.in/website/laravel/meditation/public/api';
 
-  /// For [register] and [forgotPassword]
+  /// [User_Authentication]
+  // User Before For [registerUser] and [forgotPassword]
   static const String sendOTP = '/send-otp';
   static const String verifyOTP = '/verify-otp';
-  static const String register = '/register';
-  static const String login = '/login';
-  static const String logout = '/log-out';
-
-  /// Forgot Password : Only OTP Verification Require, No Auth Require
+  static const String registerUser = '/register';
+  static const String loginUser = '/login';
+  static const String logoutUser = '/log-out';
+  static const String getUserProfile = '/get-user-profile';
+  static const String updateUserProfile = '/update-profile';
+  // For Forgot Password : Only OTP Verification Require, No Auth Require
+  // Do OTP Verification via [sendOTP] and then [verifyOTP]
   static const String resetPassword = '/reset-password';
-
-  /// Chanage Password : Auth Require
+  // For Chanage Password : Auth Require
   static const String changePassword = '/update-password';
-  static const String userProfile = '/get-user-profile';
-  static const String updateProfile = '/update-profile';
 
-  /// Get All View Data Example List Of Privacy Policy, Terms & Conditions, share_ios_link, share_android_link etc.
-  static const String getStaticPage = '/get-static-page';
+  /// [Settings]
+  // Get All View Data Example List Of Privacy Policy, Terms & Conditions,
+  // share_ios_link, share_android_link etc.
+  static const String getStaticPageData = '/get-static-page';
+  static const String raiseSupportTicket = '/contact-support';
+  static const String getSupportTicketsList = '/contact-support-list';
 
-  /// Shared Key
+  /// END [API_CONFIG]
+
+  /// START [LOCAL_KEY]
+
+  // Shared Preference Key
   static const String TOKEN = 'meditation_token';
+
+  /// END [LOCAL_KEY]
 }

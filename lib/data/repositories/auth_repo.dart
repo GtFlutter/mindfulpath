@@ -33,23 +33,23 @@ class AuthRepo {
   }
 
   Future<Response> createUserProfile(UserBody model) async {
-    return await apiClient.postData(AppConfigs.register, model.toMap);
+    return await apiClient.postData(AppConfigs.registerUser, model.toJson);
   }
 
   Future<Response> updateUserProfile(UserBody model) async {
-    return await apiClient.postData(AppConfigs.updateProfile, model.toMap);
+    return await apiClient.postData(AppConfigs.updateUserProfile, model.toJson);
   }
 
   Future<Response> loginUser(String phoneNo, String password) async {
-    return await apiClient.postData(AppConfigs.login, {'phone_no': phoneNo, 'password': password});
+    return await apiClient.postData(AppConfigs.loginUser, {'phone_no': phoneNo, 'password': password});
   }
 
   Future<Response> logoutUser() async {
-    return await apiClient.getData(AppConfigs.logout);
+    return await apiClient.getData(AppConfigs.logoutUser);
   }
 
   Future<Response> getUserProfile() async {
-    return await apiClient.getData(AppConfigs.userProfile);
+    return await apiClient.getData(AppConfigs.getUserProfile);
   }
 
   /// Forgot Password : Only OTP Verification Require, No Auth Require
@@ -59,10 +59,6 @@ class AuthRepo {
 
   Future<Response> changePassword(String oldPassword, String password) async {
     return await apiClient.postData(AppConfigs.changePassword, {'old_password': oldPassword, 'new_password': password});
-  }
-
-  Future<Response> getStaticPage() async {
-    return await apiClient.getData(AppConfigs.getStaticPage);
   }
 
   Future<bool> saveUserToken(String token) async {

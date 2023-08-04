@@ -3,8 +3,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/static_data_model.dart';
 import 'package:meditation_app/provider/static_data_provider.dart';
-import 'package:meditation_app/theme/colors.dart';
-import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import 'package:meditation_app/util/constants.dart';

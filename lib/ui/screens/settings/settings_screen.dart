@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,13 +8,22 @@ import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/settings/widget/custom_switch.dart';
 import 'package:meditation_app/ui/screens/settings/widget/settings_listtile.dart';
 import 'package:meditation_app/util/assets.dart';
+import 'package:meditation_app/util/constants.dart';
 
+import '../../../data/model/response/static_data_model.dart';
+import '../../../provider/static_data_provider.dart';
 import '../../../theme/styles.dart';
 import '../../common/custom_app_bar.dart';
 
+///  TODO : Error In Share Data Get Working On It
+///
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -94,7 +105,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 SizedBox(height: _style.scaleX(25)),
                 SettingsListTile(
                   style: _style,
-                  onPressed: () {},
+                  onPressed: () {
+                    AsyncValue<List<StaticData>> data = ref.read(getStaticDataProvider);
+                    data.when(
+                      skipLoadingOnReload: true,
+                      data: (data) {
+                        debugPrint('data :::::::::');
+                        int index = data.indexWhere(
+                          (element) {
+                            return element.key == (Platform.isAndroid ? 'share_android' : 'share_ios');
+                          },
+                        );
+                        if (index != -1 && data[index].value != null) {
+                          showCustomSnackBar(data[index].value ?? AppConstants.WENT_WRONG);
+                        } else {
+                          showCustomSnackBar(AppConstants.WENT_WRONG);
+                        }
+                      },
+                      error: (error, stackTrace) {
+                        showCustomSnackBar(AppConstants.WENT_WRONG);
+                        debugPrint('error :::::::');
+                      },
+                      loading: () {
+                        // showCustomSnackBar('Sharing...');
+                      },
+                    );
+                  },
                   title: 'Share App',
                 ),
                 SizedBox(height: _style.scaleX(25)),

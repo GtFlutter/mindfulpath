@@ -32,7 +32,7 @@ class UserBody {
     this.gender,
   ) : password = '';
 
-  Map<String, String> get toMap {
+  Map<String, String> get toJson {
     return {
       'name': name.trim(),
       'email': email.trim(),

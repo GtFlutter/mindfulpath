@@ -7,6 +7,7 @@ import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/user_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 
+import '../../../data/model/response/response_error.dart';
 import '../../../data/model/response/user_response.dart';
 import '../../../theme/styles.dart';
 import '../../common/custom_app_bar.dart';

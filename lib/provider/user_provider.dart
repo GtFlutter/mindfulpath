@@ -13,6 +13,7 @@ import 'package:meditation_app/provider/repo_provider/auth_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 
 import '../data/model/response/error_res_model.dart';
+import '../data/model/response/response_error.dart';
 import '../helper/route/route_paths.dart';
 import '../helper/route/router.dart';
 import '../util/constants.dart';
@@ -29,9 +30,6 @@ class UserNotifier extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-
-  UserResponse? _user;
-  UserResponse? get user => _user;
 
   String? _nameErrorText;
   String? _emailErrorText;
@@ -154,14 +152,17 @@ class UserNotifier extends ChangeNotifier {
     startProgress();
     showCustomSnackBar('Updating Profile...');
     Response response = await repo.updateUserProfile(model);
-    stopProgress();
+
     if (response.statusCode == 200) {
+      stopProgress();
       showCustomSnackBar('Profile Updated Successfully', type: true);
       // _contextPopIfAvailable();
       return;
     }
-    if (response.statusCode == 403 && jsonDecode(response.body)['data'] != null) {
-      NewUserResponseErrorModel errorModel = NewUserResponseErrorModel.fromJson(jsonDecode(response.body)['data']);
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 403 && data['data'] != null) {
+      NewUserResponseErrorModel errorModel = NewUserResponseErrorModel.fromJson(data['data']);
       if (errorModel.phoneNo.isNotEmpty) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
         _contextPopIfAvailable();
@@ -171,8 +172,10 @@ class UserNotifier extends ChangeNotifier {
         if (errorModel.birthDate.isNotEmpty) setDateError(error: errorModel.birthDate.first, notifie: false);
         if (errorModel.gender.isNotEmpty) setGenderError(error: errorModel.gender.first, notifie: false);
       }
+      stopProgress();
       return;
     }
+    startProgress();
     ApiChecker.checkApi(response);
     _contextPopIfAvailable();
   }
@@ -183,12 +186,6 @@ class UserNotifier extends ChangeNotifier {
       context.pop();
     }
   }
-}
-
-class ResponseError {
-  final int statusCode;
-  final String error;
-  ResponseError(this.statusCode, this.error);
 }
 
 final getUserProfileProvider = FutureProvider<UserResponse>((ref) async {

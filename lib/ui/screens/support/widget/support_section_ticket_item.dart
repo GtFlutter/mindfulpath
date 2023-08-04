@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:meditation_app/data/model/support_ticket_body_model.dart';
 import 'package:meditation_app/helper/date_converter.dart';
 
 import '../../../../theme/colors.dart';
@@ -9,11 +10,13 @@ import '../../../../util/assets.dart';
 
 class SupportSectionTicketItem extends StatelessWidget {
   final VoidCallback? onPressed;
+  final SupportTicket ticket;
 
   const SupportSectionTicketItem({
     super.key,
     required AppStyle style,
     this.onPressed,
+    required this.ticket,
   }) : _style = style;
 
   final AppStyle _style;
@@ -43,14 +46,14 @@ class SupportSectionTicketItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'I have technical issues',
+                    ticket.description ?? '',
                     style: _style.text.font(mulishSemiBold600, sizePx: 12.5),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: _style.scaleX(7.5)),
                   Text(
-                    DateTime.now().toStringFormat2,
+                    ticket.updatedAt == null ? '' : ticket.updatedAt!.toStringFormat2,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: _style.text.font(
