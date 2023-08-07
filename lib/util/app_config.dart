@@ -28,6 +28,7 @@ class AppConfigs {
   static const String getStaticPageData = '/get-static-page';
   static const String raiseSupportTicket = '/contact-support';
   static const String getSupportTicketsList = '/contact-support-list';
+  static const String notificationToggle = '/notification-setting';
 
   /// END [API_CONFIG]
 

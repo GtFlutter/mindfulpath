@@ -1,0 +1,93 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../provider/auth_provider.dart';
+import '../../../../theme/styles.dart';
+import '../../../../theme/text_style.dart';
+
+class LogoutDialog extends ConsumerWidget {
+  const LogoutDialog(this.style, {super.key});
+
+  final AppStyle style;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var authP = ref.watch(authProvider);
+    return AbsorbPointer(
+      absorbing: authP.isLoading,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: style.scaleX(330)),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            style.scaleX(12.5),
+            style.scaleX(26.5),
+            style.scaleX(12.5),
+            style.scaleX(18),
+          ),
+          child: Stack(
+            alignment: AlignmentDirectional.topEnd,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Log out',
+                    style: style.text.font(mulishSemiBold600, sizePx: 20),
+                  ),
+                  SizedBox(height: style.scaleX(10)),
+                  Text(
+                    'Are you sure, you want to Logout?',
+                    style: style.text.font(mulishRegular400, sizePx: 13),
+                  ),
+                  SizedBox(height: style.scaleX(37.5)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: authP.isLoading
+                              ? null
+                              : () {
+                                  if (context.canPop()) context.pop();
+                                },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
+                            padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
+                          ),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                      SizedBox(width: style.scaleX(21)),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: authP.isLoading ? null : () => authP.logoutUser(),
+                          style: FilledButton.styleFrom(
+                            textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
+                            padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
+                          ),
+                          child: Text(authP.isLoading ? 'Loging out..' : 'Log out'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if (authP.isLoading)
+                Container(
+                  alignment: Alignment.center,
+                  margin: EdgeInsets.symmetric(horizontal: style.scaleX(10)),
+                  constraints: BoxConstraints(maxHeight: style.scaleX(20), maxWidth: style.scaleX(20)),
+                  child: CircularProgressIndicator.adaptive(
+                    strokeWidth: style.scaleX(2),
+                    backgroundColor: Colors.white,
+                    valueColor: AlwaysStoppedAnimation(Colors.green.shade900),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

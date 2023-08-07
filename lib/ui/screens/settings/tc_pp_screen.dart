@@ -47,6 +47,7 @@ class TCPPScreen extends ConsumerWidget {
                 if (index != -1 && data[index].value != null) {
                   return SingleChildScrollView(
                     padding: EdgeInsets.all(_style.scale * 20),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     child: Html(
                       shrinkWrap: true,
                       data: data[index].value ?? '',

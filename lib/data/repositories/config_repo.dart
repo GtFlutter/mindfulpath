@@ -22,4 +22,8 @@ class ConfigRepo {
   Future<Response> getSupportTicketsList() async {
     return await apiClient.getData(AppConfigs.getSupportTicketsList);
   }
+
+  Future<Response> notificationToggle() async {
+    return await apiClient.getData(AppConfigs.notificationToggle);
+  }
 }

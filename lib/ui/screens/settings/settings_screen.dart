@@ -5,25 +5,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
-import 'package:meditation_app/provider/auth_provider.dart';
-import 'package:meditation_app/theme/text_style.dart';
+import 'package:meditation_app/provider/config_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/settings/widget/custom_switch.dart';
 import 'package:meditation_app/ui/screens/settings/widget/settings_listtile.dart';
+import 'package:meditation_app/util/app_config.dart';
 import 'package:meditation_app/util/assets.dart';
-import 'package:meditation_app/util/constants.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../data/model/response/static_data_model.dart';
+import '../../../data/model/response/user_response.dart';
 import '../../../provider/static_data_provider.dart';
+import '../../../provider/user_provider.dart';
 import '../../../theme/styles.dart';
 import '../../common/custom_app_bar.dart';
+import 'widget/logout_dialog.dart';
 
-///  TODO : Error In Share Data Get Working On It
-///
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -40,6 +37,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
+    AsyncValue<UserResponse> user = ref.watch(getUserProfileProvider);
+    AsyncValue<List<StaticData>> staticData = ref.watch(getStaticDataProvider);
+    var configP = ref.watch(configProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
@@ -51,96 +52,107 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: BackgroundImage(
         alignment: Alignment.topCenter,
         child: SafeArea(
-          bottom: false,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20), vertical: _style.scaleX(25)),
-            child: Column(
-              children: [
-                SettingsListTile(
-                  style: _style,
-                  onPressed: () {
-                    setState(() {
-                      notification = !notification;
-                    });
-                  },
-                  tralling: FlutterSwitch(
-                    value: notification,
-                    width: _style.scaleX(35),
-                    height: _style.scaleX(22),
-                    borderRadius: _style.scaleX(20),
-                    toggleSize: _style.scaleX(15),
-                    activeToggleColor: const Color(0xFFEADDFF),
-                    inactiveToggleColor: const Color(0xFF49454F),
-                    inactiveSwitchBorder: Border.all(color: const Color(0xFF79747E), width: _style.scaleX(1.5)),
-                    activeSwitchBorder: Border.all(color: const Color(0xFF5A5A5A), width: _style.scaleX(1.5)),
-                    activeColor: const Color(0xFF5A5A5A),
-                    inactiveColor: const Color(0xFFE6E0E9),
-                    onToggle: (value) {
-                      setState(() {
-                        notification = value;
-                      });
-                    },
-                    toggleMargin: _style.scaleX(4),
-                  ),
-                  title: 'Notification',
-                ),
-                SizedBox(height: _style.scaleX(25)),
-                SettingsListTile(
-                  style: _style,
-                  onPressed: () {
-                    context.push(RoutePath.tCPpScreen, extra: false);
-                  },
-                  tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
-                  title: 'Privacy Policy',
-                ),
-                SizedBox(height: _style.scaleX(25)),
-                SettingsListTile(
-                  style: _style,
-                  onPressed: () {
-                    context.push(RoutePath.tCPpScreen, extra: true);
-                  },
-                  tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
-                  title: 'Terms & Conditions',
-                ),
-                SizedBox(height: _style.scaleX(25)),
-                SettingsListTile(
-                  style: _style,
-                  onPressed: () {
-                    AsyncValue<List<StaticData>> data = ref.read(getStaticDataProvider);
-                    data.when(
-                      skipLoadingOnReload: true,
+          // bottom: false,
+          child: RefreshIndicator(
+            onRefresh: () => ref.refresh(getUserProfileProvider.future),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20), vertical: _style.scaleX(25)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SettingsListTile(
+                    style: _style,
+                    onPressed: !user.hasValue || configP.isLoading ? null : () => configP.notificationToggle(),
+                    tralling: user.when(
+                      skipLoadingOnRefresh: false,
                       data: (data) {
-                        debugPrint('data :::::::::');
-                        int index = data.indexWhere(
-                          (element) {
-                            return element.key == (Platform.isAndroid ? 'share_android' : 'share_ios');
-                          },
-                        );
-                        if (index != -1 && data[index].value != null) {
-                          showCustomSnackBar(data[index].value ?? AppConstants.WENT_WRONG);
-                        } else {
-                          showCustomSnackBar(AppConstants.WENT_WRONG);
+                        if (configP.isLoading) {
+                          return SizedBox(
+                            height: _style.scaleX(22),
+                            width: _style.scaleX(22),
+                            child: const CircularProgressIndicator(strokeWidth: 2),
+                          );
                         }
+                        return FlutterSwitch(
+                          value: data.isNotificationMute == null ? false : data.isNotificationMute == 1,
+                          width: _style.scaleX(35),
+                          height: _style.scaleX(22),
+                          borderRadius: _style.scaleX(20),
+                          toggleSize: _style.scaleX(15),
+                          activeToggleColor: const Color(0xFFEADDFF),
+                          inactiveToggleColor: const Color(0xFF49454F),
+                          inactiveSwitchBorder: Border.all(color: const Color(0xFF79747E), width: _style.scaleX(1.5)),
+                          activeSwitchBorder: Border.all(color: const Color(0xFF5A5A5A), width: _style.scaleX(1.5)),
+                          activeColor: const Color(0xFF5A5A5A),
+                          inactiveColor: const Color(0xFFE6E0E9),
+                          toggleMargin: _style.scaleX(4),
+                          onToggle: (_) => configP.notificationToggle(),
+                        );
                       },
-                      error: (error, stackTrace) {
-                        showCustomSnackBar(AppConstants.WENT_WRONG);
-                        debugPrint('error :::::::');
-                      },
-                      loading: () {
-                        // showCustomSnackBar('Sharing...');
-                      },
-                    );
-                  },
-                  title: 'Share App',
-                ),
-                SizedBox(height: _style.scaleX(25)),
-                SettingsListTile(
-                  style: _style,
-                  onPressed: logout,
-                  title: 'Logout',
-                ),
-                SizedBox(height: _style.scaleX(25)),
-              ],
+                      error: (error, stackTrace) => IconButton(
+                        onPressed: () => ref.refresh(getUserProfileProvider.future),
+                        icon: const Icon(Icons.refresh_sharp),
+                        style: IconButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+                        ),
+                      ),
+                      loading: () => SizedBox(
+                        height: _style.scaleX(22),
+                        width: _style.scaleX(22),
+                        child: const CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    title: 'Notification',
+                  ),
+                  SizedBox(height: _style.scaleX(25)),
+                  SettingsListTile(
+                    style: _style,
+                    onPressed: () => context.push(RoutePath.tCPpScreen, extra: false),
+                    tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
+                    title: 'Privacy Policy',
+                  ),
+                  SizedBox(height: _style.scaleX(25)),
+                  SettingsListTile(
+                    style: _style,
+                    onPressed: () => context.push(RoutePath.tCPpScreen, extra: true),
+                    tralling: SvgPicture.asset(SvgPaths.arrowRight, width: 20, fit: BoxFit.fitWidth),
+                    title: 'Terms & Conditions',
+                  ),
+                  SizedBox(height: _style.scaleX(25)),
+                  staticData.when(
+                    data: (data) {
+                      int index = data.indexWhere(
+                        (element) => element.key == (Platform.isAndroid ? 'share_android' : 'share_ios'),
+                      );
+                      return index != -1 && data[index].value != null
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SettingsListTile(
+                                  style: _style,
+                                  onPressed: () {
+                                    Share.share(
+                                      'Download The ${AppConfigs.APP_NAME} App Now. \n ${data[index].value}',
+                                      subject: 'Download the ${AppConfigs.APP_NAME} app now.',
+                                    );
+                                  },
+                                  title: 'Share App',
+                                ),
+                                SizedBox(height: _style.scaleX(25)),
+                              ],
+                            )
+                          : const SizedBox.shrink();
+                    },
+                    error: (Object _, StackTrace __) => const SizedBox.shrink(),
+                    loading: () => const SizedBox.shrink(),
+                  ),
+                  SettingsListTile(style: _style, onPressed: logout, title: 'Logout'),
+                  SizedBox(height: _style.scaleX(25)),
+                ],
+              ),
             ),
           ),
         ),
@@ -163,98 +175,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         );
       },
-    );
-  }
-}
-
-class LogoutDialog extends ConsumerWidget {
-  const LogoutDialog(this.style, {super.key});
-
-  final AppStyle style;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var authP = ref.watch(authProvider);
-    return AbsorbPointer(
-      absorbing: authP.isLoading,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: style.scaleX(330)),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            style.scaleX(12.5),
-            style.scaleX(26.5),
-            style.scaleX(12.5),
-            style.scaleX(18),
-          ),
-          child: Stack(
-            alignment: AlignmentDirectional.topEnd,
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Log out',
-                    style: style.text.font(mulishSemiBold600, sizePx: 20),
-                  ),
-                  SizedBox(height: style.scaleX(10)),
-                  Text(
-                    'Are you sure, you want to Logout?',
-                    style: style.text.font(mulishRegular400, sizePx: 13),
-                  ),
-                  SizedBox(height: style.scaleX(37.5)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: authP.isLoading
-                              ? null
-                              : () {
-                                  if (context.canPop()) {
-                                    context.pop();
-                                  }
-                                },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
-                            padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                      ),
-                      SizedBox(width: style.scaleX(21)),
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: authP.isLoading
-                              ? null
-                              : () {
-                                  authP.logoutUser();
-                                },
-                          style: FilledButton.styleFrom(
-                            textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
-                            padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
-                          ),
-                          child: Text(authP.isLoading ? 'Loging out..' : 'Log out'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if (authP.isLoading)
-                Container(
-                  alignment: Alignment.center,
-                  margin: EdgeInsets.symmetric(horizontal: style.scaleX(10)),
-                  constraints: BoxConstraints(maxHeight: style.scaleX(20), maxWidth: style.scaleX(20)),
-                  child: CircularProgressIndicator.adaptive(
-                    strokeWidth: style.scaleX(2),
-                    backgroundColor: Colors.white,
-                    valueColor: AlwaysStoppedAnimation(Colors.green.shade900),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

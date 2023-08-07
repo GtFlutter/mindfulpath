@@ -52,6 +52,7 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
               skipLoadingOnRefresh: false,
               data: (data) {
                 return ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20), vertical: _style.scaleX(25)),
                   itemBuilder: (context, index) {
                     return SupportSectionTicketItem(
