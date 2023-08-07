@@ -42,14 +42,22 @@ class AuthNotifier extends ChangeNotifier {
     }
   }
 
-  /// Password is required for type == SendOTP.register
+  /// Password is required for type == SendOTP.register, If You Want To Replace Screen Then add shouldReplace = true
   Future<void> requestOTP(
-      {required String countryCode, required String phoneNo, required SendOTP type, String? password}) async {
+      {required String countryCode,
+      required String phoneNo,
+      required SendOTP type,
+      String? password,
+      bool shouldReplace = false}) async {
     assert(!(type == SendOTP.register && password == null));
-    startProgress();
+    if (!shouldReplace) {
+      startProgress();
+    } else {
+      showCustomSnackBar('Resending OTP');
+    }
     Response response = await repo.requestOTP(countryCode + phoneNo, type);
     if (response.statusCode != 200) {
-      stopProgress();
+      if (!shouldReplace) stopProgress();
       ApiChecker.checkApi(response);
       return;
     }
@@ -59,20 +67,36 @@ class AuthNotifier extends ChangeNotifier {
     } catch (_) {
       otp = null;
     }
-    stopProgress();
+    if (!shouldReplace) {
+      stopProgress();
+    }
     if (otp != null) {
+      if (shouldReplace) showCustomSnackBar('OTP Sended Successfully $otp');
       BuildContext? context = rootNavigator.currentContext;
       if (context != null && context.mounted) {
-        context.push(
-          RoutePath.otpVerificationScreen,
-          extra: OTPModel(
-            otp: otp,
-            type: type,
-            countryCode: countryCode,
-            phoneNo: phoneNo,
-            password: password,
-          ),
-        );
+        if (!shouldReplace) {
+          context.push(
+            RoutePath.otpVerificationScreen,
+            extra: OTPModel(
+              otp: otp,
+              type: type,
+              countryCode: countryCode,
+              phoneNo: phoneNo,
+              password: password,
+            ),
+          );
+        } else {
+          context.pushReplacement(
+            RoutePath.otpVerificationScreen,
+            extra: OTPModel(
+              otp: otp,
+              type: type,
+              countryCode: countryCode,
+              phoneNo: phoneNo,
+              password: password,
+            ),
+          );
+        }
         return;
       }
     }

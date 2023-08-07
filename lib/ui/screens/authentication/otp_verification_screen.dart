@@ -4,9 +4,7 @@ import 'package:flutter/cupertino.dart' show CupertinoButton;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
-import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
@@ -72,7 +70,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       absorbing: authP.isLoading,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         extendBody: true,
         body: BackgroundImage(
             alignment: Alignment.topCenter,
@@ -87,7 +85,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                   ),
                   Expanded(
                     child: CustomScrollableColumnLayout(
-                      minHeight: 150 * _style.scale,
+                      minHeight: 200 * _style.scale,
                       style: _style,
                       children: [
                         Spacer(flex: 1),
@@ -140,7 +138,15 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                         color: AppColors.otpMsgTextColor,
                                       )),
                                   CupertinoButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      ref.read(authProvider).requestOTP(
+                                            countryCode: widget.model.countryCode,
+                                            phoneNo: widget.model.phoneNo,
+                                            type: widget.model.type,
+                                            password: widget.model.password,
+                                            shouldReplace: true,
+                                          );
+                                    },
                                     padding: EdgeInsets.zero,
                                     minSize: 10,
                                     child: Text(
