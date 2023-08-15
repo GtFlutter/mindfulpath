@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
@@ -13,11 +14,11 @@ class DBTempModel {
 }
 
 class DiscoverItem extends StatelessWidget {
-  final DBTempModel model;
+  final CategoryListResponse item;
   final AppStyle style;
   final VoidCallback? onPressed;
 
-  const DiscoverItem({super.key, required this.model, required this.style, this.onPressed});
+  const DiscoverItem({super.key, required this.item, required this.style, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class DiscoverItem extends StatelessWidget {
         alignment: Alignment.centerLeft,
         decoration: ShapeDecoration(
           image: DecorationImage(
-            image: NetworkImage(model.imgUrl),
+            image: NetworkImage(item.imageResponse!.imageUrl ?? ''),
             fit: BoxFit.cover,
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -64,17 +65,17 @@ class DiscoverItem extends StatelessWidget {
                 children: [
                   const Spacer(flex: 2),
                   Text(
-                    model.title,
+                    item.title ?? '',
                     style: style.text.font(mulishBold700, sizePx: 20, color: AppColors.cardTextColor),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
-                    model.subTitle,
-                    style: style.text.font(mulishRegular400, sizePx: 20, color: AppColors.cardTextColor),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  // Text(
+                  //   model.subTitle,
+                  //   style: style.text.font(mulishRegular400, sizePx: 20, color: AppColors.cardTextColor),
+                  //   maxLines: 1,
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
                   const Spacer(),
                   FilledButton(
                     onPressed: onPressed,
@@ -87,7 +88,7 @@ class DiscoverItem extends StatelessWidget {
                       ),
                       visualDensity: const VisualDensity(vertical: -1),
                     ),
-                    child: Text(model.btnText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    child: Text(item.buttonTitle ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                   const Spacer(),
                 ],

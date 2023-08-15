@@ -30,6 +30,9 @@ class AppConfigs {
   static const String getSupportTicketsList = '/contact-support-list';
   static const String notificationToggle = '/notification-setting';
 
+  static const String getCategoryList = '/get-category-list';
+  static const String getVideoList = '/get-video-list';
+
   /// END [API_CONFIG]
 
   /// START [LOCAL_KEY]

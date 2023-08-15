@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
+import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/discover/widget/discover_header.dart';
@@ -60,18 +61,35 @@ List<FCTempModel> recentlyCardList = [
   ),
 ];
 
-class DiscoverScreen extends ConsumerWidget {
+class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
+
+  @override
+  ConsumerState<DiscoverScreen> createState() => _DiscoverScreenState();
+}
+
+class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   static AppStyle _style = AppStyle();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    final dashboardNotifier = ref.read(dashboardProvider);
+    Future.delayed(Duration.zero, () {
+      dashboardNotifier.getCategoryList();
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
     /// This is For Featured Card Image Clipper
     final DashboardCustomImageClipper clipper = DashboardCustomImageClipper(_style.scaleX(15));
+
+    final dashboardNotifier = ref.watch<DashboardNotifier>(dashboardProvider);
 
     return Scaffold(
       extendBody: true,
@@ -131,7 +149,7 @@ class DiscoverScreen extends ConsumerWidget {
       body: BackgroundImage(
         child: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
+          child: dashboardNotifier.isLoading ? const Center(child: CircularProgressIndicator(),) : SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.only(bottom: _style.scale * 100, top: _style.scale * 10),
             child: Column(
@@ -140,6 +158,7 @@ class DiscoverScreen extends ConsumerWidget {
                 /// Discover Layout
                 DiscoverLayout(
                   style: _style,
+                  categoryListResponse: dashboardNotifier.categoryListResponse ?? [],
                 ),
                 DiscoverHeader(title: 'Featured', style: _style),
 
