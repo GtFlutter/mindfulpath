@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meditation_app/data/model/response/video_list_response.dart';
 import 'package:meditation_app/ui/screens/discover/widget/featured_item.dart';
 import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.dart';
 
@@ -14,7 +15,7 @@ class FeaturedListWidget extends StatelessWidget {
 
   final AppStyle style;
   final DashboardCustomImageClipper clipper;
-  final List<FCTempModel> list;
+  final List<VideoListResponse> list;
 
   @override
   Widget build(BuildContext context) {

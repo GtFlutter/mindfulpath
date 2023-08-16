@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
 
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
-import '../../category/widget/detail_item.dart';
 
 class BookmarkItem extends StatelessWidget {
   final AppStyle appStyle;
-  final DIModel model;
+  final BookmarkListResponse model;
   final String index;
   final bool dragable;
   final bool dragging;
@@ -60,8 +60,8 @@ class BookmarkItem extends StatelessWidget {
           children: [
             MediaImageCard(
               appStyle: appStyle,
-              imgUrl: model.imgUrl,
-              duration: model.duration,
+              imgUrl: model.bookmarkVideoResponse != null ? model.bookmarkVideoResponse!.thumbnailImageUrl ?? '' : '',
+              duration: '10 Min',
               imgRadius: appStyle.scaleX(25),
               imgSize: appStyle.scaleX(90),
             ),
@@ -78,7 +78,7 @@ class BookmarkItem extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '$index ${model.title} \n ashjsahd',
+                            '${model.videoTitle}',
                             style: appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -88,7 +88,6 @@ class BookmarkItem extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             TextSpan(
-                              text: model.auther,
                               style: textStyle.copyWith(color: AppColors.autherNameColor),
                               children: [
                                 TextSpan(
@@ -97,7 +96,7 @@ class BookmarkItem extends StatelessWidget {
                                       appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                 ),
                                 TextSpan(
-                                  text: model.category,
+                                  text: 'Nutrition',
                                   style: textStyle.copyWith(color: AppColors.categoryNameColor),
                                 ),
                               ],

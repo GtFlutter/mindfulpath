@@ -76,7 +76,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   void initState() {
     final dashboardNotifier = ref.read(dashboardProvider);
     Future.delayed(Duration.zero, () {
-      dashboardNotifier.getCategoryList();
+      dashboardNotifier.init();
     });
     super.initState();
   }
@@ -166,7 +166,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 FeaturedListWidget(
                   style: _style,
                   clipper: clipper,
-                  list: featuredCardList,
+                  list: dashboardNotifier.featureVideoListResponse ?? [],
                 ),
 
                 DiscoverHeader(title: 'Recently played', style: _style),
@@ -176,7 +176,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 FeaturedListWidget(
                   style: _style,
                   clipper: clipper,
-                  list: recentlyCardList,
+                  list: dashboardNotifier.featureVideoListResponse ?? [],
                 ),
               ],
             ),

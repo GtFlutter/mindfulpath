@@ -32,6 +32,10 @@ class AppConfigs {
 
   static const String getCategoryList = '/get-category-list';
   static const String getVideoList = '/get-video-list';
+  static const String getFeatureVideoList = '/get-featured-video-list';
+
+  static const String getBookmarks = '/get-bookmark-list';
+  static const String toggleBookmark = '/add-to-bookmark';
 
   /// END [API_CONFIG]
 

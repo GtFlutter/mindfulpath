@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meditation_app/data/model/response/video_list_response.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
@@ -11,7 +12,7 @@ class FCTempModel {
 }
 
 class FeaturedItem extends StatelessWidget {
-  final FCTempModel model;
+  final VideoListResponse model;
   final DashboardCustomImageClipper clipper;
   final AppStyle style;
   const FeaturedItem(this.model, this.clipper, {super.key, required this.style});
@@ -39,7 +40,7 @@ class FeaturedItem extends StatelessWidget {
               style.scaleX(9),
             ),
             child: Text(
-              model.title,
+              model.title ?? '',
               style: style.text.font(mulishRegular400, sizePx: 12.5),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -53,7 +54,7 @@ class FeaturedItem extends StatelessWidget {
                 child: Container(
                   width: cardWidth * 0.55,
                   decoration: BoxDecoration(
-                    image: DecorationImage(image: NetworkImage(model.imgUrl), fit: BoxFit.cover),
+                    image: DecorationImage(image: NetworkImage(model.thumbnailImage ?? ''), fit: BoxFit.cover),
                   ),
                 ),
               ),

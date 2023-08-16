@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meditation_app/data/model/response/video_list_response.dart';
 
 import '../../../../theme/styles.dart';
 import '../../category/temp_data_file.dart';
@@ -27,8 +28,8 @@ class AllVideosList extends StatelessWidget {
           onTap: () {},
           child: DetailItem(
             appStyle: _style,
-            model: TempData.listDiModel[index],
-            index: '$index',
+            model: VideoListResponse(),
+            index: '$index', onToggleBookmark: () {  },
           ),
         );
       },

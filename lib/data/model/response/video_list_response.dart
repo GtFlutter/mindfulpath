@@ -29,10 +29,11 @@ class VideoListResponse {
   String? duration;
   String? thumbnailImage;
   String? videoUrl;
+  bool? bookmark;
   VideoImageResponse? imageResponse;
   VideoImageResponse? videResponse;
 
-  VideoListResponse({this.id, this.title, this.categoryId, this.duration, this.thumbnailImage, this.videoUrl, this.imageResponse, this.videResponse});
+  VideoListResponse({this.id, this.title, this.categoryId, this.duration, this.thumbnailImage, this.videoUrl, this.imageResponse, this.videResponse,this.bookmark=false});
 
   VideoListResponse.fromJson(dynamic json) {
     id = json['id'];
@@ -41,8 +42,9 @@ class VideoListResponse {
     duration = json['duration'];
     thumbnailImage = json['thumbnail_image_url'];
     videoUrl = json['video_url'];
-    imageResponse = json['image'];
-    videResponse = json['video'];
+    bookmark=false;
+    if (json['image'] != null) imageResponse = VideoImageResponse.fromJson(json['image']);
+    if (json['video'] != null) videResponse = VideoImageResponse.fromJson(json['video']);
   }
 
   static List<VideoListResponse> listFromJson(dynamic jsonList) {

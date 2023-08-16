@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/ui/screens/analytics/analytics_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/create_new_password_screen.dart';
@@ -195,7 +196,7 @@ final appRouter = GoRouter(
                 parentNavigatorKey: rootNavigator,
                 path: RoutePath.detailCategoryScreen,
                 builder: (context, state) {
-                  return DetailCategoryScreen(key: state.pageKey);
+                  return DetailCategoryScreen(key: state.pageKey, categoryListResponse: state.extra as CategoryListResponse,);
                 },
               ),
             ]),

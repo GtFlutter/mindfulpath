@@ -1,6 +1,7 @@
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
 import 'package:meditation_app/util/app_config.dart';
+import 'package:meditation_app/util/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardRepo {
@@ -14,6 +15,10 @@ class DashboardRepo {
   }
 
   Future<Response> getVideoList(int id, {int page = 1}) async {
-    return await apiClient.getData('${AppConfigs.getVideoList}/$id/$page');
+    return await apiClient.getData('${AppConfigs.getVideoList}/$id?perPage=${AppConstants.kPerPage}&page=$page');
+  }
+
+  Future<Response> getFeatureVideoList({int page = 1}) async {
+    return await apiClient.getData('${AppConfigs.getFeatureVideoList}?perPage=${AppConstants.kPerPage}&page=$page');
   }
 }

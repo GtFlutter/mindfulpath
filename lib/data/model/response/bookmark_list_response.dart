@@ -32,7 +32,15 @@ class BookmarkListResponse {
     videoTitle = json['video_title'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    if (json['video'] != null) bookmarkVideoResponse = json['video'];
+    if (json['video'] != null) bookmarkVideoResponse = BookmarkVideoResponse.fromJson(json['video']);
+  }
+
+  static List<BookmarkListResponse> listFromJson(dynamic jsonList) {
+    List<BookmarkListResponse> list = [];
+    for (var json in jsonList) {
+      list.add(BookmarkListResponse.fromJson(json));
+    }
+    return list;
   }
 }
 

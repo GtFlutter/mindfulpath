@@ -7,4 +7,6 @@ class AppConstants {
   static const int OTP_LENGTH = 4;
 
   static const String WENT_WRONG = 'Something went wrong! Please try again';
+
+  static const int kPerPage = 10;
 }

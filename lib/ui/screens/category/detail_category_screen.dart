@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
+import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
@@ -10,14 +14,15 @@ import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 import '../../../theme/styles.dart';
 import '../../common/media_player/app_video_player.dart';
 
-class DetailCategoryScreen extends StatefulWidget {
-  const DetailCategoryScreen({super.key});
+class DetailCategoryScreen extends ConsumerStatefulWidget {
+  final CategoryListResponse categoryListResponse;
+  const DetailCategoryScreen({super.key, required this.categoryListResponse});
 
   @override
-  State<DetailCategoryScreen> createState() => _DetailCategoryScreenState();
+  ConsumerState<DetailCategoryScreen> createState() => _DetailCategoryScreenState();
 }
 
-class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
+class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
   static AppStyle _style = AppStyle();
   ScrollController controller = ScrollController();
   String link2 = 'https://assets.mixkit.co/videos/preview/mixkit-man-holding-neon-light-1238-large.mp4';
@@ -27,6 +32,15 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
 
   String description =
       'Nutrition is essential for maintaining good health and preventing chronic diseases. A balanced and varied diet that includes a variety of whole foods. ';
+
+  @override
+  void initState() {
+    final dashboardNotifier = ref.read(dashboardProvider);
+    Future.delayed(Duration.zero, () {
+      dashboardNotifier.getVideoList(widget.categoryListResponse.id ?? 0);
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -42,6 +56,8 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
     _style = AppStyle(screenSize: size);
     TextStyle textStyle = _style.text.font(mulishRegular400, sizePx: 14);
 
+    final dashboardNotifier = ref.watch(dashboardProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: _showVideo
@@ -54,14 +70,14 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
         imgUrl:
             'https://images.pexels.com/photos/6740518/pexels-photo-6740518.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
         hideImage: isLandscape && _showVideo,
-        child: SafeArea(
+        child: dashboardNotifier.isVideoLoading ? const Center(child: CircularProgressIndicator(),) : SafeArea(
           left: false,
           right: false,
           bottom: false,
           child: Padding(
             padding: isLandscape && _showVideo ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (_showVideo) ...[
                   if (!isLandscape) SizedBox(height: _style.scaleX(25)),
@@ -101,12 +117,12 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       spacing: _style.scaleX(10),
                       children: [
-                        Text(
-                          _videoDetail!.auther,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: textStyle.copyWith(color: AppColors.autherNameColor),
-                        ),
+                        // Text(
+                        //   _videoDetail!.auther,
+                        //   maxLines: 1,
+                        //   overflow: TextOverflow.ellipsis,
+                        //   style: textStyle.copyWith(color: AppColors.autherNameColor),
+                        // ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -136,7 +152,7 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
                     flex: 2,
                     child: IntroWidget(
                       description: description,
-                      title: 'Nutrution',
+                      title: widget.categoryListResponse.title ?? '',
                       style: _style,
                     ),
                   ),
@@ -151,28 +167,31 @@ class _DetailCategoryScreenState extends State<DetailCategoryScreen> {
                         bottom: _style.scale * 100,
                         top: _style.scale * 10,
                       ),
-                      itemCount: TempData.listDiModel.length,
+                      itemCount: dashboardNotifier.videoListResponse!.length,
                       itemBuilder: (context, index) {
-                        var model = TempData.listDiModel[index];
+                        var model = dashboardNotifier.videoListResponse![index];
                         return GestureDetector(
                           onTap: () {
                             if (!_showVideo) {
                               setState(() {
                                 _showVideo = true;
+                                link = model.videoUrl ?? '';
                                 _videoDetail = DIModel(
-                                  imgUrl: model.imgUrl,
-                                  duration: model.duration,
-                                  title: '$index ${model.title}',
-                                  auther: model.auther,
-                                  category: model.category,
+                                  imgUrl: model.thumbnailImage ?? '',
+                                  duration: model.duration ?? '',
+                                  title: model.title ?? '',
+                                  category: widget.categoryListResponse.title ?? '',
                                 );
                               });
                             }
                           },
                           child: DetailItem(
                             appStyle: _style,
-                            model: TempData.listDiModel[index],
-                            index: '$index',
+                            model: model,
+                            index: '$index', onToggleBookmark: () {
+                              if(model.id==null) return;
+                              ref.read(bookmarkProvider).toggleBookmark(model.id!);
+                            },
                           ),
                         );
                       },
@@ -247,29 +266,29 @@ class IntroWidget extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: style.scaleX(25)),
-          Text.rich(
-            maxLines: 6,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: style.text.font(
-              brandonBold700,
-              sizePx: 14,
-              color: AppColors.primaryColor,
-            ),
-            TextSpan(
-              text: description.firstWord(),
-              children: [
-                TextSpan(
-                  text: description.removeFirstWord(),
-                  style: style.text.font(
-                    mulishLight300,
-                    sizePx: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Text.rich(
+          //   maxLines: 6,
+          //   overflow: TextOverflow.ellipsis,
+          //   textAlign: TextAlign.center,
+          //   style: style.text.font(
+          //     brandonBold700,
+          //     sizePx: 14,
+          //     color: AppColors.primaryColor,
+          //   ),
+          //   TextSpan(
+          //     text: description.firstWord(),
+          //     children: [
+          //       TextSpan(
+          //         text: description.removeFirstWord(),
+          //         style: style.text.font(
+          //           mulishLight300,
+          //           sizePx: 14,
+          //           color: Colors.white,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
           const Spacer(flex: 3),
         ],
       ),

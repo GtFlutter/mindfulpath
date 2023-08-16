@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/ui/screens/bookmark/widget/bookmark_item.dart';
 
 import '../../../theme/styles.dart';
-import '../category/temp_data_file.dart';
 
-class BookmarkScreen extends StatefulWidget {
+class BookmarkScreen extends ConsumerStatefulWidget {
   const BookmarkScreen({super.key});
 
   @override
-  State<BookmarkScreen> createState() => _BookmarkScreenState();
+  ConsumerState<BookmarkScreen> createState() => _BookmarkScreenState();
 }
 
-class _BookmarkScreenState extends State<BookmarkScreen> {
+class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   static AppStyle _style = AppStyle();
+
+  @override
+  void initState() {
+    final bookmarkNotifier = ref.read(bookmarkProvider);
+    Future.delayed(Duration.zero, () {
+      bookmarkNotifier.getBookmarkList();
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
+    final bookmarkNotifier = ref.watch(bookmarkProvider);
     return SafeArea(
       bottom: false,
-      child: SizedBox.expand(
+      child: bookmarkNotifier.isLoading ? const Center(child: CircularProgressIndicator(),) : SizedBox.expand(
         child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),
           scrollDirection: Axis.vertical,
@@ -30,13 +41,13 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
             right: _style.scale * 22,
             left: _style.scale * 22,
           ),
-          itemCount: TempData.listDiModel.length,
+          itemCount: bookmarkNotifier.bookmarkListResponse!.length,
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {},
               child: BookmarkItem(
                 appStyle: _style,
-                model: TempData.listDiModel[index],
+                model: bookmarkNotifier.bookmarkListResponse![index],
                 index: '$index',
               ),
             );

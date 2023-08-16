@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
@@ -46,7 +47,7 @@ class _SubPlayListScreenState extends State<SubPlayListScreen> {
             borderRadius: BorderRadius.circular(_style.scaleX(25)),
             child: BookmarkItem.dragable(
               appStyle: _style,
-              model: _items[index],
+              model: BookmarkListResponse(),
               index: '$index',
               dragging: true,
             ),
@@ -88,7 +89,7 @@ class _SubPlayListScreenState extends State<SubPlayListScreen> {
                 onTap: () {},
                 child: BookmarkItem.dragable(
                   appStyle: _style,
-                  model: _items[index],
+                  model: BookmarkListResponse(),
                   index: '$index',
                 ),
               );

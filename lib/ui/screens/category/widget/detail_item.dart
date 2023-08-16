@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meditation_app/data/model/response/video_list_response.dart';
 
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
@@ -6,29 +7,27 @@ import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
-import '../../../common/cutom_media_card.dart';
 
 class DIModel {
   final String imgUrl;
   final String duration;
   final String title;
-  final String auther;
   final String category;
 
   DIModel({
     required this.imgUrl,
     required this.duration,
     required this.title,
-    required this.auther,
     required this.category,
   });
 }
 
 class DetailItem extends StatelessWidget {
   final AppStyle appStyle;
-  final DIModel model;
+  final VideoListResponse model;
   final String index;
-  const DetailItem({super.key, required this.appStyle, required this.model, required this.index});
+  final GestureTapCallback onToggleBookmark;
+  const DetailItem({super.key, required this.appStyle, required this.model, required this.index, required this.onToggleBookmark});
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +45,8 @@ class DetailItem extends StatelessWidget {
           children: [
             MediaImageCard(
               appStyle: appStyle,
-              imgUrl: model.imgUrl,
-              duration: model.duration,
+              imgUrl: model.thumbnailImage ?? '',
+              duration: model.duration ?? '',
               imgRadius: appStyle.scaleX(10),
               imgSize: appStyle.scaleX(97),
             ),
@@ -59,7 +58,7 @@ class DetailItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '$index ${model.title}',
+                    '${model.title}',
                     style: appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -69,12 +68,12 @@ class DetailItem extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: appStyle.scaleX(10),
                     children: [
-                      Text(
-                        model.auther,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textStyle.copyWith(color: AppColors.autherNameColor),
-                      ),
+                      // Text(
+                      //   model.auther,
+                      //   maxLines: 1,
+                      //   overflow: TextOverflow.ellipsis,
+                      //   style: textStyle.copyWith(color: AppColors.autherNameColor),
+                      // ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -87,7 +86,7 @@ class DetailItem extends StatelessWidget {
                           SizedBox(width: appStyle.scaleX(5)),
                           Flexible(
                             child: Text(
-                              model.category,
+                              model.categoryId ?? '0',
                               style: textStyle.copyWith(color: AppColors.categoryNameColor),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -105,10 +104,10 @@ class DetailItem extends StatelessWidget {
               children: [
                 const Spacer(),
                 OutlinedIconButton.svg(
-                  SvgPaths.bookmarkUnselected,
+                 model.bookmark!=null && model.bookmark!? SvgPaths.bookmarkSelected: SvgPaths.bookmarkUnselected,
                   appStyle: appStyle,
                   // svgIconSrc: SvgPaths.bookmarkSelected,
-                  onTap: () {},
+                  onTap: onToggleBookmark,
                 ),
                 const Spacer(flex: 2),
                 OutlinedIconButton.svg(
