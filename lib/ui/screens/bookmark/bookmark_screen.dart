@@ -49,6 +49,11 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                 appStyle: _style,
                 model: bookmarkNotifier.bookmarkListResponse![index],
                 index: '$index',
+                onBookmarkRemove: () async {
+                  if(bookmarkNotifier.bookmarkListResponse![index].videoId == null) return;
+                  await ref.read(bookmarkProvider).toggleBookmark(bookmarkNotifier.bookmarkListResponse![index].videoId!, isRemove: true);
+                  bookmarkNotifier.bookmarkListResponse!.removeAt(index);
+                },
               ),
             );
           },

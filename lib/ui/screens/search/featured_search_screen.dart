@@ -2,17 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/search/widget/all_videos_list.dart';
 import 'package:meditation_app/ui/screens/search/widget/options_selection_sheet.dart';
-import 'package:meditation_app/ui/screens/search/widget/recent_search_result_list.dart';
-import 'package:meditation_app/ui/screens/search/widget/search_result_list.dart';
-import 'package:pinput/pinput.dart';
 
 import '../../../util/assets.dart';
-import 'widget/filter_icon_button.dart';
 
 List<String> recentSearchHistory = [
   'Eating for Heart Health',
@@ -22,69 +20,16 @@ List<String> recentSearchHistory = [
   'Creating a Personalized Cancer Prevention Plan',
 ];
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class FeaturedSearchScreen extends StatefulWidget {
+  const FeaturedSearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<FeaturedSearchScreen> createState() => _FeaturedSearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _controller = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  final FocusNode _focusNode = FocusNode(
-    skipTraversal: true,
-  );
+class _FeaturedSearchScreenState extends State<FeaturedSearchScreen> {
   static AppStyle _style = AppStyle();
-  bool isFirstTime = true;
-  bool showSearchResult = false;
 
-  @override
-  void initState() {
-    _focusNode.addListener(focusNodeListener);
-    _controller.addListener(controllerListener);
-    super.initState();
-  }
-
-  void focusNodeListener() {
-    if (_focusNode.hasFocus && isFirstTime) {
-      setState(() {
-        isFirstTime = !isFirstTime;
-      });
-    }
-  }
-
-  void controllerListener() {
-    if (_controller.text.trim().isNotEmpty) {
-      if (showSearchResult) return;
-      setState(() {
-        showSearchResult = true;
-      });
-    } else {
-      if (!showSearchResult) return;
-      setState(() {
-        showSearchResult = false;
-      });
-    }
-  }
-
-  void setSearchValue(String value) {
-    _controller.text = value;
-    if (!_focusNode.hasFocus) {
-      _focusNode.requestFocus();
-    }
-    _controller.moveCursorToEnd();
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(focusNodeListener);
-    _controller.removeListener(controllerListener);
-    _controller.dispose();
-    _focusNode.dispose();
-
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,19 +62,19 @@ class _SearchScreenState extends State<SearchScreen> {
                       SizedBox(width: _style.scaleX(14)),
                       Flexible(
                         child: TextField(
-                          scrollController: _scrollController,
-                          focusNode: _focusNode,
-                          controller: _controller,
+                          readOnly: true,
                           textInputAction: TextInputAction.search,
                           keyboardType: TextInputType.text,
-                          onSubmitted: (_) => _scrollController.jumpTo(0),
+                          onTap: () {
+                            context.replace(RoutePath.search);
+                          },
                           style: _style.text.font(mulishMedium500, sizePx: 11, color: Colors.white, spacingPc: 10),
                           textAlignVertical: TextAlignVertical.top,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Hinted search text',
                             hintStyle:
-                                _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
+                            _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
                             contentPadding: EdgeInsets.only(bottom: _style.scaleX(9)),
                             constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                             alignLabelWithHint: true,
@@ -139,37 +84,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     ],
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    FilterIconButton(
-                      style: _style,
-                      title: 'Category',
-                      onTap: selectCategory,
-                    ),
-                    FilterIconButton(
-                      style: _style,
-                      title: 'Time',
-                      onTap: selectTime,
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        textStyle: _style.text.font(mulishMedium500, sizePx: 10),
-                      ),
-                      child: Text('Clear all'),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: showSearchResult
-                      ? SearchResultsList(style: _style)
-                      : RecentSearchResultList(
-                    style: _style,
-                    onRecentSearchTap: setSearchValue,
-                  ),
-                )
+                Expanded(child: AllVideosList(
+                  style: _style,
+                ))
               ],
             ),
           ),

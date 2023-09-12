@@ -11,6 +11,7 @@ import 'package:meditation_app/ui/screens/authentication/sign_in_up_screen.dart'
 import 'package:meditation_app/ui/screens/category/detail_category_screen.dart';
 import 'package:meditation_app/ui/screens/courses/courses_list_screen.dart';
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
+import 'package:meditation_app/ui/screens/search/featured_search_screen.dart';
 import 'package:meditation_app/ui/screens/update_profile/update_profile_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
 import 'package:meditation_app/ui/screens/notifications/notifications_screen.dart';
@@ -106,6 +107,14 @@ final appRouter = GoRouter(
       path: RoutePath.search,
       builder: (context, state) {
         return SearchScreen(key: state.pageKey);
+      },
+    ),
+
+    GoRoute(
+      parentNavigatorKey: rootNavigator,
+      path: RoutePath.featuredSearchScreen,
+      builder: (context, state) {
+        return FeaturedSearchScreen(key: state.pageKey);
       },
     ),
 

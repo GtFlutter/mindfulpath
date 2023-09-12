@@ -42,7 +42,7 @@ class VideoListResponse {
     duration = json['duration'];
     thumbnailImage = json['thumbnail_image_url'];
     videoUrl = json['video_url'];
-    bookmark=false;
+    bookmark = json['is_bookmark'];
     if (json['image'] != null) imageResponse = VideoImageResponse.fromJson(json['image']);
     if (json['video'] != null) videResponse = VideoImageResponse.fromJson(json['video']);
   }

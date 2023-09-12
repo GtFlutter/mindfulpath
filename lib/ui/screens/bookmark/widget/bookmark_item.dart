@@ -14,12 +14,14 @@ class BookmarkItem extends StatelessWidget {
   final String index;
   final bool dragable;
   final bool dragging;
+  final GestureTapCallback? onBookmarkRemove;
 
   const BookmarkItem({
     super.key,
     required this.appStyle,
     required this.model,
     required this.index,
+    required this.onBookmarkRemove,
   })  : dragable = false,
         dragging = false;
 
@@ -29,6 +31,7 @@ class BookmarkItem extends StatelessWidget {
     required this.model,
     required this.index,
     this.dragging = false,
+    this.onBookmarkRemove,
   }) : dragable = true;
 
   @override
@@ -111,7 +114,7 @@ class BookmarkItem extends StatelessWidget {
                       child: Row(
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: onBookmarkRemove,
                             icon: SvgPicture.asset(
                               SvgPaths.remove,
                               height: appStyle.scaleX(16),
@@ -124,7 +127,7 @@ class BookmarkItem extends StatelessWidget {
                             icon: SvgPicture.asset(
                               SvgPaths.share,
                               height: appStyle.scaleX(16),
-                              fit: BoxFit.contain,
+                              fit: BoxFit.contain, // 155861
                             ),
                             style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                           ),

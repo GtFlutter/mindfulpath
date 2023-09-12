@@ -77,8 +77,8 @@ class BookmarkNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleBookmark(int itemId) async {
-    showCustomSnackBar('Bookmarking...');
+  Future<void> toggleBookmark(int itemId, {bool isRemove = false}) async {
+    showCustomSnackBar(isRemove ? 'Removing...' : 'Bookmarking...');
     startToggleLoading();
     Response response = await repo.toggleBookmark(itemId);
     if (response.statusCode != 200) {
@@ -88,7 +88,7 @@ class BookmarkNotifier extends ChangeNotifier {
       try {
         stopToggleLoading();
         ref.read(dashboardProvider).toggleBookmark(itemId);
-        showCustomSnackBar('Bookmarked Successful',type: true);
+        showCustomSnackBar('${isRemove ? 'Removed' : 'Bookmarked'} Successful',type: true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
         stopToggleLoading();

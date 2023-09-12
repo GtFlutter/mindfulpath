@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meditation_app/data/model/response/video_list_response.dart';
+import 'package:meditation_app/helper/string_converter.dart';
 
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
@@ -46,7 +47,7 @@ class DetailItem extends StatelessWidget {
             MediaImageCard(
               appStyle: appStyle,
               imgUrl: model.thumbnailImage ?? '',
-              duration: model.duration ?? '',
+              duration: model.duration!.toDuration ?? '',
               imgRadius: appStyle.scaleX(10),
               imgSize: appStyle.scaleX(97),
             ),

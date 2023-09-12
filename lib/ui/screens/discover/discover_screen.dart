@@ -118,7 +118,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             padding: EdgeInsets.only(right: _style.scale * 9),
             child: IconButton(
               onPressed: () {
-                context.push(RoutePath.search);
+                context.push(RoutePath.featuredSearchScreen);
               },
               icon: SvgPicture.asset(
                 SvgPaths.search,

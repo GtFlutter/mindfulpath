@@ -188,7 +188,8 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                           child: DetailItem(
                             appStyle: _style,
                             model: model,
-                            index: '$index', onToggleBookmark: () {
+                            index: '$index',
+                            onToggleBookmark: () {
                               if(model.id==null) return;
                               ref.read(bookmarkProvider).toggleBookmark(model.id!);
                             },

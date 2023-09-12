@@ -42,4 +42,21 @@ extension OnString on String {
     if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1);
   }
+  
+  
+  String get toDuration {
+    Duration duration = Duration(
+      hours: int.parse(split(':')[0]),
+      minutes: int.parse(split(':')[1]),
+      seconds: int.parse(split(':')[2].split('.')[0]),
+      milliseconds: int.parse(split(':')[2].split('.')[1]),
+    );
+    if (duration.inHours > 0) {
+      return '${duration.inHours} ${duration.inHours > 1 ? 'Hours' : 'Hour'}';
+    } else if (duration.inMinutes > 0) {
+      return '${duration.inMinutes} Min';
+    } else {
+      return '${duration.inSeconds} Sec';
+    }
+  }
 }
