@@ -1,11 +1,12 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/screens/search/widget/all_videos_list.dart';
 import 'package:meditation_app/ui/screens/search/widget/options_selection_sheet.dart';
 import 'package:meditation_app/ui/screens/search/widget/recent_search_result_list.dart';
 import 'package:meditation_app/ui/screens/search/widget/search_result_list.dart';
@@ -22,14 +23,14 @@ List<String> recentSearchHistory = [
   'Creating a Personalized Cancer Prevention Plan',
 ];
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  ConsumerState<SearchScreen> createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode(
@@ -43,6 +44,12 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     _focusNode.addListener(focusNodeListener);
     _controller.addListener(controllerListener);
+    final dashboardNotifier = ref.read<DashboardNotifier>(dashboardProvider);
+    Future.delayed(Duration.zero, () {
+      if (dashboardNotifier.categoryListResponse == null && dashboardNotifier.categoryListResponse!.isEmpty) {
+        dashboardNotifier.getCategoryList();
+      }
+    });
     super.initState();
   }
 
@@ -90,6 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
+    final dashboardNotifier = ref.watch<DashboardNotifier>(dashboardProvider);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: BackgroundImage(
@@ -130,7 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             hintText: 'Hinted search text',
                             hintStyle:
                                 _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
-                            contentPadding: EdgeInsets.only(bottom: _style.scaleX(9)),
+                            contentPadding: EdgeInsets.only(bottom: _style.scaleX(16)),
                             constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                             alignLabelWithHint: true,
                           ),

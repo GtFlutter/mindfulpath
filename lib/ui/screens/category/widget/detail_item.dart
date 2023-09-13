@@ -47,7 +47,7 @@ class DetailItem extends StatelessWidget {
             MediaImageCard(
               appStyle: appStyle,
               imgUrl: model.thumbnailImage ?? '',
-              duration: model.duration!.toDuration ?? '',
+              duration: model.duration!.toDuration,
               imgRadius: appStyle.scaleX(10),
               imgSize: appStyle.scaleX(97),
             ),
@@ -105,7 +105,7 @@ class DetailItem extends StatelessWidget {
               children: [
                 const Spacer(),
                 OutlinedIconButton.svg(
-                 model.bookmark!=null && model.bookmark!? SvgPaths.bookmarkSelected: SvgPaths.bookmarkUnselected,
+                 model.bookmark != null && model.bookmark! ? SvgPaths.bookmarkSelected: SvgPaths.bookmarkUnselected,
                   appStyle: appStyle,
                   // svgIconSrc: SvgPaths.bookmarkSelected,
                   onTap: onToggleBookmark,

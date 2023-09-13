@@ -1,40 +1,47 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/search/widget/all_videos_list.dart';
-import 'package:meditation_app/ui/screens/search/widget/options_selection_sheet.dart';
 
 import '../../../util/assets.dart';
 
-List<String> recentSearchHistory = [
-  'Eating for Heart Health',
-  'The Power of Nutrients',
-  'Transcendental Meditation',
-  'Physical Activity and Cancer Prevention',
-  'Creating a Personalized Cancer Prevention Plan',
-];
-
-class FeaturedSearchScreen extends StatefulWidget {
+class FeaturedSearchScreen extends ConsumerStatefulWidget {
   const FeaturedSearchScreen({super.key});
 
   @override
-  State<FeaturedSearchScreen> createState() => _FeaturedSearchScreenState();
+  ConsumerState<FeaturedSearchScreen> createState() => _FeaturedSearchScreenState();
 }
 
-class _FeaturedSearchScreenState extends State<FeaturedSearchScreen> {
+class _FeaturedSearchScreenState extends ConsumerState<FeaturedSearchScreen> {
   static AppStyle _style = AppStyle();
+
+  @override
+  void initState() {
+    final dashboardNotifier = ref.read<DashboardNotifier>(dashboardProvider);
+    Future.delayed(Duration.zero, () {
+      if (dashboardNotifier.featureVideoListResponse == null && dashboardNotifier.featureVideoListResponse!.isEmpty) {
+        dashboardNotifier.getFeatureVideoList();
+      }
+    },);
+    super.initState();
+  }
 
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
+
+    final dashboardNotifier = ref.watch<DashboardNotifier>(dashboardProvider);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: BackgroundImage(
@@ -75,7 +82,7 @@ class _FeaturedSearchScreenState extends State<FeaturedSearchScreen> {
                             hintText: 'Hinted search text',
                             hintStyle:
                             _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
-                            contentPadding: EdgeInsets.only(bottom: _style.scaleX(9)),
+                            contentPadding: EdgeInsets.only(bottom: _style.scaleX(16)),
                             constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                             alignLabelWithHint: true,
                           ),
@@ -84,72 +91,21 @@ class _FeaturedSearchScreenState extends State<FeaturedSearchScreen> {
                     ],
                   ),
                 ),
-                Expanded(child: AllVideosList(
-                  style: _style,
-                ))
+                if (dashboardNotifier.isLoading)...[
+                  Center(child: CircularProgressIndicator(),),
+                ] else if (dashboardNotifier.featureVideoListResponse == null && dashboardNotifier.featureVideoListResponse!.isEmpty)...[
+                  Center(child: Text('No data found'),),
+                ] else...[
+                  Expanded(child: AllVideosList(
+                    style: _style,
+                    featureVideoListResponse: dashboardNotifier.featureVideoListResponse,
+                  ))
+                ]
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  void selectCategory() {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxHeight: 400,
-        maxWidth: 500,
-        minHeight: 300,
-      ),
-      useSafeArea: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(_style.scaleX(15)),
-          topRight: Radius.circular(_style.scaleX(15)),
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      builder: (context) {
-        var items = ['Meditation', 'Diet', 'Nutrition', 'Exercise', 'Cancer prevention'];
-        return OptionsSelectionSheet.multiSelect(
-          items: items,
-          selectedItems: ['Cancer prevention'],
-          title: 'Category',
-        );
-      },
-      context: context,
-      enableDrag: false,
-    );
-  }
-
-  void selectTime() {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxHeight: 400,
-        maxWidth: 500,
-        minHeight: 300,
-      ),
-      useSafeArea: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(_style.scaleX(15)),
-          topRight: Radius.circular(_style.scaleX(15)),
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      builder: (context) {
-        var items = ['3 min', '5 min', '10 min', '15 min', '45 min', '60+ min'];
-        return OptionsSelectionSheet.singleSelect(
-          items: items,
-          useGridLayout: true,
-          title: 'Time',
-        );
-      },
-      context: context,
-      enableDrag: false,
     );
   }
 }
