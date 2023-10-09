@@ -31,7 +31,10 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
     final bookmarkNotifier = ref.watch(bookmarkProvider);
     return SafeArea(
       bottom: false,
-      child: bookmarkNotifier.isLoading ? const Center(child: CircularProgressIndicator(),) : SizedBox.expand(
+      child: bookmarkNotifier.isLoading ? 
+      const Center(child: CircularProgressIndicator(),) :
+      bookmarkNotifier.bookmarkListResponse == null || bookmarkNotifier.bookmarkListResponse!.isEmpty ?
+      const Center(child: Text('No Data Found')) : SizedBox.expand(
         child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),
           scrollDirection: Axis.vertical,

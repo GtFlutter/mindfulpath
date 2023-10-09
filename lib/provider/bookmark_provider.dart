@@ -62,6 +62,7 @@ class BookmarkNotifier extends ChangeNotifier {
   Future<void> getBookmarkList() async {
     startLoading();
     Response response = await repo.getBookmarks();
+    debugPrint('RESPONSE CODE :: ${response.statusCode}');
     if (response.statusCode != 200) {
       stopLoading();
       ApiChecker.checkApi(response);

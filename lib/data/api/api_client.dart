@@ -28,6 +28,7 @@ class ApiClient {
   void updateHeader(String? token) {
     _mainHeaders = {
       'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
       'Authorization': 'Bearer ${token ?? ''}',
     };
   }

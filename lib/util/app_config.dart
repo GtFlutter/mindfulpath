@@ -37,6 +37,9 @@ class AppConfigs {
   static const String getBookmarks = '/get-bookmark-list';
   static const String toggleBookmark = '/add-to-bookmark';
 
+  static const String getPlaylist = '/get-playlist';
+  static const String createPlaylist = '/create-playlist';
+
   /// END [API_CONFIG]
 
   /// START [LOCAL_KEY]
