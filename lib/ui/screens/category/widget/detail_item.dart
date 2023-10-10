@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/video_list_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/playlist_provider.dart';
+import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
 
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
@@ -23,7 +26,7 @@ class DIModel {
   });
 }
 
-class DetailItem extends StatelessWidget {
+class DetailItem extends ConsumerWidget {
   final AppStyle appStyle;
   final VideoListResponse model;
   final String index;
@@ -31,7 +34,7 @@ class DetailItem extends StatelessWidget {
   const DetailItem({super.key, required this.appStyle, required this.model, required this.index, required this.onToggleBookmark});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     TextStyle textStyle = appStyle.text.font(mulishRegular400, sizePx: 9);
     return Container(
       decoration: ShapeDecoration(
@@ -110,19 +113,83 @@ class DetailItem extends StatelessWidget {
                   // svgIconSrc: SvgPaths.bookmarkSelected,
                   onTap: onToggleBookmark,
                 ),
-                const Spacer(flex: 2),
-                OutlinedIconButton.svg(
-                  SvgPaths.addToPlaylist,
-                  appStyle: appStyle,
-                  onTap: () {},
+                // const Spacer(),
+                PopupMenuButton(
+                  padding: EdgeInsets.zero,
+                  position: PopupMenuPosition.under,
+                  iconSize: 15,
+                  splashRadius: 1,
+                  tooltip: '',
+                  icon: OutlinedIconButton.svg(
+                    SvgPaths.addToPlaylist,
+                    appStyle: appStyle,
+                    onTap: null,
+                  ),
+                  constraints: BoxConstraints(
+                    maxWidth: appStyle.scaleX(200),
+                    maxHeight: appStyle.scaleX(204)
+                  ),
+                  // onOpened: () async {
+                  //   await ref.read(playListProvider).getPlaylistList();
+                  // },
+                  color:AppColors.popupMenuItemColor,
+                  itemBuilder: (context) {
+                    final playlistP = ref.read(playListProvider);
+                    playlistP.getPlaylistList();
+                    return [
+                      PopupMenuItem(
+                        height: appStyle.scaleX(24),
+                        onTap: () {
+                          createPlaylist(context, videoId: model.videResponse != null ? model.videResponse!.id!.toString() : null);
+                        },
+                        child: Text(
+                          'Create Playlist',
+                          style: appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                        ),
+                      ),
+                      if (playlistP.playlistListResponse != null)...[
+                        ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                          return PopupMenuItem(
+                            height: appStyle.scaleX(24),
+                            onTap: () {},
+                            child: Text(
+                              playlistP.playlistListResponse![index].title ?? '',
+                              style: appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                            ),
+                          );
+                        })
+                      ]
+                    ];
+                  },
                 ),
-                const Spacer(),
+                // OutlinedIconButton.svg(
+                //   SvgPaths.addToPlaylist,
+                //   appStyle: appStyle,
+                //   onTap: () {},
+                // ),
+                // const Spacer(),
               ],
             ),
             SizedBox(width: appStyle.scaleX(10)),
           ],
         ),
       ),
+    );
+  }
+
+  void createPlaylist(BuildContext context, {String? videoId}) {
+    showDialog(
+      context: context,
+      // barrierDismissible: false,
+      builder: (c) {
+        return ProviderScope(
+          parent: ProviderScope.containerOf(context, listen: false),
+          child: Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(appStyle.scaleX(10))),
+            child: CreatePlaylistDialog(appStyle, videoId: videoId,),
+          ),
+        );
+      },
     );
   }
 }

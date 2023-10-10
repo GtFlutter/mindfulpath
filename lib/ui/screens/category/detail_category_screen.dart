@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
-import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
-import 'package:meditation_app/ui/screens/category/temp_data_file.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
 import '../../../theme/styles.dart';

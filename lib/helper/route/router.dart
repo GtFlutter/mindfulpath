@@ -145,7 +145,7 @@ final appRouter = GoRouter(
                 builder: (context, state) {
                   return SubPlayListScreen(
                     key: state.pageKey,
-                    title: state.extra as String? ?? 'Router Extra Not Found',
+                    data: state.extra as SubPlayListScreenData,
                   );
                 },
               ),

@@ -1,35 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meditation_app/provider/playlist_provider.dart';
+import 'package:meditation_app/ui/screens/playlist/sub_playlist_screen.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/playlist_item.dart';
 
 import '../../../helper/route/route_paths.dart';
 import '../../../theme/styles.dart';
 
-class PlaylistScreen extends StatefulWidget {
+class PlaylistScreen extends ConsumerStatefulWidget {
   const PlaylistScreen({super.key});
 
   @override
-  State<PlaylistScreen> createState() => _PlaylistScreenState();
+  ConsumerState<PlaylistScreen> createState() => _PlaylistScreenState();
 }
 
-class _PlaylistScreenState extends State<PlaylistScreen> {
-  List<String> list = [
-    'Healing Meditations',
-    'Nutrition and Cancer',
-    'Mindful Meditations',
-    'Cancer Survivorship',
-  ];
+class _PlaylistScreenState extends ConsumerState<PlaylistScreen> {
   static AppStyle _style = AppStyle();
+
+  @override
+  void initState() {
+    final playlistProvider = ref.read(playListProvider);
+    Future.delayed(Duration.zero, () {
+      playlistProvider.getPlaylistList(showProgress: true);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
+    final playlistProvider = ref.watch(playListProvider);
     return SafeArea(
       bottom: false,
-      child: Center(
+      child: playlistProvider.isLoading ?
+      const Center(child: CircularProgressIndicator(),) : Center(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: _style.scaleX(42),
@@ -45,21 +52,29 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 onTap: () => createPlaylist(),
               ),
               SizedBox(height: _style.scaleX(25)),
-              ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: list.length,
-                itemBuilder: (context, index) {
-                  return PlaylistItem(
-                    title: list[index],
-                    style: _style,
-                    onTap: () {
-                      context.go(RoutePath.subPlaylistScreenPath, extra: list[index]);
-                    },
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-              ),
+              if (playlistProvider.playlistListResponse == null || playlistProvider.playlistListResponse!.isEmpty)...[
+                const SizedBox.shrink()
+              ] else...[
+                ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: playlistProvider.playlistListResponse!.length,
+                  itemBuilder: (context, index) {
+                    return PlaylistItem(
+                      title: playlistProvider.playlistListResponse![index].title ?? '',
+                      style: _style,
+                      onTap: () {
+                        SubPlayListScreenData data = SubPlayListScreenData(id: playlistProvider.playlistListResponse![index].id!.toInt(), title: playlistProvider.playlistListResponse![index].title);
+                        context.go(RoutePath.subPlaylistScreenPath, extra: data);
+                      },
+                      onDelete: () {
+                        playlistProvider.deletePlaylist(playlistProvider.playlistListResponse![index].id!.toString());
+                      },
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                )
+              ],
             ],
           ),
         ),
@@ -70,15 +85,13 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   void createPlaylist() {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      // barrierDismissible: false,
       builder: (c) {
-        Size size = MediaQuery.of(c).size;
-        AppStyle style = AppStyle(screenSize: size);
         return ProviderScope(
-          parent: ProviderScope.containerOf(context),
+          parent: ProviderScope.containerOf(context, listen: false),
           child: Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
-            child: CreatePlaylistDialog(style),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_style.scaleX(10))),
+            child: CreatePlaylistDialog(_style),
           ),
         );
       },

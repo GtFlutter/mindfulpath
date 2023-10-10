@@ -39,6 +39,8 @@ class AppConfigs {
 
   static const String getPlaylist = '/get-playlist';
   static const String createPlaylist = '/create-playlist';
+  static const String deletePlaylist = '/delete-playlist';
+  static const String addToPlaylist = '/add-to-playlist';
 
   /// END [API_CONFIG]
 

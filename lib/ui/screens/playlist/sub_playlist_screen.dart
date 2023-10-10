@@ -11,9 +11,17 @@ import '../bookmark/widget/bookmark_item.dart';
 import '../category/temp_data_file.dart';
 import '../category/widget/detail_item.dart';
 
+class SubPlayListScreenData {
+  int? id;
+  String? title;
+
+  SubPlayListScreenData({this.id, this.title});
+}
+
+
 class SubPlayListScreen extends StatefulWidget {
-  final String title;
-  const SubPlayListScreen({super.key, required this.title});
+  final SubPlayListScreenData data;
+  const SubPlayListScreen({super.key, required this.data});
 
   @override
   State<SubPlayListScreen> createState() => _SubPlayListScreenState();
@@ -66,7 +74,7 @@ class _SubPlayListScreenState extends State<SubPlayListScreen> {
       appBar: CustomAppBar(
         screenSize: size,
         style: _style,
-        title: widget.title,
+        title: widget.data.title ?? '',
       ),
       extendBodyBehindAppBar: true,
       body: BackgroundImage(

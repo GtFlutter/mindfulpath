@@ -11,9 +11,10 @@ class PlaylistItem extends StatelessWidget {
   final AppStyle style;
   final GestureTapCallback? onTap;
   final bool isCreateTile;
+  final void Function()? onDelete;
 
-  const PlaylistItem({super.key, required this.title, required this.style, this.onTap}):isCreateTile=false;
-  const PlaylistItem.create({super.key, required this.title, required this.style, this.onTap}):isCreateTile=true;
+  const PlaylistItem({super.key, required this.title, required this.style, this.onTap, this.onDelete}):isCreateTile=false;
+  const PlaylistItem.create({super.key, required this.title, required this.style, this.onTap}):isCreateTile=true,onDelete = null;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +73,7 @@ class PlaylistItem extends StatelessWidget {
                       PopupMenuItem(
                         padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                         height: style.scaleX(30),
+                        onTap: onDelete,
                         child: Text(
                           'Delete',
                           style: style.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
