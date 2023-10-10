@@ -9,11 +9,11 @@ class PlaylistRepo {
   final SharedPreferences sharedPreferences;
 
   PlaylistRepo(this.apiClient, this.sharedPreferences);
-  
+
   Future<Response> getPlaylist({int page = 1}) async {
     return await apiClient.getData('${AppConfigs.getPlaylist}?perPage=${AppConstants.kPerPage}&page=$page');
   }
-  
+
   Future<Response> createPlaylist(String title, {String? videoId}) async {
     var body = {'title': title};
     if (videoId != null) body.addAll({'video_id': videoId});
@@ -25,7 +25,7 @@ class PlaylistRepo {
   }
 
   Future<Response> addToPlaylist(String playlistId, String videoId) async {
-    var body = {'title': playlistId, 'video_id': videoId};
+    var body = {'playlist_id': playlistId, 'video_id': videoId};
     return await apiClient.postData(AppConfigs.addToPlaylist, body);
   }
 }

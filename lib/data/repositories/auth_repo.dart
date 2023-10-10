@@ -41,7 +41,8 @@ class AuthRepo {
   }
 
   Future<Response> loginUser(String phoneNo, String password) async {
-    return await apiClient.postData(AppConfigs.loginUser, {'phone_no': phoneNo, 'password': password});
+    return await apiClient
+        .postData(AppConfigs.loginUser, {'phone_no': phoneNo, 'password': password, 'fcm_token': 'fcm_token'});
   }
 
   Future<Response> logoutUser() async {

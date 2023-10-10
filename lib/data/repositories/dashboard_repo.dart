@@ -18,6 +18,13 @@ class DashboardRepo {
     return await apiClient.getData('${AppConfigs.getVideoList}/$id?perPage=${AppConstants.kPerPage}&page=$page');
   }
 
+  Future<Response> storeVideoWatchedTime(int videoId, Duration duration) async {
+    return await apiClient.postData(
+      AppConfigs.storeWatchedVideoDuration,
+      {'video_id': videoId, 'duration': duration.inSeconds},
+    );
+  }
+
   Future<Response> getFeatureVideoList({int page = 1}) async {
     return await apiClient.getData('${AppConfigs.getFeatureVideoList}?perPage=${AppConstants.kPerPage}&page=$page');
   }

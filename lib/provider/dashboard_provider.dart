@@ -106,6 +106,14 @@ class DashboardNotifier extends ChangeNotifier {
     }
   }
 
+  Future<void> storeVideoWatchedTime(int videoId, Duration duration) async {
+    Response response = await repo.storeVideoWatchedTime(videoId, duration);
+    if (response.statusCode != 200) {
+      ApiChecker.checkApi(response);
+      return;
+    } else {}
+  }
+
   Future<void> getFeatureVideoList() async {
     startLoading();
     Response response = await repo.getFeatureVideoList();
@@ -124,11 +132,11 @@ class DashboardNotifier extends ChangeNotifier {
     }
   }
 
-  void toggleBookmark(int itemId,{bool notifier = true}){
-    if(_videoListResponse==null) return;
-    var  itemIndex = _videoListResponse!.indexWhere((element) => element.id==itemId);
-    if(itemIndex==-1) return;
-    _videoListResponse![itemIndex].bookmark =!( _videoListResponse![itemIndex].bookmark??true);
-    if(notifier) notifyListeners();
+  void toggleBookmark(int itemId, {bool notifier = true}) {
+    if (_videoListResponse == null) return;
+    var itemIndex = _videoListResponse!.indexWhere((element) => element.id == itemId);
+    if (itemIndex == -1) return;
+    _videoListResponse![itemIndex].bookmark = !(_videoListResponse![itemIndex].bookmark ?? true);
+    if (notifier) notifyListeners();
   }
 }

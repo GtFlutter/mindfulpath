@@ -1,14 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
+import 'package:meditation_app/ui/common/media_player/custom_track_shape.dart';
 import 'package:meditation_app/util/assets.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../util/dimensions.dart';
 import '../outlined_icon_button.dart';
 
-class AppVideoPlayer extends StatefulWidget {
+class AppVideoPlayer extends ConsumerStatefulWidget {
   final String url;
+  final int videoId;
   final AppStyle style;
   final bool isLandscape;
   final VoidCallback? onBackPress;
@@ -19,17 +25,22 @@ class AppVideoPlayer extends StatefulWidget {
     required this.style,
     this.onBackPress,
     required this.isLandscape,
+    required this.videoId,
   });
 
   @override
-  State<AppVideoPlayer> createState() => _AppVideoPlaterState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AppVideoPlayerState();
 }
 
-class _AppVideoPlaterState extends State<AppVideoPlayer> {
+class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   late VideoPlayerController _controller;
   bool _isBuffering = false;
   double _progress = 0;
   bool _showReload = false;
+
+  Timer? _watchTimer;
+  Duration _watchTimeInSeconds = Duration.zero;
+  final Duration _period = const Duration(seconds: 10);
 
   @override
   void initState() {
@@ -66,6 +77,16 @@ class _AppVideoPlaterState extends State<AppVideoPlayer> {
           _showReload = _controller.value.position >= _controller.value.duration;
         },
       );
+    }
+    if (_controller.value.isPlaying) {
+      _watchTimer ??= Timer.periodic(_period, (timer) {
+        _watchTimeInSeconds += _period; // Increment watch time
+        // Call API to update watch duration and video ID
+        ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
+      });
+    } else {
+      _watchTimer?.cancel();
+      _watchTimer = null;
     }
   }
 
@@ -224,37 +245,6 @@ class _AppVideoPlaterState extends State<AppVideoPlayer> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class CustomTrackShape extends RoundedRectSliderTrackShape {
-  @override
-  void paint(
-    PaintingContext context,
-    Offset offset, {
-    required RenderBox parentBox,
-    required SliderThemeData sliderTheme,
-    required Animation<double> enableAnimation,
-    required TextDirection textDirection,
-    required Offset thumbCenter,
-    Offset? secondaryOffset,
-    bool isDiscrete = false,
-    bool isEnabled = false,
-    double additionalActiveTrackHeight = 2,
-  }) {
-    super.paint(
-      context,
-      offset,
-      parentBox: parentBox,
-      sliderTheme: sliderTheme,
-      enableAnimation: enableAnimation,
-      textDirection: textDirection,
-      thumbCenter: thumbCenter,
-      secondaryOffset: secondaryOffset,
-      isDiscrete: isDiscrete,
-      isEnabled: isEnabled,
-      additionalActiveTrackHeight: 0,
     );
   }
 }

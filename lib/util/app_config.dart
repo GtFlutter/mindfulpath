@@ -32,6 +32,7 @@ class AppConfigs {
 
   static const String getCategoryList = '/get-category-list';
   static const String getVideoList = '/get-video-list';
+  static const String storeWatchedVideoDuration = '/store-watched-video-duration';
   static const String getFeatureVideoList = '/get-featured-video-list';
 
   static const String getBookmarks = '/get-bookmark-list';

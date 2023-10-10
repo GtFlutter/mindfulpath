@@ -13,12 +13,14 @@ import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
 
 class DIModel {
+  final int videoId;
   final String imgUrl;
   final String duration;
   final String title;
   final String category;
 
   DIModel({
+    required this.videoId,
     required this.imgUrl,
     required this.duration,
     required this.title,
@@ -31,7 +33,8 @@ class DetailItem extends ConsumerWidget {
   final VideoListResponse model;
   final String index;
   final GestureTapCallback onToggleBookmark;
-  const DetailItem({super.key, required this.appStyle, required this.model, required this.index, required this.onToggleBookmark});
+  const DetailItem(
+      {super.key, required this.appStyle, required this.model, required this.index, required this.onToggleBookmark});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -108,7 +111,7 @@ class DetailItem extends ConsumerWidget {
               children: [
                 const Spacer(),
                 OutlinedIconButton.svg(
-                 model.bookmark != null && model.bookmark! ? SvgPaths.bookmarkSelected: SvgPaths.bookmarkUnselected,
+                  model.bookmark != null && model.bookmark! ? SvgPaths.bookmarkSelected : SvgPaths.bookmarkUnselected,
                   appStyle: appStyle,
                   // svgIconSrc: SvgPaths.bookmarkSelected,
                   onTap: onToggleBookmark,
@@ -125,14 +128,11 @@ class DetailItem extends ConsumerWidget {
                     appStyle: appStyle,
                     onTap: null,
                   ),
-                  constraints: BoxConstraints(
-                    maxWidth: appStyle.scaleX(200),
-                    maxHeight: appStyle.scaleX(204)
-                  ),
+                  constraints: BoxConstraints(maxWidth: appStyle.scaleX(200), maxHeight: appStyle.scaleX(204)),
                   // onOpened: () async {
                   //   await ref.read(playListProvider).getPlaylistList();
                   // },
-                  color:AppColors.popupMenuItemColor,
+                  color: AppColors.popupMenuItemColor,
                   itemBuilder: (context) {
                     final playlistP = ref.read(playListProvider);
                     playlistP.getPlaylistList();
@@ -140,14 +140,15 @@ class DetailItem extends ConsumerWidget {
                       PopupMenuItem(
                         height: appStyle.scaleX(24),
                         onTap: () {
-                          createPlaylist(context, videoId: model.videResponse != null ? model.videResponse!.id!.toString() : null);
+                          createPlaylist(context,
+                              videoId: model.videResponse != null ? model.videResponse!.id!.toString() : null);
                         },
                         child: Text(
                           'Create Playlist',
                           style: appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                         ),
                       ),
-                      if (playlistP.playlistListResponse != null)...[
+                      if (playlistP.playlistListResponse != null) ...[
                         ...List.generate(playlistP.playlistListResponse!.length, (index) {
                           return PopupMenuItem(
                             height: appStyle.scaleX(24),
@@ -162,12 +163,6 @@ class DetailItem extends ConsumerWidget {
                     ];
                   },
                 ),
-                // OutlinedIconButton.svg(
-                //   SvgPaths.addToPlaylist,
-                //   appStyle: appStyle,
-                //   onTap: () {},
-                // ),
-                // const Spacer(),
               ],
             ),
             SizedBox(width: appStyle.scaleX(10)),
@@ -186,7 +181,10 @@ class DetailItem extends ConsumerWidget {
           parent: ProviderScope.containerOf(context, listen: false),
           child: Dialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(appStyle.scaleX(10))),
-            child: CreatePlaylistDialog(appStyle, videoId: videoId,),
+            child: CreatePlaylistDialog(
+              appStyle,
+              videoId: videoId,
+            ),
           ),
         );
       },
