@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../../../../theme/styles.dart';
-import '../../../../theme/text_style.dart';
+import '../../../../../theme/styles.dart';
+import '../../../../../theme/text_style.dart';
 
 class AnalyticsChart extends StatefulWidget {
   const AnalyticsChart({super.key});

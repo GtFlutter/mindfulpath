@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:meditation_app/ui/screens/analytics/widget/analytics_chart.dart';
-import 'package:meditation_app/ui/screens/analytics/widget/analytics_details.dart';
+import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_chart.dart';
+import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_details.dart';
 
-import '../../../theme/styles.dart';
-import '../../../theme/text_style.dart';
-import '../../common/background_image.dart';
-import '../../common/custom_app_bar.dart';
+import '../../../../theme/styles.dart';
+import '../../../../theme/text_style.dart';
+import '../../../common/background_image.dart';
+import '../../../common/custom_app_bar.dart';
 import 'widget/analytics_filter.dart';
 
 class AnalyticsScreen extends StatefulWidget {

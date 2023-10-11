@@ -76,11 +76,12 @@ class AuthRepo {
     return sharedPreferences.clear();
   }
 
-  String getUserToken() {
-    return sharedPreferences.getString(AppConfigs.TOKEN) ?? "";
+  String? get getUserToken {
+    if (sharedPreferences.containsKey(AppConfigs.TOKEN)) {
+      return sharedPreferences.getString(AppConfigs.TOKEN);
+    }
+    return null;
   }
 
-  bool isLoggedIn() {
-    return sharedPreferences.containsKey(AppConfigs.TOKEN);
-  }
+  bool get isUserLoggedIn => getUserToken != null;
 }

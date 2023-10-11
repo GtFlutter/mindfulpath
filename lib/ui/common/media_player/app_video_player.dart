@@ -109,6 +109,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   @override
   void dispose() {
+    _watchTimer?.cancel();
     debugPrint('Yashvant Video Disposed ');
     if (_controller.value.isInitialized) {
       _controller.removeListener(listner);

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
+import '../../../helper/route/route_paths.dart';
 import '../../../theme/styles.dart';
 import '../../common/media_player/app_video_player.dart';
 
@@ -103,47 +107,54 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                         ),
                         if (_videoDetail != null && (_videoDetail == null || !isLandscape)) ...[
                           SizedBox(height: _style.scaleX(15)),
-                          Text(
-                            _videoDetail!.title,
-                            style: _style.text.font(mulishSemiBold600, sizePx: 20, color: Colors.white),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: _style.scaleX(7)),
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            spacing: _style.scaleX(10),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Text(
-                              //   _videoDetail!.auther,
-                              //   maxLines: 1,
-                              //   overflow: TextOverflow.ellipsis,
-                              //   style: textStyle.copyWith(color: AppColors.autherNameColor),
-                              // ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
+                              Text(
+                                _videoDetail!.title,
+                                style: _style.text.font(mulishSemiBold600, sizePx: 20, color: Colors.white),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.left,
+                              ),
+                              SizedBox(height: _style.scaleX(7)),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: _style.scaleX(10),
                                 children: [
-                                  Text(
-                                    '●',
-                                    style:
-                                        _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(width: _style.scaleX(5)),
-                                  Flexible(
-                                    child: Text(
-                                      _videoDetail!.category,
-                                      style: textStyle.copyWith(color: AppColors.autherNameColor),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                  // Text(
+                                  //   _videoDetail!.auther,
+                                  //   maxLines: 1,
+                                  //   overflow: TextOverflow.ellipsis,
+                                  //   style: textStyle.copyWith(color: AppColors.autherNameColor),
+                                  // ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '●',
+                                        style: _style.text
+                                            .font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(width: _style.scaleX(5)),
+                                      Flexible(
+                                        child: Text(
+                                          _videoDetail!.category,
+                                          style: textStyle.copyWith(color: AppColors.autherNameColor),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
+                              SizedBox(height: _style.scaleX(30)),
                             ],
                           ),
-                          SizedBox(height: _style.scaleX(30)),
                         ],
                       ] else
                         Expanded(
@@ -170,6 +181,11 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                               var model = dashboardNotifier.videoListResponse![index];
                               return GestureDetector(
                                 onTap: () {
+                                  if (!ref.read(authProvider).isUserLoggedIn) {
+                                    showCustomSnackBar('Login to access video', type: false);
+                                    context.go(RoutePath.signIn);
+                                    return;
+                                  }
                                   if (_videoDetail == null) {
                                     setState(() {
                                       _videoDetail = DIModel(

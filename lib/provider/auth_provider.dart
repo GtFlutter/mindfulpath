@@ -26,8 +26,6 @@ class AuthNotifier extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  bool get isLoggedIn => repo.isLoggedIn();
-
   void startProgress() {
     if (!_isLoading) {
       _isLoading = true;
@@ -185,4 +183,6 @@ class AuthNotifier extends ChangeNotifier {
       context.go(RoutePath.splash);
     }
   }
+
+  bool get isUserLoggedIn => repo.isUserLoggedIn;
 }

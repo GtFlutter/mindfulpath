@@ -69,7 +69,6 @@ class DiscoverScreen extends ConsumerStatefulWidget {
 }
 
 class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
-
   static AppStyle _style = AppStyle();
 
   @override
@@ -100,7 +99,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
         leadingWidth: _style.scale * 60,
         leading: IconButton(
           onPressed: () {
-            if (ref.read(authProvider).isLoggedIn) {
+            if (ref.read(authProvider).isUserLoggedIn) {
               context.go(RoutePath.profileScreenPath);
             } else {
               context.push(RoutePath.signIn);
@@ -149,38 +148,42 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       body: BackgroundImage(
         child: SafeArea(
           bottom: false,
-          child: dashboardNotifier.isLoading ? const Center(child: CircularProgressIndicator(),) : SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.only(bottom: _style.scale * 100, top: _style.scale * 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                /// Discover Layout
-                DiscoverLayout(
-                  style: _style,
-                  categoryListResponse: dashboardNotifier.categoryListResponse ?? [],
+          child: dashboardNotifier.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.only(bottom: _style.scale * 100, top: _style.scale * 10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      /// Discover Layout
+                      DiscoverLayout(
+                        style: _style,
+                        categoryListResponse: dashboardNotifier.categoryListResponse ?? [],
+                      ),
+                      DiscoverHeader(title: 'Featured', style: _style),
+
+                      /// Featured Layout
+                      FeaturedListWidget(
+                        style: _style,
+                        clipper: clipper,
+                        list: dashboardNotifier.featureVideoListResponse ?? [],
+                      ),
+
+                      DiscoverHeader(title: 'Recently played', style: _style),
+
+                      /// Recently played Layout
+
+                      FeaturedListWidget(
+                        style: _style,
+                        clipper: clipper,
+                        list: dashboardNotifier.featureVideoListResponse ?? [],
+                      ),
+                    ],
+                  ),
                 ),
-                DiscoverHeader(title: 'Featured', style: _style),
-
-                /// Featured Layout
-                FeaturedListWidget(
-                  style: _style,
-                  clipper: clipper,
-                  list: dashboardNotifier.featureVideoListResponse ?? [],
-                ),
-
-                DiscoverHeader(title: 'Recently played', style: _style),
-
-                /// Recently played Layout
-
-                FeaturedListWidget(
-                  style: _style,
-                  clipper: clipper,
-                  list: dashboardNotifier.featureVideoListResponse ?? [],
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );

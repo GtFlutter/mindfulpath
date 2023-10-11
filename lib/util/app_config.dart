@@ -43,6 +43,11 @@ class AppConfigs {
   static const String deletePlaylist = '/delete-playlist';
   static const String addToPlaylist = '/add-to-playlist';
 
+  /// [Analytics]
+  static const String getStatistics = '/get-statistics';
+  static const String getCategoryNames = '/get-category-name';
+  static const String getVideoNames = '/get-video-name';
+
   /// END [API_CONFIG]
 
   /// START [LOCAL_KEY]

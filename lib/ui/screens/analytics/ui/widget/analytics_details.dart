@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../theme/styles.dart';
+import '../../../../../theme/styles.dart';
 
 class AnalyticsDetails extends StatelessWidget {
   const AnalyticsDetails({
