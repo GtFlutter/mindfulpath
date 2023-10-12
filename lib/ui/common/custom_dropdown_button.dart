@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 
 import '../../theme/colors.dart';
 import '../../theme/styles.dart';
@@ -8,11 +9,11 @@ import '../../theme/text_style.dart';
 import '../../util/assets.dart';
 
 class CustomDropDownButton extends StatelessWidget {
-  final List<String> items;
-  final String? value;
+  final List<ItemName> items;
+  final ItemName? value;
   final String hint;
   final AppStyle appStyle;
-  final ValueChanged<String?>? onChanged;
+  final ValueChanged<ItemName?>? onChanged;
   final double maxHeight;
   final double? width;
 
@@ -30,7 +31,7 @@ class CustomDropDownButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
-      child: DropdownButton2<String>(
+      child: DropdownButton2<ItemName>(
         isExpanded: true,
         customButton: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
@@ -39,7 +40,7 @@ class CustomDropDownButton extends StatelessWidget {
             children: [
               Flexible(
                 child: Text(
-                  value ?? hint,
+                  value != null ? value!.title : hint,
                   style: appStyle.text.font(mulishMedium500, sizePx: 12.5, color: Colors.white),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -56,10 +57,10 @@ class CustomDropDownButton extends StatelessWidget {
           ),
         ),
         items: items
-            .map((String item) => DropdownMenuItem<String>(
+            .map((ItemName item) => DropdownMenuItem<ItemName>(
                   value: item,
                   child: Text(
-                    item,
+                    item.title,
                     style: appStyle.text.font(mulishMedium500, sizePx: 12.5, color: Colors.white),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

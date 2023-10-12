@@ -24,28 +24,35 @@ class AnalyticsNotifier extends ChangeNotifier {
   bool get loading => _loading;
 
   void startLoading({bool notifie = true}) {
-    if (_loading) return;
-    _loading = true;
-    if (notifie) notifyListeners();
+    if (!_loading) {
+      _loading = true;
+      if (notifie) notifyListeners();
+    }
   }
 
   void stopLoading({bool notifie = true}) {
-    if (!_loading) return;
-    _loading = false;
-    if (notifie) notifyListeners();
+    if (_loading) {
+      _loading = false;
+      if (notifie) notifyListeners();
+    }
   }
 
   AnalyticsBody? _analyticsBody;
-  List<ItemName>? _categories;
-  List<ItemName>? _videos;
+  List<ItemName> _categories = [];
+  List<ItemName> _videos = [];
   AnalyticsBody? get analyticsBody => _analyticsBody;
-  List<ItemName>? get categories => _categories;
-  List<ItemName>? get videos => _videos;
+  List<ItemName> get categories => _categories;
+  List<ItemName> get videos => _videos;
 
   void initData({bool notifie = true}) {
+    resetData(notifie: notifie);
+    startLoading(notifie: notifie);
+  }
+
+  void resetData({bool notifie = true}) {
     _analyticsBody = null;
-    _categories = null;
-    _videos = null;
+    _categories.clear();
+    _videos.clear();
     if (notifie) notifyListeners();
   }
 
@@ -54,72 +61,62 @@ class AnalyticsNotifier extends ChangeNotifier {
 
   Future<void> getCategoryNamesList() async {
     startLoading(notifie: false);
-    _categories = null;
-    _videos = null;
-    _analyticsBody = null;
-    notifyListeners();
+    resetData();
     Response response = await repo.getCategoryNamesList();
     stopLoading();
     if (response.statusCode != 200) {
-      _categories = null;
-      _videos = null;
-      _analyticsBody = null;
-      notifyListeners();
       ApiChecker.checkApi(response);
       return;
     }
 
     try {
       var json = jsonDecode(response.body);
-      if (json['data'] != null && json['category_list'] != null) {
+      if (json['data'] != null && json['data']['category_list'] != null) {
         CategoryNames names = CategoryNames.fromJson(json['data']);
-        if (names.list.isNotEmpty) {
-          _categories = [...names.list];
-          notifyListeners();
-          return;
-        }
+        _categories.clear();
+        _videos.clear();
+        _categories.addAll(names.list);
+        notifyListeners();
+        return;
       }
     } catch (e) {
-      debugPrint('${e}');
+      debugPrint('$e');
     }
-    _categories = null;
-    _videos = null;
-    _analyticsBody = null;
-    notifyListeners();
+    resetData();
   }
 
-  Future<void> getVideoNamesList(int categoryId) async {
-    startLoading(notifie: false);
-    _videos = null;
-    _analyticsBody = null;
-    notifyListeners();
-    Response response = await repo.getVideoNamesList(categoryId);
-    stopLoading();
-    if (response.statusCode != 200) {
-      _categories = null;
-      _videos = null;
-      _analyticsBody = null;
-      notifyListeners();
-      ApiChecker.checkApi(response);
-      return;
-    }
+  // Future<void> getVideoNamesList(int categoryId) async {
+  //   startLoading(notifie: false);
+  //   _videos = null;
+  //   _analyticsBody = null;
+  //   notifyListeners();
+  //   Response response = await repo.getVideoNamesList(categoryId);
+  //   stopLoading();
+  //   if (response.statusCode != 200) {
+  //     _categories = null;
+  //     _videos = null;
+  //     _analyticsBody = null;
+  //     notifyListeners();
+  //     ApiChecker.checkApi(response);
+  //     return;
+  //   }
 
-    try {
-      var json = jsonDecode(response.body);
-      if (json['data'] != null && json['video_list'] != null) {
-        VideoNames names = VideoNames.fromJson(json['data']);
-        if (names.list.isNotEmpty) {
-          _videos = [...names.list];
-          notifyListeners();
-          return;
-        }
-      }
-    } catch (e) {
-      debugPrint('${e}');
-    }
-    _categories = null;
-    _videos = null;
-    _analyticsBody = null;
-    notifyListeners();
-  }
+  //   try {
+  //     var json = jsonDecode(response.body);
+  //     if (json['data'] != null && json['video_list'] != null) {
+  //       VideoNames names = VideoNames.fromJson(json['data']);
+  //       if (names.list.isNotEmpty) {
+  //         _videos = [...names.list];
+  //         notifyListeners();
+  //         return;
+  //       }
+  //     }
+  //   } catch (e) {
+  //     debugPrint('${e}');
+  //   }
+  //   _categories = null;
+  //   _videos = null;
+  //   _analyticsBody = null;
+  //   notifyListeners();
+  // }
 }
