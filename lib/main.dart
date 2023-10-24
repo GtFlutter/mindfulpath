@@ -5,10 +5,14 @@ import 'package:meditation_app/provider/base/shared_preferences_provider.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/theme/theme.dart';
 import 'package:meditation_app/util/app_config.dart';
-import 'package:meditation_app/util/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// TODO See Size height and minHeight For Custome Scrollabel column layout
+//// TODO : What I Did In This Project
+///  Intial Figma Design Implemented Not Implemented Chnages
+///  Added Watch Time In Vedio Player api integrate
+///  Analytics Screen Api Integrated
+///
+/// // TODO See Size height and minHeight For Custome Scrollabel column layout
 // TODO also see extra code remove
 // TODO For IOS Number keyboard show Done Using Scaffold
 Future<void> main() async {

@@ -4,16 +4,15 @@ import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 
 import '../../theme/text_style.dart';
-import 'outlined_icon_button.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final AppStyle style;
   final String? title;
-
   final bool automaticallyImplyLeading;
   final Color? surfaceTintColor;
   final Size screenSize;
   final VoidCallback? onDonePressed;
-  final AppStyle style;
+  final List<Widget>? actions;
 
   @override
   final Size preferredSize;
@@ -26,6 +25,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.screenSize,
     this.onDonePressed,
     required this.style,
+    this.actions,
   }) : preferredSize = Size.fromHeight(kToolbarHeight + (style.scale * screenSize.height < 800 ? 0.0 : 10));
 
   @override
@@ -70,6 +70,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleTextStyle: style.text.font(mulishSemiBold600, sizePx: 15, color: Colors.white),
       toolbarHeight: kToolbarHeight + (style.scale * MediaQuery.of(context).size.height < 800 ? 0.0 : 28.5),
       actions: [
+        if (actions != null) ...actions!,
         if (onDonePressed != null)
           Padding(
             padding: EdgeInsets.only(right: style.scale * 9),

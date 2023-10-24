@@ -1,21 +1,36 @@
 import 'package:flutter/cupertino.dart';
+import 'package:meditation_app/ui/screens/analytics/data/helper/analytics_enums.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 
 import '../../../../../theme/styles.dart';
 import '../../../../common/custom_dropdown_button.dart';
 
 class AnalyticsFilter extends StatefulWidget {
-  final List<ItemName> categoryList;
+  final List<ItemName> categories;
+  final List<ItemName> videos;
+  final List<FilterDuration> durationtypes;
+  final ItemName? categoryValue;
+  final ItemName? videoValue;
+  final FilterDuration? durationtypeValue;
   final ValueChanged<ItemName?> onCategoryChanged;
-  final List<ItemName> videoList;
   final ValueChanged<ItemName?> onVideoChanged;
+  final ValueChanged<FilterDuration?> onDurationTypeChanged;
+  final AppStyle style;
+  final Size screenSize;
 
-  const AnalyticsFilter({
+  const AnalyticsFilter(
+    this.style,
+    this.screenSize, {
     super.key,
-    required this.categoryList,
+    required this.categories,
+    required this.videos,
+    required this.durationtypes,
+    required this.categoryValue,
+    required this.videoValue,
+    required this.durationtypeValue,
     required this.onCategoryChanged,
-    required this.videoList,
     required this.onVideoChanged,
+    required this.onDurationTypeChanged,
   });
 
   @override
@@ -23,35 +38,23 @@ class AnalyticsFilter extends StatefulWidget {
 }
 
 class _AnalyticsFilterState extends State<AnalyticsFilter> {
-  final List<String> allOverList = [
-    'Day',
-    'Week',
-    'Month',
-  ];
-  ItemName? categoryValue;
-  ItemName? videosValue;
-  String? allOverValue;
-
-  static AppStyle _style = AppStyle();
-
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    _style = AppStyle(screenSize: size);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+      padding: EdgeInsets.symmetric(horizontal: widget.style.scaleX(20)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: CustomDropDownButton(
-                value: categoryValue,
-                appStyle: _style,
-                items: widget.categoryList,
-                maxHeight: size.height * 0.6,
-                width: size.shortestSide * 0.4,
+              child: CustomDropDownButton<ItemName>(
+                key: const ValueKey<int>(0),
+                value: widget.categoryValue,
+                appStyle: widget.style,
+                items: widget.categories,
+                maxHeight: widget.screenSize.height * 0.6,
+                width: widget.screenSize.shortestSide * 0.4,
                 onChanged: widget.onCategoryChanged,
                 hint: 'Category',
               ),
@@ -60,35 +63,33 @@ class _AnalyticsFilterState extends State<AnalyticsFilter> {
           Expanded(
             child: Align(
               alignment: Alignment.center,
-              child: CustomDropDownButton(
-                value: videosValue,
-                appStyle: _style,
-                items: widget.videoList,
-                maxHeight: size.height * 0.6,
-                width: size.shortestSide * 0.4,
+              child: CustomDropDownButton<ItemName>(
+                key: const ValueKey<int>(1),
+                value: widget.videoValue,
+                appStyle: widget.style,
+                items: widget.videos,
+                maxHeight: widget.screenSize.height * 0.6,
+                width: widget.screenSize.shortestSide * 0.4,
                 onChanged: widget.onVideoChanged,
                 hint: 'Videos',
               ),
             ),
           ),
-          // Expanded(
-          //   child: Align(
-          //     alignment: Alignment.centerRight,
-          //     child: CustomDropDownButton(
-          //       value: allOverValue,
-          //       appStyle: _style,
-          //       items: allOverList,
-          //       width: size.shortestSide * 0.3,
-          //       maxHeight: size.height * 0.6,
-          //       onChanged: (value) {
-          //         setState(() {
-          //           allOverValue = value;
-          //         });
-          //       },
-          //       hint: 'All over',
-          //     ),
-          //   ),
-          // ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: CustomDropDownButton<FilterDuration>(
+                key: const ValueKey<int>(2),
+                value: widget.durationtypeValue,
+                appStyle: widget.style,
+                items: widget.durationtypes,
+                width: widget.screenSize.shortestSide * 0.3,
+                maxHeight: widget.screenSize.height * 0.6,
+                onChanged: widget.onDurationTypeChanged,
+                hint: 'Duration',
+              ),
+            ),
+          ),
         ],
       ),
     );

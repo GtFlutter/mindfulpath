@@ -1,70 +1,119 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
+import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/body/analytics_body.dart';
+import 'package:meditation_app/ui/screens/analytics/data/model/response/analytics_result_model.dart';
 import 'package:meditation_app/ui/screens/analytics/data/repo/analytics_repo.dart';
 import 'package:meditation_app/ui/screens/analytics/data/provider/analytics_repo_provider.dart';
 
+import '../helper/analytics_enums.dart';
 import '../model/response/category_and_video_name_model.dart';
 
 final analyticsProvider = ChangeNotifierProvider<AnalyticsNotifier>((ref) {
   var repo = ref.watch(analyticsRepoProvider);
-  return AnalyticsNotifier(repo: repo);
+  return AnalyticsNotifier(repo: repo, ref: ref);
 });
 
 class AnalyticsNotifier extends ChangeNotifier {
   final AnalyticsRepo repo;
+  ChangeNotifierProviderRef<AnalyticsNotifier> ref;
 
-  AnalyticsNotifier({required this.repo});
+  AnalyticsNotifier({required this.repo, required this.ref});
 
   bool _loading = false;
   bool get loading => _loading;
 
-  void startLoading({bool notifie = true}) {
-    if (!_loading) {
-      _loading = true;
-      if (notifie) notifyListeners();
-    }
-  }
+  /// TODO : Working On It
+  /// TODO : Show Data From This In View
+  AnalyticsResult? _result;
+  AnalyticsResult? get reslut => _result;
 
-  void stopLoading({bool notifie = true}) {
-    if (_loading) {
-      _loading = false;
-      if (notifie) notifyListeners();
-    }
-  }
+  ItemName? _category;
+  ItemName? _video;
+  FilterDuration _durationtype = FilterDuration.day;
+  DateTimeRange _duration = DateTimeRange(start: DateTime.now(), end: DateTime.now());
 
-  AnalyticsBody? _analyticsBody;
-  List<ItemName> _categories = [];
-  List<ItemName> _videos = [];
-  AnalyticsBody? get analyticsBody => _analyticsBody;
+  ItemName? get categoryId => _category;
+  ItemName? get videoId => _video;
+  FilterDuration get durationtype => _durationtype;
+  DateTimeRange get duration => _duration;
+
+  final List<ItemName> _categories = [];
+  final List<ItemName> _videos = [];
+
   List<ItemName> get categories => _categories;
   List<ItemName> get videos => _videos;
 
   void initData({bool notifie = true}) {
-    resetData(notifie: notifie);
-    startLoading(notifie: notifie);
+    _resetCategories(notifie: false);
+    _resetVideos(notifie: false);
+    _setDuration(FilterDuration.day, notifie: false);
+    _startLoading(notifie: false);
+    if (notifie) notifyListeners();
   }
 
-  void resetData({bool notifie = true}) {
-    _analyticsBody = null;
-    _categories.clear();
-    _videos.clear();
+  void onCategoryChanged(ItemName? value) {
+    _category = value;
+    _resetVideos(notifie: false);
+    notifyListeners();
+
+    if (value != null) {
+      getVideoNamesList(value.id);
+    } else {
+      getAnalytics();
+    }
+  }
+
+  void onVideoChanged(ItemName? value) {
+    _video = value;
+    notifyListeners();
+    getAnalytics();
+  }
+
+  void onDurationTypeChanged(FilterDuration? value) async {
+    if (value != null && value == FilterDuration.custom) {
+      BuildContext? context = rootNavigator.currentContext;
+      if (context != null && context.mounted) {
+        DateTimeRange? range = await showDateRangePicker(
+          context: context,
+          lastDate: DateTime.now(),
+          firstDate: DateTime.now().add(const Duration(days: -365)),
+        );
+        if (range != null) {
+          _duration = range;
+          _durationtype = FilterDuration.custom;
+          notifyListeners();
+          getAnalytics();
+        }
+      }
+    } else {
+      _setDuration(value ?? FilterDuration.day);
+      getAnalytics();
+    }
+  }
+
+  void reset({bool notifie = true}) {
+    _category = null;
+    _resetVideos(notifie: false);
+    _setDuration(FilterDuration.day, notifie: false);
     if (notifie) notifyListeners();
+    getAnalytics();
   }
 
   // category_list
   // video_list
 
   Future<void> getCategoryNamesList() async {
-    startLoading(notifie: false);
-    resetData();
+    _resetCategories(notifie: false);
+    _resetVideos(notifie: false);
+    _startLoading();
     Response response = await repo.getCategoryNamesList();
-    stopLoading();
     if (response.statusCode != 200) {
+      _stopLoading();
       ApiChecker.checkApi(response);
       return;
     }
@@ -73,50 +122,132 @@ class AnalyticsNotifier extends ChangeNotifier {
       var json = jsonDecode(response.body);
       if (json['data'] != null && json['data']['category_list'] != null) {
         CategoryNames names = CategoryNames.fromJson(json['data']);
-        _categories.clear();
-        _videos.clear();
         _categories.addAll(names.list);
+        _stopLoading(notifie: false);
         notifyListeners();
-        return;
+      } else {
+        throw Exception('Unable to fetch categories');
       }
     } catch (e) {
       debugPrint('$e');
+      _stopLoading(notifie: false);
+      _resetCategories(notifie: false);
+      _resetVideos(notifie: false);
+      notifyListeners();
     }
-    resetData();
+
+    getAnalytics();
   }
 
-  // Future<void> getVideoNamesList(int categoryId) async {
-  //   startLoading(notifie: false);
-  //   _videos = null;
-  //   _analyticsBody = null;
-  //   notifyListeners();
-  //   Response response = await repo.getVideoNamesList(categoryId);
-  //   stopLoading();
-  //   if (response.statusCode != 200) {
-  //     _categories = null;
-  //     _videos = null;
-  //     _analyticsBody = null;
-  //     notifyListeners();
-  //     ApiChecker.checkApi(response);
-  //     return;
-  //   }
+  Future<void> getVideoNamesList(int categoryId) async {
+    _resetVideos(notifie: false);
+    _startLoading();
 
-  //   try {
-  //     var json = jsonDecode(response.body);
-  //     if (json['data'] != null && json['video_list'] != null) {
-  //       VideoNames names = VideoNames.fromJson(json['data']);
-  //       if (names.list.isNotEmpty) {
-  //         _videos = [...names.list];
-  //         notifyListeners();
-  //         return;
-  //       }
-  //     }
-  //   } catch (e) {
-  //     debugPrint('${e}');
-  //   }
-  //   _categories = null;
-  //   _videos = null;
-  //   _analyticsBody = null;
-  //   notifyListeners();
-  // }
+    Response response = await repo.getVideoNamesList(categoryId);
+
+    if (response.statusCode != 200) {
+      _stopLoading();
+      ApiChecker.checkApi(response);
+      return;
+    }
+
+    try {
+      var json = jsonDecode(response.body);
+      if (json['data'] != null && json['data']['video_list'] != null) {
+        VideoNames names = VideoNames.fromJson(json['data']);
+        _videos.addAll(names.list);
+        _stopLoading(notifie: false);
+        notifyListeners();
+      } else {
+        throw Exception('Unable to fetch videoNamesList');
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      _stopLoading(notifie: false);
+      _resetVideos(notifie: false);
+      notifyListeners();
+    }
+
+    getAnalytics();
+  }
+
+  Future<void> getAnalytics() async {
+    _result = null;
+    _startLoading();
+
+    Response response = await repo.getAnalytics(
+      AnalyticsBody(
+        categoryId: _category?.id,
+        videoId: _video?.id,
+        duration: _duration,
+      ),
+    );
+
+    if (response.statusCode != 200) {
+      _stopLoading(notifie: false);
+      ApiChecker.checkApi(response);
+      return;
+    }
+
+    try {
+      var json = jsonDecode(response.body);
+      if (json['data'] != null) {
+        AnalyticsResult reslutResponse = AnalyticsResult.fromJson(json['data']);
+        _result = reslutResponse;
+        _stopLoading(notifie: false);
+        notifyListeners();
+      } else {
+        throw Exception('Unable to fetch result');
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      _result = null;
+      _stopLoading(notifie: false);
+      notifyListeners();
+    }
+  }
+
+  void _setDuration(FilterDuration type, {bool notifie = true}) {
+    if (type == FilterDuration.custom) {
+      return;
+    }
+    DateTime currentDate = DateTime.now();
+    Duration addableDuration = Duration(
+        days: type == FilterDuration.day
+            ? 0
+            : type == FilterDuration.week
+                ? 6
+                : type == FilterDuration.month
+                    ? 29
+                    : 0);
+    _duration = DateTimeRange(start: currentDate, end: currentDate.add(addableDuration));
+    _durationtype = type;
+    if (notifie) notifyListeners();
+  }
+
+  void _resetVideos({bool notifie = true}) {
+    _videos.clear();
+    _video = null;
+    if (notifie) notifyListeners();
+  }
+
+  void _resetCategories({bool notifie = true}) {
+    _categories.clear();
+    _category = null;
+    if (notifie) notifyListeners();
+  }
+
+  void _startLoading({bool notifie = true}) {
+    if (!_loading) {
+      _loading = true;
+      if (notifie) notifyListeners();
+    }
+  }
+
+  void _stopLoading({bool notifie = true}) {
+    if (_loading) {
+      _loading = false;
+      if (notifie) notifyListeners();
+    }
+  }
 }

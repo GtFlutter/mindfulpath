@@ -1,9 +1,15 @@
 enum FilterDuration {
-  day(1),
-  week(7),
-  month(30),
-  custome;
+  day,
+  week,
+  month,
+  custom;
 
-  final int? days;
-  const FilterDuration([this.days]);
+  static List<FilterDuration> toList() {
+    return [
+      FilterDuration.day,
+      FilterDuration.week,
+      FilterDuration.month,
+      FilterDuration.custom,
+    ];
+  }
 }
