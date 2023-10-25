@@ -9,8 +9,12 @@ class AnalyticsDetails extends StatelessWidget {
     required this.textStyle,
     required this.size,
     required this.subTextStyle,
+    required this.totalWatchTime,
+    required this.totalAverageWatchTime,
   }) : _style = style;
 
+  final String totalWatchTime;
+  final String totalAverageWatchTime;
   final AppStyle _style;
   final TextStyle textStyle;
   final Size size;
@@ -29,19 +33,19 @@ class AnalyticsDetails extends StatelessWidget {
               children: [
                 SizedBox(height: _style.scaleX(25)),
                 Text(
-                  'Total category time',
+                  'Total watch time',
                   style: textStyle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: _style.scaleX(25)),
-                Text(
-                  'Total video time',
-                  style: textStyle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: _style.scaleX(25)),
+                // Text(
+                //   'Total video time',
+                //   style: textStyle,
+                //   maxLines: 1,
+                //   overflow: TextOverflow.ellipsis,
+                // ),
+                // SizedBox(height: _style.scaleX(25)),
                 Text(
                   'Total average time',
                   style: textStyle,
@@ -60,19 +64,19 @@ class AnalyticsDetails extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               children: [
                 Text(
-                  '1h 20m 14s',
+                  totalWatchTime,
                   style: subTextStyle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                // Text(
+                //   '45m',
+                //   style: subTextStyle,
+                //   maxLines: 1,
+                //   overflow: TextOverflow.ellipsis,
+                // ),
                 Text(
-                  '45m',
-                  style: subTextStyle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  '2h 21m 8s',
+                  totalAverageWatchTime,
                   style: subTextStyle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

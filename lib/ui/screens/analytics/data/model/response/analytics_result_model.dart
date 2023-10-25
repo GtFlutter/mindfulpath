@@ -20,6 +20,8 @@ part 'analytics_result_model.g.dart';
 //   };
 // }
 
+enum ShowType { weekDayName, monthName, unknown }
+
 @JsonSerializable(explicitToJson: false, createToJson: false)
 class AnalyticsResult {
   @JsonKey(name: 'statistics_data')
@@ -29,6 +31,8 @@ class AnalyticsResult {
   final double? totalWatchTimeHr;
   @JsonKey(name: 'total_watch_time')
   final String? totalWatchTime;
+  @JsonKey(name: 'avg_watch_time_hr')
+  final double? totalAvgWatchTimeHr;
   @JsonKey(name: 'avg_watch_time')
   final String? avgWatchTime;
   @JsonKey(name: 'day_diff')
@@ -38,11 +42,22 @@ class AnalyticsResult {
     required this.statistics,
     required this.totalWatchTimeHr,
     required this.totalWatchTime,
+    required this.totalAvgWatchTimeHr,
     required this.avgWatchTime,
     required this.dayDiff,
   });
 
   factory AnalyticsResult.fromJson(Map<String, dynamic> json) => _$AnalyticsResultFromJson(json);
+
+  ShowType getShowType() {
+    if (dayDiff == null) {
+      return ShowType.unknown;
+    } else if (dayDiff! > 7) {
+      return ShowType.monthName;
+    } else {
+      return ShowType.weekDayName;
+    }
+  }
 }
 
 @JsonSerializable(explicitToJson: false, createToJson: false)

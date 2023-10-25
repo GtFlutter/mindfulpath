@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/date_converter.dart';
-import 'package:meditation_app/ui/screens/analytics/data/helper/analytics_enums.dart';
+import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 import 'package:meditation_app/ui/screens/analytics/data/provider/analytics_provider.dart';
+import 'package:meditation_app/ui/screens/analytics/helper/analytics_extensions.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_chart.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_details.dart';
 import 'package:meditation_app/util/dimensions.dart';
@@ -101,53 +102,78 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     ),
                   ),
                 ),
-                Expanded(
-                  child: prov.loading
-                      ? const Center(child: CircularProgressIndicator())
-                      : prov.reslut == null
-                          ? NoDataFound(message: 'Something went wron', onRetry: () {})
-                          : prov.reslut!.statistics.isEmpty
-                              ? NoDataFound(message: 'No Data Found', onRetry: () {})
-                              : SingleChildScrollView(
-                                  padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(height: _style.scaleX(orientation == Orientation.landscape ? 15 : 30)),
-                                      if (orientation == Orientation.landscape ||
-                                          (orientation == Orientation.portrait && size.width > 999))
-                                        Row(
-                                          children: [
-                                            const Expanded(child: AnalyticsChart(key: ValueKey('AnalyticsChart'))),
-                                            SizedBox(width: _style.scaleX(25)),
-                                            Expanded(
-                                              child: AnalyticsDetails(
-                                                key: const ValueKey('AnalyticsDetails'),
-                                                style: _style,
-                                                textStyle: textStyle,
-                                                size: size,
-                                                subTextStyle: subTextStyle,
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      else ...[
-                                        const AnalyticsChart(
-                                          key: ValueKey('AnalyticsChart'),
-                                        ),
-                                        SizedBox(height: _style.scaleX(25)),
-                                        AnalyticsDetails(
-                                          key: const ValueKey('AnalyticsDetails'),
-                                          style: _style,
-                                          textStyle: textStyle,
-                                          size: size,
-                                          subTextStyle: subTextStyle,
-                                        ),
-                                      ],
-                                    ],
+                if (prov.loading)
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (prov.reslut == null)
+                  Expanded(
+                    child: NoDataFound(
+                      message: 'Something went wron',
+                      onRetry: () {},
+                    ),
+                  )
+                else if (prov.reslut!.statistics.isEmpty)
+                  Expanded(
+                    child: NoDataFound(
+                      message: 'No Data Found',
+                      onRetry: () {},
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(height: _style.scaleX(orientation == Orientation.landscape ? 15 : 30)),
+                          if (orientation == Orientation.landscape ||
+                              (orientation == Orientation.portrait && size.width > 999))
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: AnalyticsChart(
+                                    key: const ValueKey('AnalyticsChart'),
+                                    result: prov.reslut!,
                                   ),
                                 ),
-                ),
+                                SizedBox(width: _style.scaleX(25)),
+                                Expanded(
+                                  flex: 1,
+                                  child: AnalyticsDetails(
+                                    key: const ValueKey('AnalyticsDetails'),
+                                    style: _style,
+                                    textStyle: textStyle,
+                                    size: size,
+                                    subTextStyle: subTextStyle,
+                                    totalWatchTime: prov.reslut!.totalWatchTimeHr.formatInDuration(),
+                                    totalAverageWatchTime: prov.reslut!.totalAvgWatchTimeHr.formatInDuration(),
+                                  ),
+                                ),
+                              ],
+                            )
+                          else ...[
+                            AnalyticsChart(
+                              key: const ValueKey('AnalyticsChart'),
+                              result: prov.reslut!,
+                            ),
+                            SizedBox(height: _style.scaleX(25)),
+                            AnalyticsDetails(
+                              key: const ValueKey('AnalyticsDetails'),
+                              style: _style,
+                              textStyle: textStyle,
+                              size: size,
+                              subTextStyle: subTextStyle,
+                              totalWatchTime: prov.reslut!.totalWatchTimeHr.formatInDuration(),
+                              totalAverageWatchTime: prov.reslut!.totalAvgWatchTimeHr.formatInDuration(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             );
           }),

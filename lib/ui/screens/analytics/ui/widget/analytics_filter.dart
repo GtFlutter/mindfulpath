@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:meditation_app/ui/screens/analytics/data/helper/analytics_enums.dart';
+import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 
 import '../../../../../theme/styles.dart';

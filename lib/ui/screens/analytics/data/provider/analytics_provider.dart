@@ -10,7 +10,7 @@ import 'package:meditation_app/ui/screens/analytics/data/model/response/analytic
 import 'package:meditation_app/ui/screens/analytics/data/repo/analytics_repo.dart';
 import 'package:meditation_app/ui/screens/analytics/data/provider/analytics_repo_provider.dart';
 
-import '../helper/analytics_enums.dart';
+import '../../helper/analytics_enums.dart';
 import '../model/response/category_and_video_name_model.dart';
 
 final analyticsProvider = ChangeNotifierProvider<AnalyticsNotifier>((ref) {

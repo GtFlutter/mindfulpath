@@ -13,6 +13,7 @@ AnalyticsResult _$AnalyticsResultFromJson(Map<String, dynamic> json) =>
           .toList(),
       totalWatchTimeHr: (json['total_watch_time_hr'] as num?)?.toDouble(),
       totalWatchTime: json['total_watch_time'] as String?,
+      totalAvgWatchTimeHr: (json['avg_watch_time_hr'] as num?)?.toDouble(),
       avgWatchTime: json['avg_watch_time'] as String?,
       dayDiff: json['day_diff'] as int?,
     );
