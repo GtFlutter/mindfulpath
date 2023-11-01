@@ -7,6 +7,22 @@ import '../../../../../theme/styles.dart';
 import '../../../../../theme/text_style.dart';
 import '../../data/model/response/analytics_result_model.dart';
 
+extension OnInt on int {
+  double secondsInDays() => this / (60 * 60 * 24);
+  double secondsInHours() => this / (60 * 60);
+  double secondsInMinutes() => this / 60;
+}
+
+enum AxisYValueFormate {
+  days('D'),
+  hours('H'),
+  minutes('M'),
+  seconds('S');
+
+  final String shortName;
+  const AxisYValueFormate(this.shortName);
+}
+
 class AnalyticsChart extends StatefulWidget {
   final AnalyticsResult result;
   const AnalyticsChart({super.key, required this.result});
@@ -27,65 +43,67 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
     super.initState();
   }
 
+  int _calculateMaxDuration(List<Statistic> statistics) {
+    return statistics
+        .map(
+          (item) => item.totalDurationInSecond,
+        )
+        .reduce(
+          (value, item) => value + item,
+        );
+  }
+
+  double _calculateY(AxisYValueFormate valueFormat, int seconds) {
+    switch (valueFormat) {
+      case AxisYValueFormate.days:
+        return seconds.secondsInDays();
+      case AxisYValueFormate.hours:
+        return seconds.secondsInHours();
+      case AxisYValueFormate.minutes:
+        return seconds.secondsInMinutes();
+      case AxisYValueFormate.seconds:
+        return seconds.toDouble();
+      default:
+        return 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     /// For Horizintal Axis
-    ShowType type = widget.result.getShowType();
+    ShowType type = widget.result.toShowType();
 
     /// For Verticle Axis
-    int maxDurationInSeconds = widget.result.statistics.fold(0, (previousValue, element) {
-      return previousValue + element.totalDurationInSecond;
-    });
+    int maxDurationInSeconds = _calculateMaxDuration(widget.result.statistics);
 
     if (widget.result.statistics.isEmpty || maxDurationInSeconds <= 0 || type == ShowType.unknown) {
-      return const Center(
-        child: Text('No data found'),
-      );
+      return const Center(child: Text('No data found'));
     }
 
     Duration maxDuratrion = Duration(seconds: maxDurationInSeconds);
 
     double min = 0;
     double max = 0;
-    String valueFormate = '';
+    AxisYValueFormate valueFormate;
     List<_ChartData> data = [];
 
-    if (maxDuratrion.inDays != 0) {
-      valueFormate = 'D';
-      max = (maxDurationInSeconds / (60 * 60 * 24)).ceil().toDouble();
-    } else if (maxDuratrion.inHours != 0) {
-      valueFormate = 'H';
-      max = 60;
-      // max = (maxDurationInSeconds / (60 * 60)).ceil().toDouble();
-    } else if (maxDuratrion.inMinutes >= 1) {
-      valueFormate = 'M';
-      max = 60;
-      // max = (maxDurationInSeconds / 60).ceil().toDouble();
+    if (maxDuratrion.inDays != 0 && maxDuratrion.inHours != 24) {
+      valueFormate = AxisYValueFormate.days;
+      max = maxDurationInSeconds.secondsInDays().ceil().toDouble();
+    } else if (maxDuratrion.inHours != 0 && maxDuratrion.inMinutes != 60) {
+      valueFormate = AxisYValueFormate.hours;
+      max = maxDurationInSeconds.secondsInHours().ceil().toDouble();
+    } else if (maxDuratrion.inMinutes >= 1 && maxDuratrion.inSeconds != 60) {
+      valueFormate = AxisYValueFormate.minutes;
+      max = maxDurationInSeconds.secondsInMinutes().ceil().toDouble();
     } else {
-      max = 60;
       max = maxDurationInSeconds.toDouble();
-      valueFormate = 'S';
+      valueFormate = AxisYValueFormate.seconds;
     }
 
     for (var element in widget.result.statistics) {
       String x = type == ShowType.weekDayName ? element.dayName : element.monthName;
-      double y = 0;
-      switch (valueFormate) {
-        case 'D':
-          y = (element.totalDurationInSecond / (60 * 60 * 24));
-          break;
-        case 'H':
-          y = (element.totalDurationInSecond / (60 * 60));
-          break;
-        case 'M':
-          y = (element.totalDurationInSecond / 60);
-          break;
-        case 'S':
-          y = element.totalDurationInSecond.toDouble();
-          break;
-        default:
-          break;
-      }
+      double y = _calculateY(valueFormate, element.totalDurationInSecond);
       data.add(_ChartData(x, y));
     }
 
@@ -93,8 +111,9 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
     var size = MediaQuery.sizeOf(context);
     _style = AppStyle(screenSize: size);
     return Container(
-      constraints:
-          BoxConstraints(maxHeight: orientation == Orientation.landscape ? size.shortestSide * 0.5 : double.infinity),
+      constraints: BoxConstraints(
+        maxHeight: orientation == Orientation.landscape ? size.shortestSide * 0.5 : double.infinity,
+      ),
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(_style.scaleX(30)),
@@ -137,7 +156,7 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
             majorTickLines: const MajorTickLines(color: Colors.transparent, width: 0),
             labelAlignment: LabelAlignment.center,
             labelStyle: _style.text.font(mulishRegular400, sizePx: 10),
-            labelFormat: '{value} $valueFormate',
+            labelFormat: '{value} ${valueFormate.shortName}',
             axisLabelFormatter: (axisLabelRenderArgs) {
               return ChartAxisLabel(
                 axisLabelRenderArgs.value == 0 ? axisLabelRenderArgs.text : axisLabelRenderArgs.text,
@@ -153,6 +172,8 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
               yValueMapper: (_ChartData data, _) => data.y,
               name: 'Analytics',
               width: 0.2,
+              enableTooltip: false,
+              // markerSettings: MarkerSettings(isVisible: true),
               isTrackVisible: false,
               borderRadius: BorderRadius.circular(_style.scaleX(50)),
               gradient: const LinearGradient(

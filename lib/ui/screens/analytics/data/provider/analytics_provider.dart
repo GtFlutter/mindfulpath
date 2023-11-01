@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/helper/route/router.dart';
+import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/body/analytics_body.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/analytics_result_model.dart';
 import 'package:meditation_app/ui/screens/analytics/data/repo/analytics_repo.dart';
@@ -82,6 +83,16 @@ class AnalyticsNotifier extends ChangeNotifier {
           context: context,
           lastDate: DateTime.now(),
           firstDate: DateTime.now().add(const Duration(days: -365)),
+          builder: (context, child) {
+            return Theme(
+              data: ThemeData(
+                colorScheme: const ColorScheme.dark(
+                  primary: AppColors.primaryColor,
+                ),
+              ),
+              child: child!,
+            );
+          },
         );
         if (range != null) {
           _duration = range;

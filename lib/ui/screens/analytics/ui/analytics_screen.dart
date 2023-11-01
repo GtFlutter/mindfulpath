@@ -6,7 +6,6 @@ import 'package:meditation_app/ui/screens/analytics/data/provider/analytics_prov
 import 'package:meditation_app/ui/screens/analytics/helper/analytics_extensions.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_chart.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_details.dart';
-import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../../provider/auth_provider.dart';
 import '../../../../theme/styles.dart';
@@ -73,6 +72,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
             //   return NoDataFound(onRetry: () {});
             // }
 
+            String resultOf = '${prov.duration.start.toStringFormat3}${prov.durationtype != FilterDuration.day ? ' To ${prov.duration.end.toStringFormat3}' : ''}';
+
             return Column(
               children: [
                 AbsorbPointer(
@@ -91,33 +92,24 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     onDurationTypeChanged: prov.onDurationTypeChanged,
                   ),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: _style.scaleX(20), right: _style.scaleX(20)),
-                    child: Text(
-                      '${prov.duration.start.toStringFormat3}${prov.durationtype != FilterDuration.day ? ' To ${prov.duration.end.toStringFormat3}' : ''}',
-                      style: subTextStyle,
-                      maxLines: 2,
-                    ),
-                  ),
-                ),
                 if (prov.loading)
                   const Expanded(
                     child: Center(child: CircularProgressIndicator()),
                   )
-                else if (prov.reslut == null)
+                else if (prov.reslut == null || prov.reslut!.statistics.isEmpty)
                   Expanded(
-                    child: NoDataFound(
-                      message: 'Something went wron',
-                      onRetry: () {},
-                    ),
-                  )
-                else if (prov.reslut!.statistics.isEmpty)
-                  Expanded(
-                    child: NoDataFound(
-                      message: 'No Data Found',
-                      onRetry: () {},
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            prov.reslut == null ? 'Something went wron' : 'No Data Found',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          if (prov.reslut != null) Text(resultOf, style: subTextStyle, maxLines: 2),
+                        ],
+                      ),
                     ),
                   )
                 else
@@ -128,8 +120,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SizedBox(height: _style.scaleX(orientation == Orientation.landscape ? 15 : 30)),
-                          if (orientation == Orientation.landscape ||
-                              (orientation == Orientation.portrait && size.width > 999))
+                          if (orientation == Orientation.landscape || (orientation == Orientation.portrait && size.width > 999))
                             Row(
                               children: [
                                 Expanded(
@@ -140,6 +131,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                   ),
                                 ),
                                 SizedBox(width: _style.scaleX(25)),
+
+                                /// TODO : Change rqage selection color
                                 Expanded(
                                   flex: 1,
                                   child: AnalyticsDetails(
@@ -150,6 +143,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                                     subTextStyle: subTextStyle,
                                     totalWatchTime: prov.reslut!.totalWatchTimeHr.formatInDuration(),
                                     totalAverageWatchTime: prov.reslut!.totalAvgWatchTimeHr.formatInDuration(),
+                                    resultOf: resultOf,
                                   ),
                                 ),
                               ],
@@ -168,6 +162,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                               subTextStyle: subTextStyle,
                               totalWatchTime: prov.reslut!.totalWatchTimeHr.formatInDuration(),
                               totalAverageWatchTime: prov.reslut!.totalAvgWatchTimeHr.formatInDuration(),
+                              resultOf: resultOf,
                             ),
                           ],
                         ],
@@ -183,33 +178,33 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   }
 }
 
-class NoDataFound extends StatelessWidget {
-  final String? message;
-  final String? buttonLable;
-  final VoidCallback? onRetry;
-  const NoDataFound({super.key, this.message, this.buttonLable, this.onRetry});
+// class NoDataFound extends StatelessWidget {
+//   final String? message;
+//   final String? buttonLable;
+//   final VoidCallback? onRetry;
+//   const NoDataFound({super.key, this.message, this.buttonLable, this.onRetry});
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Dimensions.PADDING_SIZE_DEFAULT,
-          vertical: Dimensions.PADDING_SIZE_DEFAULT,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              message ?? 'Unable to fetch Data',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: Dimensions.PADDING_SIZE_DEFAULT),
-            TextButton(onPressed: onRetry, child: Text(buttonLable ?? 'Retry')),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: Padding(
+//         padding: const EdgeInsets.symmetric(
+//           horizontal: Dimensions.PADDING_SIZE_DEFAULT,
+//           vertical: Dimensions.PADDING_SIZE_DEFAULT,
+//         ),
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Text(
+//               message ?? 'Unable to fetch Data',
+//               textAlign: TextAlign.center,
+//               style: Theme.of(context).textTheme.bodyLarge,
+//             ),
+//             const SizedBox(height: Dimensions.PADDING_SIZE_DEFAULT),
+//             TextButton(onPressed: onRetry, child: Text(buttonLable ?? 'Retry')),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

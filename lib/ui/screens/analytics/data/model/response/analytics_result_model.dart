@@ -49,7 +49,7 @@ class AnalyticsResult {
 
   factory AnalyticsResult.fromJson(Map<String, dynamic> json) => _$AnalyticsResultFromJson(json);
 
-  ShowType getShowType() {
+  ShowType toShowType() {
     if (dayDiff == null) {
       return ShowType.unknown;
     } else if (dayDiff! > 7) {

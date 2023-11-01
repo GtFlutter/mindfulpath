@@ -23,6 +23,7 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
 
   @override
   void initState() {
+    // ignore: unused_result
     ref.refresh(supportTicketsListProvider.future);
     super.initState();
   }
@@ -86,6 +87,7 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
                               if (err.statusCode == 401) {
                                 context.go(RoutePath.signIn);
                               } else {
+                                // ignore: unused_result
                                 ref.refresh(supportTicketsListProvider.future);
                               }
                             },

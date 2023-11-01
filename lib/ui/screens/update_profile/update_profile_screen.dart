@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -53,12 +51,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
         screenSize: size,
         style: _style,
         title: 'Edit Profile',
-        onDonePressed: user.isLoading ||
-                !user.hasValue ||
-                user.isRefreshing ||
-                user.isReloading ||
-                user.hasError ||
-                userP.isLoading
+        onDonePressed: user.isLoading || !user.hasValue || user.isRefreshing || user.isReloading || user.hasError || userP.isLoading
             ? null
             : () {
                 if (_controller.onNext != null) {
@@ -105,10 +98,10 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
                 ),
               );
             } else {
-              return Center(child: Text('Unknown Error'));
+              return const Center(child: Text('Unknown Error'));
             }
           },
-          loading: () => Center(
+          loading: () => const Center(
             child: CircularProgressIndicator(),
           ),
         ),

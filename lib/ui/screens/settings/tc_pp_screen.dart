@@ -67,6 +67,7 @@ class TCPPScreen extends ConsumerWidget {
                   return WentWrong(
                     style: _style,
                     onPressed: () {
+                      // ignore: unused_result
                       ref.refresh(getStaticDataProvider.future);
                     },
                   );
@@ -76,6 +77,7 @@ class TCPPScreen extends ConsumerWidget {
                 return WentWrong(
                   style: _style,
                   onPressed: () {
+                    // ignore: unused_result
                     ref.refresh(getStaticDataProvider.future);
                   },
                 );
