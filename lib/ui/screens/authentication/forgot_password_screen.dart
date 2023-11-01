@@ -12,10 +12,8 @@ import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/contact_number_text_field.dart';
 
-import '../../../helper/route/route_paths.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/styles.dart';
-import 'otp_verification_screen.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});

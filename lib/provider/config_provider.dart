@@ -44,6 +44,7 @@ class ConfigNotifier extends ChangeNotifier {
       ApiChecker.checkApi(response);
     } else {
       try {
+        // ignore: unused_result
         await ref.refresh(getUserProfileProvider.future);
         showCustomSnackBar('Notification Setting Updated Successfully');
         stopLoading();

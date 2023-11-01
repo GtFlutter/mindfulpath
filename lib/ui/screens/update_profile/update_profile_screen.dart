@@ -24,6 +24,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
 
   @override
   void initState() {
+    // ignore: unused_result
     ref.refresh(getUserProfileProvider.future);
     super.initState();
   }
@@ -51,7 +52,12 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
         screenSize: size,
         style: _style,
         title: 'Edit Profile',
-        onDonePressed: user.isLoading || !user.hasValue || user.isRefreshing || user.isReloading || user.hasError || userP.isLoading
+        onDonePressed: user.isLoading ||
+                !user.hasValue ||
+                user.isRefreshing ||
+                user.isReloading ||
+                user.hasError ||
+                userP.isLoading
             ? null
             : () {
                 if (_controller.onNext != null) {
@@ -88,6 +94,7 @@ class _UpdateProfileScreenState extends ConsumerState<UpdateProfileScreen> {
                           if (err.statusCode == 401) {
                             context.go(RoutePath.signIn);
                           } else {
+                            // ignore: unused_result
                             ref.refresh(getUserProfileProvider.future);
                           }
                         },

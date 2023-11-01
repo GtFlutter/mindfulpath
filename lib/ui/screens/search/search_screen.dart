@@ -97,7 +97,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
-    final dashboardNotifier = ref.watch<DashboardNotifier>(dashboardProvider);
+    // final dashboardNotifier = ref.watch<DashboardNotifier>(dashboardProvider);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: BackgroundImage(
@@ -174,9 +174,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   child: showSearchResult
                       ? SearchResultsList(style: _style)
                       : RecentSearchResultList(
-                    style: _style,
-                    onRecentSearchTap: setSearchValue,
-                  ),
+                          style: _style,
+                          onRecentSearchTap: setSearchValue,
+                        ),
                 )
               ],
             ),

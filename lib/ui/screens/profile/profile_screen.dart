@@ -61,9 +61,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
-    const double ratio = 30;
-    double maxWidth = _style.scaleX(16 * ratio);
-    double maxHeight = _style.scaleX(8.2 * ratio);
+    // const double ratio = 30;
+    // double maxWidth = _style.scaleX(16 * ratio);
+    // double maxHeight = _style.scaleX(8.2 * ratio);
     return Scaffold(
       appBar: CustomAppBar(
         screenSize: size,

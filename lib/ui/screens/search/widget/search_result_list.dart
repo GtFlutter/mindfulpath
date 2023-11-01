@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:meditation_app/data/model/response/video_list_response.dart';
 
 import '../../../../theme/styles.dart';
-import '../../category/temp_data_file.dart';
 import '../../category/widget/detail_item.dart';
 
 class SearchResultsList extends StatelessWidget {
@@ -31,9 +30,7 @@ class SearchResultsList extends StatelessWidget {
             appStyle: _style,
             model: VideoListResponse(),
             index: '$index',
-            onToggleBookmark: () {
-
-            },
+            onToggleBookmark: () {},
           ),
         );
       },

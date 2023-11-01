@@ -39,7 +39,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   bool _showReload = false;
 
   Timer? _watchTimer;
-  Duration _watchTimeInSeconds = Duration.zero;
+  // Duration _watchTimeInSeconds = Duration.zero;
   final Duration _period = const Duration(seconds: 10);
 
   @override
@@ -80,7 +80,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     }
     if (_controller.value.isPlaying) {
       _watchTimer ??= Timer.periodic(_period, (timer) {
-        _watchTimeInSeconds += _period; // Increment watch time
+        // _watchTimeInSeconds += _period; // Increment watch time
         // Call API to update watch duration and video ID
         ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
       });

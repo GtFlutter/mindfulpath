@@ -1,8 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart' show showCupertinoModalPopup;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,7 +10,6 @@ import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/user_provider.dart';
 import 'package:meditation_app/ui/common/adaptive_date_picker.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/common/cupertino_date_picker.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
