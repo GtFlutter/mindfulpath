@@ -14,6 +14,21 @@ ThemeData darkTheme = ThemeData(
     // error: const Color(0xFFE84D4F),
   ),
   useMaterial3: true,
+  tabBarTheme: TabBarTheme(
+    labelColor: Colors.black,
+    unselectedLabelColor: Colors.white,
+    indicator: ShapeDecoration(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(40),
+      ),
+      color: AppColors.primaryColor,
+    ),
+    indicatorSize: TabBarIndicatorSize.label,
+    overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+    //
+    dividerColor: Colors.transparent,
+    dividerHeight: 0,
+  ),
 
   // disabledColor: const Color(0xFFA0A4A8),
   // hintColor: const Color(0xFF9F9F9F),

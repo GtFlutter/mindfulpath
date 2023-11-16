@@ -227,11 +227,11 @@ class AnalyticsNotifier extends ChangeNotifier {
         days: type == FilterDuration.day
             ? 0
             : type == FilterDuration.week
-                ? 6
+                ? -6
                 : type == FilterDuration.month
-                    ? 29
+                    ? -29
                     : 0);
-    _duration = DateTimeRange(start: currentDate, end: currentDate.add(addableDuration));
+    _duration = DateTimeRange(start: currentDate.add(addableDuration), end: currentDate);
     _durationtype = type;
     if (notifie) notifyListeners();
   }

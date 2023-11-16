@@ -1,0 +1,89 @@
+import 'dart:convert';
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart';
+import 'package:meditation_app/data/repositories/dashboard_repo.dart';
+import 'package:meditation_app/provider/repo_provider/dashboard_repo_provider.dart';
+
+import '../data/api/api_checker.dart';
+import '../data/model/response/featured_videos_response.dart';
+import '../ui/common/custom_snackbar.dart';
+
+final featuredVideosProvider = ChangeNotifierProvider<FeaturedVideosNotifier>((ref) {
+  final repo = ref.watch(dashboardRepoProvider);
+
+  return FeaturedVideosNotifier(repo);
+});
+
+class FeaturedVideosNotifier extends ChangeNotifier {
+  final DashboardRepo repo;
+
+  FeaturedVideosNotifier(this.repo);
+
+  FeaturedVideosResponse? _data;
+  FeaturedVideosResponse? get data => _data;
+
+  bool _loading = false;
+  bool get loading => _loading;
+
+  void startLoading({bool notifie = true}) {
+    _loading = true;
+    if (notifie) notifyListeners();
+  }
+
+  void stopLoading({bool notifie = true}) {
+    _loading = false;
+    if (notifie) notifyListeners();
+  }
+
+  Future<void> getFeatureVideoList(int offset, bool reload, {bool showProgress = true}) async {
+    if (!reload && offset == 1) {
+      _data = null;
+      if (showProgress) {
+        startLoading(notifie: false);
+      }
+      notifyListeners();
+    }
+
+    Response response = await repo.getFeatureVideoList(offset);
+
+    try {
+      if (response.statusCode == 200) {
+        var json = jsonDecode(response.body);
+        if (json['data'] == null) {
+          throw Exception('Unable to find data');
+        }
+        if (offset == 1 || _data == null) {
+          if (reload) _data = null;
+          _data = FeaturedVideosResponse.fromJson(json['data']);
+          if (!reload && offset == 1 && showProgress) {
+            stopLoading(notifie: false);
+          }
+          notifyListeners();
+        } else if (_data != null) {
+          var tempModel = FeaturedVideosResponse.fromJson(json['data']);
+          _data!.total = tempModel.total;
+          _data!.currentPage = tempModel.currentPage;
+          _data!.lastPage = tempModel.lastPage;
+          _data!.limit = tempModel.limit;
+          if (_data!.list != null) _data!.list!.addAll(tempModel.list ?? []);
+          if (!reload && offset == 1 && showProgress) {
+            stopLoading(notifie: false);
+          }
+          notifyListeners();
+        }
+      } else {
+        if (!reload && offset == 1 && showProgress) {
+          stopLoading();
+        }
+        ApiChecker.checkApi(response);
+      }
+    } catch (e) {
+      if (!reload && offset == 1 && showProgress) {
+        stopLoading();
+      }
+      showCustomSnackBar('Something went wrong');
+    }
+  }
+}

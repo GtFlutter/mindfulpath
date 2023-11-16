@@ -10,6 +10,7 @@ import 'package:meditation_app/data/repositories/dashboard_repo.dart';
 import 'package:meditation_app/provider/repo_provider/dashboard_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
+import '../data/model/response/videos_response.dart';
 
 final dashboardProvider = ChangeNotifierProvider<DashboardNotifier>((ref) {
   final repo = ref.watch(dashboardRepoProvider);
@@ -59,20 +60,19 @@ class DashboardNotifier extends ChangeNotifier {
   List<CategoryListResponse>? _categoryListResponse;
   List<CategoryListResponse>? get categoryListResponse => _categoryListResponse;
 
-  List<VideoListResponse>? _videoListResponse;
-  List<VideoListResponse>? get videoListResponse => _videoListResponse;
-
-  List<VideoListResponse>? _featureVideoListResponse;
-  List<VideoListResponse>? get featureVideoListResponse => _featureVideoListResponse;
+  VideosResponse? _videosResponse;
+  VideosResponse? get videosResponse => _videosResponse;
 
   Future<void> init() async {
     await getCategoryList();
-    await getFeatureVideoList();
+
+    /// TODO: Get Featured List Response
+    // await getFeatureVideoList();
   }
 
   Future<void> getCategoryList() async {
     startLoading();
-    Response response = await repo.getCategories();
+    Response response = await repo.getCategories(1);
     if (response.statusCode != 200) {
       stopLoading();
       ApiChecker.checkApi(response);
@@ -90,6 +90,7 @@ class DashboardNotifier extends ChangeNotifier {
 
   Future<void> getVideoList(int id) async {
     startVideoLoading();
+    await Future.delayed(Duration(seconds: 5));
     Response response = await repo.getVideoList(id);
     if (response.statusCode != 200) {
       stopVideoLoading();
@@ -97,7 +98,7 @@ class DashboardNotifier extends ChangeNotifier {
     } else {
       try {
         var json = jsonDecode(response.body);
-        _videoListResponse = VideoListResponse.listFromJson(json['data']['video_list']);
+        _videosResponse = VideosResponse.fromJson(json['data']);
         stopVideoLoading();
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
@@ -114,29 +115,13 @@ class DashboardNotifier extends ChangeNotifier {
     } else {}
   }
 
-  Future<void> getFeatureVideoList() async {
-    startLoading();
-    Response response = await repo.getFeatureVideoList();
-    if (response.statusCode != 200) {
-      stopLoading();
-      ApiChecker.checkApi(response);
-    } else {
-      try {
-        var json = jsonDecode(response.body);
-        _featureVideoListResponse = VideoListResponse.listFromJson(json['data']['featured_video_list']);
-        stopLoading();
-      } catch (e) {
-        showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
-        stopLoading();
-      }
-    }
-  }
-
   void toggleBookmark(int itemId, {bool notifier = true}) {
-    if (_videoListResponse == null) return;
-    var itemIndex = _videoListResponse!.indexWhere((element) => element.id == itemId);
+    if (_videosResponse == null || _videosResponse!.list == null) {
+      return;
+    }
+    var itemIndex = _videosResponse!.list!.indexWhere((element) => element.id == itemId);
     if (itemIndex == -1) return;
-    _videoListResponse![itemIndex].bookmark = !(_videoListResponse![itemIndex].bookmark ?? true);
+    _videosResponse!.list![itemIndex].bookmarked = !(_videosResponse!.list![itemIndex].bookmarked ?? true);
     if (notifier) notifyListeners();
   }
 }

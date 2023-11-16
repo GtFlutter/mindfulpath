@@ -24,15 +24,18 @@ class SearchResultsList extends StatelessWidget {
       // itemCount: TempData.listDiModel.length,
       itemCount: 2,
       itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {},
-          child: DetailItem(
-            appStyle: _style,
-            model: VideoListResponse(),
-            index: '$index',
-            onToggleBookmark: () {},
-          ),
-        );
+        return SizedBox.shrink();
+
+        /// TODO : Workign On it
+        // return GestureDetector(
+        //   onTap: () {},
+        //   child: DetailItem(
+        //     appStyle: _style,
+        //     model: VideoListResponse(),
+        //     index: '$index',
+        //     onToggleBookmark: () {},
+        //   ),
+        // );
       },
       separatorBuilder: (BuildContext context, int index) => SizedBox(
         height: _style.scaleX(25),

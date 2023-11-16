@@ -11,22 +11,21 @@
 ///   }
 /// },
 
-
 class CategoryListResponse {
-  int? id;
-  String? title;
-  String? buttonTitle;
-  CategoryImageResponse? imageResponse;
+  final int? id;
+  final String? title;
+  final String? buttonTitle;
+  final CategoryImageResponse? imageResponse;
 
-  CategoryListResponse({this.id, this.title, this.buttonTitle, this.imageResponse});
+  const CategoryListResponse({this.id, this.title, this.buttonTitle, this.imageResponse});
 
-  CategoryListResponse.fromJson(dynamic json) {
-    id = json['id'];
-    title = json['title'];
-    buttonTitle = json['button_title'];
-    if (json['image'] != null) {
-      imageResponse = CategoryImageResponse.fromJson(json['image']);
-    }
+  factory CategoryListResponse.fromJson(dynamic json) {
+    return CategoryListResponse(
+      id: json['id'],
+      title: json['title'],
+      buttonTitle: json['button_title'],
+      imageResponse: json['image'] != null ? CategoryImageResponse.fromJson(json['image']) : null,
+    );
   }
 
   static List<CategoryListResponse> listFromJson(List<dynamic> listJson) {

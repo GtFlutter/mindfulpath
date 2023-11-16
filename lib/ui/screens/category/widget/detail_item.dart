@@ -5,6 +5,7 @@ import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
 
+import '../../../../data/model/response/videos_response.dart';
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
@@ -30,7 +31,7 @@ class DIModel {
 
 class DetailItem extends ConsumerWidget {
   final AppStyle appStyle;
-  final VideoListResponse model;
+  final VideoResponse model;
   final String index;
   final GestureTapCallback onToggleBookmark;
   const DetailItem(
@@ -52,7 +53,7 @@ class DetailItem extends ConsumerWidget {
           children: [
             MediaImageCard(
               appStyle: appStyle,
-              imgUrl: model.thumbnailImage ?? '',
+              imgUrl: model.imgUrl ?? '',
               duration: model.duration!.toDuration,
               imgRadius: appStyle.scaleX(10),
               imgSize: appStyle.scaleX(97),
@@ -111,7 +112,9 @@ class DetailItem extends ConsumerWidget {
               children: [
                 const Spacer(),
                 OutlinedIconButton.svg(
-                  model.bookmark != null && model.bookmark! ? SvgPaths.bookmarkSelected : SvgPaths.bookmarkUnselected,
+                  model.bookmarked != null && model.bookmarked!
+                      ? SvgPaths.bookmarkSelected
+                      : SvgPaths.bookmarkUnselected,
                   appStyle: appStyle,
                   // svgIconSrc: SvgPaths.bookmarkSelected,
                   onTap: onToggleBookmark,
@@ -140,8 +143,9 @@ class DetailItem extends ConsumerWidget {
                       PopupMenuItem(
                         height: appStyle.scaleX(24),
                         onTap: () {
-                          createPlaylist(context,
-                              videoId: model.videResponse != null ? model.videResponse!.id!.toString() : null);
+                          if (model.video != null && model.video!.id != null) {
+                            createPlaylist(context, videoId: model.video?.id?.toString());
+                          }
                         },
                         child: Text(
                           'Create Playlist',

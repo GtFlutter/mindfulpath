@@ -20,8 +20,10 @@
 ///     "image_url": "https://gurutechnolabs.co.in/website/laravel/meditation/public/video/Video_2_49607.mp4"
 ///   }
 /// },
+///
+///
 
-
+/// TODO: Working On it removbe this and create new for feature video list
 class VideoListResponse {
   int? id;
   String? title;
@@ -33,7 +35,16 @@ class VideoListResponse {
   VideoImageResponse? imageResponse;
   VideoImageResponse? videResponse;
 
-  VideoListResponse({this.id, this.title, this.categoryId, this.duration, this.thumbnailImage, this.videoUrl, this.imageResponse, this.videResponse,this.bookmark=false});
+  VideoListResponse(
+      {this.id,
+      this.title,
+      this.categoryId,
+      this.duration,
+      this.thumbnailImage,
+      this.videoUrl,
+      this.imageResponse,
+      this.videResponse,
+      this.bookmark = false});
 
   VideoListResponse.fromJson(dynamic json) {
     id = json['id'];

@@ -26,14 +26,17 @@ class _FeaturedSearchScreenState extends ConsumerState<FeaturedSearchScreen> {
   @override
   void initState() {
     final dashboardNotifier = ref.read<DashboardNotifier>(dashboardProvider);
-    Future.delayed(Duration.zero, () {
-      if (dashboardNotifier.featureVideoListResponse == null && dashboardNotifier.featureVideoListResponse!.isEmpty) {
-        dashboardNotifier.getFeatureVideoList();
-      }
-    },);
+    Future.delayed(
+      Duration.zero,
+      () {
+        /// TODO : Working On It
+        // if (dashboardNotifier.featureVideoListResponse == null && dashboardNotifier.featureVideoListResponse!.isEmpty) {
+        // dashboardNotifier.getFeatureVideoList();
+        // }
+      },
+    );
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +84,7 @@ class _FeaturedSearchScreenState extends ConsumerState<FeaturedSearchScreen> {
                             border: InputBorder.none,
                             hintText: 'Hinted search text',
                             hintStyle:
-                            _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
+                                _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
                             contentPadding: EdgeInsets.only(bottom: _style.scaleX(16)),
                             constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                             alignLabelWithHint: true,
@@ -91,16 +94,24 @@ class _FeaturedSearchScreenState extends ConsumerState<FeaturedSearchScreen> {
                     ],
                   ),
                 ),
-                if (dashboardNotifier.isLoading)...[
-                  Center(child: CircularProgressIndicator(),),
-                ] else if (dashboardNotifier.featureVideoListResponse == null && dashboardNotifier.featureVideoListResponse!.isEmpty)...[
-                  Center(child: Text('No data found'),),
-                ] else...[
-                  Expanded(child: AllVideosList(
-                    style: _style,
-                    featureVideoListResponse: dashboardNotifier.featureVideoListResponse,
-                  ))
-                ]
+
+                /// TODO : WORKING ON IT
+                // if (dashboardNotifier.isLoading) ...[
+                //   Center(
+                //     child: CircularProgressIndicator(),
+                //   ),
+                // ] else if (dashboardNotifier.featureVideoListResponse == null &&
+                //     dashboardNotifier.featureVideoListResponse!.isEmpty) ...[
+                //   Center(
+                //     child: Text('No data found'),
+                //   ),
+                // ] else ...[
+                //   Expanded(
+                //       child: AllVideosList(
+                //     style: _style,
+                //     featureVideoListResponse: dashboardNotifier.featureVideoListResponse,
+                //   ))
+                // ]
               ],
             ),
           ),

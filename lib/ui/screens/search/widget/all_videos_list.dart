@@ -29,18 +29,21 @@ class AllVideosList extends StatelessWidget {
       itemBuilder: (context, index) {
         return Consumer(
           builder: (BuildContext context, WidgetRef ref, Widget? child) {
-            return GestureDetector(
-              onTap: () {},
-              child: DetailItem(
-                appStyle: _style,
-                model: featureVideoListResponse![index],
-                index: '$index',
-                onToggleBookmark: () {
-                  if(featureVideoListResponse![index].videResponse==null) return;
-                  ref.read(bookmarkProvider).toggleBookmark(featureVideoListResponse![index].id!);
-                },
-              ),
-            );
+            return SizedBox.shrink();
+
+            /// TODO : Working On It
+            // return GestureDetector(
+            //   onTap: () {},
+            //   child: DetailItem(
+            //     appStyle: _style,
+            //     model: featureVideoListResponse![index],
+            //     index: '$index',
+            //     onToggleBookmark: () {
+            //       if(featureVideoListResponse![index].videResponse==null) return;
+            //       ref.read(bookmarkProvider).toggleBookmark(featureVideoListResponse![index].id!);
+            //     },
+            //   ),
+            // );
           },
         );
       },

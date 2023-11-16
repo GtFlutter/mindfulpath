@@ -90,7 +90,7 @@ final appRouter = GoRouter(
     ),
 
     /// TODO For Call This Screen Pass Bool Param For Is
-    /// Fals For Privacy Policy And True Terms And Conditions
+    /// False For Privacy Policy And True Terms And Conditions
     GoRoute(
       parentNavigatorKey: rootNavigator,
       path: RoutePath.tCPpScreen,
