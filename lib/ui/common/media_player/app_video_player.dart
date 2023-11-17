@@ -82,7 +82,9 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       _watchTimer ??= Timer.periodic(_period, (timer) {
         // _watchTimeInSeconds += _period; // Increment watch time
         // Call API to update watch duration and video ID
-        ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
+        if (!_isBuffering && _controller.value.isInitialized) {
+          ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
+        }
       });
     } else {
       _watchTimer?.cancel();

@@ -1,5 +1,6 @@
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
+import 'package:meditation_app/data/model/body/resource_type.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:meditation_app/util/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,14 +15,18 @@ class DashboardRepo {
     return await apiClient.getData('${AppConfigs.getCategoryList}?page=$offset&perPage=25');
   }
 
-  Future<Response> getVideoList(int categoryId, {int offset = 1}) async {
+  Future<Response> getVideoList({
+    required int offset,
+    required int categoryId,
+    required ResourceType resourceType,
+  }) async {
     return await apiClient.postData(
       AppConfigs.getVideoList,
       {
-        'perPage': AppConstants.kPerPage,
         'page': offset,
         'category_id': categoryId,
-        'type': 0,
+        'type': resourceType.toJson(),
+        'perPage': AppConstants.kPerPage,
       },
     );
   }

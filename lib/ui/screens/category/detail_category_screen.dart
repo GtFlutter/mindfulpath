@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
-import 'package:meditation_app/provider/auth_provider.dart';
-import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
-import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
+import 'package:meditation_app/ui/screens/category/widget/resource_list.dart';
 
-import '../../../helper/route/route_paths.dart';
 import '../../../theme/styles.dart';
 import '../../common/media_player/app_video_player.dart';
 
@@ -26,7 +22,6 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
 
 class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
   static AppStyle _style = AppStyle();
-  ScrollController controller = ScrollController();
 
   DIModel? _videoDetail;
 
@@ -43,20 +38,11 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
   }
 
   @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
-
-    var size = MediaQuery.of(context).size;
+    Size size = MediaQuery.sizeOf(context);
     _style = AppStyle(screenSize: size);
     TextStyle textStyle = _style.text.font(mulishRegular400, sizePx: 14);
-
-    final dashboardNotifier = ref.watch(dashboardProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -157,62 +143,25 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                       style: _style,
                     ),
                   ),
-                if (!isLandscape)
+                if (!isLandscape || _videoDetail == null)
                   Expanded(
                     flex: 3,
-                    child: dashboardNotifier.isVideoLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : dashboardNotifier.videosResponse == null || dashboardNotifier.videosResponse!.list == null
-                            ? const Center(
-                                child: Text('Unable to find data!'),
-                              )
-                            : ListView.separated(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                controller: controller,
-                                scrollDirection: Axis.vertical,
-                                padding: EdgeInsets.only(
-                                  bottom: _style.scale * 100,
-                                  top: _style.scale * 10,
-                                ),
-                                itemCount: dashboardNotifier.videosResponse!.list!.length,
-                                itemBuilder: (context, index) {
-                                  var model = dashboardNotifier.videosResponse!.list![index];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (!ref.read(authProvider).isUserLoggedIn) {
-                                        showCustomSnackBar('Login to access video', type: false);
-                                        context.go(RoutePath.signIn);
-                                        return;
-                                      }
-                                      if (_videoDetail == null) {
-                                        setState(() {
-                                          _videoDetail = DIModel(
-                                            imgUrl: model.videoUrl!,
-                                            // imgUrl: model.thumbnailImage ?? '',
-                                            duration: model.duration ?? '',
-                                            title: model.title ?? '',
-                                            category: widget.categoryListResponse.title ?? '', videoId: model.id!,
-                                          );
-                                        });
-                                      }
-                                    },
-                                    child: DetailItem(
-                                      appStyle: _style,
-                                      model: model,
-                                      index: '$index',
-                                      onToggleBookmark: () {
-                                        if (model.id == null) return;
-                                        ref.read(bookmarkProvider).toggleBookmark(model.id!);
-                                      },
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (BuildContext context, int index) => SizedBox(
-                                  height: _style.scaleX(25),
-                                ),
-                              ),
+                    child: ResourceList(
+                      style: _style,
+                      playVideo: (model) {
+                        if (_videoDetail == null) {
+                          setState(() {
+                            _videoDetail = DIModel(
+                              imgUrl: model.videoUrl!,
+                              // imgUrl: model.thumbnailImage ?? '',
+                              duration: model.duration ?? '',
+                              title: model.title ?? '',
+                              category: widget.categoryListResponse.title ?? '', videoId: model.id!,
+                            );
+                          });
+                        }
+                      },
+                    ),
                   ),
               ],
             ),

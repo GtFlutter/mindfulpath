@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 
 import '../../theme/styles.dart';
@@ -41,6 +42,16 @@ class MediaImageCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(imgRadius),
           child: Image.network(
             imgUrl,
+            errorBuilder: (_, __, ___) => SizedBox(
+              width: imgSize,
+              height: imgSize,
+              child: const Center(
+                child: Icon(
+                  Icons.image_not_supported_outlined,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
             width: imgSize,
             height: imgSize,
             fit: BoxFit.cover,

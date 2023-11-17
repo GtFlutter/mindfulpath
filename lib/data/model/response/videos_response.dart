@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../body/resource_type.dart';
 import 'video_response_media.dart';
 
 part 'videos_response.g.dart';
@@ -50,33 +51,34 @@ part 'videos_response.g.dart';
 @JsonSerializable(createToJson: false, explicitToJson: false)
 class VideosResponse {
   @JsonKey(name: 'current_page')
-  final int currentPage;
+  int currentPage;
   @JsonKey(name: 'per_page')
-  final int limit;
+  int limit;
   @JsonKey(name: 'total')
-  final int total;
+  int total;
+  @JsonKey(name: 'last_page')
+  int? lastPage;
 
   @JsonKey(name: 'video_list')
   final List<VideoResponse>? list;
 
-  const VideosResponse({
+  VideosResponse({
     required this.currentPage,
     required this.limit,
     required this.total,
+    required this.lastPage,
     required this.list,
   });
 
   factory VideosResponse.fromJson(Map<String, dynamic> json) => _$VideosResponseFromJson(json);
 }
 
-enum Type { free, paid }
-
 @JsonSerializable(createToJson: false, explicitToJson: false)
 class VideoResponse {
   final int? id;
   final String? title;
   @JsonKey(name: 'category_id')
-  final String? categoryId;
+  final int? categoryId;
   @JsonKey(name: 'category_title')
   final String? categoryTitle;
   final String? duration;
@@ -85,8 +87,8 @@ class VideoResponse {
 
   /// Don't use this variable for [feature_list]
   /// no need to use this variable beacause [feature_list] always return [free] vedio list
-  @JsonKey(name: 'video_type', fromJson: videoTypeFromJson)
-  final Type? videoType;
+  @JsonKey(name: 'video_type', fromJson: ResourceType.fromJson)
+  final ResourceType? videoType;
   @JsonKey(name: 'is_bookmark')
   bool? bookmarked;
 
@@ -126,16 +128,6 @@ class VideoResponse {
 
   String? get imgUrl => thumbnailImageUrlSrc ?? image?.url;
   String? get videoUrl => videoUrlSrc ?? video?.url;
-
-  static Type? videoTypeFromJson(int? value) {
-    if (value == null) return null;
-    if (value == 0) {
-      return Type.free;
-    } else if (value == 1) {
-      return Type.paid;
-    }
-    return null;
-  }
 
   factory VideoResponse.fromJson(Map<String, dynamic> json) => _$VideoResponseFromJson(json);
 }

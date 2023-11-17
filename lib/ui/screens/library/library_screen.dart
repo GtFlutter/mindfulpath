@@ -7,7 +7,8 @@ import 'package:meditation_app/ui/screens/bookmark/bookmark_screen.dart';
 import 'package:meditation_app/ui/screens/courses/courses_screen.dart';
 import 'package:meditation_app/ui/screens/playlist/playlist_screen.dart';
 
-import '../../common/custom_tabbar.dart';
+import '../../../theme/text_style.dart';
+import '../../common/custom_tab.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -44,13 +45,17 @@ class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateM
         flexibleSpace: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            CustomTabBar(
-              tabController: _tabController,
-              style: _style,
+            TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              indicatorPadding: EdgeInsets.symmetric(vertical: _style.scaleX(9)),
+              tabAlignment: TabAlignment.center,
+              indicatorWeight: 1,
+              labelStyle: _style.text.font(mulishRegular400, sizePx: 12.5),
               tabs: [
-                Tab(child: CustomTab(text: 'Bookmark', style: _style)),
-                Tab(child: CustomTab(text: 'Playlist', style: _style)),
-                Tab(child: CustomTab(text: 'Courses', style: _style)),
+                Tab(child: CustomTab.small(text: 'Bookmark', style: _style)),
+                Tab(child: CustomTab.small(text: 'Playlist', style: _style)),
+                Tab(child: CustomTab.small(text: 'Courses', style: _style)),
               ],
             ),
           ],

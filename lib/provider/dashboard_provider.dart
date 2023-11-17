@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
+import 'package:meditation_app/data/model/body/resource_type.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/data/model/response/video_list_response.dart';
 import 'package:meditation_app/data/repositories/dashboard_repo.dart';
@@ -90,8 +91,10 @@ class DashboardNotifier extends ChangeNotifier {
 
   Future<void> getVideoList(int id) async {
     startVideoLoading();
-    await Future.delayed(Duration(seconds: 5));
-    Response response = await repo.getVideoList(id);
+
+    /// TODO :: Remove Below Line For Production
+    await Future.delayed(const Duration(seconds: 10));
+    Response response = await repo.getVideoList(categoryId: id, offset: 1, resourceType: ResourceType.free);
     if (response.statusCode != 200) {
       stopVideoLoading();
       ApiChecker.checkApi(response);

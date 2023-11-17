@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meditation_app/data/model/response/video_list_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
@@ -94,7 +93,7 @@ class DetailItem extends ConsumerWidget {
                           SizedBox(width: appStyle.scaleX(5)),
                           Flexible(
                             child: Text(
-                              model.categoryId ?? '0',
+                              '${model.categoryId ?? 0}',
                               style: textStyle.copyWith(color: AppColors.categoryNameColor),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
