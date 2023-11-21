@@ -44,7 +44,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   @override
   void initState() {
-    debugPrint('Yashvant Video Init');
+    debugPrint(' Video Init');
     super.initState();
     VideoPlayerController videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(widget.url),
@@ -62,7 +62,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   @override
   void didUpdateWidget(covariant AppVideoPlayer oldWidget) {
-    debugPrint('Yashvant Video UpdateWidget');
+    debugPrint(' Video UpdateWidget');
 
     super.didUpdateWidget(oldWidget);
   }
@@ -112,7 +112,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   @override
   void dispose() {
     _watchTimer?.cancel();
-    debugPrint('Yashvant Video Disposed ');
+    debugPrint(' Video Disposed ');
     if (_controller.value.isInitialized) {
       _controller.removeListener(listner);
     }

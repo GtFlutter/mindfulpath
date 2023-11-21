@@ -63,14 +63,14 @@ class AuthRepo {
   }
 
   Future<bool> saveUserToken(String token) async {
-    debugPrint('Yashvant New Token :::: $token');
+    debugPrint(' New Token :::: $token');
     apiClient.token = token;
     apiClient.updateHeader(token);
     return await sharedPreferences.setString(AppConfigs.TOKEN, token);
   }
 
   Future<bool> clearUserData() async {
-    debugPrint('Yashvant Clearing User Token');
+    debugPrint(' Clearing User Token');
     apiClient.token = null;
     apiClient.updateHeader(null);
     return sharedPreferences.clear();

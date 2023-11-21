@@ -18,7 +18,6 @@ class SubPlayListScreenData {
   SubPlayListScreenData({this.id, this.title});
 }
 
-
 class SubPlayListScreen extends StatefulWidget {
   final SubPlayListScreenData data;
   const SubPlayListScreen({super.key, required this.data});

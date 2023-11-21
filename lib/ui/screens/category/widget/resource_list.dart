@@ -1,77 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/body/resource_type.dart';
+import 'package:meditation_app/provider/resource_provider/resource_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../../data/model/response/videos_response.dart';
-import '../../../../helper/route/route_paths.dart';
-import '../../../../provider/auth_provider.dart';
 import '../../../../provider/bookmark_provider.dart';
-import '../../../../provider/dashboard_provider.dart';
+import '../../../../provider/video_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../../theme/text_style.dart';
 import '../../../common/custom_dropdown_button.dart';
-import '../../../common/custom_snackbar.dart';
 import '../../../common/custom_tab.dart';
 import 'detail_item.dart';
 
 /// TODO ::: Working On It
 
-class ResourceList extends ConsumerStatefulWidget {
+class ResourceDetailCategory extends ConsumerStatefulWidget {
   final AppStyle style;
-  final Function(VideoResponse model) playVideo;
+  final String categoryTitle;
 
-  const ResourceList({super.key, required this.style, required this.playVideo});
+  const ResourceDetailCategory({
+    super.key,
+    required this.style,
+    required this.categoryTitle,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ResourceListState();
 }
 
-class _ResourceListState extends ConsumerState<ResourceList> with TickerProviderStateMixin {
+class _ResourceListState extends ConsumerState<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
+  late ResourceType _currentCourseType;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(initialIndex: 0, length: 2, vsync: this);
+    _currentCourseType = ResourceType.free;
+    _tabController.addListener(tabListner);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(tabListner);
     _tabController.dispose();
     super.dispose();
   }
 
-  void toggleItemBookmark(int? itemId) {
-    if (itemId == null) return;
-    ref.read(bookmarkProvider).toggleBookmark(itemId);
+  void tabListner() {
+    switch (_tabController.index) {
+      case 0:
+        setState(() => _currentCourseType = ResourceType.free);
+        break;
+      case 1:
+        setState(() => _currentCourseType = ResourceType.paid);
+        break;
+      default:
+    }
   }
 
-  void playVideoWithAuth(VideoResponse model) {
-    if ((model.videoType == null || model.videoType == ResourceType.paid) && !ref.read(authProvider).isUserLoggedIn) {
-      showCustomSnackBar('Login to access video', type: false);
-      context.go(RoutePath.signIn);
-      return;
-    }
-    widget.playVideo(model);
+  void _changeFilter(ItemName? value) {
+    if (value == null) return;
+    ref.read(resourceProvider).chnageFilter(_currentCourseType, CourseFilter.fromInt(value.id));
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(dashboardProvider);
+    final resourceCtrl = ref.watch(resourceProvider);
 
-    if (provider.isVideoLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (provider.videosResponse == null || provider.videosResponse!.list == null) {
-      return const Center(child: Text('Unable to find data!'));
-    }
-
-    var items2 = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF')];
+    var filterValue = resourceCtrl.filter(_currentCourseType);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -89,7 +89,7 @@ class _ResourceListState extends ConsumerState<ResourceList> with TickerProvider
                 labelStyle: widget.style.text.font(mulishRegular400, sizePx: 12.5),
                 tabs: [
                   Tab(child: CustomTab(text: 'Free', style: widget.style)),
-                  Tab(child: CustomTab(text: '30 Days', style: widget.style)),
+                  Tab(child: CustomTab(text: 'Paid', style: widget.style)),
                 ],
               ),
             ),
@@ -105,13 +105,12 @@ class _ResourceListState extends ConsumerState<ResourceList> with TickerProvider
                 vertical: widget.style.scaleX(3.5),
               ),
               child: CustomDropDownButton<ItemName>(
-                key: const ValueKey<int>(3),
-                value: null,
+                value: filterValue,
                 appStyle: widget.style,
-                items: items2,
+                items: resourceCtrl.filters,
                 width: widget.style.scaleX(120),
                 maxHeight: widget.style.scaleX(150),
-                onChanged: (ItemName? value) {},
+                onChanged: _changeFilter,
                 // hint: 'PDF',
                 hint: 'Filter',
               ),
@@ -124,8 +123,13 @@ class _ResourceListState extends ConsumerState<ResourceList> with TickerProvider
             physics: const BouncingScrollPhysics(),
             controller: _tabController,
             children: [
-              VideoListWidget(key: const ValueKey<String>('121'), widget.style, provider),
-              VideoListWidget(key: const ValueKey<String>('123'), widget.style, provider)
+              const DemoWIdget1(),
+              VideoListWidget(
+                key: const ValueKey<String>('videolisting'),
+                widget.style,
+                resourceCtrl,
+                categoryTitle: widget.categoryTitle,
+              ),
             ],
           ),
         ),
@@ -134,27 +138,68 @@ class _ResourceListState extends ConsumerState<ResourceList> with TickerProvider
   }
 }
 
-class VideoListWidget extends ConsumerStatefulWidget {
-  final AppStyle style;
-  final DashboardNotifier provider;
+class DemoWIdget1 extends StatefulWidget {
+  const DemoWIdget1({super.key});
 
-  const VideoListWidget(this.style, this.provider, {super.key});
+  @override
+  State<DemoWIdget1> createState() => _DemoWIdget1State();
+}
+
+class _DemoWIdget1State extends State<DemoWIdget1> with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return const SizedBox.expand(
+      child: Center(
+        child: Text('Free'),
+      ),
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class VideoListWidget extends ConsumerStatefulWidget {
+  final String categoryTitle;
+  final AppStyle style;
+  final ResourceNotifier provider;
+
+  const VideoListWidget(this.style, this.provider, {super.key, required this.categoryTitle});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _VideoListWidgetState();
 }
 
-class _VideoListWidgetState extends ConsumerState<VideoListWidget> {
+class _VideoListWidgetState extends ConsumerState<VideoListWidget> with AutomaticKeepAliveClientMixin {
   final ScrollController _controller = ScrollController();
+
+  @override
+  void initState() {
+    debugPrint('initState: VideoListWidget');
+    super.initState();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
+    // TODO :::
+    if (widget.provider.isVideoLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // TODO :::::
+    if (widget.provider.videosResponse == null || widget.provider.videosResponse!.list == null) {
+      return const Center(child: Text('Unable to find data!'));
+    }
+
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: _controller,
@@ -167,21 +212,38 @@ class _VideoListWidgetState extends ConsumerState<VideoListWidget> {
       itemBuilder: (context, index) {
         var model = widget.provider.videosResponse!.list![index];
         return GestureDetector(
-          /// TODO:::: Working On It
-          // onTap: () => playVideoWithAuth(model),
+          onTap: () => playVideo(model),
           child: DetailItem(
             appStyle: widget.style,
             model: model,
             index: '$index',
-
-            /// TODO ::::  Working On It
-            // onToggleBookmark: () => toggleItemBookmark(model.id!),
+            onToggleBookmark: () => toggleItemBookmark(model.id),
           ),
         );
       },
-      separatorBuilder: (BuildContext context, int index) => SizedBox(
-        height: widget.style.scaleX(25),
-      ),
+      separatorBuilder: (BuildContext context, int index) => SizedBox(height: widget.style.scaleX(25)),
     );
   }
+
+  void toggleItemBookmark(int? itemId) {
+    if (itemId == null) return;
+    ref.read(bookmarkProvider).toggleBookmark(itemId);
+  }
+
+  void playVideo(VideoResponse model) {
+    ref.read(videoProvider).playVideo(
+          DIModel(
+            // imgUrl: model.thumbnailImage ?? '',
+            imgUrl: model.videoUrl!,
+            duration: model.duration ?? '',
+            title: model.title ?? '',
+            category: widget.categoryTitle,
+            videoId: model.id!,
+            videoType: model.videoType ?? ResourceType.paid,
+          ),
+        );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

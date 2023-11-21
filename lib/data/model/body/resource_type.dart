@@ -14,5 +14,5 @@ enum ResourceType {
     return null;
   }
 
-  int toJson() => value;
+  int toInt() => value;
 }

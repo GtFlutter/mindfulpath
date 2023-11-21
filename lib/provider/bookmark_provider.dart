@@ -8,6 +8,7 @@ import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
 import 'package:meditation_app/data/repositories/bookmark_repo.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/provider/repo_provider/bookmark_repo_provider.dart';
+import 'package:meditation_app/provider/resource_provider/resource_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
 
@@ -88,14 +89,12 @@ class BookmarkNotifier extends ChangeNotifier {
     } else {
       try {
         stopToggleLoading();
-        ref.read(dashboardProvider).toggleBookmark(itemId);
-        showCustomSnackBar('${isRemove ? 'Removed' : 'Bookmarked'} Successful',type: true);
+        ref.read(resourceProvider).toggleBookmark(itemId);
+        showCustomSnackBar('${isRemove ? 'Removed' : 'Bookmarked'} Successful', type: true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
         stopToggleLoading();
       }
     }
   }
-
-
 }

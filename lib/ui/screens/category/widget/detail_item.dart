@@ -4,6 +4,7 @@ import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
 
+import '../../../../data/model/body/resource_type.dart';
 import '../../../../data/model/response/videos_response.dart';
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
@@ -18,14 +19,25 @@ class DIModel {
   final String duration;
   final String title;
   final String category;
+  final ResourceType videoType;
 
-  DIModel({
+  const DIModel({
+    required this.videoType,
     required this.videoId,
     required this.imgUrl,
     required this.duration,
     required this.title,
     required this.category,
   });
+
+  DIModel copyWith() => DIModel(
+        videoId: videoId,
+        imgUrl: imgUrl,
+        duration: duration,
+        title: title,
+        category: category,
+        videoType: videoType,
+      );
 }
 
 class DetailItem extends ConsumerWidget {

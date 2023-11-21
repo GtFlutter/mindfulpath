@@ -25,7 +25,7 @@ class DashboardRepo {
       {
         'page': offset,
         'category_id': categoryId,
-        'type': resourceType.toJson(),
+        'type': resourceType.toInt(),
         'perPage': AppConstants.kPerPage,
       },
     );
