@@ -12,6 +12,7 @@ import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
 import '../../common/media_player/app_video_player.dart';
+import 'widget/intro_widget.dart';
 
 class DetailCategoryScreen extends ConsumerStatefulWidget {
   final CategoryListResponse categoryListResponse;
@@ -28,11 +29,6 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
   void initState() {
     /// TODO :: Pass Dimodel to init method if open this screen from featured video list
     ref.read(videoProvider).init();
-
-    /// TODO ::
-    Future.delayed(Duration.zero, () {
-      ref.read(resourceProvider).getVideoList(widget.categoryListResponse.id ?? 0);
-    });
     super.initState();
   }
 
@@ -127,7 +123,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                   ],
                 ] else
                   Expanded(
-                    flex: 2,
+                    flex: !isLandscape ? 2 : 1,
                     child: IntroWidget(
                       title: widget.categoryListResponse.title ?? '',
                       style: _style,
@@ -138,48 +134,13 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                     flex: 3,
                     child: ResourceDetailCategory(
                       categoryTitle: widget.categoryListResponse.title ?? '',
-                      style: _style,
+                      categoryId: widget.categoryListResponse.id ?? -1,
                     ),
                   ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class IntroWidget extends StatelessWidget {
-  final String title;
-  final AppStyle style;
-
-  const IntroWidget({
-    super.key,
-    required this.title,
-    required this.style,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: style.scaleX(15)),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          const Spacer(flex: 3),
-          Text(
-            title,
-            style: style.text.font(
-              brandonMedium500,
-              sizePx: 30,
-              color: AppColors.primaryColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: style.scaleX(25)),
-          const Spacer(flex: 3),
-        ],
       ),
     );
   }

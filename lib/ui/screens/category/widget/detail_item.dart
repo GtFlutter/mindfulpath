@@ -13,6 +13,7 @@ import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
 
+/// TODO ::: Create PDF Layout Widget Inside It no need to use new widget
 class DIModel {
   final int videoId;
   final String imgUrl;

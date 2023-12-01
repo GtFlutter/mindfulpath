@@ -1,1 +1,9 @@
 include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
+
+custom_lint:
+  # Forcibly enable lint rules by default
+  enable_all_lint_rules: true

@@ -9,140 +9,71 @@ import '../../data/model/body/resource_type.dart';
 import '../../data/model/response/videos_response.dart';
 import '../../data/repositories/dashboard_repo.dart';
 import '../../ui/common/custom_snackbar.dart';
-import '../../ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 import '../../util/constants.dart';
 import '../repo_provider/dashboard_repo_provider.dart';
 
 /// TODO::: Working From Here Start :Resource Provider
-
-enum CourseFilter {
-  video(0),
-  pdf(1);
-
-  final int filterIndex;
-  const CourseFilter(this.filterIndex);
-
-  factory CourseFilter.fromInt(int id) {
-    switch (id) {
-      case 0:
-        return video;
-      case 1:
-        return pdf;
-      default:
-        throw ArgumentError();
-    }
-  }
-
-  static List<ItemName> filterList = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF')];
-}
-
-class ResourceBody {
-  final ResourceType type;
-  CourseFilter filter;
-  ResourceBody.free(this.filter) : type = ResourceType.free;
-  ResourceBody.thirtydays(this.filter) : type = ResourceType.paid;
-}
-
-final resourceProvider = ChangeNotifierProvider<ResourceNotifier>((ref) {
+final videoResourceProvider = ChangeNotifierProvider<FreeVideoResourceNotifier>((ref) {
   final repo = ref.watch(dashboardRepoProvider);
 
-  return ResourceNotifier(repo);
+  return FreeVideoResourceNotifier(repo);
 });
 
-class ResourceNotifier extends ChangeNotifier {
+/// TODO ::: First Start From Here ________|||||||++++++++++++++++++++|||||||||||__________
+abstract class VideoResourceNotifier with ChangeNotifier {
+  void toggleBookmark(int itemId, {bool notifier = true});
+  void startFreeVideoLoading();
+  void stopFreeVideoLoading();
+  Future<void> getFreeVideoList(int id);
+}
+
+class FreeVideoResourceNotifier extends VideoResourceNotifier {
   final DashboardRepo repo;
-  ResourceNotifier(this.repo);
+  FreeVideoResourceNotifier(this.repo);
 
-  final List<ItemName> _filters = [...CourseFilter.filterList];
-  List<ItemName> get filters => _filters;
+  VideosResponse? _freeVideosResponse;
+  VideosResponse? get freeVideosResponse => _freeVideosResponse;
 
-  ItemName filter(ResourceType currentSelectedType) {
-    switch (currentSelectedType) {
-      case ResourceType.free:
-        return _filters[_freeBody.filter.filterIndex];
-      case ResourceType.paid:
-        return _filters[_paidBody.filter.filterIndex];
-      default:
-        throw ArgumentError();
-    }
-  }
-
-  final ResourceBody _freeBody = ResourceBody.free(CourseFilter.video);
-  ResourceBody get freeBody => _freeBody;
-
-  final ResourceBody _paidBody = ResourceBody.free(CourseFilter.video);
-  ResourceBody get paidBody => _paidBody;
-
-  void chnageFilter(ResourceType type, CourseFilter filter) {
-    switch (type) {
-      case ResourceType.free:
-        if (_freeBody.filter != filter) {
-          debugPrint('changes');
-          _freeBody.filter = filter;
-          notifyListeners();
-        }
-        break;
-      case ResourceType.paid:
-        if (_paidBody.filter != filter) {
-          debugPrint('changes2');
-          _paidBody.filter = filter;
-          notifyListeners();
-        }
-        break;
-    }
-  }
-
-  /// [ResourceType.free] & [CourseFilter.video]
-  /// [ResourceType.free] & [CourseFilter.pdf]
-  /// [ResourceType.paid] & [CourseFilter.video]
-  /// [ResourceType.paid] & [CourseFilter.pdf]
-  ///
-  ///
-  ///
-  ///
-
-  VideosResponse? _videosResponse;
-  VideosResponse? get videosResponse => _videosResponse;
+  @override
   void toggleBookmark(int itemId, {bool notifier = true}) {
-    if (_videosResponse == null || _videosResponse!.list == null) {
+    if (_freeVideosResponse == null || _freeVideosResponse!.list == null) {
       return;
     }
-    var itemIndex = _videosResponse!.list!.indexWhere((element) => element.id == itemId);
+    var itemIndex = _freeVideosResponse!.list!.indexWhere((element) => element.id == itemId);
     if (itemIndex == -1) return;
-    _videosResponse!.list![itemIndex].bookmarked = !(_videosResponse!.list![itemIndex].bookmarked ?? true);
+    _freeVideosResponse!.list![itemIndex].bookmarked = !(_freeVideosResponse!.list![itemIndex].bookmarked ?? true);
     if (notifier) notifyListeners();
   }
 
-  bool _isVideoLoading = false;
-  bool get isVideoLoading => _isVideoLoading;
-
-  void startVideoLoading() {
-    _isVideoLoading = true;
+  bool _isFreeVideoLoading = false;
+  bool get isFreeVideoLoading => _isFreeVideoLoading;
+  @override
+  void startFreeVideoLoading() {
+    _isFreeVideoLoading = true;
     notifyListeners();
   }
 
-  void stopVideoLoading() {
-    _isVideoLoading = false;
+  @override
+  void stopFreeVideoLoading() {
+    _isFreeVideoLoading = false;
     notifyListeners();
   }
 
-  Future<void> getVideoList(int id) async {
-    startVideoLoading();
-
-    /// TODO :: Remove Below Line For Production
-
+  @override
+  Future<void> getFreeVideoList(int id) async {
+    startFreeVideoLoading();
     Response response = await repo.getVideoList(categoryId: id, offset: 1, resourceType: ResourceType.free);
     if (response.statusCode != 200) {
-      stopVideoLoading();
+      stopFreeVideoLoading();
       ApiChecker.checkApi(response);
     } else {
       try {
         var json = jsonDecode(response.body);
-        _videosResponse = VideosResponse.fromJson(json['data']);
-        stopVideoLoading();
+        _freeVideosResponse = VideosResponse.fromJson(json['data']);
+        stopFreeVideoLoading();
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
-        stopVideoLoading();
+        stopFreeVideoLoading();
       }
     }
   }

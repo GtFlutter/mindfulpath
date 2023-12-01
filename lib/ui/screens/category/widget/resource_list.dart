@@ -10,126 +10,144 @@ import '../../../../data/model/response/videos_response.dart';
 import '../../../../provider/bookmark_provider.dart';
 import '../../../../provider/video_provider.dart';
 import '../../../../theme/colors.dart';
-import '../../../../theme/text_style.dart';
 import '../../../common/custom_dropdown_button.dart';
-import '../../../common/custom_tab.dart';
+import 'custom_selecteable_button.dart';
 import 'detail_item.dart';
 
 /// TODO ::: Working On It
-
-class ResourceDetailCategory extends ConsumerStatefulWidget {
-  final AppStyle style;
+class ResourceDetailCategory extends StatefulWidget {
+  final int categoryId;
   final String categoryTitle;
 
-  const ResourceDetailCategory({
-    super.key,
-    required this.style,
-    required this.categoryTitle,
-  });
+  const ResourceDetailCategory({super.key, required this.categoryId, required this.categoryTitle});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ResourceListState();
+  State<ResourceDetailCategory> createState() => _ResourceListState();
 }
 
-class _ResourceListState extends ConsumerState<ResourceDetailCategory> with TickerProviderStateMixin {
+class _ResourceListState extends State<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
-  late ResourceType _currentCourseType;
+  final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF')];
+
+  static AppStyle _style = AppStyle();
+
+  /// Either 0 = [Video] or 1 = [PDF]
+  late int filterIndex;
+
+  /// Either 0 = [Free] or 1 = [Paid]
+  late int courseIndex;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(initialIndex: 0, length: 2, vsync: this);
-    _currentCourseType = ResourceType.free;
-    _tabController.addListener(tabListner);
+    filterIndex = 0;
+    courseIndex = 0;
+    _tabController = TabController(
+      initialIndex: courseIndex,
+      length: 4,
+      vsync: this,
+    );
   }
 
   @override
   void dispose() {
-    _tabController.removeListener(tabListner);
     _tabController.dispose();
     super.dispose();
   }
 
-  void tabListner() {
-    switch (_tabController.index) {
-      case 0:
-        setState(() => _currentCourseType = ResourceType.free);
-        break;
-      case 1:
-        setState(() => _currentCourseType = ResourceType.paid);
-        break;
-      default:
+  void _changeTab(int filterIndex, int courseTypeIndex) {
+    int currentTabIndex = _tabController.index;
+    late int animateTo;
+    if (filterIndex == 0 && courseTypeIndex == 0) {
+      animateTo = 0;
+    } else if (filterIndex == 0 && courseTypeIndex == 1) {
+      animateTo = 1;
+    } else if (filterIndex == 1 && courseTypeIndex == 0) {
+      animateTo = 2;
+    } else if (filterIndex == 1 && courseTypeIndex == 1) {
+      animateTo = 3;
+    } else {
+      animateTo = throw ArgumentError();
     }
+    if (currentTabIndex == animateTo) return;
+    _tabController.animateTo(animateTo);
   }
 
   void _changeFilter(ItemName? value) {
-    if (value == null) return;
-    ref.read(resourceProvider).chnageFilter(_currentCourseType, CourseFilter.fromInt(value.id));
+    if (value == null || value.id == filterIndex) return;
+    setState(() {
+      filterIndex = value.id;
+      _changeTab(filterIndex, courseIndex);
+    });
+  }
+
+  void _changeCourseType(int index) {
+    if (index == courseIndex) return;
+    setState(() {
+      courseIndex = index;
+      _changeTab(filterIndex, courseIndex);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final resourceCtrl = ref.watch(resourceProvider);
-
-    var filterValue = resourceCtrl.filter(_currentCourseType);
+    _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Expanded(
-              child: TabBar(
-                controller: _tabController,
-                isScrollable: true,
-                tabAlignment: TabAlignment.start,
-                indicatorPadding: EdgeInsets.symmetric(vertical: widget.style.scaleX(8)),
-                padding: EdgeInsets.zero,
-                labelPadding: EdgeInsets.only(right: widget.style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
-                indicatorWeight: 1,
-                labelStyle: widget.style.text.font(mulishRegular400, sizePx: 12.5),
-                tabs: [
-                  Tab(child: CustomTab(text: 'Free', style: widget.style)),
-                  Tab(child: CustomTab(text: 'Paid', style: widget.style)),
-                ],
-              ),
+            CustomSelecteableButton(
+              text: 'Free',
+              selected: courseIndex == 0,
+              onTap: () => _changeCourseType(0),
             ),
+            const SizedBox(width: Dimensions.PADDING_SIZE_DEFAULT),
+            CustomSelecteableButton(
+              text: 'Paid',
+              selected: courseIndex == 1,
+              onTap: () => _changeCourseType(1),
+            ),
+            const Spacer(),
             Container(
               decoration: ShapeDecoration(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(widget.style.scaleX(40)),
+                  borderRadius: BorderRadius.circular(_style.scaleX(40)),
                   side: const BorderSide(color: AppColors.primaryColor, width: 0.5),
                 ),
               ),
               padding: EdgeInsets.symmetric(
-                horizontal: widget.style.scaleX(10),
-                vertical: widget.style.scaleX(3.5),
+                horizontal: _style.scaleX(10),
+                vertical: _style.scaleX(3.5),
               ),
               child: CustomDropDownButton<ItemName>(
-                value: filterValue,
-                appStyle: widget.style,
-                items: resourceCtrl.filters,
-                width: widget.style.scaleX(120),
-                maxHeight: widget.style.scaleX(150),
+                value: _filters[filterIndex],
+                appStyle: _style,
+                items: _filters,
+                width: _style.scaleX(120),
+                maxHeight: _style.scaleX(150),
                 onChanged: _changeFilter,
-                // hint: 'PDF',
                 hint: 'Filter',
               ),
             ),
           ],
         ),
-        SizedBox(height: widget.style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
+        SizedBox(height: _style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
         Expanded(
           child: TabBarView(
-            physics: const BouncingScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
-            children: [
-              const DemoWIdget1(),
-              VideoListWidget(
-                key: const ValueKey<String>('videolisting'),
-                widget.style,
-                resourceCtrl,
-                categoryTitle: widget.categoryTitle,
-              ),
+            children: const [
+              DemoWIdget1(title: 'Free Videos'),
+              // VideoListWidget(
+              //   key: const ValueKey<String>('videolisting'),
+              //   widget.style,
+              //   resourceCtrl,
+              //   categoryTitle: widget.categoryTitle,
+              // ),
+              DemoWIdget1(title: 'Paid Videos'),
+              DemoWIdget1(title: 'Free PDF'),
+              DemoWIdget1(title: 'Paid PDF'),
             ],
           ),
         ),
@@ -139,7 +157,8 @@ class _ResourceListState extends ConsumerState<ResourceDetailCategory> with Tick
 }
 
 class DemoWIdget1 extends StatefulWidget {
-  const DemoWIdget1({super.key});
+  final String title;
+  const DemoWIdget1({super.key, required this.title});
 
   @override
   State<DemoWIdget1> createState() => _DemoWIdget1State();
@@ -149,9 +168,9 @@ class _DemoWIdget1State extends State<DemoWIdget1> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return const SizedBox.expand(
+    return SizedBox.expand(
       child: Center(
-        child: Text('Free'),
+        child: Text(widget.title),
       ),
     );
   }
@@ -161,11 +180,14 @@ class _DemoWIdget1State extends State<DemoWIdget1> with AutomaticKeepAliveClient
 }
 
 class VideoListWidget extends ConsumerStatefulWidget {
+  final int categoryId;
   final String categoryTitle;
-  final AppStyle style;
-  final ResourceNotifier provider;
 
-  const VideoListWidget(this.style, this.provider, {super.key, required this.categoryTitle});
+  const VideoListWidget({
+    super.key,
+    required this.categoryTitle,
+    required this.categoryId,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _VideoListWidgetState();
@@ -173,6 +195,7 @@ class VideoListWidget extends ConsumerStatefulWidget {
 
 class _VideoListWidgetState extends ConsumerState<VideoListWidget> with AutomaticKeepAliveClientMixin {
   final ScrollController _controller = ScrollController();
+  static AppStyle _style = AppStyle();
 
   @override
   void initState() {
@@ -189,14 +212,16 @@ class _VideoListWidgetState extends ConsumerState<VideoListWidget> with Automati
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
+    var provider = ref.watch(videoResourceProvider);
 
     // TODO :::
-    if (widget.provider.isVideoLoading) {
+    if (provider.isFreeVideoLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     // TODO :::::
-    if (widget.provider.videosResponse == null || widget.provider.videosResponse!.list == null) {
+    if (provider.freeVideosResponse == null || provider.freeVideosResponse!.list == null) {
       return const Center(child: Text('Unable to find data!'));
     }
 
@@ -205,23 +230,23 @@ class _VideoListWidgetState extends ConsumerState<VideoListWidget> with Automati
       controller: _controller,
       scrollDirection: Axis.vertical,
       padding: EdgeInsets.only(
-        bottom: widget.style.scale * 100,
-        top: widget.style.scale * 10,
+        bottom: _style.scale * 100,
+        top: _style.scale * 10,
       ),
-      itemCount: widget.provider.videosResponse!.list!.length,
+      itemCount: provider.freeVideosResponse!.list!.length,
       itemBuilder: (context, index) {
-        var model = widget.provider.videosResponse!.list![index];
+        var model = provider.freeVideosResponse!.list![index];
         return GestureDetector(
           onTap: () => playVideo(model),
           child: DetailItem(
-            appStyle: widget.style,
+            appStyle: _style,
             model: model,
             index: '$index',
             onToggleBookmark: () => toggleItemBookmark(model.id),
           ),
         );
       },
-      separatorBuilder: (BuildContext context, int index) => SizedBox(height: widget.style.scaleX(25)),
+      separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
     );
   }
 
