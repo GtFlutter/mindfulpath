@@ -1,121 +1,68 @@
 import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart';
-import 'package:meditation_app/data/api/api_checker.dart';
-import 'package:meditation_app/data/model/body/resource_type.dart';
-import 'package:meditation_app/data/model/response/error_res_model.dart';
-import 'package:meditation_app/data/model/response/videos_response.dart';
-
+import 'package:http/http.dart' show Response;
+import '../../data/api/api_checker.dart';
+import '../../data/model/body/resource_type.dart';
+import '../../data/model/response/videos_response.dart';
 import '../../data/repositories/dashboard_repo.dart';
 import '../../ui/common/custom_snackbar.dart';
+import '../../util/constants.dart';
 import '../repo_provider/dashboard_repo_provider.dart';
+import 'video_resource_notifier_model.dart';
 
-//// TODO ::::::::: Start From Here
 final freeVideosProvider = ChangeNotifierProvider<FreeVideosNotifier>((ref) {
   final repo = ref.watch(dashboardRepoProvider);
-
   return FreeVideosNotifier(repo);
 });
 
-abstract class VideosNotifier with ChangeNotifier {
-  void startLoading({bool notifie = true});
-  void stopLoading({bool notifie = true});
-  void featchingComplete(bool reload, int offset, bool showProgress, {bool notifie = true});
-  Future<void> fetchData(
-    int offset, {
-    required int categoryId,
-    required bool reload,
-    bool showProgress = true,
-  });
-}
-
-class FreeVideosNotifier extends VideosNotifier {
+class FreeVideosNotifier extends VideoResourceNotifier {
   final DashboardRepo repo;
   FreeVideosNotifier(this.repo);
 
-  VideosResponse? _data;
-  VideosResponse? get data => _data;
+  VideosResponse? _videosResponse;
+  VideosResponse? get videosResponse => _videosResponse;
+
+  @override
+  void toggleBookmark(int itemId, {bool notifier = true}) {
+    if (_videosResponse == null || _videosResponse!.list == null) {
+      return;
+    }
+    var itemIndex = _videosResponse!.list!.indexWhere((element) => element.id == itemId);
+    if (itemIndex == -1) return;
+    _videosResponse!.list![itemIndex].bookmarked = !(_videosResponse!.list![itemIndex].bookmarked ?? true);
+    if (notifier) notifyListeners();
+  }
 
   bool _loading = false;
   bool get loading => _loading;
-
   @override
-  void startLoading({bool notifie = true}) {
+  void startLoading() {
     _loading = true;
-    if (notifie) notifyListeners();
+    notifyListeners();
   }
 
   @override
-  void stopLoading({bool notifie = true}) {
+  void stopLoading() {
     _loading = false;
-    if (notifie) notifyListeners();
+    notifyListeners();
   }
 
   @override
-  Future<void> fetchData(int offset, {required int categoryId, required bool reload, bool showProgress = true}) async {
-    _initFeatching(reload, offset, showProgress);
-
-    Response response = await repo.getVideoList(
-      offset: offset,
-      categoryId: categoryId,
-      resourceType: ResourceType.free,
-    );
-
+  Future<void> fetchVideos(int categoryId) async {
+    startLoading();
+    Response response = await repo.getVideos(categoryId: categoryId, offset: 1, resourceType: ResourceType.free);
     if (response.statusCode != 200) {
-      featchingComplete(reload, offset, showProgress);
+      stopLoading();
       ApiChecker.checkApi(response);
-      return;
-    }
-    try {
-      if (response.statusCode == 200) {
-        var json = jsonDecode(response.body)['data'];
-        if (json == null) {
-          throw ErrorResponse(message: 'Unable to find data');
-        }
-
-        if (offset == 1 || _data == null) {
-          /// Featched Intial Page
-          if (reload) _data = null;
-          _data = VideosResponse.fromJson(json);
-          featchingComplete(reload, offset, showProgress, notifie: false);
-          notifyListeners();
-        } else if (_data != null) {
-          /// Featched Next Page
-          var tempModel = VideosResponse.fromJson(json);
-          _data!
-            ..total = tempModel.total
-            ..currentPage = tempModel.currentPage
-            ..lastPage = tempModel.lastPage
-            ..limit = tempModel.limit;
-          if (_data!.list != null) {
-            _data!.list!.addAll(tempModel.list ?? []);
-          }
-          featchingComplete(reload, offset, showProgress, notifie: false);
-          notifyListeners();
-        }
+    } else {
+      try {
+        var json = jsonDecode(response.body);
+        _videosResponse = VideosResponse.fromJson(json['data']);
+        stopLoading();
+      } catch (e) {
+        showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+        stopLoading();
       }
-    } catch (e) {
-      featchingComplete(reload, offset, showProgress);
-      showCustomSnackBar('Something went wrong');
-    }
-  }
-
-  void _initFeatching(bool reload, int offset, bool showProgress) {
-    if (!reload && offset == 1) {
-      _data = null;
-      if (showProgress) {
-        startLoading(notifie: false);
-      }
-      notifyListeners();
-    }
-  }
-
-  @override
-  void featchingComplete(bool reload, int offset, bool showProgress, {bool notifie = true}) {
-    if (!reload && offset == 1 && showProgress) {
-      stopLoading(notifie: notifie);
     }
   }
 }

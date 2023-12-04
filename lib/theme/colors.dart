@@ -19,6 +19,9 @@ class AppColors {
 
   static const dividerColor = Color(0xFF3F3F3F);
 
+  /// Details Category Screen
+  static const pdfItemBgColor = Color(0xFF2D251F);
+
   /// terms and conditions and privacy policy color
   static const tcppBtnColor = Color(0xFFADA996);
   static const tcppTextColor = Color(0xFFFAFAFA);
@@ -41,8 +44,6 @@ class AppColors {
   static const autherNameColor = Color(0xFF8A8A8A);
   static const categoryNameColor = Color(0xFFE3E3E3);
   static const detailItemBgColor = Color(0xFF0F0F0F);
-
-
 
   static const popupMenuColor = Color(0xFF49454F);
   static const popupMenuItemColor = Color(0xFFF3EDF7);

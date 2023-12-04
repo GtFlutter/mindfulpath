@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/ui/common/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/analytics_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/create_new_password_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/create_profile_screen.dart';
@@ -115,6 +116,28 @@ final appRouter = GoRouter(
       path: RoutePath.featuredSearchScreen,
       builder: (context, state) {
         return FeaturedSearchScreen(key: state.pageKey);
+      },
+    ),
+
+    /// Common
+    GoRoute(
+      parentNavigatorKey: rootNavigator,
+      path: RoutePath.splash,
+      builder: (context, state) {
+        if (state.extra is String) {
+          return PdfViewer.network(key: state.pageKey, url: '');
+        }
+
+        /// TODO ::: Working From Here
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        ///
+        return PdfViewer.network(key: state.pageKey, url: '');
       },
     ),
 

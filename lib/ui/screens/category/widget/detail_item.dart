@@ -13,7 +13,6 @@ import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
 
-/// TODO ::: Create PDF Layout Widget Inside It no need to use new widget
 class DIModel {
   final int videoId;
   final String imgUrl;
@@ -43,15 +42,37 @@ class DIModel {
 
 class DetailItem extends ConsumerWidget {
   final AppStyle appStyle;
-  final VideoResponse model;
+  final VideoResponse? model;
+  final String? title;
+  final String? subTitle;
   final String index;
-  final GestureTapCallback onToggleBookmark;
-  const DetailItem(
-      {super.key, required this.appStyle, required this.model, required this.index, required this.onToggleBookmark});
+  final GestureTapCallback? onToggleBookmark;
+
+  const DetailItem.video({
+    super.key,
+    required this.appStyle,
+    required VideoResponse this.model,
+    required this.index,
+    required this.onToggleBookmark,
+  })  : title = null,
+        subTitle = null;
+
+  const DetailItem.pdf({
+    super.key,
+    required this.appStyle,
+    required this.index,
+    required String this.title,
+    required String this.subTitle,
+  })  : model = null,
+        onToggleBookmark = null;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     TextStyle textStyle = appStyle.text.font(mulishRegular400, sizePx: 9);
+    var radius = appStyle.scaleX(10);
+    var dimension = appStyle.scaleX(97);
+    bool isVideo = model != null;
+    var pdfIconSize = isVideo ? 0.0 : appStyle.scaleX(30);
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
@@ -63,13 +84,31 @@ class DetailItem extends ConsumerWidget {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            MediaImageCard(
-              appStyle: appStyle,
-              imgUrl: model.imgUrl ?? '',
-              duration: model.duration!.toDuration,
-              imgRadius: appStyle.scaleX(10),
-              imgSize: appStyle.scaleX(97),
-            ),
+            if (isVideo)
+              MediaImageCard(
+                appStyle: appStyle,
+                imgUrl: model!.imgUrl ?? '',
+                duration: model!.duration!.toDuration,
+                imgRadius: radius,
+                imgSize: dimension,
+              )
+            else
+              Container(
+                key: const ValueKey<String>('pdf-icon'),
+                width: dimension,
+                height: dimension,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  color: AppColors.pdfItemBgColor,
+                ),
+                alignment: Alignment.center,
+                child: Image.asset(
+                  ImagePaths.pdfIcon,
+                  width: pdfIconSize,
+                  height: pdfIconSize,
+                  fit: BoxFit.contain,
+                ),
+              ),
             SizedBox(width: appStyle.scaleX(20)),
             Expanded(
               child: Column(
@@ -78,7 +117,7 @@ class DetailItem extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '${model.title}',
+                    isVideo ? '${model!.title}' : title ?? '',
                     style: appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -88,12 +127,6 @@ class DetailItem extends ConsumerWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: appStyle.scaleX(10),
                     children: [
-                      // Text(
-                      //   model.auther,
-                      //   maxLines: 1,
-                      //   overflow: TextOverflow.ellipsis,
-                      //   style: textStyle.copyWith(color: AppColors.autherNameColor),
-                      // ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -106,7 +139,7 @@ class DetailItem extends ConsumerWidget {
                           SizedBox(width: appStyle.scaleX(5)),
                           Flexible(
                             child: Text(
-                              '${model.categoryId ?? 0}',
+                              isVideo ? '${model!.categoryTitle}' : subTitle ?? '',
                               style: textStyle.copyWith(color: AppColors.categoryNameColor),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -119,68 +152,70 @@ class DetailItem extends ConsumerWidget {
                 ],
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                const Spacer(),
-                OutlinedIconButton.svg(
-                  model.bookmarked != null && model.bookmarked!
-                      ? SvgPaths.bookmarkSelected
-                      : SvgPaths.bookmarkUnselected,
-                  appStyle: appStyle,
-                  // svgIconSrc: SvgPaths.bookmarkSelected,
-                  onTap: onToggleBookmark,
-                ),
-                // const Spacer(),
-                PopupMenuButton(
-                  padding: EdgeInsets.zero,
-                  position: PopupMenuPosition.under,
-                  iconSize: 15,
-                  splashRadius: 1,
-                  tooltip: '',
-                  icon: OutlinedIconButton.svg(
-                    SvgPaths.addToPlaylist,
+            if (isVideo)
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const Spacer(),
+                  OutlinedIconButton.svg(
+                    model!.bookmarked != null && model!.bookmarked!
+                        ? SvgPaths.bookmarkSelected
+                        : SvgPaths.bookmarkUnselected,
                     appStyle: appStyle,
-                    onTap: null,
+                    // svgIconSrc: SvgPaths.bookmarkSelected,
+                    onTap: onToggleBookmark,
                   ),
-                  constraints: BoxConstraints(maxWidth: appStyle.scaleX(200), maxHeight: appStyle.scaleX(204)),
-                  // onOpened: () async {
-                  //   await ref.read(playListProvider).getPlaylistList();
-                  // },
-                  color: AppColors.popupMenuItemColor,
-                  itemBuilder: (context) {
-                    final playlistP = ref.read(playListProvider);
-                    playlistP.getPlaylistList();
-                    return [
-                      PopupMenuItem(
-                        height: appStyle.scaleX(24),
-                        onTap: () {
-                          if (model.video != null && model.video!.id != null) {
-                            createPlaylist(context, videoId: model.video?.id?.toString());
-                          }
-                        },
-                        child: Text(
-                          'Create Playlist',
-                          style: appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                  // const Spacer(),
+                  PopupMenuButton(
+                    padding: EdgeInsets.zero,
+                    position: PopupMenuPosition.under,
+                    iconSize: 15,
+                    splashRadius: 1,
+                    tooltip: '',
+                    icon: OutlinedIconButton.svg(
+                      SvgPaths.addToPlaylist,
+                      appStyle: appStyle,
+                      onTap: null,
+                    ),
+                    constraints: BoxConstraints(maxWidth: appStyle.scaleX(200), maxHeight: appStyle.scaleX(204)),
+                    // onOpened: () async {
+                    //   await ref.read(playListProvider).getPlaylistList();
+                    // },
+                    color: AppColors.popupMenuItemColor,
+                    itemBuilder: (context) {
+                      final playlistP = ref.read(playListProvider);
+                      playlistP.getPlaylistList();
+                      return [
+                        PopupMenuItem(
+                          height: appStyle.scaleX(24),
+                          onTap: () {
+                            if (model!.video != null && model!.video!.id != null) {
+                              createPlaylist(context, videoId: model!.video?.id?.toString());
+                            }
+                          },
+                          child: Text(
+                            'Create Playlist',
+                            style: appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                          ),
                         ),
-                      ),
-                      if (playlistP.playlistListResponse != null) ...[
-                        ...List.generate(playlistP.playlistListResponse!.length, (index) {
-                          return PopupMenuItem(
-                            height: appStyle.scaleX(24),
-                            onTap: () {},
-                            child: Text(
-                              playlistP.playlistListResponse![index].title ?? '',
-                              style: appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                            ),
-                          );
-                        })
-                      ]
-                    ];
-                  },
-                ),
-              ],
-            ),
+                        if (playlistP.playlistListResponse != null) ...[
+                          ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                            return PopupMenuItem(
+                              height: appStyle.scaleX(24),
+                              onTap: () {},
+                              child: Text(
+                                playlistP.playlistListResponse![index].title ?? '',
+                                style:
+                                    appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              ),
+                            );
+                          })
+                        ]
+                      ];
+                    },
+                  ),
+                ],
+              ),
             SizedBox(width: appStyle.scaleX(10)),
           ],
         ),

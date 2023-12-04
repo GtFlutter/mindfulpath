@@ -7,8 +7,6 @@ import '../ui/common/custom_snackbar.dart';
 import '../ui/screens/category/widget/detail_item.dart';
 import 'auth_provider.dart';
 
-/// TODO:: Working On It
-
 final videoProvider = ChangeNotifierProvider<VideoNotifier>((ref) {
   return VideoNotifier(ref);
 });
@@ -19,7 +17,7 @@ class VideoNotifier extends ChangeNotifier {
   DIModel? _video;
   DIModel? get video => _video;
 
-  void init([DIModel? video]) {
+  void reinit([DIModel? video]) {
     if (video == null) {
       clearVideo(notifie: false);
     } else {

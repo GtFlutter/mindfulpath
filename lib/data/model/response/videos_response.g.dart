@@ -31,8 +31,8 @@ VideoResponse _$VideoResponseFromJson(Map<String, dynamic> json) =>
       videoUrlSrc: json['video_url'] as String?,
       image: json['image'] == null
           ? null
-          : VideoResponseMedia.fromJson(json['image'] as Map<String, dynamic>),
+          : MediaResponse.fromJson(json['image'] as Map<String, dynamic>),
       video: json['video'] == null
           ? null
-          : VideoResponseMedia.fromJson(json['video'] as Map<String, dynamic>),
+          : MediaResponse.fromJson(json['video'] as Map<String, dynamic>),
     );

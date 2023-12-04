@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/body/resource_type.dart';
-import 'package:meditation_app/provider/resource_provider/resource_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
+import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_widget.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../../data/model/response/videos_response.dart';
 import '../../../../provider/bookmark_provider.dart';
+import '../../../../provider/resource_provider/free_videos_provider.dart';
 import '../../../../provider/video_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../common/custom_dropdown_button.dart';
 import 'custom_selecteable_button.dart';
 import 'detail_item.dart';
+import 'tabs/free_pdf_list_widget.dart';
+import 'tabs/free_video_list_widget.dart';
+import 'tabs/paid_pdf_list_widget.dart';
 
-/// TODO ::: Working On It
 class ResourceDetailCategory extends StatefulWidget {
   final int categoryId;
   final String categoryTitle;
@@ -22,19 +25,19 @@ class ResourceDetailCategory extends StatefulWidget {
   const ResourceDetailCategory({super.key, required this.categoryId, required this.categoryTitle});
 
   @override
-  State<ResourceDetailCategory> createState() => _ResourceListState();
+  State<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
 }
 
-class _ResourceListState extends State<ResourceDetailCategory> with TickerProviderStateMixin {
+class _ResourceDetailCategoryState extends State<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
   final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF')];
 
   static AppStyle _style = AppStyle();
 
-  /// Either 0 = [Video] or 1 = [PDF]
+  /// Either 0(Video) or 1(PDF)
   late int filterIndex;
 
-  /// Either 0 = [Free] or 1 = [Paid]
+  /// Either 0(Free) or 1(Paid)
   late int courseIndex;
 
   @override
@@ -42,11 +45,7 @@ class _ResourceListState extends State<ResourceDetailCategory> with TickerProvid
     super.initState();
     filterIndex = 0;
     courseIndex = 0;
-    _tabController = TabController(
-      initialIndex: courseIndex,
-      length: 4,
-      vsync: this,
-    );
+    _tabController = TabController(initialIndex: courseIndex, length: 4, vsync: this);
   }
 
   @override
@@ -57,20 +56,20 @@ class _ResourceListState extends State<ResourceDetailCategory> with TickerProvid
 
   void _changeTab(int filterIndex, int courseTypeIndex) {
     int currentTabIndex = _tabController.index;
-    late int animateTo;
+    int goTo;
     if (filterIndex == 0 && courseTypeIndex == 0) {
-      animateTo = 0;
+      goTo = 0;
     } else if (filterIndex == 0 && courseTypeIndex == 1) {
-      animateTo = 1;
+      goTo = 1;
     } else if (filterIndex == 1 && courseTypeIndex == 0) {
-      animateTo = 2;
+      goTo = 2;
     } else if (filterIndex == 1 && courseTypeIndex == 1) {
-      animateTo = 3;
+      goTo = 3;
     } else {
-      animateTo = throw ArgumentError();
+      goTo = throw ArgumentError();
     }
-    if (currentTabIndex == animateTo) return;
-    _tabController.animateTo(animateTo);
+    if (currentTabIndex == goTo) return;
+    _tabController.animateTo(goTo);
   }
 
   void _changeFilter(ItemName? value) {
@@ -137,17 +136,23 @@ class _ResourceListState extends State<ResourceDetailCategory> with TickerProvid
           child: TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
-            children: const [
-              DemoWIdget1(title: 'Free Videos'),
-              // VideoListWidget(
-              //   key: const ValueKey<String>('videolisting'),
-              //   widget.style,
-              //   resourceCtrl,
-              //   categoryTitle: widget.categoryTitle,
-              // ),
-              DemoWIdget1(title: 'Paid Videos'),
-              DemoWIdget1(title: 'Free PDF'),
-              DemoWIdget1(title: 'Paid PDF'),
+            children: [
+              FreeVideoListWidget(
+                categoryTitle: widget.categoryTitle,
+                categoryId: widget.categoryId,
+              ),
+              PaidVideoListWidget(
+                categoryTitle: widget.categoryTitle,
+                categoryId: widget.categoryId,
+              ),
+              FreePdfListWidget(
+                categoryTitle: widget.categoryTitle,
+                categoryId: widget.categoryId,
+              ),
+              PaidPdfListWidget(
+                categoryTitle: widget.categoryTitle,
+                categoryId: widget.categoryId,
+              ),
             ],
           ),
         ),
@@ -173,100 +178,6 @@ class _DemoWIdget1State extends State<DemoWIdget1> with AutomaticKeepAliveClient
         child: Text(widget.title),
       ),
     );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class VideoListWidget extends ConsumerStatefulWidget {
-  final int categoryId;
-  final String categoryTitle;
-
-  const VideoListWidget({
-    super.key,
-    required this.categoryTitle,
-    required this.categoryId,
-  });
-
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _VideoListWidgetState();
-}
-
-class _VideoListWidgetState extends ConsumerState<VideoListWidget> with AutomaticKeepAliveClientMixin {
-  final ScrollController _controller = ScrollController();
-  static AppStyle _style = AppStyle();
-
-  @override
-  void initState() {
-    debugPrint('initState: VideoListWidget');
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
-    var provider = ref.watch(videoResourceProvider);
-
-    // TODO :::
-    if (provider.isFreeVideoLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // TODO :::::
-    if (provider.freeVideosResponse == null || provider.freeVideosResponse!.list == null) {
-      return const Center(child: Text('Unable to find data!'));
-    }
-
-    return ListView.separated(
-      physics: const AlwaysScrollableScrollPhysics(),
-      controller: _controller,
-      scrollDirection: Axis.vertical,
-      padding: EdgeInsets.only(
-        bottom: _style.scale * 100,
-        top: _style.scale * 10,
-      ),
-      itemCount: provider.freeVideosResponse!.list!.length,
-      itemBuilder: (context, index) {
-        var model = provider.freeVideosResponse!.list![index];
-        return GestureDetector(
-          onTap: () => playVideo(model),
-          child: DetailItem(
-            appStyle: _style,
-            model: model,
-            index: '$index',
-            onToggleBookmark: () => toggleItemBookmark(model.id),
-          ),
-        );
-      },
-      separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-    );
-  }
-
-  void toggleItemBookmark(int? itemId) {
-    if (itemId == null) return;
-    ref.read(bookmarkProvider).toggleBookmark(itemId);
-  }
-
-  void playVideo(VideoResponse model) {
-    ref.read(videoProvider).playVideo(
-          DIModel(
-            // imgUrl: model.thumbnailImage ?? '',
-            imgUrl: model.videoUrl!,
-            duration: model.duration ?? '',
-            title: model.title ?? '',
-            category: widget.categoryTitle,
-            videoId: model.id!,
-            videoType: model.videoType ?? ResourceType.paid,
-          ),
-        );
   }
 
   @override

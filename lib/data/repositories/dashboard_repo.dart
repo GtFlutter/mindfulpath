@@ -15,21 +15,28 @@ class DashboardRepo {
     return await apiClient.getData('${AppConfigs.getCategoryList}?page=$offset&perPage=25');
   }
 
-  Future<Response> getVideoList({
-    required int offset,
+  Future<Response> getVideos({
     required int categoryId,
+    required int offset,
     required ResourceType resourceType,
   }) async {
-    return await apiClient.postData(
-      AppConfigs.getVideoList,
-      {
-        'page': offset,
+    return await apiClient.postData(AppConfigs.getVideos, _toBody(categoryId, resourceType, offset));
+  }
+
+  Future<Response> getPdfs({
+    required int categoryId,
+    required int offset,
+    required ResourceType resourceType,
+  }) async {
+    return await apiClient.postData(AppConfigs.getPdfs, _toBody(categoryId, resourceType, offset));
+  }
+
+  Map<String, int> _toBody(int categoryId, ResourceType resourceType, int offset) => {
         'category_id': categoryId,
         'type': resourceType.toInt(),
+        'page': offset,
         'perPage': AppConstants.kPerPage * 10,
-      },
-    );
-  }
+      };
 
   Future<Response> storeVideoWatchedTime(int videoId, Duration duration) async {
     return await apiClient.postData(

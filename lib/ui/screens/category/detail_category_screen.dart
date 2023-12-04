@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
-import 'package:meditation_app/provider/resource_provider/resource_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
-import 'package:meditation_app/ui/screens/category/widget/resource_list.dart';
+import 'package:meditation_app/ui/screens/category/widget/resource_widget.dart';
 import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
@@ -28,7 +27,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
   @override
   void initState() {
     /// TODO :: Pass Dimodel to init method if open this screen from featured video list
-    ref.read(videoProvider).init();
+    ref.read(videoProvider).reinit();
     super.initState();
   }
 

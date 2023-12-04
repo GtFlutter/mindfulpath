@@ -31,7 +31,8 @@ class AppConfigs {
   static const String notificationToggle = '/notification-setting';
 
   static const String getCategoryList = '/get-category-list';
-  static const String getVideoList = '/get-video-list';
+  static const String getVideos = '/get-video-list';
+  static const String getPdfs = '/get-pdf-list';
   static const String storeWatchedVideoDuration = '/store-watched-video-duration';
   static const String getFeatureVideoList = '/get-featured-video-list';
 

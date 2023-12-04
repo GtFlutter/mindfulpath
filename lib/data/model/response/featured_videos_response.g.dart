@@ -29,10 +29,10 @@ FeaturedVideoResponse _$FeaturedVideoResponseFromJson(
       thumbnailImageUrlSrc: json['thumbnail_image_url'] as String?,
       image: json['image'] == null
           ? null
-          : VideoResponseMedia.fromJson(json['image'] as Map<String, dynamic>),
+          : MediaResponse.fromJson(json['image'] as Map<String, dynamic>),
       videoUrlSrc: json['video_url'] as String?,
       video: json['video'] == null
           ? null
-          : VideoResponseMedia.fromJson(json['video'] as Map<String, dynamic>),
+          : MediaResponse.fromJson(json['video'] as Map<String, dynamic>),
       category: CategoryListResponse.fromJson(json['category']),
     );

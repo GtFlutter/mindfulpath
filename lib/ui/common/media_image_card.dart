@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 
 import '../../theme/styles.dart';

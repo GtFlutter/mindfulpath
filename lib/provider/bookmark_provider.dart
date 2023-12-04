@@ -7,9 +7,11 @@ import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
 import 'package:meditation_app/data/repositories/bookmark_repo.dart';
 import 'package:meditation_app/provider/repo_provider/bookmark_repo_provider.dart';
-import 'package:meditation_app/provider/resource_provider/resource_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
+
+import 'resource_provider/free_videos_provider.dart';
+import 'resource_provider/paid_videos_provider.dart';
 
 final bookmarkProvider = ChangeNotifierProvider<BookmarkNotifier>((ref) {
   final repo = ref.watch(bookmarkRepoProvider);
@@ -88,7 +90,8 @@ class BookmarkNotifier extends ChangeNotifier {
     } else {
       try {
         stopToggleLoading();
-        ref.read(videoResourceProvider).toggleBookmark(itemId);
+        ref.read(freeVideosProvider).toggleBookmark(itemId);
+        ref.read(paidVideosProvider).toggleBookmark(itemId);
         showCustomSnackBar('${isRemove ? 'Removed' : 'Bookmarked'} Successful', type: true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);

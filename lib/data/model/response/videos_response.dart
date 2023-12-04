@@ -98,7 +98,7 @@ class VideoResponse {
 
   /// insted of using Below Field [image] use [imgUrl] getter
   @JsonKey(name: 'image', includeFromJson: true)
-  final VideoResponseMedia? image;
+  final MediaResponse? image;
 
   /// insted of using Below Field [videoUrlSrc] use [videoUrl]
   @JsonKey(name: 'video_url', includeFromJson: true)
@@ -106,7 +106,7 @@ class VideoResponse {
 
   /// insted of using Below Field [video] use [videoUrl]
   @JsonKey(name: 'video', includeFromJson: true)
-  final VideoResponseMedia? video;
+  final MediaResponse? video;
 
   /// No Use of below variable
   // int can_view_free_user;

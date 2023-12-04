@@ -6,8 +6,8 @@ part of 'video_response_media.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-VideoResponseMedia _$VideoResponseMediaFromJson(Map<String, dynamic> json) =>
-    VideoResponseMedia(
+MediaResponse _$MediaResponseFromJson(Map<String, dynamic> json) =>
+    MediaResponse(
       id: json['id'] as int?,
       typeId: json['type_id'] as String?,
       fileName: json['file_name'] as String?,
