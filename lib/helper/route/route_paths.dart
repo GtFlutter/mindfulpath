@@ -50,4 +50,7 @@ class RoutePath {
 
   ///
   static const String analyticsScreen = '/analytics';
+
+  // [Base Screen]
+  static const String pdfViewer = '/pdf-viewer';
 }

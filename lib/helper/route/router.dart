@@ -122,22 +122,12 @@ final appRouter = GoRouter(
     /// Common
     GoRoute(
       parentNavigatorKey: rootNavigator,
-      path: RoutePath.splash,
+      path: RoutePath.pdfViewer,
       builder: (context, state) {
         if (state.extra is String) {
-          return PdfViewer.network(key: state.pageKey, url: '');
+          return PdfViewer.network(key: state.pageKey, url: state.extra as String);
         }
-
-        /// TODO ::: Working From Here
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///
-        ///
-        return PdfViewer.network(key: state.pageKey, url: '');
+        return const WentWrongScreen();
       },
     ),
 
@@ -245,3 +235,17 @@ final appRouter = GoRouter(
     ),
   ],
 );
+
+class WentWrongScreen extends StatelessWidget {
+  const WentWrongScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: const Center(
+        child: Text('Something went wrong'),
+      ),
+    );
+  }
+}

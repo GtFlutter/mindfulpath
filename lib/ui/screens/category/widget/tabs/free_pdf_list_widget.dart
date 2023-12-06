@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:meditation_app/helper/navigation.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/resource_provider/free_pdfs_provider.dart';
 
 import '../../../../../theme/styles.dart';
@@ -76,8 +79,7 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
 
   void viewPdf(String? pdfUrl) {
     if (pdfUrl == null) return;
-
-    /// TODO ::: View PDF
+    context.pushViewPDFScreen(pdfUrl);
   }
 
   @override
