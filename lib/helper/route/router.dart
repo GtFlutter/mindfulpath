@@ -25,6 +25,7 @@ import 'package:meditation_app/ui/screens/splash_screen.dart';
 import 'package:meditation_app/ui/screens/settings/tc_pp_screen.dart';
 import 'package:meditation_app/ui/screens/support/support_screen.dart';
 import 'package:meditation_app/ui/screens/support/support_section_screen.dart';
+import '../../ui/screens/category/widget/detail_item.dart';
 
 final GlobalKey<NavigatorState> rootNavigator = GlobalKey(debugLabel: 'root');
 final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
@@ -218,10 +219,15 @@ final appRouter = GoRouter(
                 parentNavigatorKey: rootNavigator,
                 path: RoutePath.detailCategoryScreen,
                 builder: (context, state) {
-                  return DetailCategoryScreen(
-                    key: state.pageKey,
-                    categoryListResponse: state.extra as CategoryListResponse,
-                  );
+                  if (state.extra != null && state.extra is (CategoryListResponse, DIModel?)) {
+                    var (category, video) = state.extra as (CategoryListResponse, DIModel?);
+                    return DetailCategoryScreen(
+                      key: state.pageKey,
+                      categoryListResponse: category,
+                      intialVideo: video,
+                    );
+                  }
+                  return const WentWrongScreen();
                 },
               ),
             ]),

@@ -5,14 +5,14 @@ import 'package:meditation_app/helper/navigation.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/resource_provider/free_pdfs_provider.dart';
 
+import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../theme/styles.dart';
 import '../detail_item.dart';
 
 class FreePdfListWidget extends ConsumerStatefulWidget {
-  final int categoryId;
-  final String categoryTitle;
+  final CategoryListResponse category;
 
-  const FreePdfListWidget({super.key, required this.categoryTitle, required this.categoryId});
+  const FreePdfListWidget({super.key, required this.category});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _FreePdfListWidgetState();
@@ -24,7 +24,7 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () => ref.read(freePdfsProvider).fetchPdfs(widget.categoryId));
+    Future.delayed(Duration.zero, () => ref.read(freePdfsProvider).fetchPdfs(widget.category.id!));
     super.initState();
   }
 

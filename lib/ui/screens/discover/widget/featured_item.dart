@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
-import '../../../../data/model/response/featured_videos_response.dart';
 import 'featured_item_painter.dart';
 
 class FeaturedItem extends StatelessWidget {
-  final FeaturedVideoResponse model;
+  final String title;
+  final String imgUrl;
   final DashboardCustomImageClipper clipper;
   final AppStyle style;
-  const FeaturedItem(this.model, this.clipper, {super.key, required this.style});
+  const FeaturedItem(
+    this.clipper, {
+    super.key,
+    required this.style,
+    required this.title,
+    required this.imgUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +40,7 @@ class FeaturedItem extends StatelessWidget {
               style.scaleX(9),
             ),
             child: Text(
-              model.title ?? '',
+              title,
               style: style.text.font(mulishRegular400, sizePx: 12.5),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -49,7 +55,7 @@ class FeaturedItem extends StatelessWidget {
                   width: cardWidth * 0.55,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(model.imgUrl ?? ''),
+                      image: NetworkImage(imgUrl),
                       fit: BoxFit.cover,
                     ),
                   ),

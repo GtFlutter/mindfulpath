@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/navigation.dart';
 import 'package:meditation_app/provider/resource_provider/paid_pdfs_provider.dart';
 
-import '../../../../../helper/route/route_paths.dart';
+import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../theme/styles.dart';
 import '../detail_item.dart';
 
 class PaidPdfListWidget extends ConsumerStatefulWidget {
-  final int categoryId;
-  final String categoryTitle;
+  final CategoryListResponse category;
 
-  const PaidPdfListWidget({super.key, required this.categoryTitle, required this.categoryId});
+  const PaidPdfListWidget({super.key, required this.category});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _PaidPdfListWidgetState();
@@ -24,7 +22,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () => ref.read(paidPdfsProvider).fetchPdfs(widget.categoryId));
+    Future.delayed(Duration.zero, () => ref.read(paidPdfsProvider).fetchPdfs(widget.category.id!));
     super.initState();
   }
 

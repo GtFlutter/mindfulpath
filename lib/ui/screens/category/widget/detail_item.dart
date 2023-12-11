@@ -15,29 +15,56 @@ import '../../../common/outlined_icon_button.dart';
 
 class DIModel {
   final int videoId;
-  final String imgUrl;
+  final String thumbnailUrl;
+  final String videoUrl;
   final String duration;
   final String title;
-  final String category;
+  final String categoryName;
   final ResourceType videoType;
 
   const DIModel({
     required this.videoType,
     required this.videoId,
-    required this.imgUrl,
+    required this.thumbnailUrl,
+    required this.videoUrl,
     required this.duration,
     required this.title,
-    required this.category,
+    required this.categoryName,
   });
 
   DIModel copyWith() => DIModel(
         videoId: videoId,
-        imgUrl: imgUrl,
+        videoUrl: videoUrl,
+        thumbnailUrl: thumbnailUrl,
         duration: duration,
         title: title,
-        category: category,
+        categoryName: categoryName,
         videoType: videoType,
       );
+
+  factory DIModel.fromJson(dynamic json) {
+    return DIModel(
+      videoId: json('video_id') as int,
+      videoUrl: json('video_url') as String,
+      thumbnailUrl: json('thumbnail_url') as String,
+      duration: json('duration') as String,
+      title: json('title') as String,
+      categoryName: json('category_name') as String,
+      videoType: ResourceType.fromJson(json('video_type') as int)!,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['video_id'] = videoId;
+    data['video_url'] = videoUrl;
+    data['thumbnail_url'] = thumbnailUrl;
+    data['duration'] = duration;
+    data['title'] = title;
+    data['category_name'] = categoryName;
+    data['video_type'] = videoType.toInt();
+    return data;
+  }
 }
 
 class DetailItem extends ConsumerWidget {

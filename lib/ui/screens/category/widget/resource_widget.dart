@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meditation_app/data/model/body/resource_type.dart';
+import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_widget.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
-import '../../../../data/model/response/videos_response.dart';
-import '../../../../provider/bookmark_provider.dart';
-import '../../../../provider/resource_provider/free_videos_provider.dart';
-import '../../../../provider/video_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../common/custom_dropdown_button.dart';
 import 'custom_selecteable_button.dart';
-import 'detail_item.dart';
 import 'tabs/free_pdf_list_widget.dart';
 import 'tabs/free_video_list_widget.dart';
 import 'tabs/paid_pdf_list_widget.dart';
 
 class ResourceDetailCategory extends StatefulWidget {
-  final int categoryId;
-  final String categoryTitle;
+  final CategoryListResponse category;
 
-  const ResourceDetailCategory({super.key, required this.categoryId, required this.categoryTitle});
+  const ResourceDetailCategory({super.key, required this.category});
 
   @override
   State<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
@@ -112,7 +105,7 @@ class _ResourceDetailCategoryState extends State<ResourceDetailCategory> with Ti
               decoration: ShapeDecoration(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(_style.scaleX(40)),
-                  side: const BorderSide(color: AppColors.primaryColor, width: 0.5),
+                  side: const BorderSide(color: AppColors.primaryColor),
                 ),
               ),
               padding: EdgeInsets.symmetric(
@@ -137,22 +130,10 @@ class _ResourceDetailCategoryState extends State<ResourceDetailCategory> with Ti
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-              FreeVideoListWidget(
-                categoryTitle: widget.categoryTitle,
-                categoryId: widget.categoryId,
-              ),
-              PaidVideoListWidget(
-                categoryTitle: widget.categoryTitle,
-                categoryId: widget.categoryId,
-              ),
-              FreePdfListWidget(
-                categoryTitle: widget.categoryTitle,
-                categoryId: widget.categoryId,
-              ),
-              PaidPdfListWidget(
-                categoryTitle: widget.categoryTitle,
-                categoryId: widget.categoryId,
-              ),
+              FreeVideoListWidget(category: widget.category),
+              PaidVideoListWidget(category: widget.category),
+              FreePdfListWidget(category: widget.category),
+              PaidPdfListWidget(category: widget.category),
             ],
           ),
         ),

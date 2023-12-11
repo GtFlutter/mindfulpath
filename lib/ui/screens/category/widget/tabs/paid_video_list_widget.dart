@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/provider/recent_videos_provider.dart';
 
 import '../../../../../data/model/body/resource_type.dart';
+import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../data/model/response/videos_response.dart';
 import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../provider/resource_provider/paid_videos_provider.dart';
@@ -10,10 +12,9 @@ import '../../../../../theme/styles.dart';
 import '../detail_item.dart';
 
 class PaidVideoListWidget extends ConsumerStatefulWidget {
-  final int categoryId;
-  final String categoryTitle;
+  final CategoryListResponse category;
 
-  const PaidVideoListWidget({super.key, required this.categoryTitle, required this.categoryId});
+  const PaidVideoListWidget({super.key, required this.category});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _PaidVideoListWidgetState();
@@ -25,7 +26,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () => ref.read(paidVideosProvider).fetchVideos(widget.categoryId));
+    Future.delayed(Duration.zero, () => ref.read(paidVideosProvider).fetchVideos(widget.category.id!));
     super.initState();
   }
 
@@ -85,14 +86,17 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
   void playVideo(VideoResponse model) {
     ref.read(videoProvider).playVideo(
-          DIModel(
-            // imgUrl: model.thumbnailImage ?? '',
-            imgUrl: model.videoUrl!,
-            duration: model.duration ?? '',
-            title: model.title ?? '',
-            category: widget.categoryTitle,
-            videoId: model.id!,
-            videoType: model.videoType ?? ResourceType.paid,
+          DetailedVideoModel(
+            category: widget.category,
+            video: DIModel(
+              thumbnailUrl: model.imgUrl ?? '',
+              videoUrl: model.videoUrl!,
+              duration: model.duration ?? '',
+              title: model.title ?? '',
+              categoryName: widget.category.title ?? '',
+              videoId: model.id!,
+              videoType: model.videoType ?? ResourceType.paid,
+            ),
           ),
         );
   }

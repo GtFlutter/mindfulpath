@@ -12,6 +12,7 @@ import 'package:meditation_app/util/assets.dart';
 import '../../../theme/styles.dart';
 import 'discover_list_widget.dart';
 import 'featured_list_widget.dart';
+import 'recent_list_widget.dart';
 import 'widget/greeting.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -96,22 +97,13 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 /// Discover Layout
-
-                const DiscoverLayout(),
-                DiscoverHeader(title: 'Featured', style: _style),
+                const DiscoverListWidget(),
 
                 /// Featured Layout
                 FeaturedListWidget(style: _style, clipper: clipper),
 
-                DiscoverHeader(title: 'Recently played', style: _style),
-
-                /// TODO : Working On It
                 /// Recently played Layout
-                // FeaturedListWidget(
-                //   style: _style,
-                //   clipper: clipper,
-                //   list: dashboardNotifier.featureVideoListResponse ?? [],
-                // ),
+                RecentListWidget(style: _style, clipper: clipper),
               ],
             ),
           ),

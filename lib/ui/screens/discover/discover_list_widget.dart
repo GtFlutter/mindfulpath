@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/helper/navigation.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/discover/widget/discover_item.dart';
 import '../../../provider/dashboard_provider.dart';
 
-class DiscoverLayout extends ConsumerStatefulWidget {
-  const DiscoverLayout({super.key});
+class DiscoverListWidget extends ConsumerStatefulWidget {
+  const DiscoverListWidget({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _DiscoverLayoutState();
 }
 
-class _DiscoverLayoutState extends ConsumerState<DiscoverLayout> {
+class _DiscoverLayoutState extends ConsumerState<DiscoverListWidget> {
   static AppStyle _style = AppStyle();
 
   @override
@@ -56,12 +55,7 @@ class _DiscoverLayoutState extends ConsumerState<DiscoverLayout> {
         return DiscoverItem(
           item: dashboardNotifier.categoryListResponse![index],
           style: _style,
-          onPressed: () {
-            context.go(
-              RoutePath.detailCategoryScreenPath,
-              extra: dashboardNotifier.categoryListResponse![index],
-            );
-          },
+          onPressed: () => context.goToDetailCategoryScreen(dashboardNotifier.categoryListResponse![index]),
         );
       },
     );

@@ -35,6 +35,15 @@ class CategoryListResponse {
     }
     return list;
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['button_title'] = buttonTitle;
+    data['image'] = imageResponse?.toJson();
+    return data;
+  }
 }
 
 class CategoryImageResponse {
@@ -52,5 +61,15 @@ class CategoryImageResponse {
     fileName = json['file_name'];
     type = json['type'];
     imageUrl = json['image_url'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['type_id'] = typeId;
+    data['file_name'] = fileName;
+    data['type'] = type;
+    data['image_url'] = imageUrl;
+    return data;
   }
 }

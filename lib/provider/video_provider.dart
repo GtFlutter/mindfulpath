@@ -6,6 +6,7 @@ import '../helper/route/route_paths.dart';
 import '../ui/common/custom_snackbar.dart';
 import '../ui/screens/category/widget/detail_item.dart';
 import 'auth_provider.dart';
+import 'recent_videos_provider.dart';
 
 final videoProvider = ChangeNotifierProvider<VideoNotifier>((ref) {
   return VideoNotifier(ref);
@@ -17,30 +18,31 @@ class VideoNotifier extends ChangeNotifier {
   DIModel? _video;
   DIModel? get video => _video;
 
-  void reinit([DIModel? video]) {
-    if (video == null) {
+  void reinit([DetailedVideoModel? detailedVideoModel]) {
+    if (detailedVideoModel == null) {
       clearVideo(notifie: false);
     } else {
-      playVideo(video, notifie: false, forceToPlay: true);
+      playVideo(detailedVideoModel, notifie: false, forceToPlay: true);
     }
   }
 
-  void playVideo(DIModel video, {bool notifie = true, bool forceToPlay = false}) {
+  void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false}) {
     /// Auth User
     bool isLoggedIn = _ref.read(authProvider).isUserLoggedIn;
-    if (video.videoType == ResourceType.paid && !isLoggedIn) {
+    if (detailedVideoModel.video.videoType == ResourceType.paid && !isLoggedIn) {
       showCustomSnackBar('Login to access video', type: false);
-      appRouter.go(RoutePath.signIn);
+      appRouter.push(RoutePath.signIn);
       return;
     }
 
-    /// If Video Already Playing Then Don't Chnage Video
+    /// If Video Already Playing Then Don't Chanage Video
     /// Also If Video Playing Is Same Requested Video Then Don't Chnage Video
     /// If It's Want to faorce to play video then just play video
     DIModel? model = _video?.copyWith();
-    if ((model == null || model.videoId != video.videoId) || forceToPlay) {
-      _video = video.copyWith();
+    if ((model == null || model.videoId != detailedVideoModel.videoId) || forceToPlay) {
+      _video = detailedVideoModel.video.copyWith();
       if (notifie) notifyListeners();
+      _ref.read(recentVideosProvider).addRecentVideo(detailedVideoModel);
     }
   }
 

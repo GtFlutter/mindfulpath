@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
+import 'package:meditation_app/provider/recent_videos_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
@@ -11,11 +12,17 @@ import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
 import '../../common/media_player/app_video_player.dart';
+import 'widget/detail_item.dart';
 import 'widget/intro_widget.dart';
 
 class DetailCategoryScreen extends ConsumerStatefulWidget {
   final CategoryListResponse categoryListResponse;
-  const DetailCategoryScreen({super.key, required this.categoryListResponse});
+  final DIModel? intialVideo;
+  const DetailCategoryScreen({
+    super.key,
+    required this.categoryListResponse,
+    required this.intialVideo,
+  });
 
   @override
   ConsumerState<DetailCategoryScreen> createState() => _DetailCategoryScreenState();
@@ -26,8 +33,16 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
 
   @override
   void initState() {
-    /// TODO :: Pass Dimodel to init method if open this screen from featured video list
-    ref.read(videoProvider).reinit();
+    Future.delayed(
+        Duration.zero,
+        () => ref.read(videoProvider).reinit(
+              widget.intialVideo != null
+                  ? DetailedVideoModel(
+                      category: widget.categoryListResponse,
+                      video: widget.intialVideo!,
+                    )
+                  : null,
+            ));
     super.initState();
   }
 
@@ -69,7 +84,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                       child: AppVideoPlayer(
                         key: const ValueKey('value'),
                         videoId: videoCtrl.video!.videoId,
-                        url: videoCtrl.video!.imgUrl,
+                        url: videoCtrl.video!.videoUrl,
                         style: _style,
                         isLandscape: isLandscape,
                         onBackPress: videoCtrl.clearVideo,
@@ -106,7 +121,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                                 SizedBox(width: _style.scaleX(5)),
                                 Flexible(
                                   child: Text(
-                                    videoCtrl.video!.category,
+                                    videoCtrl.video!.categoryName,
                                     style: textStyle.copyWith(color: AppColors.autherNameColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -132,8 +147,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                   Expanded(
                     flex: 3,
                     child: ResourceDetailCategory(
-                      categoryTitle: widget.categoryListResponse.title ?? '',
-                      categoryId: widget.categoryListResponse.id ?? -1,
+                      category: widget.categoryListResponse,
                     ),
                   ),
               ],
