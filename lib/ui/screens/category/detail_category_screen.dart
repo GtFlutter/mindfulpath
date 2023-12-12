@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
@@ -33,16 +34,20 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
 
   @override
   void initState() {
+    ref.read(videoProvider).clearVideo(notifie: false);
     Future.delayed(
-        Duration.zero,
-        () => ref.read(videoProvider).reinit(
+      Duration.zero,
+      () {
+        ref.read(videoProvider).reinit(
               widget.intialVideo != null
                   ? DetailedVideoModel(
                       category: widget.categoryListResponse,
                       video: widget.intialVideo!,
                     )
                   : null,
-            ));
+            );
+      },
+    );
     super.initState();
   }
 
@@ -55,102 +60,119 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
 
     var videoCtrl = ref.watch(videoProvider);
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: videoCtrl.video != null ? null : CustomAppBar(screenSize: size, style: _style),
-      body: BackgroundImage.network(
-        imgUrl: widget.categoryListResponse.imageResponse?.imageUrl ?? AppConstants.placeHolder,
-        hideImage: isLandscape && videoCtrl.video != null,
-        child: SafeArea(
-          left: false,
-          right: false,
-          bottom: false,
-          child: Padding(
-            padding: isLandscape && videoCtrl.video != null
-                ? EdgeInsets.zero
-                : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (videoCtrl.video != null) ...[
-                  if (!isLandscape) SizedBox(height: _style.scaleX(25)),
-                  Flexible(
-                    flex: isLandscape ? 1 : 0,
-                    child: Container(
-                      width: !isLandscape ? null : double.infinity,
-                      height: !isLandscape ? null : double.infinity,
-                      alignment: !isLandscape ? null : Alignment.topCenter,
-                      constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
-                      child: AppVideoPlayer(
-                        key: const ValueKey('value'),
-                        videoId: videoCtrl.video!.videoId,
-                        url: videoCtrl.video!.videoUrl,
-                        style: _style,
-                        isLandscape: isLandscape,
-                        onBackPress: videoCtrl.clearVideo,
+    var isVideoAvailable = videoCtrl.video != null;
+    return PopScope(
+      canPop: !isVideoAvailable,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          return;
+        }
+        if (isVideoAvailable) {
+          videoCtrl.clearVideo();
+          return;
+        }
+        if (context.canPop()) {
+          context.pop();
+        }
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: isVideoAvailable ? null : CustomAppBar(screenSize: size, style: _style),
+        body: BackgroundImage.network(
+          imgUrl: widget.categoryListResponse.imageResponse?.imageUrl ?? AppConstants.placeHolder,
+          hideImage: isLandscape && isVideoAvailable,
+          child: SafeArea(
+            left: false,
+            right: false,
+            bottom: false,
+            child: Padding(
+              padding: isLandscape && isVideoAvailable
+                  ? EdgeInsets.zero
+                  : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (isVideoAvailable) ...[
+                    if (!isLandscape) SizedBox(height: _style.scaleX(25)),
+                    Flexible(
+                      flex: isLandscape ? 1 : 0,
+                      child: Container(
+                        width: !isLandscape ? null : double.infinity,
+                        height: !isLandscape ? null : double.infinity,
+                        alignment: !isLandscape ? null : Alignment.topCenter,
+                        constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
+                        child: AppVideoPlayer(
+                          key: const ValueKey('value'),
+                          videoId: videoCtrl.video!.videoId,
+                          url: videoCtrl.video!.videoUrl,
+                          style: _style,
+                          isLandscape: isLandscape,
+                          onBackPress: videoCtrl.clearVideo,
+                        ),
                       ),
                     ),
-                  ),
-                  if (videoCtrl.video != null && (videoCtrl.video == null || !isLandscape)) ...[
-                    SizedBox(height: _style.scaleX(15)),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          videoCtrl.video!.title,
-                          style: _style.text.font(mulishSemiBold600, sizePx: 20, color: Colors.white),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.left,
-                        ),
-                        SizedBox(height: _style.scaleX(7)),
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: _style.scaleX(10),
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '●',
-                                  style: _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(width: _style.scaleX(5)),
-                                Flexible(
-                                  child: Text(
-                                    videoCtrl.video!.categoryName,
-                                    style: textStyle.copyWith(color: AppColors.autherNameColor),
+                    if (isVideoAvailable && !isLandscape) ...[
+                      SizedBox(height: _style.scaleX(15)),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            videoCtrl.video!.title,
+                            style: _style.text.font(mulishSemiBold600, sizePx: 20, color: Colors.white),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.left,
+                          ),
+                          SizedBox(height: _style.scaleX(7)),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: _style.scaleX(10),
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '●',
+                                    style:
+                                        _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: _style.scaleX(30)),
-                      ],
+                                  SizedBox(width: _style.scaleX(5)),
+                                  Flexible(
+                                    child: Text(
+                                      videoCtrl.video!.categoryName,
+                                      style: textStyle.copyWith(color: AppColors.autherNameColor),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: _style.scaleX(30)),
+                        ],
+                      ),
+                    ],
+                  ] else
+                    Expanded(
+                      flex: !isLandscape ? 2 : 1,
+                      child: IntroWidget(
+                        title: widget.categoryListResponse.title ?? '',
+                        style: _style,
+                      ),
                     ),
-                  ],
-                ] else
-                  Expanded(
-                    flex: !isLandscape ? 2 : 1,
-                    child: IntroWidget(
-                      title: widget.categoryListResponse.title ?? '',
-                      style: _style,
+                  if (!isLandscape || !isVideoAvailable)
+                    Expanded(
+                      flex: 3,
+                      child: ResourceDetailCategory(
+                        category: widget.categoryListResponse,
+                      ),
                     ),
-                  ),
-                if (!isLandscape || videoCtrl.video == null)
-                  Expanded(
-                    flex: 3,
-                    child: ResourceDetailCategory(
-                      category: widget.categoryListResponse,
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

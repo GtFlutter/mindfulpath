@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/navigation.dart';
-import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/resource_provider/free_pdfs_provider.dart';
 
 import '../../../../../data/model/response/category_list_reponse.dart';

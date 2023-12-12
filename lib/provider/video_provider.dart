@@ -20,10 +20,9 @@ class VideoNotifier extends ChangeNotifier {
 
   void reinit([DetailedVideoModel? detailedVideoModel]) {
     if (detailedVideoModel == null) {
-      clearVideo(notifie: false);
-    } else {
-      playVideo(detailedVideoModel, notifie: false, forceToPlay: true);
+      return;
     }
+    playVideo(detailedVideoModel, notifie: true, forceToPlay: true);
   }
 
   void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false}) {
@@ -42,7 +41,10 @@ class VideoNotifier extends ChangeNotifier {
     if ((model == null || model.videoId != detailedVideoModel.videoId) || forceToPlay) {
       _video = detailedVideoModel.video.copyWith();
       if (notifie) notifyListeners();
+      // showCustomSnackBar('New Video Set Video Name: ${_video!.title}', type: true);
       _ref.read(recentVideosProvider).addRecentVideo(detailedVideoModel);
+    } else {
+      // showCustomSnackBar('Errorororo', type: false);
     }
   }
 

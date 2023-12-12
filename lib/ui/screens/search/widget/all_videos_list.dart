@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/video_list_response.dart';
-import 'package:meditation_app/provider/bookmark_provider.dart';
 
 import '../../../../theme/styles.dart';
-import '../../category/widget/detail_item.dart';
 
 class AllVideosList extends StatelessWidget {
   const AllVideosList({

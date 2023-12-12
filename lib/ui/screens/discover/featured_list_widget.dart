@@ -44,10 +44,15 @@ class _FeaturedListWidgetState extends ConsumerState<FeaturedListWidget> {
       return const Center(child: CircularProgressIndicator());
     }
     if (provider.data == null || provider.data!.list == null) {
-      return const Center(child: Text('Something Wenet Wrong'));
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text('Something Wenet Wrong'),
+        ),
+      );
     }
     if (provider.data!.list!.isEmpty) {
-      return const Center(child: Text('No Data Found'));
+      return const SizedBox.shrink();
     }
 
     return Column(

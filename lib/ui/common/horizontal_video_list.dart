@@ -46,7 +46,7 @@ class HorizontalVideoList extends StatelessWidget {
                   video: DIModel(
                     thumbnailUrl: dataModel.imgUrl ?? '',
                     videoType: ResourceType.paid,
-                    videoId: dataModel.id!,
+                    videoId: dataModel.video!.id!,
                     videoUrl: dataModel.videoUrl ?? '',
                     duration: dataModel.duration ?? '',
                     title: dataModel.title ?? 'Title Not Found',

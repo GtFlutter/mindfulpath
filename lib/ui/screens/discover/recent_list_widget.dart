@@ -32,7 +32,7 @@ class _FeaturedListWidgetState extends ConsumerState<RecentListWidget> {
     var provider = ref.watch(recentVideosProvider);
 
     if (provider.list.isEmpty) {
-      return const Center(child: Text('No Data Found'));
+      return const SizedBox.shrink();
     }
 
     return Column(

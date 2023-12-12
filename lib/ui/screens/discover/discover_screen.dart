@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/screens/discover/widget/discover_header.dart';
 import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.dart';
 import 'package:meditation_app/util/assets.dart';
 

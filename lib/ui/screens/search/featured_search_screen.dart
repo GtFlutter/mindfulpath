@@ -9,7 +9,6 @@ import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/screens/search/widget/all_videos_list.dart';
 
 import '../../../util/assets.dart';
 
