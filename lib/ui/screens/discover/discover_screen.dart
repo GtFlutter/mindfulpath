@@ -10,7 +10,7 @@ import 'package:meditation_app/util/assets.dart';
 
 import '../../../theme/styles.dart';
 import 'discover_list_widget.dart';
-import 'featured_list_widget.dart';
+import 'featured_widget.dart';
 import 'recent_list_widget.dart';
 import 'widget/greeting.dart';
 
@@ -62,9 +62,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           Padding(
             padding: EdgeInsets.only(right: _style.scale * 9),
             child: IconButton(
-              onPressed: () {
-                context.push(RoutePath.featuredSearchScreen);
-              },
+              onPressed: () => context.push(RoutePath.featuredSearchScreen),
               icon: SvgPicture.asset(
                 SvgPaths.search,
                 width: _style.scale * 20,
@@ -99,7 +97,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 const DiscoverListWidget(),
 
                 /// Featured Layout
-                FeaturedListWidget(style: _style, clipper: clipper),
+                FeaturedWidget(style: _style, clipper: clipper),
 
                 /// Recently played Layout
                 RecentListWidget(style: _style, clipper: clipper),

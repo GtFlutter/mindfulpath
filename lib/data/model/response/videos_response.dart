@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../body/resource_type.dart';
+import 'featured_videos_response.dart';
 import 'video_response_media.dart';
 
 part 'videos_response.g.dart';
@@ -130,4 +131,21 @@ class VideoResponse {
   String? get videoUrl => videoUrlSrc ?? video?.url;
 
   factory VideoResponse.fromJson(Map<String, dynamic> json) => _$VideoResponseFromJson(json);
+
+  factory VideoResponse.fromFeaturedVideoResponse(FeaturedVideoResponse response) {
+    return VideoResponse(
+      id: response.id,
+      title: response.title,
+      categoryId: response.category?.id,
+      categoryTitle: response.category?.title,
+      duration: response.duration,
+      uniqueId: response.uniqueId,
+      videoType: ResourceType.free,
+      bookmarked: response.bookmarked,
+      thumbnailImageUrlSrc: response.thumbnailImageUrlSrc,
+      videoUrlSrc: response.videoUrl,
+      image: response.image,
+      video: response.video,
+    );
+  }
 }

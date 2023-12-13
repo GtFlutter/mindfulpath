@@ -86,4 +86,14 @@ class FeaturedVideosNotifier extends ChangeNotifier {
       showCustomSnackBar('Something went wrong');
     }
   }
+
+  void toggleBookmark(int itemId, {bool notifier = true}) {
+    if (_data == null || _data!.list == null) {
+      return;
+    }
+    var itemIndex = _data!.list!.indexWhere((element) => element.id == itemId);
+    if (itemIndex == -1) return;
+    _data!.list![itemIndex].bookmarked = !(_data!.list![itemIndex].bookmarked ?? true);
+    if (notifier) notifyListeners();
+  }
 }

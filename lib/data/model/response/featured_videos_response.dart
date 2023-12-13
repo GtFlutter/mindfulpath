@@ -87,7 +87,7 @@ class FeaturedVideoResponse {
   // int can_view_free_user;
 
   @JsonKey(name: 'is_bookmark')
-  final bool? bookmarked;
+  bool? bookmarked;
 
   /// insted of using Below Field [thumbnailImageUrlSrc] use [imgUrl] getter
   @JsonKey(name: 'thumbnail_image_url')
@@ -108,7 +108,7 @@ class FeaturedVideoResponse {
   @JsonKey(name: 'category', fromJson: CategoryListResponse.fromJson)
   final CategoryListResponse? category;
 
-  const FeaturedVideoResponse({
+  FeaturedVideoResponse({
     required this.id,
     required this.title,
     required this.duration,

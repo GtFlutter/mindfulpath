@@ -30,7 +30,7 @@ class _DiscoverLayoutState extends ConsumerState<DiscoverListWidget> {
     if (dashboardNotifier.isLoading || dashboardNotifier.categoryListResponse == null) {
       return SizedBox(
         width: double.infinity,
-        height: size.shortestSide,
+        height: size.height,
         child: const Center(
           child: CircularProgressIndicator(),
         ),

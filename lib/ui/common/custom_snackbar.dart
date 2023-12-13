@@ -3,9 +3,12 @@ import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/theme/text_style.dart';
 
 /// [type]   true = Sucsses, false = Error and for null = Normal
+/// Default const Duration(seconds: 3)
 void showCustomSnackBar(
   String message, {
   bool? type,
+  SnackBarAction? action,
+  Duration? duration,
 }) {
   BuildContext? context = rootNavigator.currentContext;
   if (context != null && context.mounted) {
@@ -22,9 +25,10 @@ void showCustomSnackBar(
                         ? Colors.green.shade900
                         : Colors.red.shade900),
           ),
-          duration: const Duration(seconds: 3),
+          duration: duration ?? const Duration(seconds: 3),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           behavior: SnackBarBehavior.floating,
+          action: action,
         ),
       );
   }

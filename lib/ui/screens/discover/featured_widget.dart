@@ -5,11 +5,11 @@ import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.
 
 import '../../../provider/featured_videos_provider.dart';
 import '../../../theme/styles.dart';
-import '../../common/horizontal_video_list.dart';
+import '../../common/feature_video_list.dart';
 import 'widget/discover_header.dart';
 
-class FeaturedListWidget extends ConsumerStatefulWidget {
-  const FeaturedListWidget({super.key, required this.style, required this.clipper});
+class FeaturedWidget extends ConsumerStatefulWidget {
+  const FeaturedWidget({super.key, required this.style, required this.clipper});
 
   final AppStyle style;
   final DashboardCustomImageClipper clipper;
@@ -18,7 +18,7 @@ class FeaturedListWidget extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _FeaturedListWidgetState();
 }
 
-class _FeaturedListWidgetState extends ConsumerState<FeaturedListWidget> {
+class _FeaturedListWidgetState extends ConsumerState<FeaturedWidget> {
   final ScrollController _scrollController = ScrollController();
   final Axis scrollDirection = Axis.horizontal;
 
@@ -70,7 +70,7 @@ class _FeaturedListWidgetState extends ConsumerState<FeaturedListWidget> {
               scrollController: _scrollController,
               totalSize: provider.data!.total,
               offset: provider.data!.currentPage,
-              itemView: HorizontalVideoList(
+              itemView: FeatureVideoList.horizontal(
                 key: const ValueKey<String>('rlw-hvl-1'),
                 provider.data!.list!,
                 style: widget.style,
