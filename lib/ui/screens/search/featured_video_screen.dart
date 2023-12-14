@@ -12,14 +12,14 @@ import '../../../util/assets.dart';
 import '../../common/feature_video_list.dart';
 import '../discover/widget/discover_header.dart';
 
-class FeaturedSearchScreen extends StatefulWidget {
-  const FeaturedSearchScreen({super.key});
+class FeaturedVideoScreen extends StatefulWidget {
+  const FeaturedVideoScreen({super.key});
 
   @override
-  State<FeaturedSearchScreen> createState() => _FeaturedSearchScreenState();
+  State<FeaturedVideoScreen> createState() => _FeaturedVideoScreenState();
 }
 
-class _FeaturedSearchScreenState extends State<FeaturedSearchScreen> {
+class _FeaturedVideoScreenState extends State<FeaturedVideoScreen> {
   static AppStyle _style = AppStyle();
 
   @override

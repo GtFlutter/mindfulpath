@@ -14,7 +14,7 @@ class RoutePath {
 
   /// Search Screen
   static const String search = '/search';
-  static const String featuredSearchScreen = '/featured-search';
+  static const String featuredVideoScreen = '/featured-video';
 
   ///
   static const String libraryScreen = '/library';

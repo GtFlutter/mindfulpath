@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../body/resource_type.dart';
-import 'featured_videos_response.dart';
+import 'category_list_reponse.dart';
 import 'video_response_media.dart';
 
 part 'videos_response.g.dart';
@@ -60,7 +60,7 @@ class VideosResponse {
   @JsonKey(name: 'last_page')
   int? lastPage;
 
-  @JsonKey(name: 'video_list')
+  @JsonKey(name: 'list')
   final List<VideoResponse>? list;
 
   VideosResponse({
@@ -74,7 +74,7 @@ class VideosResponse {
   factory VideosResponse.fromJson(Map<String, dynamic> json) => _$VideosResponseFromJson(json);
 }
 
-@JsonSerializable(createToJson: false, explicitToJson: false)
+@JsonSerializable()
 class VideoResponse {
   final int? id;
   final String? title;
@@ -109,6 +109,9 @@ class VideoResponse {
   @JsonKey(name: 'video', includeFromJson: true)
   final MediaResponse? video;
 
+  @JsonKey(name: 'category', fromJson: CategoryListResponse.fromJson, toJson: categoryToJson)
+  final CategoryListResponse? category;
+
   /// No Use of below variable
   // int can_view_free_user;
 
@@ -125,27 +128,14 @@ class VideoResponse {
     required this.videoUrlSrc,
     required this.image,
     required this.video,
+    required this.category,
   });
 
   String? get imgUrl => thumbnailImageUrlSrc ?? image?.url;
   String? get videoUrl => videoUrlSrc ?? video?.url;
 
   factory VideoResponse.fromJson(Map<String, dynamic> json) => _$VideoResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$VideoResponseToJson(this);
 
-  factory VideoResponse.fromFeaturedVideoResponse(FeaturedVideoResponse response) {
-    return VideoResponse(
-      id: response.id,
-      title: response.title,
-      categoryId: response.category?.id,
-      categoryTitle: response.category?.title,
-      duration: response.duration,
-      uniqueId: response.uniqueId,
-      videoType: ResourceType.free,
-      bookmarked: response.bookmarked,
-      thumbnailImageUrlSrc: response.thumbnailImageUrlSrc,
-      videoUrlSrc: response.videoUrl,
-      image: response.image,
-      video: response.video,
-    );
-  }
+  static categoryToJson(CategoryListResponse? category) => category?.toJson();
 }

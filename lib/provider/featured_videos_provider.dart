@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
+import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/data/repositories/dashboard_repo.dart';
 import 'package:meditation_app/provider/repo_provider/dashboard_repo_provider.dart';
 
 import '../data/api/api_checker.dart';
-import '../data/model/response/featured_videos_response.dart';
+
 import '../ui/common/custom_snackbar.dart';
 
 final featuredVideosProvider = ChangeNotifierProvider<FeaturedVideosNotifier>((ref) {
@@ -21,8 +22,8 @@ class FeaturedVideosNotifier extends ChangeNotifier {
 
   FeaturedVideosNotifier(this.repo);
 
-  FeaturedVideosResponse? _data;
-  FeaturedVideosResponse? get data => _data;
+  VideosResponse? _data;
+  VideosResponse? get data => _data;
 
   bool _loading = false;
   bool get loading => _loading;
@@ -56,13 +57,13 @@ class FeaturedVideosNotifier extends ChangeNotifier {
         }
         if (offset == 1 || _data == null) {
           if (reload) _data = null;
-          _data = FeaturedVideosResponse.fromJson(json['data']);
+          _data = VideosResponse.fromJson(json['data']);
           if (!reload && offset == 1 && showProgress) {
             stopLoading(notifie: false);
           }
           notifyListeners();
         } else if (_data != null) {
-          var tempModel = FeaturedVideosResponse.fromJson(json['data']);
+          var tempModel = VideosResponse.fromJson(json['data']);
           _data!.total = tempModel.total;
           _data!.currentPage = tempModel.currentPage;
           _data!.lastPage = tempModel.lastPage;

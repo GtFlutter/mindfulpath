@@ -62,7 +62,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           Padding(
             padding: EdgeInsets.only(right: _style.scale * 9),
             child: IconButton(
-              onPressed: () => context.push(RoutePath.featuredSearchScreen),
+              onPressed: () => context.push(RoutePath.featuredVideoScreen),
               icon: SvgPicture.asset(
                 SvgPaths.search,
                 width: _style.scale * 20,

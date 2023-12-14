@@ -5,7 +5,7 @@ import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/helper/navigation.dart';
 
 import '../../data/model/body/resource_type.dart';
-import '../../data/model/response/featured_videos_response.dart';
+
 import '../../provider/bookmark_provider.dart';
 import '../../theme/styles.dart';
 import '../screens/category/widget/detail_item.dart';
@@ -15,7 +15,7 @@ import '../screens/discover/widget/featured_item_painter.dart';
 class FeatureVideoList extends ConsumerWidget {
   final AppStyle style;
   final DashboardCustomImageClipper? clipper;
-  final List<FeaturedVideoResponse> list;
+  final List<VideoResponse> list;
   final ScrollPhysics? physics;
   final Axis scrollDirection;
   final bool shrinkWrap;
@@ -83,7 +83,7 @@ class FeatureVideoList extends ConsumerWidget {
                   )
                 : DetailItem.video(
                     appStyle: style,
-                    model: VideoResponse.fromFeaturedVideoResponse(dataModel),
+                    model: dataModel,
                     index: '$index',
                     onToggleBookmark: () {
                       if (dataModel.id == null) return;

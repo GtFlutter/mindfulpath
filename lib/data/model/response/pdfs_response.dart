@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../body/resource_type.dart';
+import 'category_list_reponse.dart';
 import 'video_response_media.dart';
 
 part 'pdfs_response.g.dart';
@@ -46,7 +47,7 @@ class PdfsResponse {
   @JsonKey(name: 'last_page')
   int? lastPage;
 
-  @JsonKey(name: 'pdf_list')
+  @JsonKey(name: 'list')
   final List<PdfResponse>? list;
 
   PdfsResponse({
@@ -87,10 +88,14 @@ class PdfResponse {
   @JsonKey(name: 'pdf', includeFromJson: true)
   final MediaResponse? pdf;
 
+  @JsonKey(name: 'category', fromJson: CategoryListResponse.fromJson)
+  final CategoryListResponse? category;
+
   /// No Use of below variable
   // int can_view_free_user;
 
   const PdfResponse({
+    required this.category,
     required this.id,
     required this.title,
     required this.categoryId,

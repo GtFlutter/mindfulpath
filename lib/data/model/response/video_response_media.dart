@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'video_response_media.g.dart';
 
-@JsonSerializable(createToJson: false, explicitToJson: false)
+@JsonSerializable()
 class MediaResponse {
   final int? id;
   @JsonKey(name: 'type_id')
@@ -20,4 +20,5 @@ class MediaResponse {
     required this.url,
   });
   factory MediaResponse.fromJson(Map<String, dynamic> json) => _$MediaResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$MediaResponseToJson(this);
 }

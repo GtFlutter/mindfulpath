@@ -14,3 +14,12 @@ MediaResponse _$MediaResponseFromJson(Map<String, dynamic> json) =>
       type: json['type'] as String?,
       url: json['image_url'] as String?,
     );
+
+Map<String, dynamic> _$MediaResponseToJson(MediaResponse instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'type_id': instance.typeId,
+      'file_name': instance.fileName,
+      'type': instance.type,
+      'image_url': instance.url,
+    };
