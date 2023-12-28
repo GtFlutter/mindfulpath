@@ -3,11 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/common/custom_snackbar.dart';
+import 'package:meditation_app/ui/screens/search/util/query_time.dart';
 import 'package:meditation_app/ui/screens/search/widget/options_selection_sheet.dart';
 import 'package:meditation_app/ui/screens/search/widget/recent_search_result_list.dart';
 import 'package:meditation_app/ui/screens/search/widget/search_result_list.dart';
@@ -76,6 +77,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     _controller.moveCursorToEnd();
   }
 
+  final List<CategoryListResponse> _selectedCategories = [];
+  QueryTime? _selectedQueryTime;
+
   @override
   void dispose() {
     _focusNode.removeListener(focusNodeListener);
@@ -90,7 +94,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
-    // final dashboardNotifier = ref.watch<DashboardNotifier>(dashboardProvider);
+    final dashboardNotifier = ref.watch<DashboardNotifier>(dashboardProvider);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: BackgroundImage(
@@ -126,7 +130,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           if (text.isEmpty) {
                             return;
                           }
-                          showCustomSnackBar(text);
+                          dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
                         },
                         style: _style.text.font(mulishMedium500, sizePx: 11, color: Colors.white, spacingPc: 10),
                         textAlignVertical: TextAlignVertical.top,
@@ -172,7 +176,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               Expanded(
                 child: showSearchResult
-                    ? SearchResultsList(style: _style)
+                    ? dashboardNotifier.isSearchLoading || dashboardNotifier.data == null ? Center(child: CircularProgressIndicator(),) : SearchResultsList(style: _style, model: dashboardNotifier.data!.list!,)
                     : RecentSearchResultList(
                         style: _style,
                         onRecentSearchTap: setSearchValue,
@@ -186,6 +190,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   void selectCategory() {
+    final dashboardNotifier = ref.watch(dashboardProvider);
     showModalBottomSheet(
       isScrollControlled: true,
       constraints: BoxConstraints(
@@ -202,11 +207,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
       clipBehavior: Clip.antiAlias,
       builder: (context) {
-        var items = ['Meditation', 'Diet', 'Nutrition', 'Exercise', 'Cancer prevention'];
         return OptionsSelectionSheet.multiSelect(
-          items: items,
-          selectedItems: ['Cancer prevention'],
+          categoryList: dashboardNotifier.categoryListResponse!,
+          selectedItems: [],
           title: 'Category',
+          onCategorySelect: (categories) {
+            if (context.mounted) _selectedCategories.addAll(categories);
+            debugPrint('Selected Categories :: $categories');
+          },
         );
       },
       context: context,
@@ -231,11 +239,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
       clipBehavior: Clip.antiAlias,
       builder: (context) {
-        var items = ['3 min', '5 min', '10 min', '15 min', '45 min', '60+ min'];
         return OptionsSelectionSheet.singleSelect(
-          items: items,
+          queryItems: QueryTime.toList,
           useGridLayout: true,
           title: 'Time',
+          onTimeSelect: (item) {
+            _selectedQueryTime = item;
+            if (context.mounted) setState(() {});
+            debugPrint('Selected Items :: $item');
+          },
         );
       },
       context: context,

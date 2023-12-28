@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/data/model/response/videos_response.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
+import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
 import '../../../../theme/styles.dart';
 
-class SearchResultsList extends StatelessWidget {
+class SearchResultsList extends ConsumerWidget {
   const SearchResultsList({
     super.key,
     required AppStyle style,
-  }) : _style = style;
+    required List<VideoResponse> model
+  }) : _style = style, _model = model;
 
   final AppStyle _style;
-
+  final List<VideoResponse> _model;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
@@ -20,24 +25,29 @@ class SearchResultsList extends StatelessWidget {
         top: _style.scale * 20,
       ),
       // itemCount: TempData.listDiModel.length,
-      itemCount: 2,
+      itemCount: _model.length,
       itemBuilder: (context, index) {
-        return const SizedBox.shrink();
+        // return const SizedBox.shrink();
 
         /// TODO : Workign On it
-        // return GestureDetector(
-        //   onTap: () {},
-        //   child: DetailItem(
-        //     appStyle: _style,
-        //     model: VideoListResponse(),
-        //     index: '$index',
-        //     onToggleBookmark: () {},
-        //   ),
-        // );
+        return GestureDetector(
+          onTap: () {},
+          child: DetailItem.video(
+            appStyle: _style,
+            model: _model[index],
+            index: '$index',
+            onToggleBookmark: () => toggleItemBookmark(ref, _model[index].id),
+          ),
+        );
       },
       separatorBuilder: (BuildContext context, int index) => SizedBox(
         height: _style.scaleX(25),
       ),
     );
+  }
+
+  void toggleItemBookmark(WidgetRef ref, int? itemId) {
+    if (itemId == null) return;
+    ref.read(bookmarkProvider).toggleBookmark(itemId);
   }
 }
