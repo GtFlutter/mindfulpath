@@ -22,7 +22,7 @@ class SearchResultsList extends StatelessWidget {
       // itemCount: TempData.listDiModel.length,
       itemCount: 2,
       itemBuilder: (context, index) {
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
 
         /// TODO : Workign On it
         // return GestureDetector(

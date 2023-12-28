@@ -173,7 +173,7 @@ class AnalyticsNotifier extends ChangeNotifier {
         throw Exception('Unable to fetch videoNamesList');
       }
     } catch (e) {
-      debugPrint('${e}');
+      debugPrint('$e');
       _stopLoading(notifie: false);
       _resetVideos(notifie: false);
       notifyListeners();
@@ -211,7 +211,7 @@ class AnalyticsNotifier extends ChangeNotifier {
         throw Exception('Unable to fetch result');
       }
     } catch (e) {
-      debugPrint('${e}');
+      debugPrint('$e');
       _result = null;
       _stopLoading(notifie: false);
       notifyListeners();

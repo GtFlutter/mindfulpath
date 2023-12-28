@@ -20,8 +20,7 @@
 ///     "image_url": "https://gurutechnolabs.co.in/website/laravel/meditation/public/video/Video_2_49607.mp4"
 ///   }
 /// },
-///
-///
+library;
 
 /// TODO: Working On it removbe this and create new for feature video list
 class VideoListResponse {

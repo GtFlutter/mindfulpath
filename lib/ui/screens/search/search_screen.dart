@@ -112,7 +112,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       SvgPaths.search,
                       height: _style.scale * 20,
                       fit: BoxFit.contain,
-                      color: Colors.white,
+                      colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                     SizedBox(width: _style.scaleX(14)),
                     Flexible(

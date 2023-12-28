@@ -63,7 +63,7 @@ class CustomDropDownButton<T> extends StatelessWidget {
                 SvgPaths.arrowDown,
                 width: appStyle.scaleX(17.5),
                 fit: BoxFit.fitWidth,
-                color: AppColors.primaryColor,
+                colorFilter: const ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
               ),
             ],
           ),

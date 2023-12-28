@@ -210,7 +210,12 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
     String name = _nameCtrl.text.trim();
     String email = _emailCtrl.text.trim();
     DateTime? dateOfBirth = _dateOfBirth;
-    String? gender = _gender == null ? null : _gender!.trim();
+    String? gender;
+    if (_gender == null) {
+      gender = null;
+    } else {
+      gender = _gender!.trim();
+    }
     String phoneNo = widget.phoneNo.trim();
     String password = widget.password.trim();
 

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
 import 'package:meditation_app/data/model/body/resource_type.dart';

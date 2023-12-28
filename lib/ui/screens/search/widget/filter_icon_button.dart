@@ -46,7 +46,7 @@ class FilterIconButton extends StatelessWidget {
               SvgPaths.arrowDown,
               width: _style.scaleX(15),
               fit: BoxFit.fitWidth,
-              color: AppColors.primaryColor,
+              colorFilter: const ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
             ),
           ],
         ),

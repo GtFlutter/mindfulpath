@@ -12,6 +12,7 @@
 ///     "video_url": "https://gurutechnolabs.co.in/website/laravel/meditation/public/video/Video_2_49607.mp4"
 ///   }
 /// }
+library;
 
 
 class BookmarkListResponse {

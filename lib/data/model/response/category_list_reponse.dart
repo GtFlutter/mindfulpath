@@ -10,6 +10,7 @@
 ///     "image_url": "https://gurutechnolabs.co.in/website/laravel/meditation/public/category_image/Category_1_95077.jpg"
 ///   }
 /// },
+library;
 
 class CategoryListResponse {
   final int? id;

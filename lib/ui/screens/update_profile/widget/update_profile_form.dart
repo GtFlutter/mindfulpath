@@ -52,7 +52,12 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
     String name = _nameCtrl.text.trim();
     String email = _emailCtrl.text.trim().toLowerCase();
     DateTime dateTime = _dateOfBirth;
-    String? gender = _gender == null ? null : _gender!.trim();
+    String? gender;
+    if (null == _gender) {
+      gender = null;
+    } else {
+      gender = _gender!.trim();
+    }
 
     if (name.isEmpty) {
       ref.read(userProvider).setNameError(error: 'Please enter a name');
