@@ -13,3 +13,14 @@ enum FilterDuration {
     ];
   }
 }
+
+enum ScreenTitles {
+  purchased('Purchased'),
+  downloaded('Downloaded'),
+  currentlyProgress('Currently Progress');
+
+  final String value;
+  const ScreenTitles(this.value);
+
+  static List<ScreenTitles> get toList => [purchased, downloaded, currentlyProgress];
+}

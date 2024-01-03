@@ -44,7 +44,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   @override
   void initState() {
-    debugPrint(' Video Init');
+    debugPrint(' Video Init :: ${widget.videoId}');
     super.initState();
     VideoPlayerController videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(widget.url),

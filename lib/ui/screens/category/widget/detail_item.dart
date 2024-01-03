@@ -44,13 +44,13 @@ class DIModel {
 
   factory DIModel.fromJson(dynamic json) {
     return DIModel(
-      videoId: json('video_id') as int,
-      videoUrl: json('video_url') as String,
-      thumbnailUrl: json('thumbnail_url') as String,
-      duration: json('duration') as String,
-      title: json('title') as String,
-      categoryName: json('category_name') as String,
-      videoType: ResourceType.fromJson(json('video_type') as int)!,
+      videoId: json['video_id'] as int,
+      videoUrl: json['video_url'] as String,
+      thumbnailUrl: json['thumbnail_url'] as String,
+      duration: json['duration'] as String,
+      title: json['title'] as String,
+      categoryName: json['category_name'] as String,
+      videoType: ResourceType.fromJson(json['video_type'] as int)!,
     );
   }
 

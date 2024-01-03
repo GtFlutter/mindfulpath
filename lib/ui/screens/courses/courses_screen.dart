@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 
 import '../../../theme/styles.dart';
 import '../../../theme/text_style.dart';
@@ -15,11 +16,7 @@ class CoursesScreen extends StatefulWidget {
 }
 
 class _CoursesScreenState extends State<CoursesScreen> {
-  List<String> list = [
-    'Purchased',
-    'Downloaded',
-    'Currently Progress',
-  ];
+
   static AppStyle _style = AppStyle();
 
   @override
@@ -38,13 +35,13 @@ class _CoursesScreenState extends State<CoursesScreen> {
           child: ListView.separated(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            itemCount: list.length,
+            itemCount: ScreenTitles.toList.length,
             itemBuilder: (context, index) {
               return CoursesItem(
-                title: list[index],
+                title: ScreenTitles.toList[index].value,
                 style: _style,
                 onTap: () {
-                  context.go(RoutePath.coursesListScreenPath, extra: list[index]);
+                  context.go(RoutePath.coursesListScreenPath, extra: ScreenTitles.toList[index].value);
                 },
               );
             },

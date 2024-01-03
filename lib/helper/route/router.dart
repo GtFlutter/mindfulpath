@@ -224,7 +224,7 @@ final appRouter = GoRouter(
                     return DetailCategoryScreen(
                       key: state.pageKey,
                       categoryListResponse: category,
-                      intialVideo: video,
+                      initialVideo: video,
                     );
                   }
                   return const WentWrongScreen();

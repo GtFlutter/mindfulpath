@@ -6,10 +6,9 @@ import '../../../../../theme/text_style.dart';
 
 class CITempModel {
   final String title;
-  final String subTitle;
   final String imgUrl;
 
-  CITempModel(this.title, this.subTitle, this.imgUrl);
+  CITempModel(this.title, this.imgUrl);
 }
 
 class CourseItem extends StatelessWidget {
@@ -63,12 +62,6 @@ class CourseItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Spacer(flex: 2),
-                  Text(
-                    model.subTitle,
-                    style: style.text.font(mulishRegular400, sizePx: 10, color: Colors.white),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
                   Text(
                     model.title,
                     style: style.text.font(mulishBold700, sizePx: 15, color: Colors.white),

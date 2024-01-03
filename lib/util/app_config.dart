@@ -51,6 +51,10 @@ class AppConfigs {
   static const String getCategoryNames = '/get-category-name';
   static const String getVideoNames = '/get-video-name';
 
+
+  static const String getPurchaseList = '/get-purchase-list';
+  static const String getCurrentlyProgressList = '/get-currently-progress';
+
   /// END [API_CONFIG]
 
   /// START [LOCAL_KEY]

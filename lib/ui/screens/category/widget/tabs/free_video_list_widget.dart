@@ -94,7 +94,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
               duration: model.duration ?? '',
               title: model.title ?? '',
               categoryName: widget.category.title ?? '',
-              videoId: model.video!.id!,
+              videoId: model.id!,
               videoType: model.videoType ?? ResourceType.paid,
             ),
           ),

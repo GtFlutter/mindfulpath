@@ -18,11 +18,11 @@ import 'widget/intro_widget.dart';
 
 class DetailCategoryScreen extends ConsumerStatefulWidget {
   final CategoryListResponse categoryListResponse;
-  final DIModel? intialVideo;
+  final DIModel? initialVideo;
   const DetailCategoryScreen({
     super.key,
     required this.categoryListResponse,
-    required this.intialVideo,
+    required this.initialVideo,
   });
 
   @override
@@ -39,10 +39,10 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
       Duration.zero,
       () {
         ref.read(videoProvider).reinit(
-              widget.intialVideo != null
+              widget.initialVideo != null
                   ? DetailedVideoModel(
                       category: widget.categoryListResponse,
-                      video: widget.intialVideo!,
+                      video: widget.initialVideo!,
                     )
                   : null,
             );

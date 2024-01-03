@@ -24,8 +24,8 @@ class DetailedVideoModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['category'] = video.toJson();
-    data['video'] = category.toJson();
+    data['category'] = category.toJson();
+    data['video'] = video.toJson();
     return data;
   }
 
@@ -66,6 +66,7 @@ class RecentVideosNotifier extends ChangeNotifier {
   List<DetailedVideoModel> get list => _list;
 
   void addRecentVideo(DetailedVideoModel video) async {
+    debugPrint('Video Details Model :: ${video.toJson()}');
     _list.removeWhere((element) => element.videoId == video.videoId);
     if (_list.length >= 10) {
       _list = _list.sublist(_list.length - 9);

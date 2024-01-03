@@ -16,15 +16,21 @@ class CategoryListResponse {
   final int? id;
   final String? title;
   final String? buttonTitle;
+  final String? price;
+  final String? createdAt;
+  final String? updatedAt;
   final CategoryImageResponse? imageResponse;
 
-  const CategoryListResponse({this.id, this.title, this.buttonTitle, this.imageResponse});
+  const CategoryListResponse({this.id, this.title, this.buttonTitle, this.price, this.createdAt, this.updatedAt, this.imageResponse});
 
   factory CategoryListResponse.fromJson(dynamic json) {
     return CategoryListResponse(
       id: json['id'],
       title: json['title'],
       buttonTitle: json['button_title'],
+      price: json['price'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
       imageResponse: json['image'] != null ? CategoryImageResponse.fromJson(json['image']) : null,
     );
   }
