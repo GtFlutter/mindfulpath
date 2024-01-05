@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
+import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../../../data/model/body/resource_type.dart';
 import '../../../../../data/model/response/category_list_reponse.dart';
@@ -26,7 +27,12 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () => ref.read(paidVideosProvider).fetchVideos(widget.category.id!));
+    Future.delayed(Duration.zero, () {
+      if (!(widget.category.isPurchased!)) {
+        buyNow();
+      }
+      ref.read(paidVideosProvider).fetchVideos(widget.category.id!);
+    });
     super.initState();
   }
 
@@ -66,7 +72,13 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
         var model = provider.videosResponse!.list![index];
 
         return GestureDetector(
-          onTap: () => playVideo(model),
+          onTap: () {
+            if (widget.category.isPurchased!) {
+              playVideo(model);
+            } else {
+              buyNow();
+            }
+          },
           child: DetailItem.video(
             appStyle: _style,
             model: model,
@@ -103,4 +115,22 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
   @override
   bool get wantKeepAlive => true;
+
+  void buyNow() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (c) {
+        Size size = MediaQuery.of(c).size;
+        AppStyle style = AppStyle(screenSize: size);
+        return ProviderScope(
+          parent: ProviderScope.containerOf(context),
+          child: Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
+            child: BuyNowDialog(style, widget.category.id.toString()),
+          ),
+        );
+      },
+    );
+  }
 }

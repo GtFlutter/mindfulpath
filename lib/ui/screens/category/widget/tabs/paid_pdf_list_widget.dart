@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/navigation.dart';
 import 'package:meditation_app/provider/resource_provider/paid_pdfs_provider.dart';
+import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../theme/styles.dart';
@@ -22,7 +23,13 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () => ref.read(paidPdfsProvider).fetchPdfs(widget.category.id!));
+
+    Future.delayed(Duration.zero, () {
+      if (!(widget.category.isPurchased!)) {
+        buyNow();
+      }
+      ref.read(paidPdfsProvider).fetchPdfs(widget.category.id!);
+    });
     super.initState();
   }
 
@@ -62,7 +69,13 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
         var model = provider.pdfsResponse!.list![index];
 
         return GestureDetector(
-          onTap: () => viewPdf(model.pdfUrl),
+          onTap: () {
+            if (widget.category.isPurchased!) {
+              viewPdf(model.pdfUrl);
+            } else {
+              buyNow();
+            }
+          },
           child: DetailItem.pdf(
             appStyle: _style,
             title: model.title ?? '',
@@ -82,4 +95,22 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
   @override
   bool get wantKeepAlive => true;
+
+  void buyNow() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (c) {
+        Size size = MediaQuery.of(c).size;
+        AppStyle style = AppStyle(screenSize: size);
+        return ProviderScope(
+          parent: ProviderScope.containerOf(context),
+          child: Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
+            child: BuyNowDialog(style, widget.category.id.toString()),
+          ),
+        );
+      },
+    );
+  }
 }

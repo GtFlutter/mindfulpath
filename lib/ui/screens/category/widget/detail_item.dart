@@ -67,7 +67,7 @@ class DIModel {
   }
 }
 
-class DetailItem extends ConsumerWidget {
+class DetailItem extends ConsumerStatefulWidget {
   final AppStyle appStyle;
   final VideoResponse? model;
   final String? title;
@@ -94,17 +94,37 @@ class DetailItem extends ConsumerWidget {
         onToggleBookmark = null;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    TextStyle textStyle = appStyle.text.font(mulishRegular400, sizePx: 9);
-    var radius = appStyle.scaleX(10);
-    var dimension = appStyle.scaleX(97);
-    bool isVideo = model != null;
-    var pdfIconSize = isVideo ? 0.0 : appStyle.scaleX(30);
+  ConsumerState<DetailItem> createState() => _DetailItemState();
+}
+
+class _DetailItemState extends ConsumerState<DetailItem> {
+
+  @override
+  void initState() {
+    final playlistP = ref.read(playListProvider);
+    Future.delayed(Duration.zero,() {
+      if (playlistP.playlistListResponse != null && playlistP.playlistListResponse!.isNotEmpty) {
+        playlistP.getPlaylistList();
+      }
+    },);
+    super.initState();
+  }
+
+@override
+  Widget build(BuildContext context) {
+    TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
+    var radius = widget.appStyle.scaleX(10);
+    var dimension = widget.appStyle.scaleX(97);
+    bool isVideo = widget.model != null;
+    var pdfIconSize = isVideo ? 0.0 : widget.appStyle.scaleX(30);
+
+    final playlistP = ref.watch(playListProvider);
+
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(appStyle.scaleX(10)),
+          borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10)),
         ),
       ),
       alignment: Alignment.center,
@@ -113,9 +133,9 @@ class DetailItem extends ConsumerWidget {
           children: [
             if (isVideo)
               MediaImageCard(
-                appStyle: appStyle,
-                imgUrl: model!.imgUrl ?? '',
-                duration: model!.duration!.toDuration,
+                appStyle: widget.appStyle,
+                imgUrl: widget.model!.imgUrl ?? '',
+                duration: widget.model!.duration!.toDuration,
                 imgRadius: radius,
                 imgSize: dimension,
               )
@@ -136,7 +156,7 @@ class DetailItem extends ConsumerWidget {
                   fit: BoxFit.contain,
                 ),
               ),
-            SizedBox(width: appStyle.scaleX(20)),
+            SizedBox(width: widget.appStyle.scaleX(20)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,29 +164,29 @@ class DetailItem extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    isVideo ? '${model!.title}' : title ?? '',
-                    style: appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                    isVideo ? '${widget.model!.title}' : widget.title ?? '',
+                    style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: appStyle.scaleX(12)),
+                  SizedBox(height: widget.appStyle.scaleX(12)),
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: appStyle.scaleX(10),
+                    spacing: widget.appStyle.scaleX(10),
                     children: [
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             '●',
-                            style: appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(width: appStyle.scaleX(5)),
+                          SizedBox(width: widget.appStyle.scaleX(5)),
                           Flexible(
                             child: Text(
-                              isVideo ? '${model!.categoryTitle}' : subTitle ?? '',
+                              isVideo ? '${widget.model!.categoryTitle}' : widget.subTitle ?? '',
                               style: textStyle.copyWith(color: AppColors.categoryNameColor),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -185,65 +205,84 @@ class DetailItem extends ConsumerWidget {
                 children: [
                   const Spacer(),
                   OutlinedIconButton.svg(
-                    model!.bookmarked != null && model!.bookmarked!
+                    widget.model!.bookmarked != null && widget.model!.bookmarked!
                         ? SvgPaths.bookmarkSelected
                         : SvgPaths.bookmarkUnselected,
-                    appStyle: appStyle,
+                    appStyle: widget.appStyle,
                     // svgIconSrc: SvgPaths.bookmarkSelected,
-                    onTap: onToggleBookmark,
+                    onTap: widget.onToggleBookmark,
                   ),
-                  // const Spacer(),
-                  PopupMenuButton(
-                    padding: EdgeInsets.zero,
-                    position: PopupMenuPosition.under,
-                    iconSize: 15,
-                    splashRadius: 1,
-                    tooltip: '',
-                    icon: OutlinedIconButton.svg(
-                      SvgPaths.addToPlaylist,
-                      appStyle: appStyle,
-                      onTap: null,
-                    ),
-                    constraints: BoxConstraints(maxWidth: appStyle.scaleX(200), maxHeight: appStyle.scaleX(204)),
-                    // onOpened: () async {
-                    //   await ref.read(playListProvider).getPlaylistList();
-                    // },
-                    color: AppColors.popupMenuItemColor,
-                    itemBuilder: (context) {
-                      final playlistP = ref.read(playListProvider);
-                      playlistP.getPlaylistList();
-                      return [
-                        PopupMenuItem(
-                          height: appStyle.scaleX(24),
-                          onTap: () {
-                            if (model!.video != null && model!.video!.id != null) {
-                              createPlaylist(context, videoId: model!.video?.id?.toString());
-                            }
-                          },
-                          child: Text(
-                            'Create Playlist',
-                            style: appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                          ),
+                  const Spacer(),
+                  MenuAnchor(
+                    menuChildren: [
+                      MenuItemButton(
+                        child: Text(
+                          'Download',
+                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                         ),
-                        if (playlistP.playlistListResponse != null) ...[
-                          ...List.generate(playlistP.playlistListResponse!.length, (index) {
-                            return PopupMenuItem(
-                              height: appStyle.scaleX(24),
-                              onTap: () {},
-                              child: Text(
-                                playlistP.playlistListResponse![index].title ?? '',
-                                style:
-                                    appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                              ),
-                            );
-                          })
-                        ]
-                      ];
+                        onPressed: () {},
+                      ),
+                      MenuItemButton(
+                        child: Text(
+                          'Create Playlist',
+                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                        ),
+                      ),
+                      SubmenuButton(
+                        menuChildren: [
+                          if (playlistP.playlistListResponse != null) ...[
+                            ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                              return PopupMenuItem(
+                                height: widget.appStyle.scaleX(24),
+                                onTap: () {},
+                                child: Text(
+                                  playlistP.playlistListResponse![index].title ?? '',
+                                  style:
+                                  widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                                ),
+                              );
+                            })
+                          ]
+                        ],
+                        menuStyle: const MenuStyle(
+                            padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                            backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                        ),
+                        style: SubmenuButton.styleFrom(
+                          backgroundColor: AppColors.popupMenuItemColor,
+                          surfaceTintColor: AppColors.popupMenuItemColor,
+                          iconColor: Colors.grey
+                        ),
+                        child: Text(
+                          'Add to Playlist',
+                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                        ),
+                      ),
+                    ],
+                    style: const MenuStyle(
+                      // padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                      backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                      visualDensity: VisualDensity(vertical: -4),
+                      surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                    ),
+                    builder: (context, controller, child) {
+                      return OutlinedIconButton.svg(
+                        SvgPaths.addToPlaylist,
+                        appStyle: widget.appStyle,
+                        onTap: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
+                          }
+                        },
+                      );
                     },
                   ),
+                  const Spacer(),
                 ],
               ),
-            SizedBox(width: appStyle.scaleX(10)),
+            SizedBox(width: widget.appStyle.scaleX(10)),
           ],
         ),
       ),
@@ -258,9 +297,9 @@ class DetailItem extends ConsumerWidget {
         return ProviderScope(
           parent: ProviderScope.containerOf(context, listen: false),
           child: Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(appStyle.scaleX(10))),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10))),
             child: CreatePlaylistDialog(
-              appStyle,
+              widget.appStyle,
               videoId: videoId,
             ),
           ),

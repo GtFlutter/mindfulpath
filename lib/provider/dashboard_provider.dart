@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/data/repositories/dashboard_repo.dart';
+import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/repo_provider/dashboard_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/search/util/query_time.dart';
@@ -104,5 +106,45 @@ class DashboardNotifier extends ChangeNotifier {
       debugPrint('Response Body :: ${response.body}');
     }
     stopSearchLoading();
+  }
+
+  bool _isPurchaseLoading = false;
+  bool get isPurchaseLoading => _isPurchaseLoading;
+
+  void startPurchaseLoading() {
+    if (!_isPurchaseLoading) {
+      _isPurchaseLoading = true;
+      notifyListeners();
+    }
+  }
+
+  void stopPurchaseLoading() {
+    if (_isPurchaseLoading) {
+      _isPurchaseLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> purchaseCategory(String categoryId) async {
+    startPurchaseLoading();
+    Response response = await repo.purchaseCategory(categoryId);
+    if (response.statusCode != 200) {
+      stopPurchaseLoading();
+      BuildContext? context = rootNavigator.currentContext;
+      if (context != null && context.mounted) {
+        context.pop();
+      }
+      ApiChecker.checkApi(response);
+      return false;
+    } else {
+      getCategoryList();
+      BuildContext? context = rootNavigator.currentContext;
+      if (context != null && context.mounted) {
+        context.pop();
+      }
+      showCustomSnackBar('Category Purchase Successfully', type: true);
+      stopPurchaseLoading();
+      return true;
+    }
   }
 }

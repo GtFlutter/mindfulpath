@@ -36,7 +36,8 @@ class AppConfigs {
   static const String storeWatchedVideoDuration = '/store-watched-video-duration';
   static const String getFeatureVideoList = '/get-featured-video-list';
   static const String searchVideos = '/search-video';
-  
+  static const String purchaseSubscription = '/purchase-subscription';
+
 
   static const String getBookmarks = '/get-bookmark-list';
   static const String toggleBookmark = '/add-to-bookmark';

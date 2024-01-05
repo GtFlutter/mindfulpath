@@ -71,4 +71,8 @@ class DashboardRepo {
       'perPage': AppConstants.kPerPage * 5,
     });
   }
+
+  Future<Response> purchaseCategory(String categoryId) async {
+    return await apiClient.postData(AppConfigs.purchaseSubscription, {'category_id': categoryId});
+  }
 }
