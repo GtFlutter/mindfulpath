@@ -137,10 +137,9 @@ class DashboardNotifier extends ChangeNotifier {
       ApiChecker.checkApi(response);
       return false;
     } else {
-      getCategoryList();
       BuildContext? context = rootNavigator.currentContext;
       if (context != null && context.mounted) {
-        context.pop();
+        context.pop(true);
       }
       showCustomSnackBar('Category Purchase Successfully', type: true);
       stopPurchaseLoading();

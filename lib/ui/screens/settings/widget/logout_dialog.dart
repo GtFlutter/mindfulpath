@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
+import 'package:meditation_app/provider/resource_provider/paid_videos_provider.dart';
 
 import '../../../../provider/auth_provider.dart';
 import '../../../../theme/styles.dart';
@@ -67,7 +68,7 @@ class LogoutDialog extends ConsumerWidget {
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
                             padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
                           ),
-                          child: Text(authP.isLoading ? 'Loging out..' : 'Log out'),
+                          child: Text(authP.isLoading ? 'Logging out..' : 'Log out'),
                         ),
                       ),
                     ],
@@ -150,7 +151,10 @@ class BuyNowDialog extends ConsumerWidget {
                       SizedBox(width: style.scaleX(21)),
                       Expanded(
                         child: FilledButton(
-                          onPressed: dashboardP.isPurchaseLoading ? null : () => dashboardP.purchaseCategory(categoryId),
+                          onPressed: dashboardP.isPurchaseLoading ? null : () async {
+                            bool result = await dashboardP.purchaseCategory(categoryId);
+                            if (result) ref.read(paidVideosProvider).fetchVideos(int.parse(categoryId));
+                          },
                           style: FilledButton.styleFrom(
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
                             padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),

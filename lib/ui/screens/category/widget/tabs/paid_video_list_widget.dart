@@ -73,7 +73,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
         return GestureDetector(
           onTap: () {
-            if (widget.category.isPurchased!) {
+            if (provider.videosResponse!.list![index].category!.isPurchased!) {
               playVideo(model);
             } else {
               buyNow();
