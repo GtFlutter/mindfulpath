@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/helper/download_helper.dart';
+import 'package:meditation_app/helper/path_helper.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
 
 import '../../../../data/model/body/resource_type.dart';
@@ -98,6 +103,10 @@ class DetailItem extends ConsumerStatefulWidget {
 }
 
 class _DetailItemState extends ConsumerState<DetailItem> {
+
+  bool _isDownloading = false;
+
+  double _progress = 0.0;
 
   @override
   void initState() {
@@ -213,72 +222,84 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                     onTap: widget.onToggleBookmark,
                   ),
                   const Spacer(),
-                  MenuAnchor(
-                    menuChildren: [
-                      MenuItemButton(
-                        child: Text(
-                          'Download',
-                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                        ),
-                        onPressed: () {},
+                  if (_isDownloading)...[
+                    SizedBox(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator(
+                        strokeCap: StrokeCap.butt,
+                        strokeWidth: 2,
+                        value: _progress,
                       ),
-                      MenuItemButton(
-                        child: Text(
-                          'Create Playlist',
-                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                    ),
+                  ] else...[
+                    MenuAnchor(
+                      menuChildren: [
+                        MenuItemButton(
+                          child: Text(
+                            'Download',
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                          ),
+                          onPressed: () => _download(),
                         ),
-                      ),
-                      SubmenuButton(
-                        menuChildren: [
-                          if (playlistP.playlistListResponse != null) ...[
-                            ...List.generate(playlistP.playlistListResponse!.length, (index) {
-                              return PopupMenuItem(
-                                height: widget.appStyle.scaleX(24),
-                                onTap: () {},
-                                child: Text(
-                                  playlistP.playlistListResponse![index].title ?? '',
-                                  style:
-                                  widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                                ),
-                              );
-                            })
-                          ]
-                        ],
-                        menuStyle: const MenuStyle(
+                        MenuItemButton(
+                          child: Text(
+                            'Create Playlist',
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                          ),
+                        ),
+                        SubmenuButton(
+                          menuChildren: [
+                            if (playlistP.playlistListResponse != null) ...[
+                              ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                                return PopupMenuItem(
+                                  height: widget.appStyle.scaleX(24),
+                                  onTap: () {},
+                                  child: Text(
+                                    playlistP.playlistListResponse![index].title ?? '',
+                                    style:
+                                    widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                                  ),
+                                );
+                              })
+                            ]
+                          ],
+                          menuStyle: const MenuStyle(
                             padding: MaterialStatePropertyAll(EdgeInsets.zero),
                             backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                          ),
+                          style: SubmenuButton.styleFrom(
+                              backgroundColor: AppColors.popupMenuItemColor,
+                              surfaceTintColor: AppColors.popupMenuItemColor,
+                              iconColor: Colors.grey
+                          ),
+                          child: Text(
+                            'Add to Playlist',
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                          ),
                         ),
-                        style: SubmenuButton.styleFrom(
-                          backgroundColor: AppColors.popupMenuItemColor,
-                          surfaceTintColor: AppColors.popupMenuItemColor,
-                          iconColor: Colors.grey
-                        ),
-                        child: Text(
-                          'Add to Playlist',
-                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                        ),
+                      ],
+                      style: const MenuStyle(
+                        // padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                        backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                        visualDensity: VisualDensity(vertical: -4),
+                        surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
                       ),
-                    ],
-                    style: const MenuStyle(
-                      // padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                      backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
-                      visualDensity: VisualDensity(vertical: -4),
-                      surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                      builder: (context, controller, child) {
+                        return OutlinedIconButton.svg(
+                          SvgPaths.addToPlaylist,
+                          appStyle: widget.appStyle,
+                          onTap: () {
+                            if (controller.isOpen) {
+                              controller.close();
+                            } else {
+                              controller.open();
+                            }
+                          },
+                        );
+                      },
                     ),
-                    builder: (context, controller, child) {
-                      return OutlinedIconButton.svg(
-                        SvgPaths.addToPlaylist,
-                        appStyle: widget.appStyle,
-                        onTap: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                      );
-                    },
-                  ),
+                  ],
                   const Spacer(),
                 ],
               ),
@@ -306,5 +327,45 @@ class _DetailItemState extends ConsumerState<DetailItem> {
         );
       },
     );
+  }
+
+  void _download() async {
+    await checkDirectory();
+    String path = await PathHelper.getDownloadDirectoryPath();
+    debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
+    bool result = await PathHelper.fileExists('$path/${widget.model!.video!.fileName!}');
+    if (result) {
+      debugPrint('True');
+      showCustomSnackBar('File Already Exists', type: true);
+    } else {
+      debugPrint('False');
+        widget.model!.videoUrl!,
+        '$path/${widget.model!.video!.fileName!}',
+        onReceiveProgress: (count, total) {
+          debugPrint('Count :: $count');
+          debugPrint('Total :: $total');
+          if (total != -1) {
+            _progress = ((count / total * 100).roundToDouble())/100;
+            if (!_isDownloading) _isDownloading = true;
+            if (_progress == 100.0) {
+              if (_isDownloading) _isDownloading = false;
+            }
+            if (context.mounted) setState(() {});
+            debugPrint("Total Progress :: ${(count / total * 100).toStringAsFixed(0)}%");
+            debugPrint("Total Progress 1 :: $_progress%");
+          }
+        },
+      );
+    }
+  }
+
+  Future<void> checkDirectory() async {
+    String path = await PathHelper.getDownloadDirectoryPath();
+    debugPrint('Path :: $path');
+    bool result = await PathHelper.directoryExits(path);
+    if (!result) {
+      Directory directory = await PathHelper.createDirectory(path, recursive: true);
+      debugPrint('Directory Path :: ${directory.path}');
+    }
   }
 }
