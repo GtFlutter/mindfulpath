@@ -29,7 +29,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
   void initState() {
     Future.delayed(Duration.zero, () {
       if (!(widget.category.isPurchased!)) {
-        buyNow();
+        buyNow(context, categoryId: widget.category.id.toString());
       }
       ref.read(paidVideosProvider).fetchVideos(widget.category.id!);
     });
@@ -73,10 +73,10 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
         return GestureDetector(
           onTap: () {
-            if (provider.videosResponse!.list![index].category!.isPurchased!) {
+            if (model.category!.isPurchased!) {
               playVideo(model);
             } else {
-              buyNow();
+              buyNow(context, categoryId: widget.category.id.toString());
             }
           },
           child: DetailItem.video(
@@ -115,22 +115,4 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
   @override
   bool get wantKeepAlive => true;
-
-  void buyNow() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (c) {
-        Size size = MediaQuery.of(c).size;
-        AppStyle style = AppStyle(screenSize: size);
-        return ProviderScope(
-          parent: ProviderScope.containerOf(context),
-          child: Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
-            child: BuyNowDialog(style, widget.category.id.toString()),
-          ),
-        );
-      },
-    );
-  }
 }

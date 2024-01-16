@@ -94,6 +94,25 @@ class LogoutDialog extends ConsumerWidget {
   }
 }
 
+
+void buyNow(BuildContext context,{required String categoryId}) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (c) {
+      Size size = MediaQuery.of(c).size;
+      AppStyle style = AppStyle(screenSize: size);
+      return ProviderScope(
+        parent: ProviderScope.containerOf(context),
+        child: Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
+          child: BuyNowDialog(style, categoryId),
+        ),
+      );
+    },
+  );
+}
+
 class BuyNowDialog extends ConsumerWidget {
   const BuyNowDialog(this.style, this.categoryId, {super.key});
 

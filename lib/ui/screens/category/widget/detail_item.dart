@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/download_helper.dart';
 import 'package:meditation_app/helper/path_helper.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
+import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../../data/model/body/resource_type.dart';
 import '../../../../data/model/response/videos_response.dart';
@@ -330,6 +334,23 @@ class _DetailItemState extends ConsumerState<DetailItem> {
   }
 
   void _download() async {
+    if (!ref.read(authProvider).isUserLoggedIn) {
+      showCustomSnackBar(
+        'Please log in to bookmark.',
+        action: SnackBarAction(
+          label: 'Log In',
+          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+          textColor: Colors.brown.shade800,
+          onPressed: () => appRouter.go(RoutePath.signIn),
+        ),
+        duration: const Duration(seconds: 5),
+      );
+      return;
+    }
+    if (!widget.model!.category!.isPurchased!) {
+      buyNow(context, categoryId: widget.model!.category!.id.toString());
+      return;
+    }
     await checkDirectory();
     String path = await PathHelper.getDownloadDirectoryPath();
     debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
@@ -339,6 +360,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
       showCustomSnackBar('File Already Exists', type: true);
     } else {
       debugPrint('False');
+      await DownloadHelper.instance.download(
         widget.model!.videoUrl!,
         '$path/${widget.model!.video!.fileName!}',
         onReceiveProgress: (count, total) {

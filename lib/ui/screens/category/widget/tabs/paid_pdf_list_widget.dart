@@ -26,7 +26,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
     Future.delayed(Duration.zero, () {
       if (!(widget.category.isPurchased!)) {
-        buyNow();
+        buyNow(context, categoryId: widget.category.id.toString());
       }
       ref.read(paidPdfsProvider).fetchPdfs(widget.category.id!);
     });
@@ -73,7 +73,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
             if (widget.category.isPurchased!) {
               viewPdf(model.pdfUrl);
             } else {
-              buyNow();
+              buyNow(context, categoryId: widget.category.id.toString());
             }
           },
           child: DetailItem.pdf(
@@ -95,22 +95,4 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
   @override
   bool get wantKeepAlive => true;
-
-  void buyNow() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (c) {
-        Size size = MediaQuery.of(c).size;
-        AppStyle style = AppStyle(screenSize: size);
-        return ProviderScope(
-          parent: ProviderScope.containerOf(context),
-          child: Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
-            child: BuyNowDialog(style, widget.category.id.toString()),
-          ),
-        );
-      },
-    );
-  }
 }
