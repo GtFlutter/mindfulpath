@@ -371,9 +371,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
             if (!_isDownloading) _isDownloading = true;
             if (_progress == 100.0) {
               if (_isDownloading) _isDownloading = false;
+
             }
             if (context.mounted) setState(() {});
-            debugPrint("Total Progress :: ${(count / total * 100).toStringAsFixed(0)}%");
             debugPrint("Total Progress 1 :: $_progress%");
           }
         },
