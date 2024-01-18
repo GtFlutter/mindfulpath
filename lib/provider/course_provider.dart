@@ -6,19 +6,22 @@ import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/model/response/purchased_video_response.dart';
 import 'package:meditation_app/data/repositories/course_repo.dart';
+import 'package:meditation_app/database/database_helper.dart';
+import 'package:meditation_app/database/database_model.dart';
 import 'package:meditation_app/provider/repo_provider/course_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
 
 final courseProvider = ChangeNotifierProvider<CourseNotifier>((ref) {
   final repo = ref.watch(courseRepoProvider);
-  return CourseNotifier(repo);
+  return CourseNotifier(ref, repo);
 });
 
 class CourseNotifier extends ChangeNotifier {
 
   final CourseRepo repo;
-  CourseNotifier(this.repo);
+  final ChangeNotifierProviderRef<CourseNotifier> ref;
+  CourseNotifier(this.ref, this.repo);
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -79,6 +82,26 @@ class CourseNotifier extends ChangeNotifier {
         _stopLoading();
       }
     }
+  }
+
+  List<CategoryModal> _downloadResponse = [];
+  List<CategoryModal> get downloadResponse => _downloadResponse;
+
+  Future<void> getCategoryFromDatabase() async {
+    _startLoading();
+    List<CategoryModal> list = await ref.read(databaseProvider).getCategory();
+    _downloadResponse = list;
+    _stopLoading();
+  }
+
+  List<VideoModal> _downloadVideoResponse = [];
+  List<VideoModal> get downloadVideoResponse => _downloadVideoResponse;
+
+  Future<void> getVideoFromDatabase(int categoryId) async {
+    _startLoading();
+    List<VideoModal> list = await ref.read(databaseProvider).getVideo(categoryId);
+    _downloadVideoResponse = list;
+    _stopLoading();
   }
 
 }

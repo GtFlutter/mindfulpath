@@ -9,7 +9,7 @@ class DatabaseConsts {
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "category_id" TEXT,
       "category_name" TEXT,
-      "category_image" TEXT,
+      "category_image" TEXT
     );''',
 
     '''CREATE TABLE $videoTable (
@@ -17,9 +17,8 @@ class DatabaseConsts {
       "video_id" TEXT,
       "video_name" TEXT,
       "video_file" TEXT,
-      "category_id" INTEGER NOT NULL,
-      FOREIGN KEY (category_id) 
-        REFERENCES $categoryTable(id)
+      "video_duration" TEXT,
+      "category_id" TEXT
     );'''
   ];
 }

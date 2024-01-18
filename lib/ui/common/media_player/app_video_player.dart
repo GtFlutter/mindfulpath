@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
   final AppStyle style;
   final bool isLandscape;
   final VoidCallback? onBackPress;
+  final bool isFileUrl;
 
   const AppVideoPlayer({
     super.key,
@@ -26,6 +28,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
     this.onBackPress,
     required this.isLandscape,
     required this.videoId,
+    this.isFileUrl = false,
   });
 
   @override
@@ -46,9 +49,12 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   void initState() {
     debugPrint(' Video Init :: ${widget.videoId}');
     super.initState();
-    VideoPlayerController videoPlayerController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.url),
-    );
+    VideoPlayerController videoPlayerController;
+    if (widget.isFileUrl) {
+      videoPlayerController = VideoPlayerController.file(File(widget.url),);
+    } else {
+      videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.url),);
+    }
     _controller = videoPlayerController
       ..initialize()
       ..setLooping(false).then(
@@ -79,13 +85,15 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       );
     }
     if (_controller.value.isPlaying) {
-      _watchTimer ??= Timer.periodic(_period, (timer) {
-        // _watchTimeInSeconds += _period; // Increment watch time
-        // Call API to update watch duration and video ID
-        if (!_isBuffering && _controller.value.isInitialized) {
-          ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
-        }
-      });
+      if (!widget.isFileUrl) {
+        _watchTimer ??= Timer.periodic(_period, (timer) {
+          // _watchTimeInSeconds += _period; // Increment watch time
+          // Call API to update watch duration and video ID
+          if (!_isBuffering && _controller.value.isInitialized) {
+            ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
+          }
+        });
+      }
     } else {
       _watchTimer?.cancel();
       _watchTimer = null;

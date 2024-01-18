@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/navigation.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
@@ -54,6 +56,10 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
       Future.delayed(Duration.zero,  () {
         courseP.getCurrentlyProgressList();
       });
+    } else {
+      Future.delayed(Duration.zero, () {
+        courseP.getCategoryFromDatabase();
+      },);
     }
     super.initState();
   }
@@ -87,7 +93,7 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
               maxCrossAxisExtent: maxWidth,
               childAspectRatio: maxWidth / maxHeight,
             ),
-            itemCount: isPurchased ? courseP.purchasedVideoResponse.length : isCurrentlyProgress ? courseP.cpVideoResponse.length : list.length,
+            itemCount: isPurchased ? courseP.purchasedVideoResponse.length : isCurrentlyProgress ? courseP.cpVideoResponse.length : courseP.downloadResponse.length,
             padding: EdgeInsets.fromLTRB(_style.scale * 25, _style.scaleX(20), _style.scale * 25, _style.scaleX(100)),
             itemBuilder: (context, index) {
               CITempModel item;
@@ -96,7 +102,7 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
               } else if (isCurrentlyProgress) {
                 item = CITempModel(courseP.cpVideoResponse[index].title ?? '', courseP.cpVideoResponse[index].categoryResponse!.imageResponse!.imageUrl ?? '');
               } else {
-                item = CITempModel(list[index].title, list[index].imgUrl);
+                item = CITempModel(courseP.downloadResponse[index].categoryName!, courseP.downloadResponse[index].categoryImage!);
               }
               return CourseItem(
                 model: item,
@@ -106,6 +112,8 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
                     context.goToDetailCategoryScreen(courseP.purchasedVideoResponse[index].categoryResponse!);
                   } else if (isCurrentlyProgress) {
                     context.goToDetailCategoryScreen(courseP.cpVideoResponse[index].categoryResponse!);
+                  } else {
+                    context.push(RoutePath.downloadDetailCategoryScreenPath, extra: courseP.downloadResponse[index]);
                   }
                 },
               );

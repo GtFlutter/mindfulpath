@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/database/database_helper.dart';
+import 'package:meditation_app/database/database_model.dart';
 import 'package:meditation_app/helper/download_helper.dart';
 import 'package:meditation_app/helper/path_helper.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
@@ -108,7 +110,7 @@ class DetailItem extends ConsumerStatefulWidget {
 
 class _DetailItemState extends ConsumerState<DetailItem> {
 
-  bool _isDownloading = false;
+  bool _isDownloading = false, _isDownloadComplete = false;
 
   double _progress = 0.0;
 
@@ -351,12 +353,13 @@ class _DetailItemState extends ConsumerState<DetailItem> {
       buyNow(context, categoryId: widget.model!.category!.id.toString());
       return;
     }
-    await checkDirectory();
+    await _checkDirectory();
     String path = await PathHelper.getDownloadDirectoryPath();
     debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
     bool result = await PathHelper.fileExists('$path/${widget.model!.video!.fileName!}');
     if (result) {
       debugPrint('True');
+      getSingleVideo('$path/${widget.model!.video!.fileName!}');
       showCustomSnackBar('File Already Exists', type: true);
     } else {
       debugPrint('False');
@@ -364,14 +367,17 @@ class _DetailItemState extends ConsumerState<DetailItem> {
         widget.model!.videoUrl!,
         '$path/${widget.model!.video!.fileName!}',
         onReceiveProgress: (count, total) {
-          debugPrint('Count :: $count');
-          debugPrint('Total :: $total');
+          debugPrint('Count :: $count --*-- Total :: $total');
           if (total != -1) {
             _progress = ((count / total * 100).roundToDouble())/100;
-            if (!_isDownloading) _isDownloading = true;
-            if (_progress == 100.0) {
-              if (_isDownloading) _isDownloading = false;
-
+            if (!_isDownloadComplete) if (!_isDownloading) _isDownloading = true;
+            if (_progress == 1.0) {
+              if (!_isDownloadComplete) {
+                _isDownloadComplete = true;
+                _isDownloading = false;
+                debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+                _saveCategoryAndVideo('$path/${widget.model!.video!.fileName!}');
+              }
             }
             if (context.mounted) setState(() {});
             debugPrint("Total Progress 1 :: $_progress%");
@@ -381,13 +387,42 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     }
   }
 
-  Future<void> checkDirectory() async {
+  Future<void> _checkDirectory() async {
     String path = await PathHelper.getDownloadDirectoryPath();
     debugPrint('Path :: $path');
     bool result = await PathHelper.directoryExits(path);
     if (!result) {
       Directory directory = await PathHelper.createDirectory(path, recursive: true);
       debugPrint('Directory Path :: ${directory.path}');
+    }
+  }
+
+  Future<void> getSingleVideo(String videoFile) async {
+    final dbHelper = ref.read(databaseProvider);
+    VideoModal? res = await dbHelper.getSingleVideo(widget.model!.id!.toString());
+    if (res == null) {
+      _saveCategoryAndVideo(videoFile);
+    }
+  }
+
+  Future<void> _saveCategoryAndVideo(String videoFile) async {
+    final dbHelper = ref.read(databaseProvider);
+    CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
+    if (res != null) {
+      VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
+      int vRes = await dbHelper.saveVideo(vModal);
+      if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
+    } else {
+      CategoryModal modal = CategoryModal(categoryId: widget.model!.categoryId!.toString(), categoryName: widget.model!.categoryTitle, categoryImage: widget.model!.category!.imageResponse!.imageUrl);
+      int cRes = await dbHelper.saveCategory(modal);
+      if (cRes == 1) {
+        CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
+        if (res != null) {
+          VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
+          int vRes = await dbHelper.saveVideo(vModal);
+          if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
+        }
+      }
     }
   }
 }

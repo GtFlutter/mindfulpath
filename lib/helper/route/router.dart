@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
+import 'package:meditation_app/database/database_model.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/ui/common/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/analytics_screen.dart';
@@ -10,6 +11,7 @@ import 'package:meditation_app/ui/screens/authentication/forgot_password_screen.
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/ui/screens/authentication/sign_in_up_screen.dart';
 import 'package:meditation_app/ui/screens/category/detail_category_screen.dart';
+import 'package:meditation_app/ui/screens/category/download_detail_category_screen.dart';
 import 'package:meditation_app/ui/screens/courses/courses_list_screen.dart';
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
 import 'package:meditation_app/ui/screens/search/featured_video_screen.dart';
@@ -226,6 +228,16 @@ final appRouter = GoRouter(
                       categoryListResponse: category,
                       initialVideo: video,
                     );
+                  }
+                  return const WentWrongScreen();
+                },
+              ),
+              GoRoute(
+                parentNavigatorKey: rootNavigator,
+                path: RoutePath.downloadDetailCategoryScreen,
+                builder: (context, state) {
+                  if (state.extra != null && state.extra is CategoryModal) {
+                    return DownloadDetailCategoryScreen(key: state.pageKey, categoryModal: state.extra as CategoryModal,);
                   }
                   return const WentWrongScreen();
                 },

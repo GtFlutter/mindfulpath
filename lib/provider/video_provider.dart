@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/route/router.dart';
+import 'package:meditation_app/ui/screens/category/widget/download_detail_item.dart';
 import '../data/model/body/resource_type.dart';
 import '../helper/route/route_paths.dart';
 import '../ui/common/custom_snackbar.dart';
@@ -18,7 +19,7 @@ class VideoNotifier extends ChangeNotifier {
   DIModel? _video;
   DIModel? get video => _video;
 
-  void reinit([DetailedVideoModel? detailedVideoModel]) {
+  void reInit([DetailedVideoModel? detailedVideoModel]) {
     if (detailedVideoModel == null) {
       return;
     }
@@ -51,5 +52,33 @@ class VideoNotifier extends ChangeNotifier {
   void clearVideo({bool notifie = true}) {
     _video = null;
     if (notifie) notifyListeners();
+  }
+}
+
+final offlineVideoProvider = ChangeNotifierProvider<OfflineVideoNotifier>((ref) => OfflineVideoNotifier());
+
+class OfflineVideoNotifier extends ChangeNotifier {
+  DDIModal? _video;
+  DDIModal? get video => _video;
+
+  void reInit([DDIModal? ddiModal]) {
+    if (ddiModal == null) {
+      return;
+    }
+    playVideo(ddiModal, forceToPlay: true);
+  }
+
+  void playVideo(DDIModal ddiModal, {bool notify = true, bool forceToPlay = false}) {
+
+    DDIModal? model = _video;
+    if ((model == null || model.videoId != ddiModal.videoId) || forceToPlay) {
+      _video = ddiModal;
+      if (notify) notifyListeners();
+    }
+  }
+
+  void clearVideo({bool notify = true}) {
+    _video = null;
+    if (notify) notifyListeners();
   }
 }

@@ -27,7 +27,9 @@ class RoutePath {
   static const String discoverScreen = '/discover';
   //  [detail-category]
   /*  */ static const String detailCategoryScreen = 'detail-category';
+  /*  */ static const String downloadDetailCategoryScreen = 'download-detail-category';
   /*  */ static const String detailCategoryScreenPath = '$discoverScreen/$detailCategoryScreen';
+  /*  */ static const String downloadDetailCategoryScreenPath = '$discoverScreen/$downloadDetailCategoryScreen';
   //  [Profile]
   /*  */ static const String profileScreen = 'profile';
   /*  */ static const String profileScreenPath = '$discoverScreen/$profileScreen';
