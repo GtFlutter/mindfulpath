@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/helper/route/router.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
+import 'package:meditation_app/theme/colors.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 
 import '../../../theme/styles.dart';
 import '../../../theme/text_style.dart';
 import '../../../util/assets.dart';
 
-class CoursesScreen extends StatefulWidget {
+class CoursesScreen extends ConsumerStatefulWidget {
   const CoursesScreen({super.key});
 
   @override
-  State<CoursesScreen> createState() => _CoursesScreenState();
+  ConsumerState<CoursesScreen> createState() => _CoursesScreenState();
 }
 
-class _CoursesScreenState extends State<CoursesScreen> {
+class _CoursesScreenState extends ConsumerState<CoursesScreen> {
 
   static AppStyle _style = AppStyle();
 
@@ -41,6 +46,20 @@ class _CoursesScreenState extends State<CoursesScreen> {
                 title: ScreenTitles.toList[index].value,
                 style: _style,
                 onTap: () {
+                  debugPrint('Is User Logged In :: ${ref.read(authProvider).isUserLoggedIn}');
+                  if (!ref.read(authProvider).isUserLoggedIn) {
+                    showCustomSnackBar(
+                      'Please log in to bookmark.',
+                      action: SnackBarAction(
+                        label: 'Log In',
+                        backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                        textColor: Colors.brown.shade800,
+                        onPressed: () => appRouter.go(RoutePath.signIn),
+                      ),
+                      duration: const Duration(seconds: 5),
+                    );
+                    return;
+                  }
                   context.go(RoutePath.coursesListScreenPath, extra: ScreenTitles.toList[index].value);
                 },
               );
