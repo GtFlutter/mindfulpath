@@ -230,19 +230,19 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
       }
       return;
     } else if (name.isEmpty) {
-      ref.read(userProvider).setNameError(error: 'Please enter a full name');
+      ref.read(userProvider).setNameError(error: 'Please Enter Your Full Name');
       return;
     } else if (email.isEmpty) {
-      ref.read(userProvider).setEmailError(error: 'Please enter an email');
+      ref.read(userProvider).setEmailError(error: 'Please Enter Your Email');
       return;
     } else if (!email.isEmail) {
-      ref.read(userProvider).setEmailError(error: 'Invalid email');
+      ref.read(userProvider).setEmailError(error: 'Please Enter Your Valid Email');
       return;
     } else if (dateOfBirth == null) {
-      ref.read(userProvider).setDateError(error: 'Please select date of birth');
+      ref.read(userProvider).setDateError(error: 'Please Select Your Date of Birth');
       return;
     } else if (gender == null || gender.isEmpty) {
-      ref.read(userProvider).setGenderError(error: 'Please select gender');
+      ref.read(userProvider).setGenderError(error: 'Please Select Your Gender');
       return;
     } else {
       ref.read(userProvider).createUserProfile(
@@ -253,6 +253,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
               dateOfBirth,
               gender,
               password,
+              'ajksdjsdjk'
             ),
           );
     }

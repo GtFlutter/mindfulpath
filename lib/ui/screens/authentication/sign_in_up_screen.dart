@@ -261,19 +261,19 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
     String code = _countryCode.trim();
     String password = _passwordCtrl.text.trim();
     if (number.isEmpty) {
-      setNumberErrorText('Please enter a number');
+      setNumberErrorText('Please Enter Your Number');
       return;
     } else if (code.isEmpty) {
-      setNumberErrorText('Please select country code');
+      setNumberErrorText('Please Select Your Country Code');
       return;
     } else if (password.isEmpty) {
-      setPwdErrorText('Please enter a password');
+      setPwdErrorText('Please Enter Your Password');
       return;
     } else if (password.length < AppConstants.PWD_MIN_LENGTH) {
       if (widget.isSignIn) {
         setPwdErrorText('Invalid Password');
       } else {
-        setPwdErrorText('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+        setPwdErrorText('Password must be at least ${AppConstants.PWD_MIN_LENGTH} character');
       }
       return;
     } else if (password.length > AppConstants.PWD_MAX_LENGTH) {

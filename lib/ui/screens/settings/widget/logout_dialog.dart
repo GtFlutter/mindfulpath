@@ -1,8 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meditation_app/payment/payment_screen.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_videos_provider.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
+import 'package:meditation_app/util/constants.dart';
 
 import '../../../../provider/auth_provider.dart';
 import '../../../../theme/styles.dart';
@@ -170,15 +175,48 @@ class BuyNowDialog extends ConsumerWidget {
                       SizedBox(width: style.scaleX(21)),
                       Expanded(
                         child: FilledButton(
-                          onPressed: dashboardP.isPurchaseLoading ? null : () async {
-                            bool result = await dashboardP.purchaseCategory(categoryId);
-                            if (result) ref.read(paidVideosProvider).fetchVideos(int.parse(categoryId));
+                          onPressed: () async {
+                            // bool result = await dashboardP.purchaseCategory(categoryId);
+                            // if (result) ref.read(paidVideosProvider).fetchVideos(int.parse(categoryId));
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => UsePaypal(
+                                clientId: 'AY6pLhhWX00Vac5a3WWDSq2E-uM24d-2r263Qo3a0FHvh755tEw5lh8tTkbTl24VB2vgceToCyqMqjLa',
+                                secretKey: 'EHT63o9JrnCT_VJH1_OXHmJmZCGY_sYQShbMQAIHXbt0q9kqt2WFsUl6bLK1KutTrvDLnbrrtbIUmL0h',
+                                cancelURL: 'https://samplesite.com/return',
+                                returnURL: 'https://samplesite.com/cancel',
+                                sandboxMode: true,
+                                transactions: const [
+                                  {
+                                    "amount": {
+                                      "total": 2,
+                                      "currency": "AUD",
+                                    },
+                                    "description": "The payment transaction description.",
+                                  }
+                                ],
+                                note: 'add wallet amount',
+                                onCancel: (value) {
+                                  debugPrint('ON Cancel :: $value');
+                                },
+                                onError: (value) {
+                                  debugPrint('ON Error :: $value');
+                                  context.pop();
+                                  showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+                                },
+                                onSuccess: (value) async {
+                                  log('ON Success :: $value', name: 'On Success');
+                                  bool result = await dashboardP.purchaseCategory(categoryId, value['paymentId']);
+                                  if (result) ref.read(paidVideosProvider).fetchVideos(int.parse(categoryId));
+                                },
+                              ),
+                            ));
                           },
                           style: FilledButton.styleFrom(
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
                             padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
                           ),
-                          child: Text(dashboardP.isPurchaseLoading ? 'Buying...' : 'Buy now'),
+                          // child: Text(dashboardP.isPurchaseLoading ? 'Buying...' : 'Buy now'),
+                          child: const Text('Buy now'),
                         ),
                       ),
                     ],

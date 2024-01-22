@@ -108,6 +108,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                           style: _style,
                           isLandscape: isLandscape,
                           onBackPress: videoCtrl.clearVideo,
+                          isFileUrl: false,
                         ),
                       ),
                     ),

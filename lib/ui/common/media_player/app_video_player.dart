@@ -49,6 +49,10 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   void initState() {
     debugPrint(' Video Init :: ${widget.videoId}');
     super.initState();
+    initVideoPlayer();
+  }
+
+  void initVideoPlayer() {
     VideoPlayerController videoPlayerController;
     if (widget.isFileUrl) {
       videoPlayerController = VideoPlayerController.file(File(widget.url),);
@@ -58,7 +62,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     _controller = videoPlayerController
       ..initialize()
       ..setLooping(false).then(
-        (value) {
+            (value) {
           _controller.addListener(listner);
           setState(() {});
           toggleVideo();
@@ -69,7 +73,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   @override
   void didUpdateWidget(covariant AppVideoPlayer oldWidget) {
     debugPrint(' Video UpdateWidget');
-
+    initVideoPlayer();
     super.didUpdateWidget(oldWidget);
   }
 

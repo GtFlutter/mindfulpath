@@ -72,7 +72,7 @@ class DashboardRepo {
     });
   }
 
-  Future<Response> purchaseCategory(String categoryId) async {
-    return await apiClient.postData(AppConfigs.purchaseSubscription, {'category_id': categoryId});
+  Future<Response> purchaseCategory(String categoryId, String transactionId) async {
+    return await apiClient.postData(AppConfigs.purchaseSubscription, {'category_id': categoryId, 'transaction_id': transactionId});
   }
 }

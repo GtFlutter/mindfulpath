@@ -14,6 +14,7 @@ class UserBody {
   final DateTime birthDate;
   final String gender;
   final String password;
+  final String fcmToken;
 
   UserBody.register(
     this.name,
@@ -22,6 +23,7 @@ class UserBody {
     this.birthDate,
     this.gender,
     this.password,
+    this.fcmToken,
   );
 
   UserBody.update(
@@ -30,7 +32,7 @@ class UserBody {
     this.phoneNo,
     this.birthDate,
     this.gender,
-  ) : password = '';
+  ) : password = '', fcmToken = '';
 
   Map<String, String> get toJson {
     return {
@@ -40,6 +42,7 @@ class UserBody {
       'birth_date': birthDate.toStringFormat3.trim(),
       'gender': gender.trim().toLowerCase(),
       if (password.trim().isNotEmpty) 'password': password.trim(),
+      if (fcmToken.trim().isNotEmpty) 'fcm_token': fcmToken.trim(),
     };
   }
 }

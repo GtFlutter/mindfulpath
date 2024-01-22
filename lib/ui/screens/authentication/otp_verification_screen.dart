@@ -181,10 +181,10 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   void onNext() {
     String otp = _pinController.text.trim();
     if (otp.isEmpty) {
-      setPinErrorText('Please enter an otp');
+      setPinErrorText('Please Enter Your OTP');
       return;
     } else if (otp.length < AppConstants.OTP_LENGTH) {
-      setPinErrorText('OTP must be atleast ${AppConstants.OTP_LENGTH} digit');
+      setPinErrorText('OTP must be at least ${AppConstants.OTP_LENGTH} digit');
       return;
     } else {
       ref.read(authProvider).verifyOTP(

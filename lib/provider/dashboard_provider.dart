@@ -125,9 +125,9 @@ class DashboardNotifier extends ChangeNotifier {
     }
   }
 
-  Future<bool> purchaseCategory(String categoryId) async {
+  Future<bool> purchaseCategory(String categoryId, String transactionId) async {
     startPurchaseLoading();
-    Response response = await repo.purchaseCategory(categoryId);
+    Response response = await repo.purchaseCategory(categoryId, transactionId);
     if (response.statusCode != 200) {
       stopPurchaseLoading();
       BuildContext? context = rootNavigator.currentContext;

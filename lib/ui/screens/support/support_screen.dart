@@ -206,16 +206,16 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     String description = _descriptionCtrl.text.trim();
 
     if (name.isEmpty) {
-      ref.read(supportProvider).setNameError(error: 'Please enter a name');
+      ref.read(supportProvider).setNameError(error: 'Please Enter Your Name');
       return;
     } else if (email.isEmpty) {
-      ref.read(supportProvider).setEmailError(error: 'Please enter an email');
+      ref.read(supportProvider).setEmailError(error: 'Please Enter Your Email');
       return;
     } else if (!email.isEmail) {
-      ref.read(supportProvider).setEmailError(error: 'Invalid email');
+      ref.read(supportProvider).setEmailError(error: 'Please Enter Your Valid Email');
       return;
     } else if (description.isEmpty) {
-      ref.read(supportProvider).setDescriptionError(error: 'Please enter an description');
+      ref.read(supportProvider).setDescriptionError(error: 'Please Enter Your Description');
       return;
     } else {
       FocusManager.instance.primaryFocus?.unfocus();
