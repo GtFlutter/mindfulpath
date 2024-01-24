@@ -12,7 +12,7 @@ class AppColors {
 
   static const textFieldEnableBorderColor = Color(0xFFADA996);
 
-  static const textFieldLableColor = Color(0xFF5A5A5A);
+  static const textFieldLabelColor = Color(0xFFF8F8F8);
   static const textFieldValueColor = Color(0xFFE1E1E1);
 
   static const fieldButtonBgColor = Color(0xFFE4E4E4);

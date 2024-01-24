@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/database/database_model.dart';
@@ -96,6 +97,13 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                           isLandscape: isLandscape,
                           onBackPress: videoCtrl.clearVideo,
                           isFileUrl: true,
+                          onFullScreen: () {
+                            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                            } else {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                            }
+                          },
                         ),
                       ),
                     ),

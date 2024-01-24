@@ -37,7 +37,7 @@ class CustomeTextFieldStyle {
       labelStyle: style.text.font(
         mulishSemiBold600,
         sizePx: labelSize,
-        color: AppColors.textFieldLableColor,
+        color: AppColors.textFieldLabelColor,
       ),
       disabledBorder: _outlineInputBorder(style: style),
       floatingLabelStyle: style.text.font(

@@ -1,19 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meditation_app/database/database_helper.dart';
-import 'package:meditation_app/database/database_model.dart';
-import 'package:meditation_app/helper/download_helper.dart';
-import 'package:meditation_app/helper/path_helper.dart';
-import 'package:meditation_app/helper/route/route_paths.dart';
-import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/helper/string_converter.dart';
-import 'package:meditation_app/provider/auth_provider.dart';
+import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
-import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../../data/model/body/resource_type.dart';
 import '../../../../data/model/response/videos_response.dart';
@@ -110,9 +101,9 @@ class DetailItem extends ConsumerStatefulWidget {
 
 class _DetailItemState extends ConsumerState<DetailItem> {
 
-  bool _isDownloading = false, _isDownloadComplete = false;
-
-  double _progress = 0.0;
+  // bool _isDownloading = false, _isDownloadComplete = false;
+  //
+  // double _progress = 0.0;
 
   @override
   void initState() {
@@ -228,84 +219,176 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                     onTap: widget.onToggleBookmark,
                   ),
                   const Spacer(),
-                  if (_isDownloading)...[
-                    SizedBox(
-                      height: 15,
-                      width: 15,
-                      child: CircularProgressIndicator(
-                        strokeCap: StrokeCap.butt,
-                        strokeWidth: 2,
-                        value: _progress,
-                      ),
-                    ),
-                  ] else...[
-                    MenuAnchor(
-                      menuChildren: [
-                        MenuItemButton(
-                          child: Text(
-                            'Download',
-                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final downloadP = ref.watch(downloadProvider);
+                      if (downloadP.isDownloading && widget.model!.id == downloadP.model!.id) {
+                        return SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            strokeCap: StrokeCap.butt,
+                            strokeWidth: 2,
+                            value: downloadP.progress,
                           ),
-                          onPressed: () => _download(),
-                        ),
-                        MenuItemButton(
-                          child: Text(
-                            'Create Playlist',
-                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                          ),
-                        ),
-                        SubmenuButton(
+                        );
+                      } else {
+                        return MenuAnchor(
                           menuChildren: [
-                            if (playlistP.playlistListResponse != null) ...[
-                              ...List.generate(playlistP.playlistListResponse!.length, (index) {
-                                return PopupMenuItem(
-                                  height: widget.appStyle.scaleX(24),
-                                  onTap: () {},
-                                  child: Text(
-                                    playlistP.playlistListResponse![index].title ?? '',
-                                    style:
-                                    widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                                  ),
-                                );
-                              })
-                            ]
+                            MenuItemButton(
+                              child: Text(
+                                'Download',
+                                style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              ),
+                              onPressed: () {
+                                if (downloadP.model == null) {
+                                  downloadP.download(model: widget.model);
+                                } else if (widget.model!.id != downloadP.model!.id) {
+                                  showCustomSnackBar('Another Video is in progress');
+                                }
+                                // else {
+                                //   downloadP.download(model: widget.model);
+                                // }
+                              },
+                            ),
+                            MenuItemButton(
+                              child: Text(
+                                'Create Playlist',
+                                style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              ),
+                            ),
+                            SubmenuButton(
+                              menuChildren: [
+                                if (playlistP.playlistListResponse != null) ...[
+                                  ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                                    return PopupMenuItem(
+                                      height: widget.appStyle.scaleX(24),
+                                      onTap: () {},
+                                      child: Text(
+                                        playlistP.playlistListResponse![index].title ?? '',
+                                        style:
+                                        widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                                      ),
+                                    );
+                                  })
+                                ]
+                              ],
+                              menuStyle: const MenuStyle(
+                                padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                                backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                              ),
+                              style: SubmenuButton.styleFrom(
+                                  backgroundColor: AppColors.popupMenuItemColor,
+                                  surfaceTintColor: AppColors.popupMenuItemColor,
+                                  iconColor: Colors.grey
+                              ),
+                              child: Text(
+                                'Add to Playlist',
+                                style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              ),
+                            ),
                           ],
-                          menuStyle: const MenuStyle(
-                            padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                          style: const MenuStyle(
+                            // padding: MaterialStatePropertyAll(EdgeInsets.zero),
                             backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                            visualDensity: VisualDensity(vertical: -4),
+                            surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
                           ),
-                          style: SubmenuButton.styleFrom(
-                              backgroundColor: AppColors.popupMenuItemColor,
-                              surfaceTintColor: AppColors.popupMenuItemColor,
-                              iconColor: Colors.grey
-                          ),
-                          child: Text(
-                            'Add to Playlist',
-                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                          ),
-                        ),
-                      ],
-                      style: const MenuStyle(
-                        // padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                        backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
-                        visualDensity: VisualDensity(vertical: -4),
-                        surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
-                      ),
-                      builder: (context, controller, child) {
-                        return OutlinedIconButton.svg(
-                          SvgPaths.addToPlaylist,
-                          appStyle: widget.appStyle,
-                          onTap: () {
-                            if (controller.isOpen) {
-                              controller.close();
-                            } else {
-                              controller.open();
-                            }
+                          builder: (context, controller, child) {
+                            return OutlinedIconButton.svg(
+                              SvgPaths.addToPlaylist,
+                              appStyle: widget.appStyle,
+                              onTap: () {
+                                if (controller.isOpen) {
+                                  controller.close();
+                                } else {
+                                  controller.open();
+                                }
+                              },
+                            );
                           },
                         );
-                      },
-                    ),
-                  ],
+                      }
+                    },
+                  ),
+                  // if (downloadP.isDownloading)...[
+                  //   SizedBox(
+                  //     height: 15,
+                  //     width: 15,
+                  //     child: CircularProgressIndicator(
+                  //       strokeCap: StrokeCap.butt,
+                  //       strokeWidth: 2,
+                  //       value: downloadP.progress,
+                  //     ),
+                  //   ),
+                  // ] else...[
+                  //   MenuAnchor(
+                  //     menuChildren: [
+                  //       MenuItemButton(
+                  //         child: Text(
+                  //           'Download',
+                  //           style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                  //         ),
+                  //         onPressed: () => downloadP.download(model: widget.model),
+                  //       ),
+                  //       MenuItemButton(
+                  //         child: Text(
+                  //           'Create Playlist',
+                  //           style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                  //         ),
+                  //       ),
+                  //       SubmenuButton(
+                  //         menuChildren: [
+                  //           if (playlistP.playlistListResponse != null) ...[
+                  //             ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                  //               return PopupMenuItem(
+                  //                 height: widget.appStyle.scaleX(24),
+                  //                 onTap: () {},
+                  //                 child: Text(
+                  //                   playlistP.playlistListResponse![index].title ?? '',
+                  //                   style:
+                  //                   widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                  //                 ),
+                  //               );
+                  //             })
+                  //           ]
+                  //         ],
+                  //         menuStyle: const MenuStyle(
+                  //           padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                  //           backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                  //         ),
+                  //         style: SubmenuButton.styleFrom(
+                  //             backgroundColor: AppColors.popupMenuItemColor,
+                  //             surfaceTintColor: AppColors.popupMenuItemColor,
+                  //             iconColor: Colors.grey
+                  //         ),
+                  //         child: Text(
+                  //           'Add to Playlist',
+                  //           style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //     style: const MenuStyle(
+                  //       // padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                  //       backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                  //       visualDensity: VisualDensity(vertical: -4),
+                  //       surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                  //     ),
+                  //     builder: (context, controller, child) {
+                  //       return OutlinedIconButton.svg(
+                  //         SvgPaths.addToPlaylist,
+                  //         appStyle: widget.appStyle,
+                  //         onTap: () {
+                  //           if (controller.isOpen) {
+                  //             controller.close();
+                  //           } else {
+                  //             controller.open();
+                  //           }
+                  //         },
+                  //       );
+                  //     },
+                  //   ),
+                  // ],
                   const Spacer(),
                 ],
               ),
@@ -335,94 +418,94 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     );
   }
 
-  void _download() async {
-    if (!ref.read(authProvider).isUserLoggedIn) {
-      showCustomSnackBar(
-        'Please log in to bookmark.',
-        action: SnackBarAction(
-          label: 'Log In',
-          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-          textColor: Colors.brown.shade800,
-          onPressed: () => appRouter.go(RoutePath.signIn),
-        ),
-        duration: const Duration(seconds: 5),
-      );
-      return;
-    }
-    if (!widget.model!.category!.isPurchased!) {
-      buyNow(context, categoryId: widget.model!.category!.id.toString());
-      return;
-    }
-    await _checkDirectory();
-    String path = await PathHelper.getDownloadDirectoryPath();
-    debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
-    bool result = await PathHelper.fileExists('$path/${widget.model!.video!.fileName!}');
-    if (result) {
-      debugPrint('True');
-      getSingleVideo('$path/${widget.model!.video!.fileName!}');
-      showCustomSnackBar('File Already Exists', type: true);
-    } else {
-      debugPrint('False');
-      await DownloadHelper.instance.download(
-        widget.model!.videoUrl!,
-        '$path/${widget.model!.video!.fileName!}',
-        onReceiveProgress: (count, total) {
-          debugPrint('Count :: $count --*-- Total :: $total');
-          if (total != -1) {
-            _progress = ((count / total * 100).roundToDouble())/100;
-            if (!_isDownloadComplete) if (!_isDownloading) _isDownloading = true;
-            if (_progress == 1.0) {
-              if (!_isDownloadComplete) {
-                _isDownloadComplete = true;
-                _isDownloading = false;
-                debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-                _saveCategoryAndVideo('$path/${widget.model!.video!.fileName!}');
-              }
-            }
-            if (context.mounted) setState(() {});
-            debugPrint("Total Progress 1 :: $_progress%");
-          }
-        },
-      );
-    }
-  }
-
-  Future<void> _checkDirectory() async {
-    String path = await PathHelper.getDownloadDirectoryPath();
-    debugPrint('Path :: $path');
-    bool result = await PathHelper.directoryExits(path);
-    if (!result) {
-      Directory directory = await PathHelper.createDirectory(path, recursive: true);
-      debugPrint('Directory Path :: ${directory.path}');
-    }
-  }
-
-  Future<void> getSingleVideo(String videoFile) async {
-    final dbHelper = ref.read(databaseProvider);
-    VideoModal? res = await dbHelper.getSingleVideo(widget.model!.id!.toString());
-    if (res == null) {
-      _saveCategoryAndVideo(videoFile);
-    }
-  }
-
-  Future<void> _saveCategoryAndVideo(String videoFile) async {
-    final dbHelper = ref.read(databaseProvider);
-    CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
-    if (res != null) {
-      VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
-      int vRes = await dbHelper.saveVideo(vModal);
-      if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
-    } else {
-      CategoryModal modal = CategoryModal(categoryId: widget.model!.categoryId!.toString(), categoryName: widget.model!.categoryTitle, categoryImage: widget.model!.category!.imageResponse!.imageUrl);
-      int cRes = await dbHelper.saveCategory(modal);
-      if (cRes == 1) {
-        CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
-        if (res != null) {
-          VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
-          int vRes = await dbHelper.saveVideo(vModal);
-          if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
-        }
-      }
-    }
-  }
+  // void _download() async {
+  //   if (!ref.read(authProvider).isUserLoggedIn) {
+  //     showCustomSnackBar(
+  //       'Please log in to bookmark.',
+  //       action: SnackBarAction(
+  //         label: 'Log In',
+  //         backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+  //         textColor: Colors.brown.shade800,
+  //         onPressed: () => appRouter.go(RoutePath.signIn),
+  //       ),
+  //       duration: const Duration(seconds: 5),
+  //     );
+  //     return;
+  //   }
+  //   if (!widget.model!.category!.isPurchased!) {
+  //     buyNow(context, categoryId: widget.model!.category!.id.toString());
+  //     return;
+  //   }
+  //   await _checkDirectory();
+  //   String path = await PathHelper.getDownloadDirectoryPath();
+  //   debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
+  //   bool result = await PathHelper.fileExists('$path/${widget.model!.video!.fileName!}');
+  //   if (result) {
+  //     debugPrint('True');
+  //     getSingleVideo('$path/${widget.model!.video!.fileName!}');
+  //     showCustomSnackBar('File Already Exists', type: true);
+  //   } else {
+  //     debugPrint('False');
+  //     await DownloadHelper.instance.download(
+  //       widget.model!.videoUrl!,
+  //       '$path/${widget.model!.video!.fileName!}',
+  //       onReceiveProgress: (count, total) {
+  //         debugPrint('Count :: $count --*-- Total :: $total');
+  //         if (total != -1) {
+  //           _progress = ((count / total * 100).roundToDouble())/100;
+  //           if (!_isDownloadComplete) if (!_isDownloading) _isDownloading = true;
+  //           if (_progress == 1.0) {
+  //             if (!_isDownloadComplete) {
+  //               _isDownloadComplete = true;
+  //               _isDownloading = false;
+  //               debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+  //               _saveCategoryAndVideo('$path/${widget.model!.video!.fileName!}');
+  //             }
+  //           }
+  //           if (context.mounted) setState(() {});
+  //           debugPrint("Total Progress 1 :: $_progress%");
+  //         }
+  //       },
+  //     );
+  //   }
+  // }
+  //
+  // Future<void> _checkDirectory() async {
+  //   String path = await PathHelper.getDownloadDirectoryPath();
+  //   debugPrint('Path :: $path');
+  //   bool result = await PathHelper.directoryExits(path);
+  //   if (!result) {
+  //     Directory directory = await PathHelper.createDirectory(path, recursive: true);
+  //     debugPrint('Directory Path :: ${directory.path}');
+  //   }
+  // }
+  //
+  // Future<void> getSingleVideo(String videoFile) async {
+  //   final dbHelper = ref.read(databaseProvider);
+  //   VideoModal? res = await dbHelper.getSingleVideo(widget.model!.id!.toString());
+  //   if (res == null) {
+  //     _saveCategoryAndVideo(videoFile);
+  //   }
+  // }
+  //
+  // Future<void> _saveCategoryAndVideo(String videoFile) async {
+  //   final dbHelper = ref.read(databaseProvider);
+  //   CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
+  //   if (res != null) {
+  //     VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
+  //     int vRes = await dbHelper.saveVideo(vModal);
+  //     if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
+  //   } else {
+  //     CategoryModal modal = CategoryModal(categoryId: widget.model!.categoryId!.toString(), categoryName: widget.model!.categoryTitle, categoryImage: widget.model!.category!.imageResponse!.imageUrl);
+  //     int cRes = await dbHelper.saveCategory(modal);
+  //     if (cRes == 1) {
+  //       CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
+  //       if (res != null) {
+  //         VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
+  //         int vRes = await dbHelper.saveVideo(vModal);
+  //         if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
+  //       }
+  //     }
+  //   }
+  // }
 }

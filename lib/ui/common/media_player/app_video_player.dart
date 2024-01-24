@@ -20,6 +20,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
   final bool isLandscape;
   final VoidCallback? onBackPress;
   final bool isFileUrl;
+  final VoidCallback? onFullScreen;
 
   const AppVideoPlayer({
     super.key,
@@ -29,6 +30,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
     required this.isLandscape,
     required this.videoId,
     this.isFileUrl = false,
+    this.onFullScreen,
   });
 
   @override
@@ -228,7 +230,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                             appStyle: widget.style,
                             hideBorder: true,
                             iconSize: widget.isLandscape ? 23 : 20,
-                            onTap: () {},
+                            onTap: widget.onFullScreen,
                           ),
                         ],
                       ),

@@ -98,7 +98,7 @@ class BookmarkNotifier extends ChangeNotifier {
       return;
     }
 
-    showCustomSnackBar(isRemove ? 'Removing...' : 'Bookmarking...');
+    showCustomSnackBar(isRemove ? 'UnBookmarking...' : 'Bookmarking...');
     startToggleLoading();
 
     Response response = await repo.toggleBookmark(itemId);
@@ -111,7 +111,7 @@ class BookmarkNotifier extends ChangeNotifier {
         ref.read(freeVideosProvider).toggleBookmark(itemId);
         ref.read(paidVideosProvider).toggleBookmark(itemId);
         ref.read(featuredVideosProvider).toggleBookmark(itemId);
-        showCustomSnackBar('${isRemove ? 'Removed' : 'Bookmarked'} Successful', type: true);
+        showCustomSnackBar('${isRemove ? 'UnBookmarked' : 'Bookmarked'} Successful', type: true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
         stopToggleLoading();
