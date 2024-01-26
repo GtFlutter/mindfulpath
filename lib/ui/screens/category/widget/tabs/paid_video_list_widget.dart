@@ -83,7 +83,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
             appStyle: _style,
             model: model,
             index: '$index',
-            onToggleBookmark: () => toggleItemBookmark(model.id),
+            onToggleBookmark: () => toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false),
           ),
         );
       },
@@ -91,9 +91,9 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
     );
   }
 
-  void toggleItemBookmark(int? itemId) {
+  void toggleItemBookmark(int? itemId, {bool isRemove = false}) {
     if (itemId == null) return;
-    ref.read(bookmarkProvider).toggleBookmark(itemId);
+    ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
   }
 
   void playVideo(VideoResponse model) {

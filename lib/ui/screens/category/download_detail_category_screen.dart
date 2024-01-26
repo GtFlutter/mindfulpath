@@ -55,6 +55,9 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
           return;
         }
         if (isVideoAvailable) {
+          if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+          }
           videoCtrl.clearVideo();
           return;
         }
@@ -95,7 +98,12 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                           url: videoCtrl.video!.videoFile!,
                           style: _style,
                           isLandscape: isLandscape,
-                          onBackPress: videoCtrl.clearVideo,
+                          onBackPress: () {
+                            if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                            }
+                            videoCtrl.clearVideo();
+                          },
                           isFileUrl: true,
                           onFullScreen: () {
                             if (MediaQuery.orientationOf(context) == Orientation.portrait) {

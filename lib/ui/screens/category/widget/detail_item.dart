@@ -252,6 +252,11 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               },
                             ),
                             MenuItemButton(
+                              onPressed: () {
+                                if (widget.model!.video != null && widget.model!.video!.id != null) {
+                                  createPlaylist(context, videoId: widget.model!.video?.id?.toString());
+                                }
+                              },
                               child: Text(
                                 'Create Playlist',
                                 style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
@@ -263,7 +268,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   ...List.generate(playlistP.playlistListResponse!.length, (index) {
                                     return PopupMenuItem(
                                       height: widget.appStyle.scaleX(24),
-                                      onTap: () {},
+                                      onTap: () async {
+                                        await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
+                                      },
                                       child: Text(
                                         playlistP.playlistListResponse![index].title ?? '',
                                         style:

@@ -71,6 +71,8 @@ class DownloadNotifier extends ChangeNotifier {
       debugPrint('True');
       _getSingleVideo('$path/${model.video!.fileName!}');
       showCustomSnackBar('File Already Exists', type: true);
+      _model = null;
+      notifyListeners();
     } else {
       debugPrint('False');
       await DownloadHelper.instance.download(
@@ -89,7 +91,7 @@ class DownloadNotifier extends ChangeNotifier {
                 _isDownloadComplete = true;
                 _isDownloading = false;
                 debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-                _saveCategoryAndVideo('$path/${model.video!.fileName!}');
+                _saveCategoryAndVideo('$path/${model.video!.fileName!}', model: model);
                 _model = null;
                 notifyListeners();
               }

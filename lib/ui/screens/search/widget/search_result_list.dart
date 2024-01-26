@@ -36,7 +36,7 @@ class SearchResultsList extends ConsumerWidget {
             appStyle: _style,
             model: _model[index],
             index: '$index',
-            onToggleBookmark: () => toggleItemBookmark(ref, _model[index].id),
+            onToggleBookmark: () => toggleItemBookmark(ref, _model[index].id, isRemove: _model[index].bookmarked ?? false),
           ),
         );
       },
@@ -46,8 +46,8 @@ class SearchResultsList extends ConsumerWidget {
     );
   }
 
-  void toggleItemBookmark(WidgetRef ref, int? itemId) {
+  void toggleItemBookmark(WidgetRef ref, int? itemId, {bool isRemove = false}) {
     if (itemId == null) return;
-    ref.read(bookmarkProvider).toggleBookmark(itemId);
+    ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
   }
 }

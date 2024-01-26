@@ -87,7 +87,7 @@ class FeatureVideoList extends ConsumerWidget {
                     index: '$index',
                     onToggleBookmark: () {
                       if (dataModel.id == null) return;
-                      ref.read(bookmarkProvider).toggleBookmark(dataModel.id!);
+                      ref.read(bookmarkProvider).toggleBookmark(dataModel.id!, isRemove: dataModel.bookmarked ?? false);
                     },
                   ),
           );

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
+import 'package:meditation_app/provider/download_provider.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
 
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
@@ -131,14 +134,25 @@ class BookmarkItem extends StatelessWidget {
                             ),
                             style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: SvgPicture.asset(
-                              SvgPaths.download,
-                              height: appStyle.scaleX(16),
-                              fit: BoxFit.contain,
-                            ),
-                            style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final downloadP = ref.watch(downloadProvider);
+                              return IconButton(
+                                onPressed: () {
+                                  // if (downloadP.model == null) {
+                                  //   downloadP.download(model: model);
+                                  // } else if (model.id != downloadP.model!.id) {
+                                  //   showCustomSnackBar('Another Video is in progress');
+                                  // }
+                                },
+                                icon: SvgPicture.asset(
+                                  SvgPaths.download,
+                                  height: appStyle.scaleX(16),
+                                  fit: BoxFit.contain,
+                                ),
+                                style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                              );
+                            },
                           ),
                         ],
                       ),

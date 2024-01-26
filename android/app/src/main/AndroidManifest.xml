@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
 
     <application
-        android:label="meditation_app"
+        android:label="Meditation"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

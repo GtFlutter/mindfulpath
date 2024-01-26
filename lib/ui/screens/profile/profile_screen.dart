@@ -35,11 +35,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       SvgPaths.profileEdit,
       'path',
     ),
-    PIModel(
-      'Subscription',
-      SvgPaths.subscription,
-      'path',
-    ),
+    // PIModel(
+    //   'Subscription',
+    //   SvgPaths.subscription,
+    //   'path',
+    // ),
     PIModel(
       'Notification',
       SvgPaths.notification,
@@ -86,11 +86,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {
                   if (index == 0) {
                     context.go(RoutePath.editProfileScreenPath);
-                  } else if (index == 2) {
+                  } else if (index == 1) {
                     context.go(RoutePath.notificationsPath);
-                  } else if (index == 3) {
+                  } else if (index == 2) {
                     context.go(RoutePath.supportScreenPath);
-                  } else if (index == 4) {
+                  } else if (index == 3) {
                     context.go(RoutePath.settingsScreenPath);
                   }
                 },

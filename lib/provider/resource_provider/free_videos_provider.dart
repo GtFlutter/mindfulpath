@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' show Response;
 import '../../data/api/api_checker.dart';
@@ -31,7 +30,6 @@ class FreeVideosNotifier extends VideoResourceNotifier {
     var itemIndex = _videosResponse!.list!.indexWhere((element) => element.id == itemId);
     if (itemIndex == -1) return;
     _videosResponse!.list![itemIndex].bookmarked = !(_videosResponse!.list![itemIndex].bookmarked ?? true);
-    debugPrint('lolololo');
     if (notifier) notifyListeners();
   }
 
