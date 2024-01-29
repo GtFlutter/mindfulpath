@@ -11,7 +11,7 @@ import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 
-class BookmarkItem extends StatelessWidget {
+class BookmarkItem extends ConsumerStatefulWidget {
   final AppStyle appStyle;
   final BookmarkListResponse model;
   final String index;
@@ -38,26 +38,42 @@ class BookmarkItem extends StatelessWidget {
   }) : dragable = true;
 
   @override
+  ConsumerState<BookmarkItem> createState() => _BookmarkItemState();
+}
+
+class _BookmarkItemState extends ConsumerState<BookmarkItem> {
+
+
+  @override
+  void initState() {
+    final downloadP = ref.read(downloadProvider);
+    Future.delayed(Duration.zero, () {
+      downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString());
+    },);
+    super.initState();
+  }
+
+@override
   Widget build(BuildContext context) {
-    TextStyle textStyle = appStyle.text.font(mulishRegular400, sizePx: 9);
+    TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(appStyle.scaleX(25)),
+          borderRadius: BorderRadius.circular(widget.appStyle.scaleX(25)),
           side: BorderSide(
             color: AppColors.primaryColor,
-            width: appStyle.scaleX(0.5),
+            width: widget.appStyle.scaleX(0.5),
             strokeAlign: BorderSide.strokeAlignOutside,
           ),
         ),
       ),
-      margin: dragable && !dragging ? EdgeInsets.only(bottom: appStyle.scaleX(12.5), top: appStyle.scaleX(12.5)) : null,
+      margin: widget.dragable && !widget.dragging ? EdgeInsets.only(bottom: widget.appStyle.scaleX(12.5), top: widget.appStyle.scaleX(12.5)) : null,
       padding: EdgeInsets.fromLTRB(
-        appStyle.scaleX(29),
-        appStyle.scaleX(31.5),
-        appStyle.scaleX(29),
-        appStyle.scaleX(21.5),
+        widget.appStyle.scaleX(29),
+        widget.appStyle.scaleX(31.5),
+        widget.appStyle.scaleX(29),
+        widget.appStyle.scaleX(21.5),
       ),
       alignment: Alignment.center,
       child: IntrinsicHeight(
@@ -65,31 +81,31 @@ class BookmarkItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             MediaImageCard(
-              appStyle: appStyle,
-              imgUrl: model.bookmarkVideoResponse != null ? model.bookmarkVideoResponse!.thumbnailImageUrl ?? '' : '',
+              appStyle: widget.appStyle,
+              imgUrl: widget.model.bookmarkVideoResponse != null ? widget.model.bookmarkVideoResponse!.thumbnailImageUrlSrc ?? '' : '',
               duration: '10 Min',
-              imgRadius: appStyle.scaleX(25),
-              imgSize: appStyle.scaleX(90),
+              imgRadius: widget.appStyle.scaleX(25),
+              imgSize: widget.appStyle.scaleX(90),
             ),
             Expanded(
               child: SizedBox(
-                height: appStyle.scaleX(105),
+                height: widget.appStyle.scaleX(105),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(left: appStyle.scaleX(25)),
+                      padding: EdgeInsets.only(left: widget.appStyle.scaleX(25)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '${model.videoTitle}',
-                            style: appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                            '${widget.model.videoTitle}',
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: appStyle.scaleX(5)),
+                          SizedBox(height: widget.appStyle.scaleX(5)),
                           Text.rich(
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -99,7 +115,7 @@ class BookmarkItem extends StatelessWidget {
                                 TextSpan(
                                   text: '  ● ',
                                   style:
-                                      appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                                  widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                 ),
                                 TextSpan(
                                   text: 'Nutrition',
@@ -113,14 +129,14 @@ class BookmarkItem extends StatelessWidget {
                     ),
                     const Spacer(),
                     Padding(
-                      padding: EdgeInsets.only(left: appStyle.scaleX(12.5)),
+                      padding: EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
                       child: Row(
                         children: [
                           IconButton(
-                            onPressed: onBookmarkRemove,
+                            onPressed: widget.onBookmarkRemove,
                             icon: SvgPicture.asset(
                               SvgPaths.remove,
-                              height: appStyle.scaleX(16),
+                              height: widget.appStyle.scaleX(16),
                               fit: BoxFit.contain,
                             ),
                             style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -129,7 +145,7 @@ class BookmarkItem extends StatelessWidget {
                             onPressed: () {},
                             icon: SvgPicture.asset(
                               SvgPaths.share,
-                              height: appStyle.scaleX(16),
+                              height: widget.appStyle.scaleX(16),
                               fit: BoxFit.contain, // 155861
                             ),
                             style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -137,21 +153,37 @@ class BookmarkItem extends StatelessWidget {
                           Consumer(
                             builder: (context, ref, child) {
                               final downloadP = ref.watch(downloadProvider);
-                              return IconButton(
-                                onPressed: () {
-                                  // if (downloadP.model == null) {
-                                  //   downloadP.download(model: model);
-                                  // } else if (model.id != downloadP.model!.id) {
-                                  //   showCustomSnackBar('Another Video is in progress');
-                                  // }
-                                },
-                                icon: SvgPicture.asset(
-                                  SvgPaths.download,
-                                  height: appStyle.scaleX(16),
-                                  fit: BoxFit.contain,
-                                ),
-                                style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                              );
+                              if (downloadP.isAlreadyDownload) {
+                                return const SizedBox.shrink();
+                              } else {
+                                if (downloadP.isDownloading && widget.model.bookmarkVideoResponse!.id == downloadP.model!.id) {
+                                  return SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: CircularProgressIndicator(
+                                      strokeCap: StrokeCap.butt,
+                                      strokeWidth: 2,
+                                      value: downloadP.progress,
+                                    ),
+                                  );
+                                } else {
+                                  return IconButton(
+                                    onPressed: () {
+                                      if (downloadP.model == null) {
+                                        downloadP.download(model: widget.model.bookmarkVideoResponse);
+                                      } else if (widget.model.bookmarkVideoResponse!.id != downloadP.model!.id) {
+                                        showCustomSnackBar('Another Video is in progress');
+                                      }
+                                    },
+                                    icon: SvgPicture.asset(
+                                      SvgPaths.download,
+                                      height: widget.appStyle.scaleX(16),
+                                      fit: BoxFit.contain,
+                                    ),
+                                    style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                  );
+                                }
+                              }
                             },
                           ),
                         ],
@@ -161,10 +193,10 @@ class BookmarkItem extends StatelessWidget {
                 ),
               ),
             ),
-            if (dragable)
+            if (widget.dragable)
               Align(
                 alignment: Alignment.center,
-                child: SvgPicture.asset(SvgPaths.drag, width: appStyle.scaleX(15), fit: BoxFit.contain),
+                child: SvgPicture.asset(SvgPaths.drag, width: widget.appStyle.scaleX(15), fit: BoxFit.contain),
               ),
           ],
         ),

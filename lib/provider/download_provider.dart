@@ -69,7 +69,7 @@ class DownloadNotifier extends ChangeNotifier {
     bool result = await PathHelper.fileExists('$path/${model.video!.fileName!}');
     if (result) {
       debugPrint('True');
-      _getSingleVideo('$path/${model.video!.fileName!}');
+      _getSingleVideo('$path/${model.video!.fileName!}', model: model);
       showCustomSnackBar('File Already Exists', type: true);
       _model = null;
       notifyListeners();
@@ -132,7 +132,7 @@ class DownloadNotifier extends ChangeNotifier {
       int vRes = await dbHelper.saveVideo(vModal);
       if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
     } else {
-      CategoryModal modal = CategoryModal(categoryId: model.categoryId!.toString(), categoryName: model.categoryTitle, categoryImage: model.category!.imageResponse!.imageUrl);
+      CategoryModal modal = CategoryModal(categoryId: model.categoryId!.toString(), categoryName: model.categoryTitle ?? model.category!.title, categoryImage: model.category!.imageResponse!.imageUrl);
       int cRes = await dbHelper.saveCategory(modal);
       if (cRes == 1) {
         CategoryModal? res = await dbHelper.getSingleCategory(model.categoryId!.toString());
@@ -143,5 +143,22 @@ class DownloadNotifier extends ChangeNotifier {
         }
       }
     }
+  }
+
+
+  bool _isAlreadyDownload = false;
+  bool get isAlreadyDownload => _isAlreadyDownload;
+
+  Future<bool> checkVideoIsDownload(String id) async {
+    final dbHelper = ref.read(databaseProvider);
+    VideoModal? res = await dbHelper.getSingleVideo(id);
+    if (res == null) {
+      _isAlreadyDownload = false;
+      notifyListeners();
+      return _isAlreadyDownload;
+    }
+    _isAlreadyDownload = true;
+    notifyListeners();
+    return _isAlreadyDownload;
   }
 }

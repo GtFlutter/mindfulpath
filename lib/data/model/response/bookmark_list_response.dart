@@ -14,6 +14,8 @@
 /// }
 library;
 
+import 'package:meditation_app/data/model/response/videos_response.dart';
+
 
 class BookmarkListResponse {
   int? id;
@@ -22,7 +24,7 @@ class BookmarkListResponse {
   String? videoTitle;
   String? createdAt;
   String? updatedAt;
-  BookmarkVideoResponse? bookmarkVideoResponse;
+  VideoResponse? bookmarkVideoResponse;
 
   BookmarkListResponse({this.id, this.userId, this.videoId, this.videoTitle, this.createdAt, this.updatedAt, this.bookmarkVideoResponse});
 
@@ -33,7 +35,7 @@ class BookmarkListResponse {
     videoTitle = json['video_title'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    if (json['video'] != null) bookmarkVideoResponse = BookmarkVideoResponse.fromJson(json['video']);
+    if (json['video'] != null) bookmarkVideoResponse = VideoResponse.fromJson(json['video']);
   }
 
   static List<BookmarkListResponse> listFromJson(dynamic jsonList) {

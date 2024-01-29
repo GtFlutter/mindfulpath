@@ -223,15 +223,15 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                     builder: (context, ref, child) {
                       final downloadP = ref.watch(downloadProvider);
                       if (downloadP.isDownloading && widget.model!.id == downloadP.model!.id) {
-                        return SizedBox(
-                          height: 15,
-                          width: 15,
-                          child: CircularProgressIndicator(
-                            strokeCap: StrokeCap.butt,
-                            strokeWidth: 2,
-                            value: downloadP.progress,
-                          ),
-                        );
+                          return SizedBox(
+                            height: 15,
+                            width: 15,
+                            child: CircularProgressIndicator(
+                              strokeCap: StrokeCap.butt,
+                              strokeWidth: 2,
+                              value: downloadP.progress,
+                            ),
+                          );
                       } else {
                         return MenuAnchor(
                           menuChildren: [
