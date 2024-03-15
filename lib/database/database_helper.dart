@@ -63,6 +63,16 @@ class DatabaseHelper {
     }
   }
 
+  Future<PdfModel?> getSinglePdf(String pdfId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.pdfTable, where: 'pdf_id = ?', whereArgs: [pdfId]);
+    if (res.isNotEmpty) {
+      return PdfModel.fromJson(res.first);
+    } else {
+      return null;
+    }
+  }
+
   Future<int> saveVideo(VideoModal modal) async {
     var dbClient = await db;
     int res;
@@ -73,6 +83,20 @@ class DatabaseHelper {
       await dbClient.delete(DatabaseConsts.videoTable);
       res = await dbClient.insert('VideoTable', modal.toJson());
       debugPrint("DATABASE:- ${DatabaseConsts.videoTable} saved to db with Error");
+    }
+    return res;
+  }
+
+  Future<int> savePDF(PdfModel modal) async {
+    var dbClient = await db;
+    int res;
+    try {
+      res = await dbClient.insert(DatabaseConsts.pdfTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.pdfTable} saved to db");
+    } catch (e) {
+      await dbClient.delete(DatabaseConsts.pdfTable);
+      res = await dbClient.insert(DatabaseConsts.pdfTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.pdfTable} saved to db with Error");
     }
     return res;
   }
@@ -103,4 +127,17 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<PdfModel>> getPdf(int categoryId) async {
+    List<PdfModel> tempList = [];
+    var dbClient = await db;
+    debugPrint("Category Id : $categoryId");
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.pdfTable, where: 'category_id = ?', whereArgs: [categoryId]);
+    debugPrint("Res :: $res");
+    if (res.isNotEmpty) {
+      tempList = PdfModel.listFromJson(res);
+      return tempList;
+    } else {
+      return tempList;
+    }
+  }
 }

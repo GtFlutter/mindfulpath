@@ -126,7 +126,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         controller: _controller,
                         textInputAction: TextInputAction.search,
                         keyboardType: TextInputType.text,
-                        onSubmitted: (text) {
+                        onChanged: (text) {
                           if (text.isEmpty) {
                             return;
                           }

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 
@@ -60,7 +61,7 @@ class _AnalyticsFilterState extends State<AnalyticsFilter> {
               ),
             ),
           ),
-          Expanded(
+          /*Expanded(
             child: Align(
               alignment: Alignment.center,
               child: CustomDropDownButton<ItemName>(
@@ -74,7 +75,13 @@ class _AnalyticsFilterState extends State<AnalyticsFilter> {
                 hint: 'Videos',
               ),
             ),
-          ),
+          ),*/
+          ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight:  widget.screenSize.height * 0.6,
+                maxWidth: widget.screenSize.shortestSide * 0.4,
+              ),
+              child: const Text("Videos")),
           Expanded(
             child: Align(
               alignment: Alignment.centerRight,

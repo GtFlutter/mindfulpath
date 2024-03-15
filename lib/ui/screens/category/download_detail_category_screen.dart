@@ -32,6 +32,9 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
     Future.delayed(Duration.zero, () {
       ref.read(courseProvider).getVideoFromDatabase(widget.categoryModal.id!);
     },);
+    Future.delayed(Duration.zero, () {
+      ref.read(courseProvider).getPdfFromDatabase(widget.categoryModal.id!);
+    },);
     super.initState();
   }
 
@@ -194,6 +197,32 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
                       )
                     ),
+                  if(courseP.downloadPdfResponse.isEmpty)...[
+                    Expanded(
+                        flex: 3,
+                        child: ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          padding: EdgeInsets.only(
+                            bottom: _style.scale * 100,
+                            top: _style.scale * 10,
+                          ),
+                          itemCount: courseP.downloadPdfResponse.length,
+                          itemBuilder: (context, index) {
+                            PdfModel item = courseP.downloadPdfResponse[index];
+                            var model = DDIModal(id: item.id, videoId: item.pdfId, videoName: item.pdfName, videoFile: item.pdfFile, categoryId: widget.categoryModal.id.toString(), categoryName: widget.categoryModal.categoryName, categoryImage: widget.categoryModal.categoryImage);
+                            return GestureDetector(
+                              onTap: () => playVideo(model),
+                              child: DownloadDetailItem(
+                                appStyle: _style,
+                                model: model,
+                              ),
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                        )
+                    ),
+                  ]
                 ],
               ),
             ),

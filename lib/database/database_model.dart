@@ -68,3 +68,38 @@ class VideoModal {
     return tempList;
   }
 }
+
+class PdfModel {
+  int? id;
+  int? categoryId;
+  String? pdfId;
+  String? pdfName;
+  String? pdfFile;
+
+  PdfModel({this.id, this.categoryId, this.pdfId, this.pdfName, this.pdfFile});
+
+  PdfModel.fromJson(dynamic json) {
+    id = json['id'];
+    categoryId = int.parse(json['category_id'].toString());
+    pdfId = json['pdf_id'];
+    pdfName = json['pdf_name'];
+    pdfFile = json['pdf_file'];
+  }
+
+  Map<String, String> toJson() {
+    Map<String, String> map = {};
+    map['category_id'] = categoryId.toString();
+    map['pdf_id'] = pdfId!;
+    map['pdf_name'] = pdfName!;
+    map['pdf_file'] = pdfFile!;
+    return map;
+  }
+
+  static List<PdfModel> listFromJson(dynamic jsonList) {
+    List<PdfModel> tempList = [];
+    for (var json in jsonList) {
+      tempList.add(PdfModel.fromJson(json));
+    }
+    return tempList;
+  }
+}

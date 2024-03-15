@@ -48,7 +48,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
   void initState() {
     final downloadP = ref.read(downloadProvider);
     Future.delayed(Duration.zero, () {
-      downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString());
+      downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false);
     },);
     super.initState();
   }

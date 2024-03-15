@@ -66,6 +66,7 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
           child: DetailItem.pdf(
             appStyle: _style,
             title: model.title ?? '',
+            pdfModel: model,
             subTitle: model.categoryTitle ?? '',
             index: '$index',
           ),

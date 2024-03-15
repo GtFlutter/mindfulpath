@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/videos_response.dart';
+import 'package:meditation_app/helper/navigation.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
@@ -31,7 +32,19 @@ class SearchResultsList extends ConsumerWidget {
 
         /// TODO : Workign On it
         return GestureDetector(
-          onTap: () {},
+          onTap: () {
+            context.goToDetailCategoryScreen(
+                _model[index].category!,
+                video: DIModel(
+                    videoType: _model[index].videoType!,
+                    videoId: _model[index].id!,
+                    thumbnailUrl: _model[index].thumbnailImageUrlSrc!,
+                    videoUrl: _model[index].videoUrl!,
+                    duration: _model[index].duration!,
+                    title: _model[index].title!,
+                    categoryName: _model[index].categoryTitle!
+                ));
+          },
           child: DetailItem.video(
             appStyle: _style,
             model: _model[index],

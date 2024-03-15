@@ -5,7 +5,7 @@ class AppConfigs {
   /// START [API_CONFIG]
 
   static const String APP_NAME = 'Meditation';
-  static const String baseUrl = 'https://gurutechnolabs.co.in/website/laravel/meditation/public/api';
+  static const String baseUrl = 'https://themindfulpath.com/api';
 
   /// [User_Authentication]
   // User Before For [registerUser] and [forgotPassword]

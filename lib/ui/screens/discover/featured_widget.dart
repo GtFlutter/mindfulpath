@@ -47,7 +47,7 @@ class _FeaturedListWidgetState extends ConsumerState<FeaturedWidget> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(8.0),
-          child: Text('Something Wenet Wrong'),
+          child: Text(''),
         ),
       );
     }

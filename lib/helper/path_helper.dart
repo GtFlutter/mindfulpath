@@ -2,8 +2,11 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class PathHelper {
-  static Future<String> getDownloadDirectoryPath() async {
+  static Future<String> getDownloadDirectoryPath(bool isPdf) async {
     Directory directory = await getApplicationSupportDirectory();
+    if(isPdf){
+      return '${directory.path}/PDF';
+    }
     return '${directory.path}/Video';
   }
 

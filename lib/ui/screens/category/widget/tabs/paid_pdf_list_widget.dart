@@ -78,6 +78,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
           },
           child: DetailItem.pdf(
             appStyle: _style,
+            pdfModel: model,
             title: model.title ?? '',
             subTitle: model.categoryTitle ?? '',
             index: '$index',

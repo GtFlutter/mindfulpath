@@ -100,7 +100,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 FeaturedWidget(style: _style, clipper: clipper),
 
                 /// Recently played Layout
-                RecentListWidget(style: _style, clipper: clipper),
+                // RecentListWidget(style: _style, clipper: clipper),
               ],
             ),
           ),

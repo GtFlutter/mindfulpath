@@ -104,4 +104,15 @@ class CourseNotifier extends ChangeNotifier {
     _stopLoading();
   }
 
+  List<PdfModel> _downloadPdfResponse = [];
+  List<PdfModel> get downloadPdfResponse => _downloadPdfResponse;
+
+  Future<void> getPdfFromDatabase(int categoryId) async {
+    _startLoading();
+    List<PdfModel> list = await ref.read(databaseProvider).getPdf(categoryId);
+    _downloadPdfResponse = list;
+    debugPrint("Length ${list.length}");
+    debugPrint("Length Of PDF : ${_downloadPdfResponse.length}");
+    _stopLoading();
+  }
 }
