@@ -5,6 +5,7 @@ import 'package:meditation_app/provider/resource_provider/paid_pdfs_provider.dar
 import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../../../data/model/response/category_list_reponse.dart';
+import '../../../../../database/database_helper.dart';
 import '../../../../../theme/styles.dart';
 import '../detail_item.dart';
 
@@ -24,13 +25,18 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
   @override
   void initState() {
 
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, ()  {
       if (!(widget.category.isPurchased!)) {
         buyNow(context, categoryId: widget.category.id.toString());
       }
       ref.read(paidPdfsProvider).fetchPdfs(widget.category.id!);
+      initCall();
     });
     super.initState();
+  }
+  Future<void> initCall()async {
+    ///to get downloaded pdf for if already downloaded then hide button so....
+    ref.read(paidPdfsProvider).downloadedPDF = await ref.read(databaseProvider).getPdf(widget.category.id!);
   }
 
   @override
@@ -82,6 +88,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
             title: model.title ?? '',
             subTitle: model.categoryTitle ?? '',
             index: '$index',
+            isDownloaded: provider.downloadedPDF.any((element) => element.id==provider.pdfsResponse?.list?[index].id),
           ),
         );
       },

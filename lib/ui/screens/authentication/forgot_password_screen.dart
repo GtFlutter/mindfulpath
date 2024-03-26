@@ -64,13 +64,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         resizeToAvoidBottomInset: false,
         extendBody: true,
         appBar: CustomAuthAppBar(
-          leadingWidth: _style.scale * 65,
+          leadingWidth: _style.scale * 72,
           leading: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: EdgeInsets.only(left: _style.scale * 15),
                 child: IconButton.outlined(
+                  padding: EdgeInsets.all(5),
                   onPressed: () {
                     if (context.canPop()) {
                       context.pop();

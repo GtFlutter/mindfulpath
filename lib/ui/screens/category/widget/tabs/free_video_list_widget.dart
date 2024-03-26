@@ -5,6 +5,8 @@ import 'package:meditation_app/provider/recent_videos_provider.dart';
 import '../../../../../data/model/body/resource_type.dart';
 import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../data/model/response/videos_response.dart';
+import '../../../../../database/database_helper.dart';
+import '../../../../../database/database_model.dart';
 import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../provider/resource_provider/free_videos_provider.dart';
 import '../../../../../provider/video_provider.dart';
@@ -26,8 +28,25 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () => ref.read(freeVideosProvider).fetchVideos(widget.category.id!));
+    Future.delayed(Duration.zero, () async {
+      ref.read(freeVideosProvider).fetchVideos(widget.category.id!);
+      await initCall();
+    });
+
     super.initState();
+  }
+
+  Future<void> initCall() async {
+    var provider = ref.read(freeVideosProvider);
+
+    ///to get downloaded video for if already downloaded then hide button so....
+    CategoryModal? res = await ref.read(databaseProvider).getSingleCategory(widget.category.id!.toString());
+    provider.downloadedVideo = await ref.read(databaseProvider).getVideo(res?.id ?? 0);
+    print("category id---${widget.category.id}");
+    print("getSingleCategory-------${res?.toJson()}");
+    if (provider.downloadedVideo.isNotEmpty) {
+      print("downloaded vedio----${provider.downloadedVideo.first.toJson()}---");
+    }
   }
 
   @override
@@ -64,7 +83,10 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
       itemCount: provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = provider.videosResponse!.list![index];
-
+        provider.downloadedVideo.map((element) {
+          print("element.categoryId---${element.videoId}---${provider.videosResponse?.list?[index].id}");
+          return element.id == provider.videosResponse?.list?[index].id;
+        });
         return GestureDetector(
           onTap: () => playVideo(model),
           child: DetailItem.video(
@@ -72,6 +94,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
             model: model,
             index: '$index',
             onToggleBookmark: () => toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false),
+            isDownloaded: provider.downloadedVideo.any((element) => element.videoId == provider.videosResponse?.list?[index].id),
           ),
         );
       },

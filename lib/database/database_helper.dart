@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/database/database_consts.dart';
@@ -105,7 +107,7 @@ class DatabaseHelper {
     List<CategoryModal> tempList = [];
     var dbClient = await db;
     List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.categoryTable);
-    debugPrint("Res :: $res");
+    debugPrint("Res getCategory:: $res");
     if (res.isNotEmpty) {
       tempList = CategoryModal.listFromJson(res);
       return tempList;
@@ -115,10 +117,11 @@ class DatabaseHelper {
   }
 
   Future<List<VideoModal>> getVideo(int categoryId) async {
+    print("category id in database helper---$categoryId");
     List<VideoModal> tempList = [];
     var dbClient = await db;
     List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.videoTable, where: 'category_id = ?', whereArgs: [categoryId]);
-    debugPrint("Res :: $res");
+    debugPrint("Res getVideo:: $res");
     if (res.isNotEmpty) {
       tempList = VideoModal.listFromJson(res);
       return tempList;
@@ -132,7 +135,7 @@ class DatabaseHelper {
     var dbClient = await db;
     debugPrint("Category Id : $categoryId");
     List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.pdfTable, where: 'category_id = ?', whereArgs: [categoryId]);
-    debugPrint("Res :: $res");
+    debugPrint("Res getPdf:: $res");
     if (res.isNotEmpty) {
       tempList = PdfModel.listFromJson(res);
       return tempList;

@@ -50,6 +50,7 @@ class SearchResultsList extends ConsumerWidget {
             model: _model[index],
             index: '$index',
             onToggleBookmark: () => toggleItemBookmark(ref, _model[index].id, isRemove: _model[index].bookmarked ?? false),
+            isDownloaded: false,
           ),
         );
       },

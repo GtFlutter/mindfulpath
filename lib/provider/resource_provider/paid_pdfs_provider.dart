@@ -6,6 +6,7 @@ import 'package:meditation_app/provider/resource_provider/pdf_resource_notifier_
 import '../../data/api/api_checker.dart';
 import '../../data/model/body/resource_type.dart';
 import '../../data/repositories/dashboard_repo.dart';
+import '../../database/database_model.dart';
 import '../../ui/common/custom_snackbar.dart';
 import '../../util/constants.dart';
 import '../repo_provider/dashboard_repo_provider.dart';
@@ -21,6 +22,9 @@ class PaidPdfsNotifier extends PdfResourceNotifier {
 
   PdfsResponse? _pdfsResponse;
   PdfsResponse? get pdfsResponse => _pdfsResponse;
+
+  List<PdfModel> downloadedPDF=[];
+
 
   bool _loading = false;
   bool get loading => _loading;

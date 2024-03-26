@@ -6,6 +6,7 @@ import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 import '../../../../../data/model/body/resource_type.dart';
 import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../data/model/response/videos_response.dart';
+import '../../../../../database/database_helper.dart';
 import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../provider/resource_provider/paid_videos_provider.dart';
 import '../../../../../provider/video_provider.dart';
@@ -27,15 +28,19 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () {
+    Future.delayed(Duration.zero, () async {
       if (!(widget.category.isPurchased!)) {
         buyNow(context, categoryId: widget.category.id.toString());
       }
       ref.read(paidVideosProvider).fetchVideos(widget.category.id!);
+      initCall();
     });
     super.initState();
   }
-
+  Future<void> initCall()async {
+    ///to get downloaded video for if already downloaded then hide button so....
+    // ref.read(paidVideosProvider).downloadedVideo = await ref.read(databaseProvider).getVideo(widget.category.id!);
+  }
   @override
   void dispose() {
     _controller.dispose();
@@ -83,6 +88,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
             appStyle: _style,
             model: model,
             index: '$index',
+            isDownloaded: provider.downloadedVideo.any((element) => element.id==provider.videosResponse?.list?[index].id),
             onToggleBookmark: () => toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false),
           ),
         );

@@ -5,6 +5,7 @@ import '../../data/api/api_checker.dart';
 import '../../data/model/body/resource_type.dart';
 import '../../data/model/response/videos_response.dart';
 import '../../data/repositories/dashboard_repo.dart';
+import '../../database/database_model.dart';
 import '../../ui/common/custom_snackbar.dart';
 import '../../util/constants.dart';
 import '../repo_provider/dashboard_repo_provider.dart';
@@ -21,6 +22,8 @@ class PaidVideosNotifier extends VideoResourceNotifier {
 
   VideosResponse? _videosResponse;
   VideosResponse? get videosResponse => _videosResponse;
+  List<VideoModal> downloadedVideo=[];
+
 
   @override
   void toggleBookmark(int itemId, {bool notifier = true}) {

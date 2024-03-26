@@ -77,6 +77,7 @@ class DetailItem extends ConsumerStatefulWidget {
   final String? title;
   final String? subTitle;
   final String index;
+  final bool isDownloaded;
   final GestureTapCallback? onToggleBookmark;
 
   const DetailItem.video({
@@ -85,6 +86,7 @@ class DetailItem extends ConsumerStatefulWidget {
     required VideoResponse this.model,
     required this.index,
     required this.onToggleBookmark,
+    required this.isDownloaded,
   })  : title = null,
         subTitle = null, pdfModel = null;
 
@@ -95,6 +97,7 @@ class DetailItem extends ConsumerStatefulWidget {
     required PdfResponse this.pdfModel,
     required String this.title,
     required String this.subTitle,
+    required this.isDownloaded,
   })  : model = null,
         onToggleBookmark = null;
 
@@ -225,6 +228,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   const Spacer(),
                   Row(
                     children: [
+                      if(!widget.isDownloaded)
                       Consumer(builder: (context, ref, child) {
                         final downloadP = ref.watch(downloadProvider);
                         if (downloadP.isDownloading && widget.model!.id == downloadP.model!.id) {
@@ -243,6 +247,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             appStyle: widget.appStyle,
                             // svgIconSrc: SvgPaths.bookmarkSelected,
                             onTap: () {
+                              print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}");
                               if (downloadP.model == null) {
                                 downloadP.download(model: widget.model);
                               } else if (widget.model!.id != downloadP.model!.id) {
