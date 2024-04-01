@@ -19,10 +19,12 @@ class FreeVideoListWidget extends ConsumerStatefulWidget {
   const FreeVideoListWidget({super.key, required this.category});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _FreeVideoListWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _FreeVideoListWidgetState();
 }
 
-class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with AutomaticKeepAliveClientMixin {
+class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
+    with AutomaticKeepAliveClientMixin {
   final ScrollController _controller = ScrollController();
   static AppStyle _style = AppStyle();
 
@@ -39,13 +41,20 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
   Future<void> initCall() async {
     var provider = ref.read(freeVideosProvider);
 
+
     ///to get downloaded video for if already downloaded then hide button so....
-    CategoryModal? res = await ref.read(databaseProvider).getSingleCategory(widget.category.id!.toString());
-    provider.downloadedVideo = await ref.read(databaseProvider).getVideo(res?.id ?? 0);
+    CategoryModal? res = await ref
+        .read(databaseProvider)
+        .getSingleCategory(widget.category.id!.toString());
+    provider.downloadedVideo = await ref
+        .read(databaseProvider)
+        .getVideo(int.parse(res?.categoryId ?? "0"));
     print("category id---${widget.category.id}");
     print("getSingleCategory-------${res?.toJson()}");
+    print("getSingleCategory-------***${provider.downloadedVideo}");
     if (provider.downloadedVideo.isNotEmpty) {
-      print("downloaded vedio----${provider.downloadedVideo.first.toJson()}---");
+      print(
+          "downloaded vedio----${provider.downloadedVideo.first.toJson()}---");
     }
   }
 
@@ -65,7 +74,8 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (provider.videosResponse == null || provider.videosResponse!.list == null) {
+    if (provider.videosResponse == null ||
+        provider.videosResponse!.list == null) {
       return const Center(child: Text('Unable to find data!'));
     }
     if (provider.videosResponse!.list!.isEmpty) {
@@ -83,22 +93,34 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
       itemCount: provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = provider.videosResponse!.list![index];
+        print('------**${model}');
+//model.id==null?false:model.id == int.parse(provider.downloadedVideo[index].videoId??"0")
+        //if(provider.downloadedVideo[index].videoId!=null){
+        //  print('--135----****${provider.downloadedVideo[index].videoId??" "}');
+        //}
+        final isDownloaded=provider.downloadedVideo.any((element){
+          return model.id==int.parse(provider.downloadedVideo[index].videoId??"0");
+        } );
+
+
         provider.downloadedVideo.map((element) {
-          print("element.categoryId---${element.videoId}---${provider.videosResponse?.list?[index].id}");
+          print(
+              "element.categoryId---${element.videoId}---${provider.videosResponse?.list?[index].id}");
           return element.id == provider.videosResponse?.list?[index].id;
         });
         return GestureDetector(
-          onTap: () => playVideo(model),
-          child: DetailItem.video(
-            appStyle: _style,
-            model: model,
-            index: '$index',
-            onToggleBookmark: () => toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false),
-            isDownloaded: provider.downloadedVideo.any((element) => element.videoId == provider.videosResponse?.list?[index].id),
-          ),
-        );
+            onTap: () => playVideo(model),
+            child: DetailItem.video(
+              appStyle: _style,
+              model: model,
+              index: '$index',
+              onToggleBookmark: () => toggleItemBookmark(model.id,
+                  isRemove: model.bookmarked ?? false),
+              isDownloaded:isDownloaded ,
+            ));
       },
-      separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+      separatorBuilder: (BuildContext context, int index) =>
+          SizedBox(height: _style.scaleX(25)),
     );
   }
 

@@ -40,9 +40,9 @@ class AuthRepo {
     return await apiClient.postData(AppConfigs.updateUserProfile, model.toJson);
   }
 
-  Future<Response> loginUser(String phoneNo, String password) async {
+  Future<Response> loginUser(String phoneNo, String password,String fcmToken) async {
     return await apiClient
-        .postData(AppConfigs.loginUser, {'phone_no': phoneNo, 'password': password, 'fcm_token': 'fcm_token'});
+        .postData(AppConfigs.loginUser, {'phone_no': phoneNo, 'password': password, 'fcm_token': fcmToken});
   }
 
   Future<Response> logoutUser() async {

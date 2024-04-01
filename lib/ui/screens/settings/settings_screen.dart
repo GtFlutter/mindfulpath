@@ -84,7 +84,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           inactiveToggleColor: const Color(0xFF49454F),
                           inactiveSwitchBorder: Border.all(color: const Color(0xFF79747E), width: _style.scaleX(1.5)),
                           activeSwitchBorder: Border.all(color: const Color(0xFF5A5A5A), width: _style.scaleX(1.5)),
-                          activeColor: const Color(0xFF5A5A5A),
+                          activeColor: const Color(0xFFB87A46),
                           inactiveColor: const Color(0xFFE6E0E9),
                           toggleMargin: _style.scaleX(4),
                           onToggle: (_) => configP.notificationToggle(),

@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 class PathHelper {
   static Future<String> getDownloadDirectoryPath(bool isPdf) async {
     Directory directory = await getApplicationSupportDirectory();
+    //Directory? directory = await getExternalStorageDirectory();
     if(isPdf){
       return '${directory.path}/PDF';
     }

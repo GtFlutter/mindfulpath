@@ -38,6 +38,7 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
     var radius = widget.appStyle.scaleX(10);
     var dimension = widget.appStyle.scaleX(97);
 
+    print('------------->${widget.model.videoFile}');
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
@@ -51,7 +52,7 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
           children: [
             MediaImageCard(
               appStyle: widget.appStyle,
-              imgUrl: widget.model.videoFile ?? '',
+              imgUrl: widget.model.categoryImage ?? '',
               duration: widget.model.videoDuration?.toDuration ?? '',
               imgRadius: radius,
               imgSize: dimension,

@@ -49,7 +49,7 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
                   debugPrint('Is User Logged In :: ${ref.read(authProvider).isUserLoggedIn}');
                   if (!ref.read(authProvider).isUserLoggedIn) {
                     showCustomSnackBar(
-                      'Please log in to bookmark.',
+                      'Please log in to Courses.',
                       action: SnackBarAction(
                         label: 'Log In',
                         backgroundColor: AppColors.primaryColor.withOpacity(0.8),

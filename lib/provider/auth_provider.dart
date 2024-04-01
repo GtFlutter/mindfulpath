@@ -128,9 +128,9 @@ class AuthNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> loginUser(String phoneNo, String password) async {
+  Future<void> loginUser(String phoneNo, String password,String fcmToken) async {
     startProgress();
-    Response response = await repo.loginUser(phoneNo, password);
+    Response response = await repo.loginUser(phoneNo, password,fcmToken);
     if (response.statusCode != 200) {
       stopProgress();
       ApiChecker.checkApi(response);

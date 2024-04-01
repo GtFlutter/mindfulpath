@@ -26,6 +26,7 @@ class FreeVideosNotifier extends VideoResourceNotifier {
   List<VideoModal> downloadedVideo=[];
 
 
+
   @override
   void toggleBookmark(int itemId, {bool notifier = true}) {
     if (_videosResponse == null || _videosResponse!.list == null) {

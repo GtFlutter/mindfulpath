@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/bookmark/bookmark_screen.dart';
@@ -10,14 +12,14 @@ import 'package:meditation_app/ui/screens/playlist/playlist_screen.dart';
 import '../../../theme/text_style.dart';
 import '../../common/custom_tab.dart';
 
-class LibraryScreen extends StatefulWidget {
+class LibraryScreen extends ConsumerStatefulWidget {
   const LibraryScreen({super.key});
 
   @override
-  State<LibraryScreen> createState() => _LibraryScreenState();
+  ConsumerState<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen> with TickerProviderStateMixin {
+class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProviderStateMixin {
   static AppStyle _style = AppStyle();
   late TabController _tabController;
 

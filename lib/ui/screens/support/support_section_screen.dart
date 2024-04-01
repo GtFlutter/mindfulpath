@@ -15,7 +15,8 @@ class SupportSectionScreen extends ConsumerStatefulWidget {
   const SupportSectionScreen({super.key});
 
   @override
-  ConsumerState<SupportSectionScreen> createState() => _SupportSectionScreenState();
+  ConsumerState<SupportSectionScreen> createState() =>
+      _SupportSectionScreenState();
 }
 
 class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
@@ -33,7 +34,10 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
-    AsyncValue<List<SupportTicket>> list = ref.watch(supportTicketsListProvider);
+    var supportP = ref.watch(supportProvider);
+
+    AsyncValue<List<SupportTicket>> list =
+        ref.watch(supportTicketsListProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -54,12 +58,20 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
               data: (data) {
                 return ListView.separated(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20), vertical: _style.scaleX(25)),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: _style.scaleX(20),
+                      vertical: _style.scaleX(25)),
                   itemBuilder: (context, index) {
                     return SupportSectionTicketItem(
                       style: _style,
                       ticket: data[index],
-                      onPressed: () {},
+                      onPressed: () async {
+                        supportP.name = data[index].name;
+                        supportP.email = data[index].email;
+                        supportP.descr = data[index].description;
+                        Navigator.pop(context);
+
+                      },
                     );
                   },
                   separatorBuilder: (context, index) {
@@ -91,7 +103,8 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
                                 ref.refresh(supportTicketsListProvider.future);
                               }
                             },
-                            child: Text(err.statusCode == 401 ? 'Sign In' : 'Retry'),
+                            child: Text(
+                                err.statusCode == 401 ? 'Sign In' : 'Retry'),
                           ),
                         ],
                       ),

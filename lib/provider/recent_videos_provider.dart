@@ -10,10 +10,10 @@ import '../data/model/response/category_list_reponse.dart';
 class DetailedVideoModel {
   int get videoId => video.videoId;
   int get catrgoryId => video.videoId;
-  final CategoryListResponse category;
+  final CategoryListResponse? category;
   final DIModel video;
 
-  const DetailedVideoModel({required this.category, required this.video});
+  const DetailedVideoModel({this.category, required this.video});
 
   factory DetailedVideoModel.fromJson(dynamic json) {
     return DetailedVideoModel(
@@ -24,7 +24,7 @@ class DetailedVideoModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['category'] = category.toJson();
+    data['category'] = category?.toJson();
     data['video'] = video.toJson();
     return data;
   }

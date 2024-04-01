@@ -72,6 +72,8 @@ class DownloadNotifier extends ChangeNotifier {
     await _checkDirectory(true);
     String path = await PathHelper.getDownloadDirectoryPath(true);
     debugPrint('File Path :: $path/${model.pdf!.fileName!}');
+    final file = File("$path/${model.pdf!.fileName!}");
+
     bool result = await PathHelper.fileExists('$path/${model.pdf!.fileName!}');
     if (result) {
       debugPrint('True');
@@ -93,7 +95,7 @@ class DownloadNotifier extends ChangeNotifier {
               notifyListeners();
             }
             if (tempProgress == 1.0) {
-              if (!_isDownloadComplete) {
+              if (!_isDownloadComplete)  {
                 _isDownloadComplete = true;
                 _isPdfDownloading = false;
                 debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
@@ -186,6 +188,85 @@ class DownloadNotifier extends ChangeNotifier {
 
     }
   }
+
+
+  void downloadPlayList({VideoResponse? model}) async {
+    print("call----${model?.category?.isPurchased}");
+
+    BuildContext? context = rootNavigator.currentContext;
+    if (context == null) return;
+    if (model == null) return;
+    print("model----$model");
+    _model = model;
+    notifyListeners();
+    double tempProgress = 0.0;
+    if (!ref.read(authProvider).isUserLoggedIn) {
+      _model=null;
+      showCustomSnackBar(
+        'Please log in to bookmark.',
+        action: SnackBarAction(
+          label: 'Log In',
+          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+          textColor: Colors.brown.shade800,
+          onPressed: () => appRouter.go(RoutePath.signIn),
+        ),
+        duration: const Duration(seconds: 5),
+      );
+      return;
+    }
+    ///Temp comment for check download process
+    // if (!model.category!.isPurchased!) {
+    //   buyNow(context, categoryId: model.category!.id.toString());
+    //   return;
+    // }
+    await _checkDirectory(false);
+    print("check directory");
+    String path = await PathHelper.getDownloadDirectoryPath(false);
+    debugPrint('File Path :: $path/${model.video!.fileName!}');
+    bool result = await PathHelper.fileExists('$path/${model.video!.fileName!}');
+    if (result) {
+      debugPrint('True');
+      _getSingleVideo('$path/${model.video!.fileName!}', model: model);
+      showCustomSnackBar('File Already Exists', type: true);
+      _model = null;
+      notifyListeners();
+    } else {
+      debugPrint('False');
+      try{
+        await DownloadHelper.instance.download(
+          model.videoUrl!,
+          '$path/${model.video!.fileName!}',
+          onReceiveProgress: (count, total) async {
+            debugPrint('Count :: $count --*-- Total :: $total');
+            if (total != -1) {
+              tempProgress = ((count / total * 100).roundToDouble())/100;
+              if (!_isDownloadComplete && !_isDownloading) {
+                _isDownloading = true;
+                notifyListeners();
+              }
+              if (tempProgress == 1.0) {
+                if (!_isDownloadComplete) {
+                  _isDownloadComplete = true;
+                  _isDownloading = false;
+                  debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+                  await _saveCategoryAndVideo('$path/${model.video!.fileName!}', model: model);//video download-download provider
+                  _model = null;
+                  notifyListeners();
+                }
+              }
+              setProgress(tempProgress);
+              debugPrint("Total Progress 1 :: $_progress%");
+            }
+          },
+        );
+      }catch(e){
+        _model=null;
+        showCustomSnackBar(e.toString());
+      }
+
+    }
+  }
+
 
   Future<void> _checkDirectory(bool isPdf) async {
     String path = await PathHelper.getDownloadDirectoryPath(isPdf);

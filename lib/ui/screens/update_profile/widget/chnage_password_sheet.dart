@@ -13,7 +13,8 @@ class ChnagePasswordSheet extends ConsumerStatefulWidget {
   const ChnagePasswordSheet({super.key});
 
   @override
-  ConsumerState<ChnagePasswordSheet> createState() => _ChnagePasswordSheetState();
+  ConsumerState<ChnagePasswordSheet> createState() =>
+      _ChnagePasswordSheetState();
 }
 
 class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
@@ -54,7 +55,8 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
     return AbsorbPointer(
       absorbing: provider.isLoading,
       child: Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         color: const Color(0xFF2D251F),
         child: SingleChildScrollView(
           child: Column(
@@ -62,7 +64,7 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
             children: [
               CommonBottomSheetWidget(
                 style: _style,
-                title: 'Change password',
+                title: 'Change Password',
                 doneLable: 'Save',
                 onCancle: () {
                   if (provider.isLoading) return;
@@ -77,14 +79,16 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
                   minHeight: _style.scaleX(1.5),
                   backgroundColor: Colors.transparent,
                 ),
-              if (provider.commonErrorText != null && provider.commonErrorText!.isNotEmpty)
+              if (provider.commonErrorText != null &&
+                  provider.commonErrorText!.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     provider.commonErrorText!,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: _style.text.font(mulishSemiBold600, sizePx: 13, color: Colors.red),
+                    style: _style.text
+                        .font(mulishSemiBold600, sizePx: 13, color: Colors.red),
                   ),
                 ),
               Padding(
@@ -125,7 +129,8 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
                       },
                       style: _style,
                     ),
-                    if (MediaQuery.of(context).viewInsets.bottom == 0) SizedBox(height: _style.scaleX(100)),
+                    if (MediaQuery.of(context).viewInsets.bottom == 0)
+                      SizedBox(height: _style.scaleX(100)),
                   ],
                 ),
               ),
@@ -143,17 +148,21 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
     String newPassword = _newPasswordCtrl.text.trim();
     if (oldPassword.isEmpty) {
       _oldPwdFocusNode.requestFocus();
-      ref.read(changePasswordProvider).setOldPwdError(error: 'Please enter an Old Password');
+      ref
+          .read(changePasswordProvider)
+          .setOldPwdError(error: 'Please enter an Old Password');
       return;
     } else if (newPassword.isEmpty) {
       _newPwdFocusNode.requestFocus();
-      ref.read(changePasswordProvider).setNewPwdError(error: 'Please enter a new Password');
+      ref
+          .read(changePasswordProvider)
+          .setNewPwdError(error: 'Please enter a new Password');
       return;
     } else if (oldPassword.length < AppConstants.PWD_MIN_LENGTH) {
       _oldPwdFocusNode.requestFocus();
-      ref
-          .read(changePasswordProvider)
-          .setOldPwdError(error: 'Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+      ref.read(changePasswordProvider).setOldPwdError(
+          error:
+              'Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
       return;
     } else if (oldPassword.length > AppConstants.PWD_MAX_LENGTH) {
       _oldPwdFocusNode.requestFocus();
@@ -163,13 +172,15 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
       return;
     } else if (oldPassword.contains(RegExp(r'\s'))) {
       _oldPwdFocusNode.requestFocus();
-      ref.read(changePasswordProvider).setOldPwdError(error: 'Password should not contain space...');
+      ref
+          .read(changePasswordProvider)
+          .setOldPwdError(error: 'Password should not contain space...');
       return;
     } else if (newPassword.length < AppConstants.PWD_MIN_LENGTH) {
       _newPwdFocusNode.requestFocus();
-      ref
-          .read(changePasswordProvider)
-          .setNewPwdError(error: 'Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+      ref.read(changePasswordProvider).setNewPwdError(
+          error:
+              'Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
       return;
     } else if (newPassword.length > AppConstants.PWD_MAX_LENGTH) {
       _newPwdFocusNode.requestFocus();
@@ -179,7 +190,9 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
       return;
     } else if (newPassword.contains(RegExp(r'\s'))) {
       _newPwdFocusNode.requestFocus();
-      ref.read(changePasswordProvider).setNewPwdError(error: 'Password should not contain space...');
+      ref
+          .read(changePasswordProvider)
+          .setNewPwdError(error: 'Password should not contain space...');
       return;
     }
     //  else if (oldPassword != newPassword) {

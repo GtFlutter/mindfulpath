@@ -161,7 +161,8 @@ final appRouter = GoRouter(
                 builder: (context, state) {
                   return SubPlayListScreen(
                     key: state.pageKey,
-                    data: state.extra as SubPlayListScreenData,
+                    id: state.extra as int? ?? 0,
+                    title: state.extra as String? ?? "",
                   );
                 },
               ),

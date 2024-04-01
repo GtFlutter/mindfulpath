@@ -23,10 +23,12 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
 
   @override
   void initState()  {
-    Future.delayed(Duration.zero, () => ref.read(freePdfsProvider).fetchPdfs(widget.category.id!));
 
+    Future.delayed(Duration.zero, () async {
+      ref.read(freePdfsProvider).fetchPdfs(widget.category.id!);
+      await initCall();
+    });
     ///to get downloaded pdf for if already downloaded then hide button so....
-    initCall();
     super.initState();
   }
 

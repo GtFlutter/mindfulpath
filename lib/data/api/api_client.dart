@@ -7,6 +7,7 @@ import 'package:meditation_app/data/model/response/error_res_model.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class ApiClient {
   final String appBaseUrl;
   final SharedPreferences sharedPreferences;
@@ -50,6 +51,27 @@ class ApiClient {
       return _errorResponse;
     }
   }
+
+
+  Future<http.Response> getNotificationData(
+      String uri, {
+        Map<String, String>? headers,
+      }) async {
+    try {
+      log('====> API Call: $uri \n Header: $_mainHeaders');
+      http.Response response = await http
+          .get(
+        Uri.parse(appBaseUrl + uri),
+        headers: headers ?? _mainHeaders,
+      )
+          .timeout(_timeoutIn);
+      return handleResponse(response, uri);
+    } catch (_) {
+      return _errorResponse;
+    }
+  }
+
+
 
   Future<http.Response> postData(
     String uri,

@@ -7,14 +7,15 @@ import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/body/user_body.dart';
 import 'package:meditation_app/helper/date_converter.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/notification_services.dart';
 import 'package:meditation_app/provider/user_provider.dart';
 import 'package:meditation_app/ui/common/adaptive_date_picker.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
+import 'package:meditation_app/ui/common/custom_next_button.dart';
+import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
-import 'package:meditation_app/ui/common/custom_next_button.dart';
-import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/util/assets.dart';
 
 import '../../../theme/styles.dart';
@@ -33,7 +34,8 @@ class CreateProfileScreen extends ConsumerStatefulWidget {
         password = value.$2;
 
   @override
-  ConsumerState<CreateProfileScreen> createState() => _CreateNewProfileScreenState();
+  ConsumerState<CreateProfileScreen> createState() =>
+      _CreateNewProfileScreenState();
 }
 
 class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
@@ -44,13 +46,31 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   final TextEditingController _dateCtrl = TextEditingController();
   DateTime? _dateOfBirth;
   String? _gender;
+  String? fcm;
 
-  final List<String> _genderList = List.unmodifiable(['Male', 'Female', 'Other']);
+  final List<String> _genderList =
+      List.unmodifiable(['Male', 'Female', 'Other']);
 
   @override
   void initState() {
-    ref.read(userProvider).clearAllErrorText(notifie: false);
+    Future.delayed(Duration.zero, () {
+      ref.read(userProvider).clearAllErrorText(notifie: false);
+      getFirebaseNotification();
+    });
     super.initState();
+  }
+
+  getFirebaseNotification() async {
+    NotificationServices notificationServices = NotificationServices();
+    notificationServices.requestNotificationPermission();
+    notificationServices.firebaseInit(context);
+    await notificationServices.forgroundMessage();
+    await notificationServices.setupInteractMessage(context);
+    notificationServices.getDeviceToken().then((value) {
+      print("device token");
+      print(value);
+      fcm = value;
+    });
   }
 
   @override
@@ -118,13 +138,16 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                 userP.setNameError();
                               },
                               textInputAction: TextInputAction.next,
-                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                              decoration: CustomeTextFieldStyle.inputDecoration(
+                                      style: _style)
+                                  .copyWith(
                                 labelText: 'Full name',
                                 errorText: userP.nameErrorText,
                               ),
                               keyboardType: TextInputType.text,
                               textCapitalization: TextCapitalization.words,
-                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                              style: CustomeTextFieldStyle.valueStyle(
+                                  style: _style),
                             ),
                             SizedBox(height: _style.scale * 27.5),
                             TextField(
@@ -134,12 +157,15 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                 userP.setEmailError();
                               },
                               textInputAction: TextInputAction.done,
-                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                              decoration: CustomeTextFieldStyle.inputDecoration(
+                                      style: _style)
+                                  .copyWith(
                                 labelText: 'Email',
                                 errorText: userP.emailErrorText,
                               ),
                               keyboardType: TextInputType.emailAddress,
-                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                              style: CustomeTextFieldStyle.valueStyle(
+                                  style: _style),
                             ),
                             SizedBox(height: _style.scale * 27.5),
                             TextField(
@@ -147,27 +173,36 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
                               readOnly: true,
                               canRequestFocus: false,
                               onTap: selectDate,
-                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                              decoration: CustomeTextFieldStyle.inputDecoration(
+                                      style: _style)
+                                  .copyWith(
                                 labelText: 'Date of birth',
                                 errorText: userP.dateErrorText,
                                 suffixIcon: Padding(
-                                  padding: EdgeInsets.only(right: _style.scale * 25),
+                                  padding:
+                                      EdgeInsets.only(right: _style.scale * 25),
                                   child: SvgPicture.asset(SvgPaths.calendar),
                                 ),
                                 suffixIconConstraints: BoxConstraints(
-                                  maxWidth: (_style.scale * 20) + (_style.scale * 25),
+                                  maxWidth:
+                                      (_style.scale * 20) + (_style.scale * 25),
                                   maxHeight: _style.scale * 20,
                                 ),
                               ),
-                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                              style: CustomeTextFieldStyle.valueStyle(
+                                  style: _style),
                             ),
                             SizedBox(height: _style.scale * 27.5),
                             DropdownButtonFormField(
                               value: _gender,
-                              style: CustomeTextFieldStyle.valueStyle(style: _style),
-                              borderRadius: BorderRadius.circular(_style.scale * 10),
+                              style: CustomeTextFieldStyle.valueStyle(
+                                  style: _style),
+                              borderRadius:
+                                  BorderRadius.circular(_style.scale * 10),
                               dropdownColor: Color.fromARGB(255, 93, 53, 20),
-                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                              decoration: CustomeTextFieldStyle.inputDecoration(
+                                      style: _style)
+                                  .copyWith(
                                 errorText: userP.genderErrorText,
                                 labelText: 'Gender',
                               ),
@@ -236,25 +271,23 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
       ref.read(userProvider).setEmailError(error: 'Please Enter Your Email');
       return;
     } else if (!email.isEmail) {
-      ref.read(userProvider).setEmailError(error: 'Please Enter Your Valid Email');
+      ref
+          .read(userProvider)
+          .setEmailError(error: 'Please Enter Your Valid Email');
       return;
     } else if (dateOfBirth == null) {
-      ref.read(userProvider).setDateError(error: 'Please Select Your Date of Birth');
+      ref
+          .read(userProvider)
+          .setDateError(error: 'Please Select Your Date of Birth');
       return;
     } else if (gender == null || gender.isEmpty) {
       ref.read(userProvider).setGenderError(error: 'Please Select Your Gender');
       return;
     } else {
+      print('------------>${fcm}');
       ref.read(userProvider).createUserProfile(
             UserBody.register(
-              name,
-              email,
-              phoneNo,
-              dateOfBirth,
-              gender,
-              password,
-              'ajksdjsdjk'
-            ),
+                name, email, phoneNo, dateOfBirth, gender, password, fcm ?? ""),
           );
     }
   }

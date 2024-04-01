@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
+import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
+import 'package:meditation_app/data/model/response/playlist_details_response.dart';
 import 'package:meditation_app/data/model/response/playlist_list_response.dart';
 import 'package:meditation_app/data/repositories/playlist_repo.dart';
 import 'package:meditation_app/provider/repo_provider/playlist_repo_provider.dart';
@@ -25,6 +27,10 @@ class PlaylistNotifier extends ChangeNotifier {
 
   List<PlaylistListResponse>? _playlistListResponse;
   List<PlaylistListResponse>? get playlistListResponse => _playlistListResponse;
+
+  Playlist_Detail_Response? _playlistDetailResponse;
+  Playlist_Detail_Response? get playlistDetailResponse => _playlistDetailResponse;
+
 
   void startLoading() {
     if (!_isLoading) {
@@ -51,6 +57,33 @@ class PlaylistNotifier extends ChangeNotifier {
       try {
         var json = jsonDecode(response.body);
         _playlistListResponse = PlaylistListResponse.listFromJson(json['data']['palylist']);
+        if (showProgress) {
+          stopLoading();
+        } else {
+          notifyListeners();
+        }
+      } catch (e) {
+        showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+        if (showProgress) stopLoading();
+      }
+    }
+  }
+
+  Future<void> getPlaylistDetails(int playListId, {bool showProgress = false}) async {
+    if (showProgress) startLoading();
+
+    Response response = await repo.getPlaylistDetail(playListId);
+    debugPrint('RESPONSE CODE :: ${response.statusCode}');
+    if (response.statusCode != 200) {
+      if (showProgress) stopLoading();
+      ApiChecker.checkApi(response);
+    } else {
+      try {
+        print('sgsdgdgsgsd ----****** ${jsonDecode(response.body)}');
+        print('sgsdgdgsgsd ----++++++ ${Playlist_Detail_Response.fromJson(jsonDecode(response.body))}');
+
+        _playlistDetailResponse = Playlist_Detail_Response.fromJson(jsonDecode(response.body));
+        print('sgsdgdgsgsd ----*****86* ${_playlistDetailResponse}');
         if (showProgress) {
           stopLoading();
         } else {

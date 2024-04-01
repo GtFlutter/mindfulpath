@@ -43,6 +43,7 @@ class AppConfigs {
   static const String toggleBookmark = '/add-to-bookmark';
 
   static const String getPlaylist = '/get-playlist';
+  static const String getPlaylistDetail = '/playlist-detail';
   static const String createPlaylist = '/create-playlist';
   static const String deletePlaylist = '/delete-playlist';
   static const String addToPlaylist = '/add-to-playlist';
@@ -55,6 +56,9 @@ class AppConfigs {
 
   static const String getPurchaseList = '/get-purchase-list';
   static const String getCurrentlyProgressList = '/get-currently-progress';
+
+  static const String getNotification = '/get-notification-list';
+  static const String getReadNotification = '/notification-read';
 
   /// END [API_CONFIG]
 

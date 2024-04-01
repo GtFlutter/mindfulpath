@@ -88,7 +88,8 @@ class DetailItem extends ConsumerStatefulWidget {
     required this.onToggleBookmark,
     required this.isDownloaded,
   })  : title = null,
-        subTitle = null, pdfModel = null;
+        subTitle = null,
+        pdfModel = null;
 
   const DetailItem.pdf({
     super.key,
@@ -106,7 +107,6 @@ class DetailItem extends ConsumerStatefulWidget {
 }
 
 class _DetailItemState extends ConsumerState<DetailItem> {
-
   // bool _isDownloading = false, _isDownloadComplete = false;
   //
   // double _progress = 0.0;
@@ -114,23 +114,29 @@ class _DetailItemState extends ConsumerState<DetailItem> {
   @override
   void initState() {
     final playlistP = ref.read(playListProvider);
-    Future.delayed(Duration.zero,() {
-      if (playlistP.playlistListResponse != null && playlistP.playlistListResponse!.isNotEmpty) {
-        playlistP.getPlaylistList();
-      }
-    },);
+    Future.delayed(
+      Duration.zero,
+      () {
+        if (playlistP.playlistListResponse != null &&
+            playlistP.playlistListResponse!.isNotEmpty) {
+          playlistP.getPlaylistList();
+        }
+      },
+    );
     super.initState();
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
+    TextStyle textStyle =
+        widget.appStyle.text.font(mulishRegular400, sizePx: 9);
     var radius = widget.appStyle.scaleX(10);
     var dimension = widget.appStyle.scaleX(97);
     bool isVideo = widget.model != null;
     var pdfIconSize = isVideo ? 0.0 : widget.appStyle.scaleX(30);
 
     final playlistP = ref.watch(playListProvider);
+
 
     return Container(
       decoration: ShapeDecoration(
@@ -177,7 +183,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 children: [
                   Text(
                     isVideo ? '${widget.model!.title}' : widget.title ?? '',
-                    style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                    style: widget.appStyle.text.font(mulishSemiBold600,
+                        sizePx: 14, color: Colors.white),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -191,15 +198,19 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         children: [
                           Text(
                             '●',
-                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                            style: widget.appStyle.text.font(mulishSemiBold600,
+                                sizePx: 14, color: AppColors.primaryColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           SizedBox(width: widget.appStyle.scaleX(5)),
                           Flexible(
                             child: Text(
-                              isVideo ? '${widget.model!.categoryTitle}' : widget.subTitle ?? '',
-                              style: textStyle.copyWith(color: AppColors.categoryNameColor),
+                              isVideo
+                                  ? '${widget.model!.categoryTitle}'
+                                  : widget.subTitle ?? '',
+                              style: textStyle.copyWith(
+                                  color: AppColors.categoryNameColor),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -218,7 +229,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 children: [
                   const Spacer(),
                   OutlinedIconButton.svg(
-                    widget.model!.bookmarked != null && widget.model!.bookmarked!
+                    widget.model!.bookmarked != null &&
+                            widget.model!.bookmarked!
                         ? SvgPaths.bookmarkSelected
                         : SvgPaths.bookmarkUnselected,
                     appStyle: widget.appStyle,
@@ -228,34 +240,41 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   const Spacer(),
                   Row(
                     children: [
-                      if(!widget.isDownloaded)
-                      Consumer(builder: (context, ref, child) {
-                        final downloadP = ref.watch(downloadProvider);
-                        if (downloadP.isDownloading && widget.model!.id == downloadP.model!.id) {
-                          return SizedBox(
-                            height: 15,
-                            width: 15,
-                            child: CircularProgressIndicator(
-                              strokeCap: StrokeCap.butt,
-                              strokeWidth: 2,
-                              value: downloadP.progress,
-                            ),
-                          );
-                        } else {
-                          return OutlinedIconButton.svg(
-                            SvgPaths.download,
-                            appStyle: widget.appStyle,
-                            // svgIconSrc: SvgPaths.bookmarkSelected,
-                            onTap: () {
-                              print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}");
-                              if (downloadP.model == null) {
-                                downloadP.download(model: widget.model);
-                              } else if (widget.model!.id != downloadP.model!.id) {
-                                showCustomSnackBar('Another Video is in progress');
-                              }
-                            },
-                          );
-                        }},),
+                      if (!widget.isDownloaded)
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final downloadP = ref.watch(downloadProvider);
+                            if (downloadP.isDownloading &&
+                                widget.model!.id == downloadP.model!.id) {
+                              return SizedBox(
+                                height: 15,
+                                width: 15,
+                                child: CircularProgressIndicator(
+                                  strokeCap: StrokeCap.butt,
+                                  strokeWidth: 2,
+                                  value: downloadP.progress,
+                                ),
+                              );
+                            } else {
+                              return OutlinedIconButton.svg(
+                                SvgPaths.download,
+                                appStyle: widget.appStyle,
+                                // svgIconSrc: SvgPaths.bookmarkSelected,
+                                onTap: () {
+                                  print(
+                                      "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                  if (downloadP.model == null) {
+                                    downloadP.download(model: widget.model);
+                                  } else if (widget.model!.id !=
+                                      downloadP.model!.id) {
+                                    showCustomSnackBar(
+                                        'Another Video is in progress');
+                                  }
+                                },
+                              );
+                            }
+                          },
+                        ),
                       const SizedBox(
                         width: 10,
                       ),
@@ -263,53 +282,75 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         menuChildren: [
                           MenuItemButton(
                             onPressed: () {
-                              if (widget.model!.video != null && widget.model!.video!.id != null) {
-                                createPlaylist(context, videoId: widget.model!.video?.id?.toString());
+                              if (widget.model!.video != null &&
+                                  widget.model!.video!.id != null) {
+                                createPlaylist(context,
+                                    videoId:
+                                        widget.model!.video?.id?.toString());
                               }
                             },
                             child: Text(
                               'Create Playlist',
-                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text.font(
+                                  mulishSemiBold600,
+                                  sizePx: 12,
+                                  color: AppColors.deleteMenuText),
                             ),
                           ),
                           SubmenuButton(
                             menuChildren: [
                               if (playlistP.playlistListResponse != null) ...[
-                                ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                                ...List.generate(
+                                    playlistP.playlistListResponse!.length,
+                                    (index) {
                                   return PopupMenuItem(
                                     height: widget.appStyle.scaleX(24),
                                     onTap: () async {
-                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
+                                      await playlistP.addToPlaylist(
+                                          playlistP
+                                              .playlistListResponse![index].id
+                                              .toString(),
+                                          widget.model!.video!.id!.toString());
                                     },
                                     child: Text(
-                                      playlistP.playlistListResponse![index].title ?? '',
-                                      style:
-                                      widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                                      playlistP.playlistListResponse![index]
+                                              .title ??
+                                          '',
+                                      style: widget.appStyle.text.font(
+                                          mulishSemiBold600,
+                                          sizePx: 12,
+                                          color: AppColors.deleteMenuText),
                                     ),
                                   );
                                 })
                               ]
                             ],
                             menuStyle: const MenuStyle(
-                              padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                              backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                              padding:
+                                  MaterialStatePropertyAll(EdgeInsets.zero),
+                              backgroundColor: MaterialStatePropertyAll(
+                                  AppColors.popupMenuItemColor),
                             ),
                             style: SubmenuButton.styleFrom(
                                 backgroundColor: AppColors.popupMenuItemColor,
                                 surfaceTintColor: AppColors.popupMenuItemColor,
-                                iconColor: Colors.grey
-                            ),
+                                iconColor: Colors.grey),
                             child: Text(
                               'Add to Playlist',
-                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text.font(
+                                  mulishSemiBold600,
+                                  sizePx: 12,
+                                  color: AppColors.deleteMenuText),
                             ),
                           ),
                         ],
                         style: const MenuStyle(
                           // padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                          backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                          backgroundColor: MaterialStatePropertyAll(
+                              AppColors.popupMenuItemColor),
                           visualDensity: VisualDensity(vertical: -4),
-                          surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                          surfaceTintColor: MaterialStatePropertyAll(
+                              AppColors.popupMenuItemColor),
                         ),
                         builder: (context, controller, child) {
                           return OutlinedIconButton.svg(
@@ -409,32 +450,37 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 ],
               )
             else
-              Consumer(builder: (context, ref, child) {
-                final downloadP = ref.watch(downloadProvider);
-                if (downloadP.isPdfDownloading && widget.pdfModel!.id == downloadP.pdfModel!.id) {
-                  return SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
-                      strokeCap: StrokeCap.butt,
-                      strokeWidth: 2,
-                      value: downloadP.progress,
-                    ),
-                  );
-                } else {
-                  return OutlinedIconButton.svg(
-                    SvgPaths.download,
-                    appStyle: widget.appStyle,
-                    // svgIconSrc: SvgPaths.bookmarkSelected,
-                    onTap: () {
-                      if (downloadP.pdfModel == null) {
-                        downloadP.pdfDownload(model: widget.pdfModel);
-                      } else if (widget.pdfModel!.id != downloadP.pdfModel!.id) {
-                        showCustomSnackBar('Another PDF is in progress');
-                      }
-                    },
-                  );
-                }},),
+              Consumer(
+                builder: (context, ref, child) {
+                  final downloadP = ref.watch(downloadProvider);
+                  if (downloadP.isPdfDownloading &&
+                      widget.pdfModel!.id == downloadP.pdfModel!.id) {
+                    return SizedBox(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator(
+                        strokeCap: StrokeCap.butt,
+                        strokeWidth: 2,
+                        value: downloadP.progress,
+                      ),
+                    );
+                  } else {
+                    return OutlinedIconButton.svg(
+                      SvgPaths.download,
+                      appStyle: widget.appStyle,
+                      // svgIconSrc: SvgPaths.bookmarkSelected,
+                      onTap: () {
+                        if (downloadP.pdfModel == null) {
+                          downloadP.pdfDownload(model: widget.pdfModel);
+                        } else if (widget.pdfModel!.id !=
+                            downloadP.pdfModel!.id) {
+                          showCustomSnackBar('Another PDF is in progress');
+                        }
+                      },
+                    );
+                  }
+                },
+              ),
             SizedBox(width: widget.appStyle.scaleX(10)),
           ],
         ),
@@ -450,7 +496,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
         return ProviderScope(
           parent: ProviderScope.containerOf(context, listen: false),
           child: Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10))),
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(widget.appStyle.scaleX(10))),
             child: CreatePlaylistDialog(
               widget.appStyle,
               videoId: videoId,
@@ -461,94 +509,94 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     );
   }
 
-  // void _download() async {
-  //   if (!ref.read(authProvider).isUserLoggedIn) {
-  //     showCustomSnackBar(
-  //       'Please log in to bookmark.',
-  //       action: SnackBarAction(
-  //         label: 'Log In',
-  //         backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-  //         textColor: Colors.brown.shade800,
-  //         onPressed: () => appRouter.go(RoutePath.signIn),
-  //       ),
-  //       duration: const Duration(seconds: 5),
-  //     );
-  //     return;
-  //   }
-  //   if (!widget.model!.category!.isPurchased!) {
-  //     buyNow(context, categoryId: widget.model!.category!.id.toString());
-  //     return;
-  //   }
-  //   await _checkDirectory();
-  //   String path = await PathHelper.getDownloadDirectoryPath();
-  //   debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
-  //   bool result = await PathHelper.fileExists('$path/${widget.model!.video!.fileName!}');
-  //   if (result) {
-  //     debugPrint('True');
-  //     getSingleVideo('$path/${widget.model!.video!.fileName!}');
-  //     showCustomSnackBar('File Already Exists', type: true);
-  //   } else {
-  //     debugPrint('False');
-  //     await DownloadHelper.instance.download(
-  //       widget.model!.videoUrl!,
-  //       '$path/${widget.model!.video!.fileName!}',
-  //       onReceiveProgress: (count, total) {
-  //         debugPrint('Count :: $count --*-- Total :: $total');
-  //         if (total != -1) {
-  //           _progress = ((count / total * 100).roundToDouble())/100;
-  //           if (!_isDownloadComplete) if (!_isDownloading) _isDownloading = true;
-  //           if (_progress == 1.0) {
-  //             if (!_isDownloadComplete) {
-  //               _isDownloadComplete = true;
-  //               _isDownloading = false;
-  //               debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-  //               _saveCategoryAndVideo('$path/${widget.model!.video!.fileName!}');
-  //             }
-  //           }
-  //           if (context.mounted) setState(() {});
-  //           debugPrint("Total Progress 1 :: $_progress%");
-  //         }
-  //       },
-  //     );
-  //   }
-  // }
-  //
-  // Future<void> _checkDirectory() async {
-  //   String path = await PathHelper.getDownloadDirectoryPath();
-  //   debugPrint('Path :: $path');
-  //   bool result = await PathHelper.directoryExits(path);
-  //   if (!result) {
-  //     Directory directory = await PathHelper.createDirectory(path, recursive: true);
-  //     debugPrint('Directory Path :: ${directory.path}');
-  //   }
-  // }
-  //
-  // Future<void> getSingleVideo(String videoFile) async {
-  //   final dbHelper = ref.read(databaseProvider);
-  //   VideoModal? res = await dbHelper.getSingleVideo(widget.model!.id!.toString());
-  //   if (res == null) {
-  //     _saveCategoryAndVideo(videoFile);
-  //   }
-  // }
-  //
-  // Future<void> _saveCategoryAndVideo(String videoFile) async {
-  //   final dbHelper = ref.read(databaseProvider);
-  //   CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
-  //   if (res != null) {
-  //     VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
-  //     int vRes = await dbHelper.saveVideo(vModal);
-  //     if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
-  //   } else {
-  //     CategoryModal modal = CategoryModal(categoryId: widget.model!.categoryId!.toString(), categoryName: widget.model!.categoryTitle, categoryImage: widget.model!.category!.imageResponse!.imageUrl);
-  //     int cRes = await dbHelper.saveCategory(modal);
-  //     if (cRes == 1) {
-  //       CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
-  //       if (res != null) {
-  //         VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
-  //         int vRes = await dbHelper.saveVideo(vModal);
-  //         if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
-  //       }
-  //     }
-  //   }
-  // }
+// void _download() async {
+//   if (!ref.read(authProvider).isUserLoggedIn) {
+//     showCustomSnackBar(
+//       'Please log in to bookmark.',
+//       action: SnackBarAction(
+//         label: 'Log In',
+//         backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+//         textColor: Colors.brown.shade800,
+//         onPressed: () => appRouter.go(RoutePath.signIn),
+//       ),
+//       duration: const Duration(seconds: 5),
+//     );
+//     return;
+//   }
+//   if (!widget.model!.category!.isPurchased!) {
+//     buyNow(context, categoryId: widget.model!.category!.id.toString());
+//     return;
+//   }
+//   await _checkDirectory();
+//   String path = await PathHelper.getDownloadDirectoryPath();
+//   debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
+//   bool result = await PathHelper.fileExists('$path/${widget.model!.video!.fileName!}');
+//   if (result) {
+//     debugPrint('True');
+//     getSingleVideo('$path/${widget.model!.video!.fileName!}');
+//     showCustomSnackBar('File Already Exists', type: true);
+//   } else {
+//     debugPrint('False');
+//     await DownloadHelper.instance.download(
+//       widget.model!.videoUrl!,
+//       '$path/${widget.model!.video!.fileName!}',
+//       onReceiveProgress: (count, total) {
+//         debugPrint('Count :: $count --*-- Total :: $total');
+//         if (total != -1) {
+//           _progress = ((count / total * 100).roundToDouble())/100;
+//           if (!_isDownloadComplete) if (!_isDownloading) _isDownloading = true;
+//           if (_progress == 1.0) {
+//             if (!_isDownloadComplete) {
+//               _isDownloadComplete = true;
+//               _isDownloading = false;
+//               debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+//               _saveCategoryAndVideo('$path/${widget.model!.video!.fileName!}');
+//             }
+//           }
+//           if (context.mounted) setState(() {});
+//           debugPrint("Total Progress 1 :: $_progress%");
+//         }
+//       },
+//     );
+//   }
+// }
+//
+// Future<void> _checkDirectory() async {
+//   String path = await PathHelper.getDownloadDirectoryPath();
+//   debugPrint('Path :: $path');
+//   bool result = await PathHelper.directoryExits(path);
+//   if (!result) {
+//     Directory directory = await PathHelper.createDirectory(path, recursive: true);
+//     debugPrint('Directory Path :: ${directory.path}');
+//   }
+// }
+//
+// Future<void> getSingleVideo(String videoFile) async {
+//   final dbHelper = ref.read(databaseProvider);
+//   VideoModal? res = await dbHelper.getSingleVideo(widget.model!.id!.toString());
+//   if (res == null) {
+//     _saveCategoryAndVideo(videoFile);
+//   }
+// }
+//
+// Future<void> _saveCategoryAndVideo(String videoFile) async {
+//   final dbHelper = ref.read(databaseProvider);
+//   CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
+//   if (res != null) {
+//     VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
+//     int vRes = await dbHelper.saveVideo(vModal);
+//     if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
+//   } else {
+//     CategoryModal modal = CategoryModal(categoryId: widget.model!.categoryId!.toString(), categoryName: widget.model!.categoryTitle, categoryImage: widget.model!.category!.imageResponse!.imageUrl);
+//     int cRes = await dbHelper.saveCategory(modal);
+//     if (cRes == 1) {
+//       CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
+//       if (res != null) {
+//         VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
+//         int vRes = await dbHelper.saveVideo(vModal);
+//         if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
+//       }
+//     }
+//   }
+// }
 }

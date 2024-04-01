@@ -1,62 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:meditation_app/helper/date_converter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
+import 'package:meditation_app/ui/screens/notifications/notificationlist_provider.dart';
 
 import '../../../theme/styles.dart';
 import '../../common/custom_app_bar.dart';
 
-class NModel {
-  final String message;
-  final String url;
-  final DateTime receviedAt;
-  NModel(this.message, this.url, this.receviedAt);
-}
 
-class NotificationsScreens extends StatefulWidget {
+class NotificationsScreens extends ConsumerStatefulWidget {
   const NotificationsScreens({super.key});
 
   @override
-  State<NotificationsScreens> createState() => _NotificationsScreensState();
+  ConsumerState<NotificationsScreens> createState() =>
+      _NotificationsScreensState();
 }
 
-class _NotificationsScreensState extends State<NotificationsScreens> {
+class _NotificationsScreensState extends ConsumerState<NotificationsScreens> {
   static AppStyle _style = AppStyle();
   bool notification = false;
+
+  @override
+  void initState() {
+    final notificationListP = ref.read(notificationListProvider);
+    Future.delayed(
+      Duration.zero,
+      () {
+        notificationListP.getNotificationList(showProgress: true);
+        notificationListP.getReadeNotification();
+      },
+    );
+    super.initState();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
+    var notiList = ref.watch(notificationListProvider);
 
-    List<NModel> list = [
-      NModel(
-        'Calm Oases has updated.',
-        'https://images.pexels.com/photos/4151865/pexels-photo-4151865.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1280&dpr=1',
-        DateTime.now(),
-      ),
-      NModel(
-        'Check Out the new video of Transcendental Meditation.',
-        'https://images.pexels.com/photos/6740518/pexels-photo-6740518.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        DateTime.now(),
-      ),
-      NModel(
-        'You have near about to complete your milestone.',
-        'https://images.pexels.com/photos/1034940/pexels-photo-1034940.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        DateTime.now(),
-      ),
-      NModel(
-        '15% Discount available on exercise category.',
-        'https://images.pexels.com/photos/841128/pexels-photo-841128.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        DateTime.now(),
-      ),
-      NModel(
-        'Inhale peace, exhale gratitude. Find stillness within.',
-        'https://images.pexels.com/photos/4553618/pexels-photo-4553618.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        DateTime.now(),
-      ),
-    ];
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -70,38 +56,66 @@ class _NotificationsScreensState extends State<NotificationsScreens> {
         alignment: Alignment.topCenter,
         child: SafeArea(
           bottom: false,
-          child: ListView.separated(
-            padding: EdgeInsets.only(
-              left: _style.scaleX(20),
-              top: _style.scaleX(60),
-              bottom: _style.scaleX(30),
-            ),
-            itemBuilder: (context, index) {
-              return NotificationItem(
-                message: list[index].message,
-                url: list[index].url,
-                receviedAt: DateTime.now().subtract(Duration(days: index + 1)),
-                appStyle: _style,
-              );
-            },
-            separatorBuilder: (context, index) {
-              return SizedBox(height: _style.scaleX(30));
-            },
-            itemCount: list.length,
-          ),
+          child: notiList.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : notiList.notificationListResponse == null ||
+                      notiList.notificationListResponse!.data!.notificationData!
+                          .isEmpty
+                  ? const Center(child: Text('No Notification Found'))
+                  : ListView.separated(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: EdgeInsets.only(
+                        left: _style.scaleX(20),
+                        top: _style.scaleX(60),
+                        bottom: _style.scaleX(30),
+                      ),
+                      itemCount: notiList.notificationListResponse?.data
+                              ?.notificationData?.length ??0,
+                      itemBuilder: (context, index) {
+                        print('---------index---->${index}');
+
+                        final model = notiList.notificationListResponse?.data
+                            ?.notificationData?[index];
+
+                        String utcTime = model?.createdAt??"";
+                        DateTime dateTime = DateTime.parse(utcTime);
+                        String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm a').format(dateTime);
+
+
+                        print('------------->${formattedDateTime ?? ""}');
+                        return NotificationItem(
+                          message: model?.message ?? "",
+                          url: model?.image ?? "",
+                          receviedAt: formattedDateTime,
+                          appStyle: _style,
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: _style.scaleX(30));
+                      },
+                    ),
         ),
       ),
     );
   }
+
 }
 
 class NotificationItem extends StatelessWidget {
   final String message;
   final String url;
-  final DateTime receviedAt;
+  final String receviedAt;
   final AppStyle appStyle;
+
   const NotificationItem(
-      {super.key, required this.message, required this.receviedAt, required this.url, required this.appStyle});
+      {super.key,
+      required this.message,
+      required this.receviedAt,
+      required this.url,
+      required this.appStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -120,12 +134,15 @@ class NotificationItem extends StatelessWidget {
               ),
               SizedBox(height: appStyle.scaleX(5)),
               Text(
-                receviedAt.toStringFormat2,
-                style: appStyle.text.font(mulishSemiBold600, sizePx: 9, color: const Color(0xFF717171)),
+                receviedAt,
+                style: appStyle.text.font(mulishSemiBold600,
+                    sizePx: 9, color: const Color(0xFF717171)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              Divider(color: AppColors.primaryColor, endIndent: appStyle.scaleX(10)),
+              Divider(
+                  color: AppColors.primaryColor,
+                  endIndent: appStyle.scaleX(10)),
             ],
           ),
         ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/notification_services.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.dart';
@@ -11,7 +12,6 @@ import 'package:meditation_app/util/assets.dart';
 import '../../../theme/styles.dart';
 import 'discover_list_widget.dart';
 import 'featured_widget.dart';
-import 'recent_list_widget.dart';
 import 'widget/greeting.dart';
 
 class DiscoverScreen extends StatefulWidget {
@@ -25,12 +25,31 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   static AppStyle _style = AppStyle();
 
   @override
+  void initState() {
+    Future.delayed(Duration.zero, () {
+      getFirebaseNotification();
+    });
+
+    super.initState();
+  }
+
+  getFirebaseNotification() async {
+    NotificationServices notificationServices = NotificationServices();
+    notificationServices.requestNotificationPermission();
+    notificationServices.firebaseInit(context);
+    await notificationServices.forgroundMessage();
+    await notificationServices.setupInteractMessage(context);
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
     /// This is For Featured Card Image Clipper
-    final DashboardCustomImageClipper clipper = DashboardCustomImageClipper(_style.scaleX(15));
+    final DashboardCustomImageClipper clipper =
+        DashboardCustomImageClipper(_style.scaleX(15));
 
     return Scaffold(
       extendBody: true,
@@ -54,7 +73,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 width: _style.scale * 20,
                 fit: BoxFit.contain,
               ),
-              style: IconButton.styleFrom(splashFactory: InkSplash.splashFactory),
+              style:
+                  IconButton.styleFrom(splashFactory: InkSplash.splashFactory),
             );
           },
         ),
@@ -78,7 +98,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: EdgeInsets.only(left: _style.scale * 20, right: _style.scale * 22, bottom: _style.scale * 10),
+              padding: EdgeInsets.only(
+                  left: _style.scale * 20,
+                  right: _style.scale * 22,
+                  bottom: _style.scale * 10),
               child: Greeting(key: const ValueKey('Greeting'), style: _style),
             ),
           ),
@@ -89,7 +112,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           bottom: false,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.only(bottom: _style.scale * 100, top: _style.scale * 10),
+            padding: EdgeInsets.only(
+                bottom: _style.scale * 100, top: _style.scale * 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

@@ -39,6 +39,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
   @override
   void initState() {
     ref.read(supportProvider).clearAllErrorText(notifie: false);
+
     super.initState();
   }
 
@@ -53,12 +54,16 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
     var supportP = ref.watch(supportProvider);
+    _nameCtrl.text = supportP.name??"";
+    _emailCtrl.text = supportP.email??"";
+    _descriptionCtrl.text = supportP.descr??"";
 
     return AbsorbPointer(
       absorbing: supportP.isLoading,
@@ -70,6 +75,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           screenSize: size,
           style: _style,
           title: 'Support',
+          dataBackMng:supportP.name == null || supportP.name==""?false:true ,
         ),
         body: BackgroundImage(
           alignment: Alignment.topCenter,
@@ -105,7 +111,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       ),
                       keyboardType: TextInputType.text,
                       textCapitalization: TextCapitalization.words,
-                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
+                      style: CustomeTextFieldStyle.valueStyle(
+                          style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
                     TextField(
@@ -125,7 +132,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         errorText: supportP.emailErrorText,
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
+                      style: CustomeTextFieldStyle.valueStyle(
+                          style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
                     TextField(
@@ -148,49 +156,56 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       maxLines: 6,
                       maxLength: 200,
                       textAlignVertical: TextAlignVertical.top,
-                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
+                      style: CustomeTextFieldStyle.valueStyle(
+                          style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
-                    TextField(
-                      readOnly: !_disableField,
-                      canRequestFocus: _disableField,
-                      showCursor: _disableField,
-                      magnifierConfiguration: TextMagnifierConfiguration.disabled,
-                      onTap: () {
-                        context.go(RoutePath.supportSectionScreenPath);
-                      },
-                      keyboardType: TextInputType.none,
-                      decoration: CustomeTextFieldStyle.inputDecoration(
-                        style: _style,
-                        labelSize: 15,
-                        floatingLabelSize: 15,
-                      ).copyWith(
-                        labelText: 'Support section',
-                        labelStyle: _style.text.font(
-                          mulishSemiBold600,
-                          sizePx: 15,
-                          color: Colors.white,
-                        ),
-                        suffixIcon: UnconstrainedBox(
-                          child: SvgPicture.asset(
-                            SvgPaths.arrowRight,
-                            height: _style.scaleX(20),
-                            width: _style.scaleX(20),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
-                    ),
+                    supportP.name == null || supportP.name==""
+                        ? TextField(
+                            readOnly: !_disableField,
+                            canRequestFocus: _disableField,
+                            showCursor: _disableField,
+                            magnifierConfiguration:
+                                TextMagnifierConfiguration.disabled,
+                            onTap: () {
+                              context.go(RoutePath.supportSectionScreenPath);
+                            },
+                            keyboardType: TextInputType.none,
+                            decoration: CustomeTextFieldStyle.inputDecoration(
+                              style: _style,
+                              labelSize: 15,
+                              floatingLabelSize: 15,
+                            ).copyWith(
+                              labelText: 'Support section',
+                              labelStyle: _style.text.font(
+                                mulishSemiBold600,
+                                sizePx: 15,
+                                color: Colors.white,
+                              ),
+                              suffixIcon: UnconstrainedBox(
+                                child: SvgPicture.asset(
+                                  SvgPaths.arrowRight,
+                                  height: _style.scaleX(20),
+                                  width: _style.scaleX(20),
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                            style: CustomeTextFieldStyle.valueStyle(
+                                style: _style, valueSize: 12.5),
+                          )
+                        : const SizedBox.shrink(),
                   ],
                 ),
                 const Spacer(),
-                CustomNextButton(
-                  text: 'Submit',
-                  onPressed: !supportP.isLoading ? onNext : null,
-                  style: _style,
-                  inProgress: supportP.isLoading,
-                ),
+                supportP.name == null || supportP.name==""
+                    ? CustomNextButton(
+                        text: 'Submit',
+                        onPressed: !supportP.isLoading ? onNext : null,
+                        style: _style,
+                        inProgress: supportP.isLoading,
+                      )
+                    : const SizedBox.shrink(),
                 SizedBox(height: _style.scale * 20),
               ],
             ),
@@ -212,10 +227,14 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
       ref.read(supportProvider).setEmailError(error: 'Please Enter Your Email');
       return;
     } else if (!email.isEmail) {
-      ref.read(supportProvider).setEmailError(error: 'Please Enter Your Valid Email');
+      ref
+          .read(supportProvider)
+          .setEmailError(error: 'Please Enter Your Valid Email');
       return;
     } else if (description.isEmpty) {
-      ref.read(supportProvider).setDescriptionError(error: 'Please Enter Your Description');
+      ref
+          .read(supportProvider)
+          .setDescriptionError(error: 'Please Enter Your Description');
       return;
     } else {
       FocusManager.instance.primaryFocus?.unfocus();

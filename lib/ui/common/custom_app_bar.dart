@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/provider/support_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 
 import '../../theme/text_style.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final AppStyle style;
   final String? title;
+  final bool? dataBackMng;
   final bool automaticallyImplyLeading;
   final Color? surfaceTintColor;
   final Size screenSize;
@@ -25,11 +29,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.screenSize,
     this.onDonePressed,
     required this.style,
-    this.actions,
+    this.actions, this.dataBackMng,
   }) : preferredSize = Size.fromHeight(kToolbarHeight + (style.scale * screenSize.height < 800 ? 0.0 : 10));
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
     var borderWidth = style.scaleX(0.50);
     var borderColor = AppColors.appBarBorderColor;
     return AppBar(
@@ -53,6 +57,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? IconButton.outlined(
               constraints: BoxConstraints(maxWidth: style.scaleX(40), maxHeight: style.scaleX(40)),
               onPressed: () {
+                print('----->>>1321321 ${dataBackMng}');
+                if(dataBackMng==true){
+                  ref.read(supportProvider.notifier).name=null;
+                  ref.read(supportProvider.notifier).email=null;
+                  ref.read(supportProvider.notifier).descr=null;
+                  context.go(RoutePath.supportSectionScreenPath);
+                  return;
+
+                }
                 if (context.canPop()) {
                   context.pop();
                 }

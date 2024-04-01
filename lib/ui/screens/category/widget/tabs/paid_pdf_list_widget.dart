@@ -24,7 +24,6 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
   @override
   void initState() {
-
     Future.delayed(Duration.zero, ()  {
       if (!(widget.category.isPurchased!)) {
         buyNow(context, categoryId: widget.category.id.toString());

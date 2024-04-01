@@ -126,7 +126,7 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
     showModalBottomSheet(
       useRootNavigator: true,
       isScrollControlled: true,
-      isDismissible: false,
+      isDismissible: true,
       useSafeArea: true,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
@@ -274,7 +274,7 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
                       onTap: changePassword,
                       keyboardType: TextInputType.none,
                       decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
-                        labelText: 'Change password',
+                        labelText: 'Change Password',
                         suffixIcon: UnconstrainedBox(
                           child: SvgPicture.asset(
                             SvgPaths.arrowRight,

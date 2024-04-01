@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
+import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/data/repositories/bookmark_repo.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
@@ -35,6 +36,10 @@ class BookmarkNotifier extends ChangeNotifier {
 
   List<BookmarkListResponse>? _bookmarkListResponse;
   List<BookmarkListResponse>? get bookmarkListResponse => _bookmarkListResponse;
+
+  List<CategoryListResponse>? _category;
+  List<CategoryListResponse>? get category => _category;
+
 
   void startLoading() {
     if (!_isLoading) {
@@ -75,9 +80,11 @@ class BookmarkNotifier extends ChangeNotifier {
       try {
         var json = jsonDecode(response.body);
         _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_video_list']);
+        _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
+        print('------------>>>>>${_category!.first.id}');
         stopLoading();
       } catch (e) {
-        showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+        //showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
         stopLoading();
       }
     }

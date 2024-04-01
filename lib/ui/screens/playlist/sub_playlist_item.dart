@@ -1,62 +1,52 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
+import 'package:meditation_app/data/model/response/playlist_details_response.dart';
+import 'package:meditation_app/helper/path_helper.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
+import 'package:meditation_app/ui/common/media_image_card.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
-import '../../../common/media_image_card.dart';
 
-class BookmarkItem extends ConsumerStatefulWidget {
+class SubPlayListItem extends ConsumerStatefulWidget {
   final AppStyle appStyle;
-  final BookmarkListResponse model;
-  final String index;
+  final PlaylistVideoList model;
+  final int index;
   final bool dragable;
   final String? url;
   final bool dragging;
   final GestureTapCallback? onBookmarkRemove;
 
-  const BookmarkItem({
+  const SubPlayListItem( {
     super.key,
     required this.appStyle,
     required this.model,
     required this.index,
-    required this.onBookmarkRemove,
+    this.onBookmarkRemove,
     this.url,
   })  : dragable = false,
         dragging = false;
 
-  const BookmarkItem.dragable({
-    super.key,
-    required this.appStyle,
-    required this.model,
-    required this.index,
-    this.url,
-    this.dragging = false,
-    this.onBookmarkRemove,
-  }) : dragable = true;
 
   @override
-  ConsumerState<BookmarkItem> createState() => _BookmarkItemState();
+  ConsumerState<SubPlayListItem> createState() => _BookmarkItemState();
 }
 
-class _BookmarkItemState extends ConsumerState<BookmarkItem> {
-  bool result=true;
+class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
   @override
   void initState() {
     final downloadP = ref.read(downloadProvider);
     Future.delayed(
       Duration.zero,
       () {
-        result = downloadP.checkVideoIsDownload(
-            widget.model.bookmarkVideoResponse!.id.toString(), false) as bool;
+        downloadP.checkVideoIsDownload(
+            widget.model.videoId.toString(), false);
 
       },
     );
@@ -69,13 +59,13 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
   Widget build(BuildContext context) {
     TextStyle textStyle =
         widget.appStyle.text.font(mulishRegular400, sizePx: 9);
-    String timeStr = widget.model.bookmarkVideoResponse!.duration??"";
-    List<String> timeComponents = timeStr.split(":");
-    int minute = int.parse(timeComponents[1]);
-    int second = int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
-    print("Minute: $minute, Second: $second");
+    //String timeStr = widget.model.bookmarkVideoResponse!.duration??"";
+    //List<String> timeComponents = timeStr.split(":");
+    //int minute = int.parse(timeComponents[1]);
+    //int second = int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
+    //print("Minute: $minute, Second: $second");
+    final bookmarkNotifier = ref.watch(bookmarkProvider);
 
-    print('----------->>>>>>${result}');
 
     return Container(
       decoration: ShapeDecoration(
@@ -107,11 +97,8 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
           children: [
             MediaImageCard(
               appStyle: widget.appStyle,
-              imgUrl: widget.model.bookmarkVideoResponse != null
-                  ? widget.model.bookmarkVideoResponse!.thumbnailImageUrlSrc ??
-                      ''
-                  : '',
-              duration: minute==0?'${second} Sec':'${minute} Min',
+              imgUrl: widget.model.video!.thumbnailImageUrl??"",
+              duration: '0',
               imgRadius: widget.appStyle.scaleX(25),
               imgSize: widget.appStyle.scaleX(90),
             ),
@@ -129,7 +116,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                         children: [
                           Text(
                             '${widget.model.videoTitle}',
-                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: Colors.white),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -159,23 +146,11 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                         ],
                       ),
                     ),
-                    const Spacer(),
                     Padding(
                       padding:
-                          EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
+                      EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
                       child: Row(
                         children: [
-                          IconButton(
-                            onPressed: widget.onBookmarkRemove,
-                            icon: SvgPicture.asset(
-                              SvgPaths.remove,
-                              height: widget.appStyle.scaleX(16),
-                              fit: BoxFit.contain,
-                            ),
-                            style: IconButton.styleFrom(
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap),
-                          ),
                           IconButton(
                             onPressed: () {
                               Share.share(
@@ -189,7 +164,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                             ),
                             style: IconButton.styleFrom(
                                 tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap),
+                                MaterialTapTargetSize.shrinkWrap),
                           ),
                           Consumer(
                             builder: (context, ref, child) {
@@ -198,7 +173,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                 return const SizedBox.shrink();
                               } else {
                                 if (downloadP.isDownloading &&
-                                    widget.model.bookmarkVideoResponse!.id ==
+                                    bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id ==
                                         downloadP.model!.id) {
                                   return SizedBox(
                                     height: 15,
@@ -210,13 +185,12 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                     ),
                                   );
                                 } else {
-                                  if (!result) {
-                                    return IconButton(
+                                  return IconButton(
                                     onPressed: () {
                                       if (downloadP.model == null) {
-                                        downloadP.download(model: widget.model.bookmarkVideoResponse);
-                                      } else if (widget.model
-                                              .bookmarkVideoResponse!.id !=
+                                        downloadP.download(
+                                            model: bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse);
+                                      } else if (bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id !=
                                           downloadP.model!.id) {
                                         showCustomSnackBar(
                                             'Another Video is in progress');
@@ -229,11 +203,8 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                     ),
                                     style: IconButton.styleFrom(
                                         tapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap),
+                                        MaterialTapTargetSize.shrinkWrap),
                                   );
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
                                 }
                               }
                             },

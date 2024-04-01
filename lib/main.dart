@@ -1,6 +1,11 @@
+import 'dart:ui';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/firebase_options.dart';
 import 'package:meditation_app/provider/base/shared_preferences_provider.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/theme/theme.dart';
@@ -18,6 +23,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO For IOS Number keyboard show Done Using Scaffold
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform
+  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
@@ -47,4 +56,12 @@ class MainApp extends StatelessWidget {
       routerConfig: appRouter,
     );
   }
+}
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage remoteMessage) async {
+  print("Handling a background message: ${remoteMessage.toMap()}");
+  DartPluginRegistrant.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final send = IsolateNameServer.lookupPortByName('notification');
+  send?.send(remoteMessage.data);
 }

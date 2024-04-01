@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/helper/route/router.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
+import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_widget.dart';
+import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../../theme/colors.dart';
@@ -12,16 +18,16 @@ import 'tabs/free_pdf_list_widget.dart';
 import 'tabs/free_video_list_widget.dart';
 import 'tabs/paid_pdf_list_widget.dart';
 
-class ResourceDetailCategory extends StatefulWidget {
+class ResourceDetailCategory extends ConsumerStatefulWidget {
   final CategoryListResponse category;
 
   const ResourceDetailCategory({super.key, required this.category});
 
   @override
-  State<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
+  ConsumerState<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
 }
 
-class _ResourceDetailCategoryState extends State<ResourceDetailCategory> with TickerProviderStateMixin {
+class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
   final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF')];
 
@@ -98,7 +104,27 @@ class _ResourceDetailCategoryState extends State<ResourceDetailCategory> with Ti
             CustomSelecteableButton(
               text: 'Paid',
               selected: courseIndex == 1,
-              onTap: () => _changeCourseType(1),
+              onTap: () {
+                if (!ref.read(authProvider).isUserLoggedIn) {
+                  showCustomSnackBar(
+                    'Please log in to paid video.',
+                    action: SnackBarAction(
+                      label: 'Log In',
+                      backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                      textColor: Colors.brown.shade800,
+                      onPressed: () => appRouter.go(RoutePath.signIn),
+                    ),
+                    duration: const Duration(seconds: 5),
+                  );
+                  return;
+                }
+                if (!(widget.category.isPurchased!)) {
+                  buyNow(context, categoryId: widget.category.id.toString());
+                  return;
+                }else{
+                  _changeCourseType(1);
+                }
+              } ,
             ),
             const Spacer(),
             Container(

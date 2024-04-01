@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
+import 'package:meditation_app/notification_services.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
@@ -39,6 +40,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
   final String initCountryCode = '+91';
   String _countryCode = '+91';
+  String? fcm;
 
   String? _numberErrorText;
   String? _pwdErrorText;
@@ -55,6 +57,26 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
   void setPwdErrorText([String? error]) {
     setState(() => _pwdErrorText = error);
+  }
+  @override
+  void initState() {
+    Future.delayed(Duration.zero, () {
+      getFirebaseNotification();
+    });
+    super.initState();
+  }
+
+  getFirebaseNotification() async {
+    NotificationServices notificationServices = NotificationServices();
+    notificationServices.requestNotificationPermission();
+    notificationServices.firebaseInit(context);
+    await notificationServices.forgroundMessage();
+    await notificationServices.setupInteractMessage(context);
+    notificationServices.getDeviceToken().then((value) {
+      print("device token");
+      print(value);
+      fcm = value;
+    });
   }
 
   @override
@@ -287,7 +309,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
     /// TODO IF this is sign then get error from api and show
     else if (widget.isSignIn) {
-      ref.read(authProvider).loginUser(code + number, password);
+      ref.read(authProvider).loginUser(code + number, password,fcm??"");
     } else {
       ref.read(authProvider).requestOTP(
             countryCode: code,

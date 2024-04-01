@@ -14,6 +14,16 @@ class PlaylistRepo {
     return await apiClient.getData('${AppConfigs.getPlaylist}?perPage=${AppConstants.kPerPage}&page=$page');
   }
 
+  Future<Response> getPlaylistDetail(int playListId) async {
+    var body = {
+      'playlist_id': playListId,
+      'perPage': AppConstants.kPerPage,
+      'page': 1,
+
+    };
+    return await apiClient.postData(AppConfigs.getPlaylistDetail,body);
+  }
+
   Future<Response> createPlaylist(String title, {String? videoId}) async {
     var body = {'title': title};
     if (videoId != null) body.addAll({'video_id': videoId});

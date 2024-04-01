@@ -40,10 +40,12 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
 class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   late VideoPlayerController _controller;
   bool _isBuffering = false;
-  double _progress = 0;
+  double _progress = 0.1;
+
   bool _showReload = false;
 
   Timer? _watchTimer;
+
   // Duration _watchTimeInSeconds = Duration.zero;
   final Duration _period = const Duration(seconds: 10);
 
@@ -57,14 +59,18 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   void initVideoPlayer() {
     VideoPlayerController videoPlayerController;
     if (widget.isFileUrl) {
-      videoPlayerController = VideoPlayerController.file(File(widget.url),);
+      videoPlayerController = VideoPlayerController.file(
+        File(widget.url),
+      );
     } else {
-      videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.url),);
+      videoPlayerController = VideoPlayerController.networkUrl(
+        Uri.parse(widget.url),
+      );
     }
     _controller = videoPlayerController
       ..initialize()
       ..setLooping(false).then(
-            (value) {
+        (value) {
           _controller.addListener(listner);
           setState(() {});
           toggleVideo();
@@ -80,15 +86,15 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   }
 
   void listner() {
-    double newValue = _controller.value.position.inMilliseconds / _controller.value.duration.inMilliseconds;
+    double newValue = _controller.value.position.inMilliseconds /
+        _controller.value.duration.inMilliseconds;
     if (_progress != newValue) {
-      setState(
-        () {
+      setState(() {
           _isBuffering = _controller.value.isBuffering;
-          _progress = newValue.clamp(0, 1).toDouble();
+          //_progress = newValue.clamp(0, 1).toDouble();
           _showReload = _controller.value.position >= _controller.value.duration;
-        },
-      );
+          _progress = _controller.value.position.inSeconds.toDouble();
+       },);
     }
     if (_controller.value.isPlaying) {
       if (!widget.isFileUrl) {
@@ -96,7 +102,9 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           // _watchTimeInSeconds += _period; // Increment watch time
           // Call API to update watch duration and video ID
           if (!_isBuffering && _controller.value.isInitialized) {
-            ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
+            ref
+                .read(dashboardProvider)
+                .storeVideoWatchedTime(widget.videoId, _period);
           }
         });
       }
@@ -107,12 +115,12 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   }
 
   void toggleVideo() async {
-    setState(() {
+   // setState(() {
       if (_controller.value.position >= _controller.value.duration) {
         _controller.seekTo(Duration.zero);
       }
       _controller.value.isPlaying ? _controller.pause() : _controller.play();
-    });
+   // });
   }
 
   void toggleAudio() {
@@ -146,11 +154,14 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           AspectRatio(
             aspectRatio: isInitialized ? _controller.value.aspectRatio : 16 / 9,
             child: ClipRRect(
-              borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)),
+              borderRadius: widget.isLandscape
+                  ? BorderRadius.zero
+                  : BorderRadius.circular(widget.style.scaleX(25)),
               child: VideoPlayer(_controller),
             ),
           ),
-          if (!isInitialized || (_isBuffering && !_showReload)) const CircularProgressIndicator(),
+          if (!isInitialized || (_isBuffering && !_showReload))
+            const CircularProgressIndicator(),
           if (_showReload && isInitialized)
             IconButton(
               onPressed: toggleVideo,
@@ -164,9 +175,13 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: EdgeInsets.only(left: widget.style.scaleX(15), top: widget.style.scaleX(10)),
+                    padding: EdgeInsets.only(
+                        left: widget.style.scaleX(15),
+                        top: widget.style.scaleX(10)),
                     child: OutlinedIconButton.icon(
-                      icon: Icon(Icons.arrow_back_ios_rounded, size: widget.style.scaleX(widget.isLandscape ? 20 : 15)),
+                      icon: Icon(Icons.arrow_back_ios_rounded,
+                          size: widget.style
+                              .scaleX(widget.isLandscape ? 20 : 15)),
                       appStyle: widget.style,
                       onTap: widget.onBackPress,
                     ),
@@ -187,8 +202,10 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                       borderRadius: widget.isLandscape
                           ? BorderRadius.zero
                           : BorderRadius.only(
-                              bottomLeft: Radius.circular(widget.style.scaleX(25)),
-                              bottomRight: Radius.circular(widget.style.scaleX(25)),
+                              bottomLeft:
+                                  Radius.circular(widget.style.scaleX(25)),
+                              bottomRight:
+                                  Radius.circular(widget.style.scaleX(25)),
                             ),
                     ),
                     gradient: LinearGradient(
@@ -224,7 +241,8 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                             iconSize: widget.isLandscape ? 23 : 20,
                             onTap: toggleAudio,
                           ),
-                          if (widget.isLandscape) SizedBox(width: widget.style.scaleX(15)),
+                          if (widget.isLandscape)
+                            SizedBox(width: widget.style.scaleX(15)),
                           OutlinedIconButton.svg(
                             SvgPaths.maximize,
                             appStyle: widget.style,
@@ -234,27 +252,40 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                           ),
                         ],
                       ),
-                      SizedBox(height: widget.style.scaleX(widget.isLandscape ? 10 : 5)),
+                      SizedBox(
+                          height:
+                              widget.style.scaleX(widget.isLandscape ? 10 : 5)),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: widget.style.scaleX(8)),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: widget.style.scaleX(8)),
                         child: SliderTheme(
                           data: Theme.of(context).sliderTheme.copyWith(
-                                trackHeight: widget.style.scaleX(4),
-                                overlayShape: SliderComponentShape.noOverlay,
-                                thumbShape: SliderComponentShape.noThumb,
-                                // thumbShape: RoundSliderThumbShape(enabledThumbRadius: widget.style.scaleX(6)),
-                                trackShape: CustomTrackShape(),
-                              ),
+                            trackHeight: widget.style.scaleX(4),
+                            overlayShape: SliderComponentShape.noOverlay,
+                            thumbShape: RoundSliderThumbShape(
+                                enabledThumbRadius: widget.style.scaleX(6)),
+                            trackShape: CustomTrackShape(),
+                          ),
                           child: Slider(
                             value: _progress,
-                            onChanged: (_) {},
+                            min: 0.0,
+                            max:
+                            _controller.value.duration.inSeconds.toDouble(),
+                            onChanged: (progress) {
+                              setState(() {
+                                _progress = progress;
+                              });
+                              _controller
+                                  .seekTo(Duration(seconds: progress.toInt()));
+                            },
                             activeColor: AppColors.primaryColor,
                             // thumbColor: AppColors.primaryColor,
                             inactiveColor: Colors.black,
                           ),
                         ),
                       ),
-                      if (widget.isLandscape) SizedBox(height: widget.style.scaleX(15)),
+                      if (widget.isLandscape)
+                        SizedBox(height: widget.style.scaleX(15)),
                     ],
                   ),
                 ),

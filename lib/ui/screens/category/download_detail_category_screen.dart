@@ -30,10 +30,13 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
-      ref.read(courseProvider).getVideoFromDatabase(widget.categoryModal.id!);
+      print('--------------*******---${widget.categoryModal.id}');
+      ref.read(courseProvider).getVideoFromDatabase(int.parse(widget.categoryModal.categoryId??""));
+
     },);
     Future.delayed(Duration.zero, () {
-      ref.read(courseProvider).getPdfFromDatabase(widget.categoryModal.id!);
+      ref.read(courseProvider).getPdfFromDatabase(int.parse(widget.categoryModal.categoryId??""));
+
     },);
     super.initState();
   }
@@ -49,6 +52,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
 
     var videoCtrl = ref.watch(offlineVideoProvider);
     final courseP = ref.watch(courseProvider);
+
+    print('---------------->${videoCtrl.video?.videoName??""}');
 
     var isVideoAvailable = videoCtrl.video != null;
     return PopScope(
