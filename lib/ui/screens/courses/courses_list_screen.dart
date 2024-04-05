@@ -48,6 +48,8 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
   @override
   void initState() {
     final courseP = ref.read(courseProvider);
+
+    print(widget.title);
     if (isPurchased) {
       Future.delayed(Duration.zero,  () {
         courseP.getPurchasedList();
@@ -64,6 +66,9 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
     super.initState();
   }
 
+
+
+
   bool get isPurchased => widget.title == ScreenTitles.purchased.value;
   bool get isCurrentlyProgress => widget.title == ScreenTitles.currentlyProgress.value;
 
@@ -76,6 +81,7 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
     double maxHeight = _style.scaleX(8.2 * ratio);
 
     final courseP = ref.watch(courseProvider);
+
     return Scaffold(
       appBar: CustomAppBar(
         screenSize: size,
@@ -93,9 +99,12 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
               maxCrossAxisExtent: maxWidth,
               childAspectRatio: maxWidth / maxHeight,
             ),
-            itemCount: isPurchased ? courseP.purchasedVideoResponse.length : isCurrentlyProgress ? courseP.cpVideoResponse.length : courseP.downloadResponse.length,
+            itemCount: isPurchased ? courseP.purchasedVideoResponse.length
+                : isCurrentlyProgress ? courseP.cpVideoResponse.length
+            :courseP.downloadResponse.length,
             padding: EdgeInsets.fromLTRB(_style.scale * 25, _style.scaleX(20), _style.scale * 25, _style.scaleX(100)),
             itemBuilder: (context, index) {
+
               CITempModel item;
               if (isPurchased) {
                 item = CITempModel(courseP.purchasedVideoResponse[index].title ?? '', courseP.purchasedVideoResponse[index].categoryResponse!.imageResponse!.imageUrl ?? '');
@@ -112,7 +121,7 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
                     context.goToDetailCategoryScreen(courseP.purchasedVideoResponse[index].categoryResponse!);
                   } else if (isCurrentlyProgress) {
                     context.goToDetailCategoryScreen(courseP.cpVideoResponse[index].categoryResponse!);
-                  } else {
+                  }else {
                     context.push(RoutePath.downloadDetailCategoryScreenPath, extra: courseP.downloadResponse[index]);
                   }
                 },

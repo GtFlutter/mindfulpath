@@ -94,6 +94,20 @@ class CourseNotifier extends ChangeNotifier {
     _stopLoading();
   }
 
+  List<PdfModel> _downloadPdfResponses = [];
+  List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
+
+
+  Future<void> getCategoryPdfFromDatabase() async {
+    _startLoading();
+    List<PdfModel> list = await ref.read(databaseProvider).getPdfCategory();
+    print(list.length);
+    print(list);
+    print("================123456=====================");
+    _downloadPdfResponses = list;
+    _stopLoading();
+  }
+
   List<VideoModal> _downloadVideoResponse = [];
   List<VideoModal> get downloadVideoResponse => _downloadVideoResponse;
 
@@ -104,13 +118,14 @@ class CourseNotifier extends ChangeNotifier {
     _stopLoading();
   }
 
-  List<PdfModel> _downloadPdfResponse = [];
+  final List<PdfModel> _downloadPdfResponse = [];
   List<PdfModel> get downloadPdfResponse => _downloadPdfResponse;
 
-  Future<void> getPdfFromDatabase(int categoryId) async {
+
+  Future<void> getPdfFromDatabase(int id) async {
     _startLoading();
-    List<PdfModel> list = await ref.read(databaseProvider).getPdf(categoryId);
-    _downloadPdfResponse = list;
+    List<PdfModel> list = await ref.read(databaseProvider).getPdf(id);
+    _downloadPdfResponse.addAll(list);
     debugPrint("Length ${list.length}");
     debugPrint("Length Of PDF : ${_downloadPdfResponse.length}");
     _stopLoading();

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meditation_app/data/model/response/playlist_details_response.dart';
-import 'package:meditation_app/helper/path_helper.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
@@ -86,9 +85,9 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
           : null,
       padding: EdgeInsets.fromLTRB(
         widget.appStyle.scaleX(29),
-        widget.appStyle.scaleX(31.5),
+        widget.appStyle.scaleX(30.5),
         widget.appStyle.scaleX(29),
-        widget.appStyle.scaleX(21.5),
+        widget.appStyle.scaleX(14.5),
       ),
       alignment: Alignment.center,
       child: IntrinsicHeight(
@@ -102,118 +101,115 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
               imgRadius: widget.appStyle.scaleX(25),
               imgSize: widget.appStyle.scaleX(90),
             ),
-            Expanded(
-              child: SizedBox(
-                height: widget.appStyle.scaleX(95),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: widget.appStyle.scaleX(25)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${widget.model.videoTitle}',
-                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: Colors.white),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: widget.appStyle.scaleX(25)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${widget.model.videoTitle}',
+                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: widget.appStyle.scaleX(5)),
+                        Text.rich(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          TextSpan(
+                            style: textStyle.copyWith(
+                                color: AppColors.autherNameColor),
+                            children: [
+                              TextSpan(
+                                text: '  ● ',
+                                style: widget.appStyle.text.font(
+                                    mulishSemiBold600,
+                                    sizePx: 14,
+                                    color: AppColors.primaryColor),
+                              ),
+                              TextSpan(
+                                text: 'Nutrition',
+                                style: textStyle.copyWith(
+                                    color: AppColors.categoryNameColor),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: widget.appStyle.scaleX(5)),
-                          Text.rich(
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            TextSpan(
-                              style: textStyle.copyWith(
-                                  color: AppColors.autherNameColor),
-                              children: [
-                                TextSpan(
-                                  text: '  ● ',
-                                  style: widget.appStyle.text.font(
-                                      mulishSemiBold600,
-                                      sizePx: 14,
-                                      color: AppColors.primaryColor),
-                                ),
-                                TextSpan(
-                                  text: 'Nutrition',
-                                  style: textStyle.copyWith(
-                                      color: AppColors.categoryNameColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Padding(
-                      padding:
-                      EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Share.share(
-                                widget.url ?? "",
-                              );
-                            },
-                            icon: SvgPicture.asset(
-                              SvgPaths.share,
-                              height: widget.appStyle.scaleX(16),
-                              fit: BoxFit.contain, // 155861
-                            ),
-                            style: IconButton.styleFrom(
-                                tapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap),
+                  ),
+                  Padding(
+                    padding:
+                    EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Share.share(
+                              widget.url ?? "",
+                            );
+                          },
+                          icon: SvgPicture.asset(
+                            SvgPaths.share,
+                            height: widget.appStyle.scaleX(16),
+                            fit: BoxFit.contain, // 155861
                           ),
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final downloadP = ref.watch(downloadProvider);
-                              if (downloadP.isAlreadyDownload) {
-                                return const SizedBox.shrink();
+                          style: IconButton.styleFrom(
+                              tapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap),
+                        ),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final downloadP = ref.watch(downloadProvider);
+                            if (downloadP.isAlreadyDownload) {
+                              return const SizedBox.shrink();
+                            } else {
+                              if (downloadP.isDownloading &&
+                                  bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id ==
+                                      downloadP.model!.id) {
+                                return SizedBox(
+                                  height: 15,
+                                  width: 15,
+                                  child: CircularProgressIndicator(
+                                    strokeCap: StrokeCap.butt,
+                                    strokeWidth: 2,
+                                    value: downloadP.progress,
+                                  ),
+                                );
                               } else {
-                                if (downloadP.isDownloading &&
-                                    bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id ==
+                                return IconButton(
+                                  onPressed: () {
+                                    if (downloadP.model == null) {
+                                      downloadP.download(
+                                          model: bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse);
+                                    } else if (bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id !=
                                         downloadP.model!.id) {
-                                  return SizedBox(
-                                    height: 15,
-                                    width: 15,
-                                    child: CircularProgressIndicator(
-                                      strokeCap: StrokeCap.butt,
-                                      strokeWidth: 2,
-                                      value: downloadP.progress,
-                                    ),
-                                  );
-                                } else {
-                                  return IconButton(
-                                    onPressed: () {
-                                      if (downloadP.model == null) {
-                                        downloadP.download(
-                                            model: bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse);
-                                      } else if (bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id !=
-                                          downloadP.model!.id) {
-                                        showCustomSnackBar(
-                                            'Another Video is in progress');
-                                      }
-                                    },
-                                    icon: SvgPicture.asset(
-                                      SvgPaths.download,
-                                      height: widget.appStyle.scaleX(16),
-                                      fit: BoxFit.contain,
-                                    ),
-                                    style: IconButton.styleFrom(
-                                        tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap),
-                                  );
-                                }
+                                      showCustomSnackBar(
+                                          'Another Video is in progress');
+                                    }
+                                  },
+                                  icon: SvgPicture.asset(
+                                    SvgPaths.download,
+                                    height: widget.appStyle.scaleX(16),
+                                    fit: BoxFit.contain,
+                                  ),
+                                  style: IconButton.styleFrom(
+                                      tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap),
+                                );
                               }
-                            },
-                          ),
-                        ],
-                      ),
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             if (widget.dragable)

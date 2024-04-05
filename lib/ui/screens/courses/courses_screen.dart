@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
+import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
+import 'package:meditation_app/ui/screens/category/widget/download_pdf_screen.dart';
 
 import '../../../theme/styles.dart';
 import '../../../theme/text_style.dart';
@@ -21,13 +25,34 @@ class CoursesScreen extends ConsumerStatefulWidget {
 }
 
 class _CoursesScreenState extends ConsumerState<CoursesScreen> {
-
   static AppStyle _style = AppStyle();
+
+  @override
+  void initState() {
+    ref.read(bookmarkProvider.notifier).islandScap = false;
+
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    Future.delayed(Duration.zero, () {
+      getCategory();
+    });
+
+    super.initState();
+  }
+
+  getCategory()async{
+    await ref.read(courseProvider).getCategoryPdfFromDatabase();
+    for(final category in ref.watch(courseProvider).downloadPdfResponses){
+      print('------------->>${category.categoryId}');
+      await ref.read(courseProvider).getPdfFromDatabase(category.categoryId??0);
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
+
     return SafeArea(
       bottom: false,
       child: Center(
@@ -42,17 +67,20 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
             shrinkWrap: true,
             itemCount: ScreenTitles.toList.length,
             itemBuilder: (context, index) {
+              final model=ScreenTitles.toList[index].value;
               return CoursesItem(
                 title: ScreenTitles.toList[index].value,
                 style: _style,
                 onTap: () {
-                  debugPrint('Is User Logged In :: ${ref.read(authProvider).isUserLoggedIn}');
+                  debugPrint(
+                      'Is User Logged In :: ${ref.read(authProvider).isUserLoggedIn}');
                   if (!ref.read(authProvider).isUserLoggedIn) {
                     showCustomSnackBar(
                       'Please log in to Courses.',
                       action: SnackBarAction(
                         label: 'Log In',
-                        backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                        backgroundColor:
+                            AppColors.primaryColor.withOpacity(0.8),
                         textColor: Colors.brown.shade800,
                         onPressed: () => appRouter.go(RoutePath.signIn),
                       ),
@@ -60,7 +88,15 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
                     );
                     return;
                   }
-                  context.go(RoutePath.coursesListScreenPath, extra: ScreenTitles.toList[index].value);
+                  if(model=="Downloaded Pdf"){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const DownloadPdfCategoryScreen()));
+                  }else{
+                    context.go(RoutePath.coursesListScreenPath, extra: ScreenTitles.toList[index].value);
+                  }
+
                 },
               );
             },
@@ -79,7 +115,8 @@ class CoursesItem extends StatelessWidget {
   final AppStyle style;
   final GestureTapCallback? onTap;
 
-  const CoursesItem({super.key, required this.title, required this.style, this.onTap});
+  const CoursesItem(
+      {super.key, required this.title, required this.style, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +129,8 @@ class CoursesItem extends StatelessWidget {
         splashColor: Colors.white.withOpacity(0.2),
         onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: style.scaleX(46), vertical: style.scaleX(24)),
+          padding: EdgeInsets.symmetric(
+              horizontal: style.scaleX(46), vertical: style.scaleX(24)),
           child: Row(
             children: [
               Expanded(

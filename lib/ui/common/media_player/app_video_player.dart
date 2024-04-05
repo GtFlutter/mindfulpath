@@ -115,12 +115,12 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   }
 
   void toggleVideo() async {
-   // setState(() {
+    setState(() {
       if (_controller.value.position >= _controller.value.duration) {
         _controller.seekTo(Duration.zero);
       }
       _controller.value.isPlaying ? _controller.pause() : _controller.play();
-   // });
+    });
   }
 
   void toggleAudio() {

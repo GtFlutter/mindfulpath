@@ -16,11 +16,12 @@ enum FilterDuration {
 
 enum ScreenTitles {
   purchased('Purchased'),
-  downloaded('Downloaded'),
+  downloadedVIDEO('Downloaded Video'),
+  downloadedPDF('Downloaded Pdf'),
   currentlyProgress('Currently Progress');
 
   final String value;
   const ScreenTitles(this.value);
 
-  static List<ScreenTitles> get toList => [purchased, downloaded, currentlyProgress];
+  static List<ScreenTitles> get toList => [purchased, downloadedVIDEO,downloadedPDF, currentlyProgress];
 }

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/body/resource_type.dart';
 import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
 import 'package:meditation_app/data/model/response/playlist_details_response.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
@@ -49,10 +50,9 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     Future.delayed(
       Duration.zero,
       () {
-        playlistP.getPlaylistDetails(widget.id,showProgress: true);
+        playlistP.getPlaylistDetails(widget.id, showProgress: true);
 
         ref.watch(videoProvider).clearVideo();
-
       },
     );
     super.initState();
@@ -93,26 +93,24 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     _style = AppStyle(screenSize: size);
     var videoCtrl = ref.watch(videoProvider);
     var isVideoAvailable = videoCtrl.video != null;
-    bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
-
+    bool isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
 
     final playlistP = ref.watch(playListProvider);
     void playVideo(PlaylistVideoList model) {
-      print(
-          '------------****${model.video!.videoUrl}');
+      print('------------****${model.video!.videoUrl}');
       ref.read(videoProvider).playVideo(
-        DetailedVideoModel(
-          video: DIModel(
-            thumbnailUrl: model.video?.thumbnailImageUrl ?? '',
-            videoUrl: model.video?.videoUrl??"",
-            duration: "10",
-            title: model.video?.title ?? '',
-            categoryName:model.categoryTitle ?? '',
-            videoId: model.videoId??0,
-            videoType: ResourceType.paid
-          ),
-        ),
-      );
+            DetailedVideoModel(
+              video: DIModel(
+                  thumbnailUrl: model.video?.thumbnailImageUrl ?? '',
+                  videoUrl: model.video?.videoUrl ?? "",
+                  duration: "10",
+                  title: model.video?.title ?? '',
+                  categoryName: model.categoryTitle ?? '',
+                  videoId: model.videoId ?? 0,
+                  videoType: ResourceType.paid),
+            ),
+          );
     }
 
     return Scaffold(
@@ -127,86 +125,101 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
           bottom: false,
           child: playlistP.isLoading
               ? const Center(
-            child: CircularProgressIndicator(),
-          )
+                  child: CircularProgressIndicator(),
+                )
               : playlistP.playlistDetailResponse == null ||
-              playlistP.playlistDetailResponse!.data!.playlistVideoList!.isEmpty
-              ? const Center(child: Text('No Data Found'))
-              : Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if(isVideoAvailable)...[
-                if (!isLandscape) SizedBox(height: _style.scaleX(25)),
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.all(25),
-                    child: Container(
-                      width: !isLandscape ? null : double.infinity,
-                      height: !isLandscape ? null : double.infinity,
-                      alignment: !isLandscape ? null : Alignment.topCenter,
-                      constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
-                      child: AppVideoPlayer(
-                        key: const ValueKey('value'),
-                        videoId: videoCtrl.video!.videoId,
-                        url: videoCtrl.video!.videoUrl,
-                        style: _style,
-                        isLandscape: isLandscape,
-                        onBackPress: () {
-                          if (MediaQuery.orientationOf(context) == Orientation.landscape) {
-                            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                          }
-                          videoCtrl.clearVideo();
-                        },
-                        isFileUrl: false,
-                        onFullScreen: () {
-                          if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                            SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                          } else {
-                            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                )]else const SizedBox.shrink(),
+                      playlistP.playlistDetailResponse!.data!.playlistVideoList!
+                          .isEmpty
+                  ? const Center(child: Text('No Data Found'))
+                  : Padding(
+                      padding: isLandscape && isVideoAvailable
+                          ? EdgeInsets.zero
+                          : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (isVideoAvailable) ...[
+                            if (!isLandscape)
+                              SizedBox(height: _style.scaleX(25)),
+                            Flexible(
+                              flex: isLandscape ? 1 : 0,
+                              child: Container(
+                                width: !isLandscape ? null : double.infinity,
+                                height: !isLandscape ? null : double.infinity,
+                                alignment:
+                                    !isLandscape ? null : Alignment.topCenter,
+                                constraints: !isLandscape
+                                    ? BoxConstraints(
+                                        maxHeight: size.height * 0.4)
+                                    : null,
+                                child: AppVideoPlayer(
+                                  key: const ValueKey('value'),
+                                  videoId: videoCtrl.video!.videoId,
+                                  url: videoCtrl.video!.videoUrl,
+                                  style: _style,
+                                  isLandscape: isLandscape,
+                                  onBackPress: () {
+                                    if (MediaQuery.orientationOf(context) ==
+                                        Orientation.landscape) {
+                                      SystemChrome.setPreferredOrientations(
+                                          [DeviceOrientation.portraitUp]);
+                                    }
+                                    videoCtrl.clearVideo();
+                                  },
+                                  isFileUrl: false,
+                                  onFullScreen: () {
+                                    if (MediaQuery.orientationOf(context) ==
+                                        Orientation.portrait) {
+                                      ref
+                                          .read(bookmarkProvider.notifier)
+                                          .islandScap = true;
+                                      SystemChrome.setPreferredOrientations(
+                                          [DeviceOrientation.landscapeLeft]);
+                                    } else {
+                                      ref
+                                          .read(bookmarkProvider.notifier)
+                                          .islandScap = false;
+                                      SystemChrome.setPreferredOrientations(
+                                          [DeviceOrientation.portraitUp]);
+                                    }
+                                  },
+                                ),
+                              ),
+                            )
+                          ] else
+                            const SizedBox.shrink(),
+                          !isLandscape
+                              ? ListView.separated(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.vertical,
+                                  padding: EdgeInsets.only(
+                                    top: _style.scale * 12.5,
+                                    right: _style.scale * 10,
+                                    left: _style.scale * 10,
+                                  ),
+                                  itemCount: playlistP.playlistDetailResponse
+                                          ?.data?.playlistVideoList?.length ??
+                                      0,
+                                  itemBuilder: (context, index) {
+                                    var model = playlistP.playlistDetailResponse
+                                        ?.data?.playlistVideoList?[index];
 
-              !isLandscape?SizedBox(
-                height: 500,
-                width: double.infinity,
-                child: ListView.separated(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  padding: EdgeInsets.only(
-                    bottom: _style.scale * 100,
-                    top: _style.scale * 12.5,
-                    right: _style.scale * 22,
-                    left: _style.scale * 22,
-                  ),
-                  itemCount: playlistP
-                          .playlistDetailResponse?.data?.playlistVideoList?.length ??
-                      0,
-                  itemBuilder: (context, index) {
-                    var model = playlistP
-                        .playlistDetailResponse?.data?.playlistVideoList?[index];
-
-                    return GestureDetector(
-                        key: Key('$index'),
-                        onTap: () {
-
-                          playVideo(model);
-
-                        },
-                        child: SubPlayListItem(
-                          appStyle: _style,
-                          model: model!,
-                          index: index,
-                          url: model.video?.videoUrl??"",
-                        ));
-                  },
-                  separatorBuilder: (BuildContext context, int index) =>
-                      SizedBox(height: _style.scaleX(25)),
-                  /* onReorder: (int oldIndex, int newIndex) {
+                                    return GestureDetector(
+                                        key: Key('$index'),
+                                        onTap: () {
+                                          playVideo(model);
+                                        },
+                                        child: SubPlayListItem(
+                                          appStyle: _style,
+                                          model: model!,
+                                          index: index,
+                                          url: model.video?.videoUrl ?? "",
+                                        ));
+                                  },
+                                  separatorBuilder:
+                                      (BuildContext context, int index) =>
+                                          SizedBox(height: _style.scaleX(25)),
+                                  /* onReorder: (int oldIndex, int newIndex) {
                     setState(() {
                       if (oldIndex < newIndex) {
                         newIndex -= 1;
@@ -215,11 +228,12 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                       _items.insert(newIndex, item);
                     });
                   },*/
-                  // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                ),
-              ):const SizedBox.shrink(),
-            ],
-          ),
+                                  // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                )
+                              : const SizedBox.shrink(),
+                        ],
+                      ),
+                    ),
         ),
       ),
     );

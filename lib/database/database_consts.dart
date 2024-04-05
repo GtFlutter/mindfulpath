@@ -1,5 +1,6 @@
 class DatabaseConsts {
   static const String categoryTable = 'CategoryTable';
+  static const String categoryPdfTable = 'CategoryPdfTable';
   static const String videoTable = 'VideoTable';
   static const String pdfTable = 'PdfTable';
 
@@ -11,6 +12,14 @@ class DatabaseConsts {
       "category_id" TEXT,
       "category_name" TEXT,
       "category_image" TEXT
+    );''',
+
+    '''CREATE TABLE $categoryPdfTable (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "pdf_id" TEXT,
+      "pdf_name" TEXT,
+      "pdf_file" TEXT,
+      "category_id" TEXT
     );''',
 
     '''CREATE TABLE $videoTable (

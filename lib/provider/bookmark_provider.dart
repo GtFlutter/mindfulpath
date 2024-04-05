@@ -28,6 +28,8 @@ class BookmarkNotifier extends ChangeNotifier {
 
   BookmarkNotifier(this.repo, this.ref);
 
+  bool islandScap=false;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 

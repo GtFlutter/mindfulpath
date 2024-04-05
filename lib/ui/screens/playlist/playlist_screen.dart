@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
@@ -24,6 +25,9 @@ class _PlaylistScreenState extends ConsumerState<PlaylistScreen> {
     final playlistProvider = ref.read(playListProvider);
     Future.delayed(Duration.zero, () {
       playlistProvider.getPlaylistList(showProgress: true);
+      ref.read(bookmarkProvider.notifier).islandScap=false;
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
     });
     super.initState();
   }

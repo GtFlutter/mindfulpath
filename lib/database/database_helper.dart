@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -14,7 +15,8 @@ final databaseProvider = Provider<DatabaseHelper>((ref) => DatabaseHelper());
 class DatabaseHelper {
 
   static late Database _db;
-
+  List<PdfModel> _downloadPdfResponses = [];
+  List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
 
   Future<Database> get db async {
     _db = await openDB();
@@ -51,6 +53,30 @@ class DatabaseHelper {
     List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.categoryTable, where: 'category_id = ?', whereArgs: [categoryId]);
     if (res.isNotEmpty) {
       return CategoryModal.fromJson(res.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<int> savePdfCategory(PdfModel modal) async {
+    var dbClient = await db;
+    int res;
+    try {
+      res = await dbClient.insert(DatabaseConsts.categoryPdfTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.categoryPdfTable} saved to db");
+    } catch (e) {
+      await dbClient.delete(DatabaseConsts.categoryPdfTable);
+      res = await dbClient.insert('CategoryPdfTable', modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.categoryPdfTable} saved to db with Error");
+    }
+    return res;
+  }
+
+  Future<PdfModel?> getSinglePdfCategory(String categoryId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.categoryPdfTable, where: 'category_id = ?', whereArgs: [categoryId]);
+    if (res.isNotEmpty) {
+      return PdfModel.fromJson(res.first);
     } else {
       return null;
     }
@@ -131,10 +157,25 @@ class DatabaseHelper {
     }
   }
 
+
+  Future<List<PdfModel>> getPdfCategory() async {
+    List<PdfModel> tempList = [];
+    var dbClient = await db;
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.categoryPdfTable);
+    debugPrint("Res getCategory::: $res");
+
+    if (res.isNotEmpty) {
+      tempList = PdfModel.listFromJson(res);
+      _downloadPdfResponses=PdfModel.listFromJson(res);
+      return tempList;
+    } else {
+      return tempList;
+    }
+  }
+
   Future<List<PdfModel>> getPdf(int categoryId) async {
     List<PdfModel> tempList = [];
     var dbClient = await db;
-    debugPrint("Category Id : $categoryId");
     List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.pdfTable, where: 'category_id = ?', whereArgs: [categoryId]);
     debugPrint("Res getPdf:: $res");
     if (res.isNotEmpty) {

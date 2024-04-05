@@ -48,6 +48,18 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
     var provider = ref.watch(freePdfsProvider);
 
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+
+    provider.downloadedPDF.map((e){
+      print('First Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
+    });
+
+    provider.pdfsResponse?.list?.map((e){
+      print('Second Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
+
+    });
+
+
     if (provider.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -70,6 +82,12 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
       itemCount: provider.pdfsResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = provider.pdfsResponse!.list![index];
+        print('-------456------->${model.categoryId}');
+       final data= provider.downloadedPDF.any((element) => model.categoryId==element.categoryId);
+       final datas= provider.downloadedPDF.any((element) => element.id == provider.pdfsResponse?.list?[index].id);
+        print('-------123------->$data');
+        print('-------789------->$datas');
+
         return GestureDetector(
           onTap: () => viewPdf(model.pdfUrl),
           child: DetailItem.pdf(
@@ -78,7 +96,8 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
             pdfModel: model,
             subTitle: model.categoryTitle ?? '',
             index: '$index',
-            isDownloaded: provider.downloadedPDF.any((element) => element.id == provider.pdfsResponse?.list?[index].id),
+            isShow: true,
+            isDownloaded:provider.downloadedPDF.any((element) => model.categoryId==element.categoryId),
           ),
         );
       },

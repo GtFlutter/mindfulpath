@@ -34,10 +34,11 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
       ref.read(courseProvider).getVideoFromDatabase(int.parse(widget.categoryModal.categoryId??""));
 
     },);
-    Future.delayed(Duration.zero, () {
+   /* Future.delayed(Duration.zero, () {
+      print('--------------*******---${widget.categoryModal.id}');
       ref.read(courseProvider).getPdfFromDatabase(int.parse(widget.categoryModal.categoryId??""));
 
-    },);
+    },);*/
     super.initState();
   }
 

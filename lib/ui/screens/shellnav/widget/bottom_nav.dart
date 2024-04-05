@@ -1,20 +1,22 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/shellnav/widget/custom_bottom_nav_item.dart';
 import 'package:meditation_app/util/assets.dart';
 
-class CustomBottomNa extends StatelessWidget {
+class CustomBottomNa extends ConsumerWidget {
   final AppStyle style;
   const CustomBottomNa({super.key, required this.style});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     const BoxFit iconFit = BoxFit.fitHeight;
     double iconHeight = style.scaleX(24);
 
@@ -27,8 +29,9 @@ class CustomBottomNa extends StatelessWidget {
     /// for good alignment
     double rowBottomPadding = style.scaleX(10);
     double iconBottomPadding = 0;
+    final bookmarkNotifier = ref.watch(bookmarkProvider);
 
-    return IntrinsicHeight(
+    return bookmarkNotifier.islandScap==true?const SizedBox.shrink():IntrinsicHeight(
       child: Container(
         margin: EdgeInsets.only(
           left: style.scaleX(22),

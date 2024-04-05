@@ -15,9 +15,9 @@ class CategoryModal {
 
   Map<String, String> toJson() {
     Map<String, String> map = {};
-    map['category_id'] = categoryId!;
-    map['category_name'] = categoryName!;
-    map['category_image'] = categoryImage!;
+    map['category_id'] = categoryId??"";
+    map['category_name'] = categoryName??"";
+    map['category_image'] = categoryImage??"";
     return map;
   }
 

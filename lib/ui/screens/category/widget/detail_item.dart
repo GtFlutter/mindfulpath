@@ -78,15 +78,17 @@ class DetailItem extends ConsumerStatefulWidget {
   final String? subTitle;
   final String index;
   final bool isDownloaded;
+  final bool? isShow;
   final GestureTapCallback? onToggleBookmark;
 
-  const DetailItem.video({
+  const DetailItem.video( {
     super.key,
     required this.appStyle,
     required VideoResponse this.model,
     required this.index,
     required this.onToggleBookmark,
     required this.isDownloaded,
+    this.isShow,
   })  : title = null,
         subTitle = null,
         pdfModel = null;
@@ -95,13 +97,13 @@ class DetailItem extends ConsumerStatefulWidget {
     super.key,
     required this.appStyle,
     required this.index,
-    required PdfResponse this.pdfModel,
+    this.pdfModel,
     required String this.title,
     required String this.subTitle,
     required this.isDownloaded,
+    this.isShow,
   })  : model = null,
         onToggleBookmark = null;
-
   @override
   ConsumerState<DetailItem> createState() => _DetailItemState();
 }
@@ -137,6 +139,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
     final playlistP = ref.watch(playListProvider);
 
+    print('--------------->${widget.isDownloaded}');
 
     return Container(
       decoration: ShapeDecoration(
@@ -241,40 +244,40 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   Row(
                     children: [
                       if (!widget.isDownloaded)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final downloadP = ref.watch(downloadProvider);
-                            if (downloadP.isDownloading &&
-                                widget.model!.id == downloadP.model!.id) {
-                              return SizedBox(
-                                height: 15,
-                                width: 15,
-                                child: CircularProgressIndicator(
-                                  strokeCap: StrokeCap.butt,
-                                  strokeWidth: 2,
-                                  value: downloadP.progress,
-                                ),
-                              );
-                            } else {
-                              return OutlinedIconButton.svg(
-                                SvgPaths.download,
-                                appStyle: widget.appStyle,
-                                // svgIconSrc: SvgPaths.bookmarkSelected,
-                                onTap: () {
-                                  print(
-                                      "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
-                                  if (downloadP.model == null) {
-                                    downloadP.download(model: widget.model);
-                                  } else if (widget.model!.id !=
-                                      downloadP.model!.id) {
-                                    showCustomSnackBar(
-                                        'Another Video is in progress');
+                         Consumer(
+                                builder: (context, ref, child) {
+                                  final downloadP = ref.watch(downloadProvider);
+                                  if (downloadP.isDownloading &&
+                                      widget.model!.id == downloadP.model!.id) {
+                                    return SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: CircularProgressIndicator(
+                                        strokeCap: StrokeCap.butt,
+                                        strokeWidth: 2,
+                                        value: downloadP.progress,
+                                      ),
+                                    );
+                                  } else {
+                                    return OutlinedIconButton.svg(
+                                      SvgPaths.download,
+                                      appStyle: widget.appStyle,
+                                      // svgIconSrc: SvgPaths.bookmarkSelected,
+                                      onTap: () {
+                                        print(
+                                            "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                        if (downloadP.model == null) {
+                                          downloadP.download(model: widget.model);
+                                        } else if (widget.model!.id !=
+                                            downloadP.model!.id) {
+                                          showCustomSnackBar(
+                                              'Another Video is in progress');
+                                        }
+                                      },
+                                    );
                                   }
                                 },
-                              );
-                            }
-                          },
-                        ),
+                              ),
                       const SizedBox(
                         width: 10,
                       ),
@@ -368,93 +371,19 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                       ),
                     ],
                   ),
-                  // if (downloadP.isDownloading)...[
-                  //   SizedBox(
-                  //     height: 15,
-                  //     width: 15,
-                  //     child: CircularProgressIndicator(
-                  //       strokeCap: StrokeCap.butt,
-                  //       strokeWidth: 2,
-                  //       value: downloadP.progress,
-                  //     ),
-                  //   ),
-                  // ] else...[
-                  //   MenuAnchor(
-                  //     menuChildren: [
-                  //       MenuItemButton(
-                  //         child: Text(
-                  //           'Download',
-                  //           style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                  //         ),
-                  //         onPressed: () => downloadP.download(model: widget.model),
-                  //       ),
-                  //       MenuItemButton(
-                  //         child: Text(
-                  //           'Create Playlist',
-                  //           style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                  //         ),
-                  //       ),
-                  //       SubmenuButton(
-                  //         menuChildren: [
-                  //           if (playlistP.playlistListResponse != null) ...[
-                  //             ...List.generate(playlistP.playlistListResponse!.length, (index) {
-                  //               return PopupMenuItem(
-                  //                 height: widget.appStyle.scaleX(24),
-                  //                 onTap: () {},
-                  //                 child: Text(
-                  //                   playlistP.playlistListResponse![index].title ?? '',
-                  //                   style:
-                  //                   widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                  //                 ),
-                  //               );
-                  //             })
-                  //           ]
-                  //         ],
-                  //         menuStyle: const MenuStyle(
-                  //           padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                  //           backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
-                  //         ),
-                  //         style: SubmenuButton.styleFrom(
-                  //             backgroundColor: AppColors.popupMenuItemColor,
-                  //             surfaceTintColor: AppColors.popupMenuItemColor,
-                  //             iconColor: Colors.grey
-                  //         ),
-                  //         child: Text(
-                  //           'Add to Playlist',
-                  //           style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //     style: const MenuStyle(
-                  //       // padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                  //       backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
-                  //       visualDensity: VisualDensity(vertical: -4),
-                  //       surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
-                  //     ),
-                  //     builder: (context, controller, child) {
-                  //       return OutlinedIconButton.svg(
-                  //         SvgPaths.addToPlaylist,
-                  //         appStyle: widget.appStyle,
-                  //         onTap: () {
-                  //           if (controller.isOpen) {
-                  //             controller.close();
-                  //           } else {
-                  //             controller.open();
-                  //           }
-                  //         },
-                  //       );
-                  //     },
-                  //   ),
-                  // ],
                   const Spacer(),
                 ],
               )
             else
+              if (!widget.isDownloaded)
+              widget.isShow == true ?
               Consumer(
                 builder: (context, ref, child) {
                   final downloadP = ref.watch(downloadProvider);
+                  print('@@@@@@@@@@@@@@@@@@@@@@@@#${downloadP.isPdfDownloading}');
+                  print('@@@@@@@@@@@@@@@@@@@@@@@@%${widget.pdfModel?.categoryId},${downloadP.pdfModel?.categoryId}');
                   if (downloadP.isPdfDownloading &&
-                      widget.pdfModel!.id == downloadP.pdfModel!.id) {
+                      widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
                     return SizedBox(
                       height: 15,
                       width: 15,
@@ -470,7 +399,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                       appStyle: widget.appStyle,
                       // svgIconSrc: SvgPaths.bookmarkSelected,
                       onTap: () {
+                        print('---------------------?${downloadP.pdfModel?.categoryId??0}');
                         if (downloadP.pdfModel == null) {
+                          print(widget.pdfModel?.categoryId ?? "");
                           downloadP.pdfDownload(model: widget.pdfModel);
                         } else if (widget.pdfModel!.id !=
                             downloadP.pdfModel!.id) {
@@ -480,7 +411,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                     );
                   }
                 },
-              ),
+              ):const SizedBox.shrink(),
             SizedBox(width: widget.appStyle.scaleX(10)),
           ],
         ),

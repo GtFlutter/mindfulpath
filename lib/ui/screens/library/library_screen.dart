@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/bookmark/bookmark_screen.dart';
@@ -19,7 +18,8 @@ class LibraryScreen extends ConsumerStatefulWidget {
   ConsumerState<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProviderStateMixin {
+class _LibraryScreenState extends ConsumerState<LibraryScreen>
+    with TickerProviderStateMixin {
   static AppStyle _style = AppStyle();
   late TabController _tabController;
 
@@ -50,7 +50,8 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
             TabBar(
               controller: _tabController,
               isScrollable: true,
-              indicatorPadding: EdgeInsets.symmetric(vertical: _style.scaleX(9)),
+              indicatorPadding:
+                  EdgeInsets.symmetric(vertical: _style.scaleX(9)),
               tabAlignment: TabAlignment.center,
               indicatorWeight: 1,
               labelStyle: _style.text.font(mulishRegular400, sizePx: 12.5),

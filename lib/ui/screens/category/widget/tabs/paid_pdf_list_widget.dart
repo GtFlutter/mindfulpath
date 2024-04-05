@@ -50,6 +50,15 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
     var provider = ref.watch(paidPdfsProvider);
 
+    provider.downloadedPDF.map((e){
+      print('First Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
+    });
+
+    provider.pdfsResponse?.list?.map((e){
+      print('Second Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
+
+    });
+
     if (provider.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -87,6 +96,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
             title: model.title ?? '',
             subTitle: model.categoryTitle ?? '',
             index: '$index',
+            isShow: true,
             isDownloaded: provider.downloadedPDF.any((element) => element.id==provider.pdfsResponse?.list?[index].id),
           ),
         );

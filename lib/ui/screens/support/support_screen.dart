@@ -54,16 +54,16 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
     var supportP = ref.watch(supportProvider);
-    _nameCtrl.text = supportP.name??"";
-    _emailCtrl.text = supportP.email??"";
-    _descriptionCtrl.text = supportP.descr??"";
+    print('--------------->${supportP.name}');
+    _nameCtrl.text = supportP.name ?? "";
+    _emailCtrl.text = supportP.email ?? "";
+    _descriptionCtrl.text = supportP.descr ?? "";
 
     return AbsorbPointer(
       absorbing: supportP.isLoading,
@@ -75,7 +75,8 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
           screenSize: size,
           style: _style,
           title: 'Support',
-          dataBackMng:supportP.name == null || supportP.name==""?false:true ,
+          dataBackMng:
+              supportP.name == null || supportP.name == "" ? false : true,
         ),
         body: BackgroundImage(
           alignment: Alignment.topCenter,
@@ -95,6 +96,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                   children: [
                     TextField(
                       focusNode: _nameFocusNode,
+                      enabled: supportP.name != null ? false : true,
                       controller: _nameCtrl,
                       cursorColor: CustomeTextFieldStyle.cursorColor,
                       onChanged: (_) {
@@ -118,6 +120,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     TextField(
                       focusNode: _emailFocusNode,
                       controller: _emailCtrl,
+                      enabled: supportP.email != null ? false : true,
                       cursorColor: CustomeTextFieldStyle.cursorColor,
                       onChanged: (_) {
                         supportP.setEmailError();
@@ -139,7 +142,9 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                     TextField(
                       focusNode: _descriptionFocusNode,
                       controller: _descriptionCtrl,
+                      enabled: supportP.descr != null ? false : true,
                       cursorColor: CustomeTextFieldStyle.cursorColor,
+                      textInputAction: TextInputAction.done,
                       onChanged: (_) {
                         supportP.setDescriptionError();
                       },
@@ -160,7 +165,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                           style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
-                    supportP.name == null || supportP.name==""
+                    supportP.name == null || supportP.name == ""
                         ? TextField(
                             readOnly: !_disableField,
                             canRequestFocus: _disableField,
@@ -198,7 +203,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                   ],
                 ),
                 const Spacer(),
-                supportP.name == null || supportP.name==""
+                supportP.name == null || supportP.name == ""
                     ? CustomNextButton(
                         text: 'Submit',
                         onPressed: !supportP.isLoading ? onNext : null,
