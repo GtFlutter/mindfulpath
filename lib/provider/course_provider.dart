@@ -89,22 +89,26 @@ class CourseNotifier extends ChangeNotifier {
 
   Future<void> getCategoryFromDatabase() async {
     _startLoading();
+
     List<CategoryModal> list = await ref.read(databaseProvider).getCategory();
+    debugPrint('VIDEO CATEGORYIES :: ${list.length}');
     _downloadResponse = list;
     _stopLoading();
   }
 
   List<PdfModel> _downloadPdfResponses = [];
   List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
+  int index = 0;
 
 
   Future<void> getCategoryPdfFromDatabase() async {
     _startLoading();
     List<PdfModel> list = await ref.read(databaseProvider).getPdfCategory();
     print(list.length);
+    index=list.length;
     print(list);
     print("================123456=====================");
-    _downloadPdfResponses = list;
+    _downloadPdfResponses=list;
     _stopLoading();
   }
 

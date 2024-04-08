@@ -356,6 +356,8 @@ class DownloadNotifier extends ChangeNotifier {
           showCustomSnackBar('PDF Save Successfully download');
           _isDownloadComplete = false;
           Pdfres = null;
+          _pdfModel = null;
+          notifyListeners();
         }
       } else {
         print("-------366------++++${Pdfres?.toJson()}");
@@ -383,6 +385,8 @@ class DownloadNotifier extends ChangeNotifier {
             showCustomSnackBar('PDF Save Successfully download');
             _isDownloadComplete = false;
             Pdfres = null;
+            _pdfModel = null;
+            notifyListeners();
           }
         }
       }
@@ -396,10 +400,10 @@ class DownloadNotifier extends ChangeNotifier {
             videoFile: videoFile,
             videoDuration: model.duration);
         int vRes = await dbHelper.saveVideo(vModal);
-        if (vRes == 1){
+        if (vRes > 0){
           showCustomSnackBar('Video Save Successfully download');
           _isDownloadComplete = false;
-          Pdfres = null;
+          res = null;
         }
       } else {
         CategoryModal modal = CategoryModal(
@@ -410,7 +414,7 @@ class DownloadNotifier extends ChangeNotifier {
         CategoryModal? res = await dbHelper
             .getSingleCategory(model?.categoryId?.toString() ?? "");
         print("after category s--->${cRes}");
-        if (cRes == 1) {
+        if (cRes > 0) {
           VideoModal vModal = VideoModal(
               categoryId: int.parse(res?.categoryId ?? "0"),
               videoId: model?.id?.toString(),
@@ -418,10 +422,11 @@ class DownloadNotifier extends ChangeNotifier {
               videoFile: videoFile,
               videoDuration: model?.duration);
           int vRes = await dbHelper.saveVideo(vModal);
-          if (vRes == 1){
+          if (vRes > 0){
             showCustomSnackBar('Video Save Successfully download');
             _isDownloadComplete = false;
-            Pdfres = null;
+            res = null;
+
           }
         }
       }

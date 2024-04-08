@@ -62,7 +62,10 @@ class _DownloadPdfCategoryScreenState extends ConsumerState<DownloadPdfCategoryS
           ),
           itemCount: courseP.downloadPdfResponse.length,
           itemBuilder: (context, index) {
-            var model = courseP.downloadPdfResponse[index];
+            var models = courseP.downloadPdfResponse.toSet().toList();
+            print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!${models.length}');
+            var model=models[index];
+
             return GestureDetector(
               onTap: (){
                 viewPdf(model.pdfFile);

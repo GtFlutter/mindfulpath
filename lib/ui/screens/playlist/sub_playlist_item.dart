@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meditation_app/data/model/response/playlist_details_response.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
+import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/common/media_image_card.dart';
@@ -22,7 +23,7 @@ class SubPlayListItem extends ConsumerStatefulWidget {
   final bool dragging;
   final GestureTapCallback? onBookmarkRemove;
 
-  const SubPlayListItem( {
+  const SubPlayListItem({
     super.key,
     required this.appStyle,
     required this.model,
@@ -32,7 +33,6 @@ class SubPlayListItem extends ConsumerStatefulWidget {
   })  : dragable = false,
         dragging = false;
 
-
   @override
   ConsumerState<SubPlayListItem> createState() => _BookmarkItemState();
 }
@@ -41,18 +41,17 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
   @override
   void initState() {
     final downloadP = ref.read(downloadProvider);
+    final courseP = ref.read(courseProvider);
+
     Future.delayed(
       Duration.zero,
       () {
-        downloadP.checkVideoIsDownload(
-            widget.model.videoId.toString(), false);
-
+        downloadP.checkVideoIsDownload(widget.model.videoId.toString(), false);
+        courseP.getCategoryFromDatabase();
       },
     );
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +63,6 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
     //int second = int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
     //print("Minute: $minute, Second: $second");
     final bookmarkNotifier = ref.watch(bookmarkProvider);
-
 
     return Container(
       decoration: ShapeDecoration(
@@ -96,7 +94,7 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
           children: [
             MediaImageCard(
               appStyle: widget.appStyle,
-              imgUrl: widget.model.video!.thumbnailImageUrl??"",
+              imgUrl: widget.model.video!.thumbnailImageUrl ?? "",
               duration: '0',
               imgRadius: widget.appStyle.scaleX(25),
               imgSize: widget.appStyle.scaleX(90),
@@ -113,7 +111,8 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
                       children: [
                         Text(
                           '${widget.model.videoTitle}',
-                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                          style: widget.appStyle.text.font(mulishSemiBold600,
+                              sizePx: 14, color: Colors.white),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -133,7 +132,7 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
                                     color: AppColors.primaryColor),
                               ),
                               TextSpan(
-                                text: 'Nutrition',
+                                text: widget.model.categoryTitle,
                                 style: textStyle.copyWith(
                                     color: AppColors.categoryNameColor),
                               ),
@@ -145,7 +144,7 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
                   ),
                   Padding(
                     padding:
-                    EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
+                        EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
                     child: Row(
                       children: [
                         IconButton(
@@ -160,17 +159,22 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
                             fit: BoxFit.contain, // 155861
                           ),
                           style: IconButton.styleFrom(
-                              tapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                         ),
                         Consumer(
                           builder: (context, ref, child) {
                             final downloadP = ref.watch(downloadProvider);
-                            if (downloadP.isAlreadyDownload) {
+                            final getCategory=ref.read(courseProvider);
+                            final getCat=getCategory.downloadResponse.any((element) =>
+                            int.parse(element.categoryId??"")==widget.model.video?.categoryId);
+                            if (getCat) {
                               return const SizedBox.shrink();
                             } else {
                               if (downloadP.isDownloading &&
-                                  bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id ==
+                                  bookmarkNotifier
+                                          .bookmarkListResponse?[widget.index]
+                                          .bookmarkVideoResponse!
+                                          .id ==
                                       downloadP.model!.id) {
                                 return SizedBox(
                                   height: 15,
@@ -186,8 +190,14 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
                                   onPressed: () {
                                     if (downloadP.model == null) {
                                       downloadP.download(
-                                          model: bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse);
-                                    } else if (bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id !=
+                                          model: bookmarkNotifier
+                                              .bookmarkListResponse?[
+                                                  widget.index]
+                                              .bookmarkVideoResponse);
+                                    } else if (bookmarkNotifier
+                                            .bookmarkListResponse?[widget.index]
+                                            .bookmarkVideoResponse!
+                                            .id !=
                                         downloadP.model!.id) {
                                       showCustomSnackBar(
                                           'Another Video is in progress');
@@ -200,7 +210,7 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
                                   ),
                                   style: IconButton.styleFrom(
                                       tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap),
+                                          MaterialTapTargetSize.shrinkWrap),
                                 );
                               }
                             }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
+import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:share_plus/share_plus.dart';
@@ -48,37 +49,40 @@ class BookmarkItem extends ConsumerStatefulWidget {
 }
 
 class _BookmarkItemState extends ConsumerState<BookmarkItem> {
-  bool result=true;
+  bool result = true;
+
   @override
   void initState() {
+    final courseP = ref.read(courseProvider);
     Future.delayed(
       Duration.zero,
       () {
         getDownload();
-
+        courseP.getCategoryFromDatabase();
       },
     );
     super.initState();
   }
 
-   getDownload() async{
+  getDownload() async {
     final downloadP = ref.read(downloadProvider);
     result = await downloadP.checkVideoIsDownload(
         widget.model.bookmarkVideoResponse!.id.toString(), false);
   }
 
-
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle =
         widget.appStyle.text.font(mulishRegular400, sizePx: 9);
-    String timeStr = widget.model.bookmarkVideoResponse!.duration??"";
+    String timeStr = widget.model.bookmarkVideoResponse!.duration ?? "";
     List<String> timeComponents = timeStr.split(":");
     int minute = int.parse(timeComponents[1]);
-    int second = int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
+    int second =
+        int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
     print("Minute: $minute, Second: $second");
 
     print('----------->>>>>>${result}');
+    print('-----------888888877${widget.model.bookmarkVideoResponse?.category?.title??""}');
 
     return Container(
       decoration: ShapeDecoration(
@@ -114,7 +118,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                   ? widget.model.bookmarkVideoResponse!.thumbnailImageUrlSrc ??
                       ''
                   : '',
-              duration: minute==0?'${second} Sec':'${minute} Min',
+              duration: minute == 0 ? '${second} Sec' : '${minute} Min',
               imgRadius: widget.appStyle.scaleX(25),
               imgSize: widget.appStyle.scaleX(90),
             ),
@@ -130,7 +134,8 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                       children: [
                         Text(
                           '${widget.model.videoTitle}',
-                          style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                          style: widget.appStyle.text.font(mulishSemiBold600,
+                              sizePx: 14, color: Colors.white),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -150,7 +155,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                     color: AppColors.primaryColor),
                               ),
                               TextSpan(
-                                text: 'Nutrition',
+                                text: widget.model.bookmarkVideoResponse?.category?.title ?? "",
                                 style: textStyle.copyWith(
                                     color: AppColors.categoryNameColor),
                               ),
@@ -174,8 +179,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                             fit: BoxFit.contain,
                           ),
                           style: IconButton.styleFrom(
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                         ),
                         IconButton(
                           onPressed: () {
@@ -189,13 +193,15 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                             fit: BoxFit.contain, // 155861
                           ),
                           style: IconButton.styleFrom(
-                              tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                         ),
                         Consumer(
                           builder: (context, ref, child) {
+                            final getCategory=ref.read(courseProvider);
+                            final getCat=getCategory.downloadResponse.any((element) =>
+                            int.parse(element.categoryId??"")==widget.model.bookmarkVideoResponse?.categoryId);
                             final downloadP = ref.watch(downloadProvider);
-                            if (downloadP.isAlreadyDownload) {
+                            if (getCat) {
                               return const SizedBox.shrink();
                             } else {
                               if (downloadP.isDownloading &&
@@ -213,25 +219,27 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                               } else {
                                 if (!result) {
                                   return IconButton(
-                                  onPressed: () {
-                                    if (downloadP.model == null) {
-                                      downloadP.download(model: widget.model.bookmarkVideoResponse);
-                                    } else if (widget.model
-                                            .bookmarkVideoResponse!.id !=
-                                        downloadP.model!.id) {
-                                      showCustomSnackBar(
-                                          'Another Video is in progress');
-                                    }
-                                  },
-                                  icon: SvgPicture.asset(
-                                    SvgPaths.download,
-                                    height: widget.appStyle.scaleX(16),
-                                    fit: BoxFit.contain,
-                                  ),
-                                  style: IconButton.styleFrom(
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap),
-                                );
+                                    onPressed: () {
+                                      if (downloadP.model == null) {
+                                        downloadP.download(
+                                            model: widget
+                                                .model.bookmarkVideoResponse);
+                                      } else if (widget.model
+                                              .bookmarkVideoResponse!.id !=
+                                          downloadP.model!.id) {
+                                        showCustomSnackBar(
+                                            'Another Video is in progress');
+                                      }
+                                    },
+                                    icon: SvgPicture.asset(
+                                      SvgPaths.download,
+                                      height: widget.appStyle.scaleX(16),
+                                      fit: BoxFit.contain,
+                                    ),
+                                    style: IconButton.styleFrom(
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap),
+                                  );
                                 } else {
                                   return const SizedBox.shrink();
                                 }
