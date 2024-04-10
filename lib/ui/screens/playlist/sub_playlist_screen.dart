@@ -51,11 +51,19 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
       Duration.zero,
       () {
         playlistP.getPlaylistDetails(widget.id, showProgress: true);
-
         ref.watch(videoProvider).clearVideo();
       },
     );
     super.initState();
+  }
+
+  @override
+  void deactivate() {
+    print("sfsdfsdfsdfsdfsdfsdfsdfsdfsdfdsf");
+    ref.read(videoProvider.notifier).isSelected=null;
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    ref.read(bookmarkProvider.notifier).islandScap = false;
+    super.deactivate();
   }
 
   Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
@@ -78,7 +86,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
             child: BookmarkItem.dragable(
               appStyle: _style,
               model: BookmarkListResponse(),
-              index: '$index',
+              index: index,
               dragging: true,
             ),
           ),
@@ -161,26 +169,28 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                   onBackPress: () {
                                     if (MediaQuery.orientationOf(context) ==
                                         Orientation.landscape) {
-                                      SystemChrome.setPreferredOrientations(
-                                          [DeviceOrientation.portraitUp]);
+
+                                      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                                     }
+                                    ref.read(videoProvider.notifier).isSelected=null;
+                                    ref.read(bookmarkProvider.notifier).islandScap=false;
+
                                     videoCtrl.clearVideo();
                                   },
                                   isFileUrl: false,
                                   onFullScreen: () {
                                     if (MediaQuery.orientationOf(context) ==
                                         Orientation.portrait) {
-                                      ref
-                                          .read(bookmarkProvider.notifier)
-                                          .islandScap = true;
-                                      SystemChrome.setPreferredOrientations(
-                                          [DeviceOrientation.landscapeLeft]);
-                                    } else {
-                                      ref
-                                          .read(bookmarkProvider.notifier)
-                                          .islandScap = false;
-                                      SystemChrome.setPreferredOrientations(
-                                          [DeviceOrientation.portraitUp]);
+
+
+                                      ref.read(bookmarkProvider.notifier).islandScap = true;
+                                      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                                    }
+                                    else {
+
+
+                                      ref.read(bookmarkProvider.notifier).islandScap = false;
+                                      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                                     }
                                   },
                                 ),
@@ -189,47 +199,54 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                           ] else
                             const SizedBox.shrink(),
                           !isLandscape
-                              ? ListView.separated(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.vertical,
-                                  padding: EdgeInsets.only(
-                                    top: _style.scale * 12.5,
-                                    right: _style.scale * 10,
-                                    left: _style.scale * 10,
-                                  ),
-                                  itemCount: playlistP.playlistDetailResponse
-                                          ?.data?.playlistVideoList?.length ??
-                                      0,
-                                  itemBuilder: (context, index) {
-                                    var model = playlistP.playlistDetailResponse
-                                        ?.data?.playlistVideoList?[index];
+                              ? Expanded(
+                                child: ListView.separated(
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.vertical,
+                                    padding: EdgeInsets.only(
+                                      top: _style.scale * 12.5,
+                                      right: _style.scale * 10,
+                                      left: _style.scale * 10,
+                                    ),
+                                    itemCount: playlistP.playlistDetailResponse
+                                            ?.data?.playlistVideoList?.length ??
+                                        0,
+                                    itemBuilder: (context, index) {
+                                      var model = playlistP.playlistDetailResponse
+                                          ?.data?.playlistVideoList?[index];
 
-                                    return GestureDetector(
-                                        key: Key('$index'),
-                                        onTap: () {
-                                          playVideo(model);
-                                        },
-                                        child: SubPlayListItem(
-                                          appStyle: _style,
-                                          model: model!,
-                                          index: index,
-                                          url: model.video?.videoUrl ?? "",
-                                        ));
-                                  },
-                                  separatorBuilder:
-                                      (BuildContext context, int index) =>
-                                          SizedBox(height: _style.scaleX(25)),
-                                  /* onReorder: (int oldIndex, int newIndex) {
-                    setState(() {
-                      if (oldIndex < newIndex) {
-                        newIndex -= 1;
-                      }
-                      final DIModel item = playlistP.playlistDetailResponse.removeAt(oldIndex);
-                      _items.insert(newIndex, item);
-                    });
-                  },*/
-                                  // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                                )
+                                      return GestureDetector(
+                                          //key: Key('$index'),
+                                          onTap: () {
+                                            //playVideo(model);
+                                          },
+                                          child: SubPlayListItem(
+                                            key: Key('$index'),
+                                            appStyle: _style,
+                                            model: model!,
+                                            onPlay: (){
+                                              ref.read(videoProvider.notifier).isSelected=index;
+                                              playVideo(model);
+                                            },
+                                            index: index,
+                                            url: model.video?.videoUrl ?? "",
+                                          ));
+                                    },
+                                    separatorBuilder:
+                                        (BuildContext context, int index) =>
+                                            SizedBox(height: _style.scaleX(25)),
+                                    /* onReorder: (int oldIndex, int newIndex) {
+                                                    setState(() {
+                                                      if (oldIndex < newIndex) {
+                                                        newIndex -= 1;
+                                                      }
+                                                      final DIModel item = playlistP.playlistDetailResponse.removeAt(oldIndex);
+                                                      _items.insert(newIndex, item);
+                                                    });
+                                                  },*/
+                                    // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                  ),
+                              )
                               : const SizedBox.shrink(),
                         ],
                       ),

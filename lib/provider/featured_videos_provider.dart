@@ -25,6 +25,8 @@ class FeaturedVideosNotifier extends ChangeNotifier {
   VideosResponse? _data;
   VideosResponse? get data => _data;
 
+
+
   bool _loading = false;
   bool get loading => _loading;
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/pdfs_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
@@ -116,6 +117,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
   @override
   void initState() {
     final playlistP = ref.read(playListProvider);
+    final courseP = ref.read(courseProvider);
+
     Future.delayed(
       Duration.zero,
       () {
@@ -123,9 +126,36 @@ class _DetailItemState extends ConsumerState<DetailItem> {
             playlistP.playlistListResponse!.isNotEmpty) {
           playlistP.getPlaylistList();
         }
+
+
+        getCategory();
+
       },
     );
     super.initState();
+  }
+
+  getCategory()async{
+    final coursePRead = ref.read(courseProvider);
+    final coursePWatch = ref.watch(courseProvider);
+    await coursePRead.getCategoryPdfFromDatabase();
+    await coursePRead.getCategoryFromDatabase();
+
+    for(final category in coursePWatch.downloadPdfResponses){
+      await coursePRead.getPdfFromDatabase(category.categoryId??0);
+    }
+
+    for(final category in coursePWatch.downloadResponse){
+      await coursePRead.getVideoFromDatabase(int.parse(category.categoryId??""));
+
+    }
+
+  }
+
+  @override
+  void deactivate() {
+    ref.read(courseProvider.notifier).downloadPdfResponses.clear();
+    ref.read(courseProvider.notifier).downloadResponse.clear();
   }
 
   @override
@@ -139,7 +169,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
     final playlistP = ref.watch(playListProvider);
 
-    print('--------------->${widget.isDownloaded}');
+    print('--------------->${widget.model?.categoryTitle}');
 
     return Container(
       decoration: ShapeDecoration(
@@ -210,7 +240,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                           Flexible(
                             child: Text(
                               isVideo
-                                  ? '${widget.model!.categoryTitle}'
+                                  ? widget.model?.category?.title??""
                                   : widget.subTitle ?? '',
                               style: textStyle.copyWith(
                                   color: AppColors.categoryNameColor),
@@ -247,35 +277,44 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                          Consumer(
                                 builder: (context, ref, child) {
                                   final downloadP = ref.watch(downloadProvider);
-                                  if (downloadP.isDownloading &&
-                                      widget.model!.id == downloadP.model!.id) {
-                                    return SizedBox(
-                                      height: 15,
-                                      width: 15,
-                                      child: CircularProgressIndicator(
-                                        strokeCap: StrokeCap.butt,
-                                        strokeWidth: 2,
-                                        value: downloadP.progress,
-                                      ),
-                                    );
-                                  } else {
-                                    return OutlinedIconButton.svg(
-                                      SvgPaths.download,
-                                      appStyle: widget.appStyle,
-                                      // svgIconSrc: SvgPaths.bookmarkSelected,
-                                      onTap: () {
-                                        print(
-                                            "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
-                                        if (downloadP.model == null) {
-                                          downloadP.download(model: widget.model);
-                                        } else if (widget.model!.id !=
-                                            downloadP.model!.id) {
-                                          showCustomSnackBar(
-                                              'Another Video is in progress');
-                                        }
-                                      },
-                                    );
+                                  final getCat=ref.read(courseProvider).downloadVideoResponse.any((element) =>
+                                  int.parse(element.videoId??"")==widget.model?.video?.id
+                                  );
+                                  if (getCat) {
+                                    return const SizedBox.shrink();
+                                  }else{
+                                    if (downloadP.isDownloading &&
+                                        widget.model?.categoryId == downloadP.model?.categoryId) {
+                                      return SizedBox(
+                                        height: 15,
+                                        width: 15,
+                                        child: CircularProgressIndicator(
+                                          strokeCap: StrokeCap.butt,
+                                          strokeWidth: 2,
+                                          value: downloadP.progress,
+                                        ),
+                                      );
+                                    } else {
+                                      return OutlinedIconButton.svg(
+                                        SvgPaths.download,
+                                        appStyle: widget.appStyle,
+                                        // svgIconSrc: SvgPaths.bookmarkSelected,
+                                        onTap: () {
+                                          print(
+                                              "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                          if (downloadP.model == null) {
+                                            downloadP.download(model: widget.model);
+                                          } else if (widget.model!.id !=
+                                              downloadP.model!.id) {
+                                            showCustomSnackBar(
+                                                'Another Video is in progress');
+                                          }
+                                        },
+                                      );
+                                    }
                                   }
+
+
                                 },
                               ),
                       const SizedBox(
@@ -380,36 +419,43 @@ class _DetailItemState extends ConsumerState<DetailItem> {
               Consumer(
                 builder: (context, ref, child) {
                   final downloadP = ref.watch(downloadProvider);
-                  print('@@@@@@@@@@@@@@@@@@@@@@@@#${downloadP.isPdfDownloading}');
-                  print('@@@@@@@@@@@@@@@@@@@@@@@@%${widget.pdfModel?.categoryId},${downloadP.pdfModel?.categoryId}');
-                  if (downloadP.isPdfDownloading &&
-                      widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
-                    return SizedBox(
-                      height: 15,
-                      width: 15,
-                      child: CircularProgressIndicator(
-                        strokeCap: StrokeCap.butt,
-                        strokeWidth: 2,
-                        value: downloadP.progress,
-                      ),
-                    );
-                  } else {
-                    return OutlinedIconButton.svg(
-                      SvgPaths.download,
-                      appStyle: widget.appStyle,
-                      // svgIconSrc: SvgPaths.bookmarkSelected,
-                      onTap: () {
-                        print('---------------------?${downloadP.pdfModel?.categoryId??0}');
-                        if (downloadP.pdfModel == null) {
-                          print(widget.pdfModel?.categoryId ?? "");
-                          downloadP.pdfDownload(model: widget.pdfModel);
-                        } else if (widget.pdfModel!.id !=
-                            downloadP.pdfModel!.id) {
-                          showCustomSnackBar('Another PDF is in progress');
-                        }
-                      },
-                    );
+                  final getCat=ref.read(courseProvider).downloadPdfResponse.any((element) =>
+                  int.parse(element.pdfId??"")==widget.pdfModel?.pdf?.id
+                  );
+                  if(getCat){
+                    return const SizedBox.shrink();
+                  }else{
+                    if (downloadP.isPdfDownloading &&
+                        widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
+                      return SizedBox(
+                        height: 15,
+                        width: 15,
+                        child: CircularProgressIndicator(
+                          strokeCap: StrokeCap.butt,
+                          strokeWidth: 2,
+                          value: downloadP.progress,
+                        ),
+                      );
+                    } else {
+                      return OutlinedIconButton.svg(
+                        SvgPaths.download,
+                        appStyle: widget.appStyle,
+                        // svgIconSrc: SvgPaths.bookmarkSelected,
+                        onTap: () {
+                          print('---------------------?${downloadP.pdfModel?.categoryId??0}');
+                          if (downloadP.pdfModel == null) {
+                            print(widget.pdfModel?.categoryId ?? "");
+                            downloadP.pdfDownload(model: widget.pdfModel);
+                          } else if (widget.pdfModel!.id !=
+                              downloadP.pdfModel!.id) {
+                            showCustomSnackBar('Another PDF is in progress');
+                          }
+                        },
+                      );
+                    }
                   }
+
+
                 },
               ):const SizedBox.shrink(),
             SizedBox(width: widget.appStyle.scaleX(10)),

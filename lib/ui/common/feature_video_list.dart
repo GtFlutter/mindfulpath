@@ -22,9 +22,10 @@ class FeatureVideoList extends ConsumerWidget {
   final ScrollController? controller;
 
   const FeatureVideoList.horizontal(
-    this.list, {
+     {
     super.key,
     required this.style,
+       required this.list,
     required this.clipper,
     this.physics,
     this.shrinkWrap = false,
@@ -32,13 +33,14 @@ class FeatureVideoList extends ConsumerWidget {
   }) : scrollDirection = Axis.horizontal;
 
   const FeatureVideoList.vertical(
-    this.list, {
+    {
     super.key,
-    required this.style,
+      required this.list,
+      required this.style,
     this.physics,
     this.shrinkWrap = false,
     this.controller,
-  })  : scrollDirection = Axis.vertical,
+    })  : scrollDirection = Axis.vertical,
         clipper = null;
 
   @override
@@ -53,7 +55,9 @@ class FeatureVideoList extends ConsumerWidget {
         padding: EdgeInsets.symmetric(horizontal: style.scale * 22),
         itemCount: list.length,
         itemBuilder: (context, index) {
+
           var dataModel = list[index];
+          print('-------------------------->${dataModel.category?.title}');
           return GestureDetector(
             onTap: () {
               if (dataModel.category != null) {
@@ -88,7 +92,7 @@ class FeatureVideoList extends ConsumerWidget {
                     isDownloaded: false,
                     onToggleBookmark: () {
                       if (dataModel.id == null) return;
-                      ref.read(bookmarkProvider).toggleBookmark(dataModel.id!, isRemove: dataModel.bookmarked ?? false);
+                      ref.read(bookmarkProvider).toggleBookmark(dataModel.video?.id??0, isRemove: dataModel.bookmarked ?? false);
                     },
                   ),
           );

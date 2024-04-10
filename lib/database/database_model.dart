@@ -75,8 +75,9 @@ class PdfModel {
   String? pdfId;
   String? pdfName;
   String? pdfFile;
+  String? categoryTitle;
 
-  PdfModel({this.id, this.categoryId, this.pdfId, this.pdfName, this.pdfFile});
+  PdfModel({this.id, this.categoryId, this.pdfId, this.pdfName, this.pdfFile,this.categoryTitle});
 
   PdfModel.fromJson(dynamic json) {
     id = json['id'];
@@ -84,6 +85,7 @@ class PdfModel {
     pdfId = json['pdf_id'];
     pdfName = json['pdf_name'];
     pdfFile = json['pdf_file'];
+    categoryTitle = json['category_title'];
   }
 
   Map<String, String> toJson() {
@@ -92,6 +94,7 @@ class PdfModel {
     map['pdf_id'] = pdfId!;
     map['pdf_name'] = pdfName!;
     map['pdf_file'] = pdfFile!;
+    map['category_title'] = categoryTitle!;
     return map;
   }
 

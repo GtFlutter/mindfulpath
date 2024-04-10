@@ -72,7 +72,7 @@ class _FeaturedListWidgetState extends ConsumerState<FeaturedWidget> {
               offset: provider.data!.currentPage,
               itemView: FeatureVideoList.horizontal(
                 key: const ValueKey<String>('rlw-hvl-1'),
-                provider.data!.list!,
+                list:provider.data!.list!,
                 style: widget.style,
                 clipper: widget.clipper,
                 shrinkWrap: true,

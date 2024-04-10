@@ -18,6 +18,8 @@ class VideoNotifier extends ChangeNotifier {
   VideoNotifier(this._ref);
   DIModel? _video;
   DIModel? get video => _video;
+  int? isSelected;
+
 
   void reInit([DetailedVideoModel? detailedVideoModel]) {
     if (detailedVideoModel == null) {

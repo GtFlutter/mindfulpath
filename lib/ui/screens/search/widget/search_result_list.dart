@@ -49,7 +49,7 @@ class SearchResultsList extends ConsumerWidget {
             appStyle: _style,
             model: _model[index],
             index: '$index',
-            onToggleBookmark: () => toggleItemBookmark(ref, _model[index].id, isRemove: _model[index].bookmarked ?? false),
+            onToggleBookmark: () => toggleItemBookmark(ref, _model[index].video?.id, isRemove: _model[index].bookmarked ?? false),
             isDownloaded: false,
           ),
         );

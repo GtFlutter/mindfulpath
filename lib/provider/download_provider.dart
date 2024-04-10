@@ -62,7 +62,7 @@ class DownloadNotifier extends ChangeNotifier {
     double tempProgress = 0.0;
     if (!ref.read(authProvider).isUserLoggedIn) {
       showCustomSnackBar(
-        'Please log in to bookmark.',
+        'Please login to download a Pdf.',
         action: SnackBarAction(
           label: 'Log In',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
@@ -152,7 +152,7 @@ class DownloadNotifier extends ChangeNotifier {
     if (!ref.read(authProvider).isUserLoggedIn) {
       _model = null;
       showCustomSnackBar(
-        'Please log in to bookmark.',
+        'Please login to download a video.',
         action: SnackBarAction(
           label: 'Log In',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
@@ -227,7 +227,7 @@ class DownloadNotifier extends ChangeNotifier {
     if (!ref.read(authProvider).isUserLoggedIn) {
       _model = null;
       showCustomSnackBar(
-        'Please log in to bookmark.',
+        'Please login to bookmark.',
         action: SnackBarAction(
           label: 'Log In',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
@@ -350,6 +350,7 @@ class DownloadNotifier extends ChangeNotifier {
             categoryId: pdfModel?.id,
             pdfId: pdfModel!.id!.toString(),
             pdfName: pdfModel.title,
+            categoryTitle: pdfModel.categoryTitle,
             pdfFile: videoFile);
         int vRes = await dbHelper.savePDF(vModal);
         if (vRes == 1){
@@ -366,6 +367,7 @@ class DownloadNotifier extends ChangeNotifier {
             categoryId: pdfModel?.categoryId,
             pdfFile: pdfModel?.pdf?.url,
             pdfId: pdfModel?.pdf?.id.toString(),
+            categoryTitle: pdfModel?.categoryTitle,
             pdfName: pdfModel?.pdf?.fileName);
         int cRes = await dbHelper.savePdfCategory(modal);
         print("-------374------++++$cRes");
@@ -376,6 +378,7 @@ class DownloadNotifier extends ChangeNotifier {
               categoryId: pdfModel?.categoryId,
               pdfId: pdfModel!.id!.toString(),
               pdfName: pdfModel.title,
+              categoryTitle: pdfModel.categoryTitle,
               pdfFile: videoFile);
           print("-------383------++++$res");
           print(vModal.toJson());
@@ -395,7 +398,7 @@ class DownloadNotifier extends ChangeNotifier {
         if (model == null) return;
         VideoModal vModal = VideoModal(
             categoryId: res.id,
-            videoId: model.id!.toString(),
+            videoId: model.video?.id.toString(),
             videoName: model.title,
             videoFile: videoFile,
             videoDuration: model.duration);
@@ -417,7 +420,7 @@ class DownloadNotifier extends ChangeNotifier {
         if (cRes > 0) {
           VideoModal vModal = VideoModal(
               categoryId: int.parse(res?.categoryId ?? "0"),
-              videoId: model?.id?.toString(),
+              videoId:model?.video?.id.toString(),
               videoName: model?.title,
               videoFile: videoFile,
               videoDuration: model?.duration);

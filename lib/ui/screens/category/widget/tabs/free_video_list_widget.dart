@@ -114,7 +114,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
               appStyle: _style,
               model: model,
               index: '$index',
-              onToggleBookmark: () => toggleItemBookmark(model.id,
+              onToggleBookmark: () => toggleItemBookmark(model.video?.id,
                   isRemove: model.bookmarked ?? false),
               isDownloaded:isDownloaded ,
             ));

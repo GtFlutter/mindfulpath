@@ -28,6 +28,8 @@ class BookmarkNotifier extends ChangeNotifier {
 
   BookmarkNotifier(this.repo, this.ref);
 
+  int? isSelected;
+
   bool islandScap=false;
 
   bool _isLoading = false;
@@ -95,7 +97,7 @@ class BookmarkNotifier extends ChangeNotifier {
   Future<void> toggleBookmark(int itemId, {bool isRemove = false}) async {
     if (!ref.read(authProvider).isUserLoggedIn) {
       showCustomSnackBar(
-        'Please log in to bookmark.',
+        'Please login to bookmark.',
         action: SnackBarAction(
           label: 'Log In',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),

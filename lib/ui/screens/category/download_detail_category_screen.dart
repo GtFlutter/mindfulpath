@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/database/database_model.dart';
+import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
@@ -18,35 +19,47 @@ import 'widget/intro_widget.dart';
 
 class DownloadDetailCategoryScreen extends ConsumerStatefulWidget {
   final CategoryModal categoryModal;
+
   const DownloadDetailCategoryScreen({super.key, required this.categoryModal});
 
   @override
-  ConsumerState<DownloadDetailCategoryScreen> createState() => _DetailCategoryScreenState();
+  ConsumerState<DownloadDetailCategoryScreen> createState() =>
+      _DetailCategoryScreenState();
 }
 
-class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScreen> with AutomaticKeepAliveClientMixin  {
+class _DetailCategoryScreenState
+    extends ConsumerState<DownloadDetailCategoryScreen>
+    with AutomaticKeepAliveClientMixin {
   static AppStyle _style = AppStyle();
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () {
-      print('--------------*******---${widget.categoryModal.id}');
-      ref.read(courseProvider).getVideoFromDatabase(int.parse(widget.categoryModal.categoryId??""));
-
-    },);
-   /* Future.delayed(Duration.zero, () {
+    Future.delayed(
+      Duration.zero,
+      () {
+        print('--------------*******---${widget.categoryModal.id}');
+        ref.read(courseProvider).getVideoFromDatabase(
+            int.parse(widget.categoryModal.categoryId ?? ""));
+      },
+    );
+    /* Future.delayed(Duration.zero, () {
       print('--------------*******---${widget.categoryModal.id}');
       ref.read(courseProvider).getPdfFromDatabase(int.parse(widget.categoryModal.categoryId??""));
 
     },);*/
     super.initState();
   }
-
+  @override
+  void deactivate() {
+    ref.read(videoProvider.notifier).isSelected=null;
+    super.deactivate();
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+    bool isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
     Size size = MediaQuery.sizeOf(context);
     _style = AppStyle(screenSize: size);
     TextStyle textStyle = _style.text.font(mulishRegular400, sizePx: 14);
@@ -54,7 +67,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
     var videoCtrl = ref.watch(offlineVideoProvider);
     final courseP = ref.watch(courseProvider);
 
-    print('---------------->${videoCtrl.video?.videoName??""}');
+    print('---------------->${videoCtrl.video?.videoName ?? ""}');
 
     var isVideoAvailable = videoCtrl.video != null;
     return PopScope(
@@ -65,7 +78,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
         }
         if (isVideoAvailable) {
           if (MediaQuery.orientationOf(context) == Orientation.landscape) {
-            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.portraitUp]);
           }
           videoCtrl.clearVideo();
           return;
@@ -76,7 +90,9 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: isVideoAvailable ? null : CustomAppBar(screenSize: size, style: _style),
+        appBar: isVideoAvailable
+            ? null
+            : CustomAppBar(screenSize: size, style: _style),
         body: BackgroundImage.network(
           // imgUrl: widget.categoryListResponse.imageResponse?.imageUrl ?? AppConstants.placeHolder,
           imgUrl: AppConstants.placeHolder,
@@ -100,7 +116,9 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         width: !isLandscape ? null : double.infinity,
                         height: !isLandscape ? null : double.infinity,
                         alignment: !isLandscape ? null : Alignment.topCenter,
-                        constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
+                        constraints: !isLandscape
+                            ? BoxConstraints(maxHeight: size.height * 0.4)
+                            : null,
                         child: AppVideoPlayer(
                           key: const ValueKey('value'),
                           videoId: videoCtrl.video!.id!,
@@ -108,17 +126,29 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                           style: _style,
                           isLandscape: isLandscape,
                           onBackPress: () {
-                            if (MediaQuery.orientationOf(context) == Orientation.landscape) {
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                            if (MediaQuery.orientationOf(context) ==
+                                Orientation.landscape) {
+                              SystemChrome.setPreferredOrientations(
+                                  [DeviceOrientation.portraitUp]);
                             }
+                            ref.read(videoProvider.notifier).isSelected=null;
+                            ref.read(bookmarkProvider.notifier).islandScap=false;
                             videoCtrl.clearVideo();
                           },
                           isFileUrl: true,
                           onFullScreen: () {
-                            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                            if (MediaQuery.orientationOf(context) ==
+                                Orientation.portrait) {
+                              SystemChrome.setPreferredOrientations(
+                                  [DeviceOrientation.landscapeLeft]);
+                              ref.read(bookmarkProvider.notifier).islandScap =
+                                  true;
                             } else {
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                              ref.read(bookmarkProvider.notifier).islandScap =
+                                  false;
+
+                              SystemChrome.setPreferredOrientations(
+                                  [DeviceOrientation.portraitUp]);
                             }
                           },
                         ),
@@ -132,7 +162,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         children: [
                           Text(
                             videoCtrl.video!.videoName ?? '',
-                            style: _style.text.font(mulishSemiBold600, sizePx: 20, color: Colors.white),
+                            style: _style.text.font(mulishSemiBold600,
+                                sizePx: 20, color: Colors.white),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.left,
@@ -147,8 +178,9 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                 children: [
                                   Text(
                                     '●',
-                                    style:
-                                    _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                                    style: _style.text.font(mulishSemiBold600,
+                                        sizePx: 14,
+                                        color: AppColors.primaryColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -156,7 +188,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                   Flexible(
                                     child: Text(
                                       videoCtrl.video!.categoryName ?? '',
-                                      style: textStyle.copyWith(color: AppColors.autherNameColor),
+                                      style: textStyle.copyWith(
+                                          color: AppColors.autherNameColor),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -177,58 +210,49 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         style: _style,
                       ),
                     ),
-                  if (!isLandscape || !isVideoAvailable)
-                    Expanded(
-                      flex: 3,
-                      child: ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        // controller: _controller,
-                        scrollDirection: Axis.vertical,
-                        padding: EdgeInsets.only(
-                          bottom: _style.scale * 100,
-                          top: _style.scale * 10,
-                        ),
-                        itemCount: courseP.downloadVideoResponse.length,
-                        itemBuilder: (context, index) {
-                          VideoModal item = courseP.downloadVideoResponse[index];
-                          var model = DDIModal(id: item.id, videoId: item.videoId, videoName: item.videoName, videoFile: item.videoFile, videoDuration: item.videoDuration, categoryId: widget.categoryModal.id.toString(), categoryName: widget.categoryModal.categoryName, categoryImage: widget.categoryModal.categoryImage);
-                          return GestureDetector(
-                            onTap: () => playVideo(model),
-                            child: DownloadDetailItem(
-                              appStyle: _style,
-                              model: model,
-                            ),
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                      )
-                    ),
-                  if(courseP.downloadPdfResponse.isEmpty)...[
-                    Expanded(
+                  !isLandscape
+                    ?Expanded(
                         flex: 3,
                         child: ListView.separated(
                           physics: const AlwaysScrollableScrollPhysics(),
+                          // controller: _controller,
                           scrollDirection: Axis.vertical,
                           padding: EdgeInsets.only(
                             bottom: _style.scale * 100,
                             top: _style.scale * 10,
                           ),
-                          itemCount: courseP.downloadPdfResponse.length,
+                          itemCount: courseP.downloadVideoResponse.length,
                           itemBuilder: (context, index) {
-                            PdfModel item = courseP.downloadPdfResponse[index];
-                            var model = DDIModal(id: item.id, videoId: item.pdfId, videoName: item.pdfName, videoFile: item.pdfFile, categoryId: widget.categoryModal.id.toString(), categoryName: widget.categoryModal.categoryName, categoryImage: widget.categoryModal.categoryImage);
+                            VideoModal item =
+                                courseP.downloadVideoResponse[index];
+                            var model = DDIModal(
+                                id: item.id,
+                                videoId: item.videoId,
+                                videoName: item.videoName,
+                                videoFile: item.videoFile,
+                                videoDuration: item.videoDuration,
+                                categoryId: widget.categoryModal.id.toString(),
+                                categoryName: widget.categoryModal.categoryName,
+                                categoryImage:
+                                    widget.categoryModal.categoryImage);
                             return GestureDetector(
-                              onTap: () => playVideo(model),
+                              //onTap: () => playVideo(model),
                               child: DownloadDetailItem(
+                                IsSelected: ref.read(videoProvider.notifier).isSelected,
+                                onPlay: (){
+                                  ref.read(videoProvider.notifier).isSelected=index;
+                                  playVideo(model);
+                                },
                                 appStyle: _style,
+                                index: index,
                                 model: model,
                               ),
                             );
                           },
-                          separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                        )
-                    ),
-                  ]
+                          separatorBuilder: (BuildContext context, int index) =>
+                              SizedBox(height: _style.scaleX(25)),
+                        )): const SizedBox.shrink(),
+
                 ],
               ),
             ),
@@ -237,7 +261,6 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
       ),
     );
   }
-
 
   void playVideo(DDIModal model) {
     ref.read(offlineVideoProvider).playVideo(model);

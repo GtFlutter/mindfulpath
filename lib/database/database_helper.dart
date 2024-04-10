@@ -62,6 +62,7 @@ class DatabaseHelper {
     var dbClient = await db;
     int res;
     try {
+      print('|||||||||||||||||||||||||||${modal.toJson()}');
       res = await dbClient.insert(DatabaseConsts.categoryPdfTable, modal.toJson());
       debugPrint("DATABASE:- ${DatabaseConsts.categoryPdfTable} saved to db");
     } catch (e) {

@@ -100,7 +100,7 @@ class _FeaturedVideoScreenState extends State<FeaturedVideoScreen> {
                         Expanded(
                           child: FeatureVideoList.vertical(
                             key: const ValueKey<String>('fss-vl-1'),
-                            provider.data!.list!,
+                            list:provider.data!.list!,
                             style: _style,
                             physics: const BouncingScrollPhysics(),
                           ),

@@ -89,7 +89,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget> with 
             model: model,
             index: '$index',
             isDownloaded: provider.downloadedVideo.any((element) => element.id==provider.videosResponse?.list?[index].id),
-            onToggleBookmark: () => toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false),
+            onToggleBookmark: () => toggleItemBookmark(model.video?.id, isRemove: model.bookmarked ?? false),
           ),
         );
       },

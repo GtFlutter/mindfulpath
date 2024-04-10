@@ -73,7 +73,7 @@ class _DownloadPdfCategoryScreenState extends ConsumerState<DownloadPdfCategoryS
               child: DetailItem.pdf(
                 appStyle: _style,
                 title: model.pdfName ?? '',
-                subTitle: 'Meditation',
+                subTitle: model.categoryTitle??"",
                 index: '$index',
                 isShow: false,
                 isDownloaded: false,

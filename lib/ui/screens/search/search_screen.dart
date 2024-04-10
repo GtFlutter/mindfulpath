@@ -47,6 +47,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final dashboardNotifier = ref.read<DashboardNotifier>(dashboardProvider);
     Future.delayed(Duration.zero, () {
       if (dashboardNotifier.categoryListResponse == null && dashboardNotifier.categoryListResponse!.isEmpty) {
+        print("=================++++++++++============");
         dashboardNotifier.getCategoryList();
       }
     });

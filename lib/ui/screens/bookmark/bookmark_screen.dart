@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +33,12 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
       ref.watch(videoProvider).clearVideo();
     });
     super.initState();
+  }
+
+  @override
+  void deactivate() {
+    ref.read(videoProvider.notifier).isSelected=null;
+    super.deactivate();
   }
 
   void playVideo(BookmarkListResponse bookmarkListResponse,
@@ -110,6 +117,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                   SystemChrome.setPreferredOrientations(
                                       [DeviceOrientation.portraitUp]);
                                 }
+                                ref.read(videoProvider.notifier).isSelected=null;
+                                ref.read(bookmarkProvider.notifier).islandScap=false;
+
                                 videoCtrl.clearVideo();
                               },
                               isFileUrl: false,
@@ -128,57 +138,57 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                       ] else
                         const SizedBox.shrink(),
                       !isLandscape
-                          ? ListView.separated(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            padding: EdgeInsets.only(
-                              //bottom: _style.scale * 100,
-                              top: _style.scale * 12.5,
-                              right: _style.scale * 10,
-                              left: _style.scale * 10,
-                            ),
-                            itemCount: bookmarkNotifier
-                                .bookmarkListResponse!.length,
-                            itemBuilder: (context, index) {
-                              var model = bookmarkNotifier
-                                  .bookmarkListResponse![index];
-
-                              return GestureDetector(
-                                onTap: () {
-                                  playVideo(model,
-                                      bookmarkNotifier.category![index]);
-                                },
-                                child: BookmarkItem(
-                                  appStyle: _style,
-                                  model: bookmarkNotifier
-                                      .bookmarkListResponse![index],
-                                  index: '$index',
-                                  url: bookmarkNotifier
-                                      .bookmarkListResponse![index]
-                                      .bookmarkVideoResponse!
-                                      .videoUrlSrc,
-                                  onBookmarkRemove: () async {
-                                    if (bookmarkNotifier
-                                            .bookmarkListResponse![index]
-                                            .videoId ==
-                                        null) return;
-                                    await ref
-                                        .read(bookmarkProvider)
-                                        .toggleBookmark(
-                                            bookmarkNotifier
-                                                .bookmarkListResponse![
-                                                    index]
-                                                .videoId!,
-                                            isRemove: true);
-                                    bookmarkNotifier.bookmarkListResponse!
-                                        .removeAt(index);
+                          ? Expanded(
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              padding: EdgeInsets.only(
+                                //bottom: _style.scale * 100,
+                                top: _style.scale * 12.5,
+                                right: _style.scale * 10,
+                                left: _style.scale * 10,
+                              ),
+                              itemCount: bookmarkNotifier
+                                  .bookmarkListResponse!.length,
+                              itemBuilder: (context, index) {
+                                var model = bookmarkNotifier
+                                    .bookmarkListResponse![index];
+                            
+                                return GestureDetector(
+                                  onTap: () {
+                            
                                   },
-                                ),
-                              );
-                            },
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    SizedBox(height: _style.scaleX(25)),
+                                  child: BookmarkItem(
+                                    appStyle: _style,
+                                    model: bookmarkNotifier
+                                        .bookmarkListResponse![index],
+                                    index: index,
+                                    IsSelected: ref.read(videoProvider.notifier).isSelected,
+                                    onPlay: (){
+                                        ref.read(videoProvider.notifier).isSelected=index;
+                                        playVideo(model, bookmarkNotifier.category![index]);
+                            
+                                    },
+                                    url: bookmarkNotifier
+                                        .bookmarkListResponse![index]
+                                        .bookmarkVideoResponse!
+                                        .videoUrlSrc,
+                                    onBookmarkRemove: () async {
+                                      if (bookmarkNotifier.bookmarkListResponse![index].videoId == null) return;
+                                      await ref
+                                          .read(bookmarkProvider)
+                                          .toggleBookmark(bookmarkNotifier.bookmarkListResponse![index].videoId!,
+                                              isRemove: true);
+                                      bookmarkNotifier.bookmarkListResponse!
+                                          .removeAt(index);
+                                    },
+                                  ),
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      SizedBox(height: _style.scaleX(25)),
+                            ),
                           )
                           : const SizedBox.shrink(),
                     ],

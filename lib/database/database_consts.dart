@@ -19,7 +19,8 @@ class DatabaseConsts {
       "pdf_id" TEXT,
       "pdf_name" TEXT,
       "pdf_file" TEXT,
-      "category_id" TEXT
+      "category_id" TEXT,
+      "category_title" TEXT
     );''',
 
     '''CREATE TABLE $videoTable (
@@ -36,7 +37,9 @@ class DatabaseConsts {
       "pdf_id" TEXT,
       "pdf_name" TEXT,
       "pdf_file" TEXT,
-      "category_id" TEXT
+      "category_id" TEXT,
+      "category_title" TEXT
+
     );'''
   ];
 }
