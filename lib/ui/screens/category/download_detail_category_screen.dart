@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/database/database_model.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
@@ -11,6 +12,7 @@ import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import 'package:meditation_app/ui/screens/category/widget/download_detail_item.dart';
+import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
@@ -37,9 +39,9 @@ class _DetailCategoryScreenState
     Future.delayed(
       Duration.zero,
       () {
-        print('--------------*******---${widget.categoryModal.id}');
         ref.read(courseProvider).getVideoFromDatabase(
             int.parse(widget.categoryModal.categoryId ?? ""));
+
       },
     );
     /* Future.delayed(Duration.zero, () {
@@ -52,6 +54,7 @@ class _DetailCategoryScreenState
   @override
   void deactivate() {
     ref.read(videoProvider.notifier).isSelected=null;
+    ref.read(courseProvider.notifier).downloadVideoResponse.clear();
     super.deactivate();
   }
 
@@ -121,8 +124,8 @@ class _DetailCategoryScreenState
                             : null,
                         child: AppVideoPlayer(
                           key: const ValueKey('value'),
-                          videoId: videoCtrl.video!.id!,
-                          url: videoCtrl.video!.videoFile!,
+                          videoId: videoCtrl.video?.id??0,
+                          url: videoCtrl.video?.videoFile??'',
                           style: _style,
                           isLandscape: isLandscape,
                           onBackPress: () {
@@ -161,7 +164,7 @@ class _DetailCategoryScreenState
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            videoCtrl.video!.videoName ?? '',
+                            videoCtrl.video?.videoName ?? '',
                             style: _style.text.font(mulishSemiBold600,
                                 sizePx: 20, color: Colors.white),
                             maxLines: 1,
@@ -187,13 +190,14 @@ class _DetailCategoryScreenState
                                   SizedBox(width: _style.scaleX(5)),
                                   Flexible(
                                     child: Text(
-                                      videoCtrl.video!.categoryName ?? '',
+                                      videoCtrl.video?.categoryName ?? '',
                                       style: textStyle.copyWith(
                                           color: AppColors.autherNameColor),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
+
                                 ],
                               ),
                             ],

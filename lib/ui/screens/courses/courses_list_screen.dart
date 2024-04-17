@@ -63,10 +63,11 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
         courseP.getCategoryFromDatabase();
       },);
     }
+
+
+
     super.initState();
   }
-
-
 
 
   bool get isPurchased => widget.title == ScreenTitles.purchased.value;
@@ -79,6 +80,15 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
     const double ratio = 30;
     double maxWidth = _style.scaleX(16 * ratio);
     double maxHeight = _style.scaleX(8.2 * ratio);
+    print('--------------*******---${ref.read(courseProvider).downloadVideoResponse.length}');
+    if(ref.watch(courseProvider).pushData==true){
+      Future.delayed(Duration.zero, () {
+        ref.read(courseProvider.notifier).pushData=false;
+        Navigator.pop(context);
+      },);
+
+    }
+
 
     final courseP = ref.watch(courseProvider);
 

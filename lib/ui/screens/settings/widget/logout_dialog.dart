@@ -206,7 +206,7 @@ class BuyNowDialog extends ConsumerWidget {
                                 onSuccess: (value) async {
                                   log('ON Success :: $value', name: 'On Success');
                                   bool result = await dashboardP.purchaseCategory(categoryId, value['paymentId']);
-                                  if (result) ref.read(paidVideosProvider).fetchVideos(int.parse(categoryId));
+                                  if (result) ref.read(paidVideosProvider.notifier).fetchVideos(int.parse(categoryId));
                                 },
                               ),
                             ));

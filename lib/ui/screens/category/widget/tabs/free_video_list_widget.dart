@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/provider/course_provider.dart';
+import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
 
 import '../../../../../data/model/body/resource_type.dart';
@@ -31,7 +33,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
   @override
   void initState() {
     Future.delayed(Duration.zero, () async {
-      ref.read(freeVideosProvider).fetchVideos(widget.category.id!);
+      ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
       await initCall();
     });
 
@@ -63,6 +65,18 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     _controller.dispose();
     super.dispose();
   }
+  Future<void> refreshh() async{
+    Future.delayed(Duration.zero, () async {
+      final coursePRead = ref.read(courseProvider);
+      await coursePRead.getCategoryFromDatabase();
+      //for(final category in coursePWatch.downloadResponse){
+       // await coursePRead.getVideoFromDatabase(int.parse(category.categoryId??""));
+        await coursePRead.getVideoFromDatabase(widget.category.id??0);
+
+    //  }
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +95,17 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     if (provider.videosResponse!.list!.isEmpty) {
       return const Center(child: Text('Free Videos Is Empty'));
     }
+
+    final downloadP = ref.watch(downloadProvider);
+
+   // print('______-------video--------_____175_______${downloadP.isDownloading}');
+    print('______-------video--------_____175_______${downloadP.complate}');
+    if(downloadP.complate==true){
+      refreshh();
+      ref.read(downloadProvider.notifier).complate=false;
+      setState((){});
+    }
+
 
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),

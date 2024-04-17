@@ -24,6 +24,10 @@ class DownloadNotifier extends ChangeNotifier {
 
   DownloadNotifier(this.ref);
 
+  bool complate = false;
+  bool Pdfcomplate = false;
+
+
   bool _isDownloading = false;
   bool get isDownloading => _isDownloading;
 
@@ -34,15 +38,12 @@ class DownloadNotifier extends ChangeNotifier {
   bool get isDownloadComplete => _isDownloadComplete;
 
   double _progress = 0.0;
-
   double get progress => _progress;
 
   VideoResponse? _model;
-
   VideoResponse? get model => _model;
 
   PdfResponse? _pdfModel;
-
   PdfResponse? get pdfModel => _pdfModel;
 
   void setProgress(double value) {
@@ -53,7 +54,8 @@ class DownloadNotifier extends ChangeNotifier {
   }
 
   void pdfDownload({PdfResponse? model}) async {
-    bool? currantResult;
+    //sdf;
+    //bool? currantResult;
     BuildContext? context = await rootNavigator.currentContext;
     if (context == null) return;
     if (model == null) return;
@@ -79,29 +81,23 @@ class DownloadNotifier extends ChangeNotifier {
     }
     await _checkDirectory(true);
 
-    String path = await PathHelper.getDownloadDirectoryPath(true);
+    String path = await PathHelper.getDownloadDirectoryPath(false);
     debugPrint('File Path :: $path/${model.pdf!.fileName!}');
-    final file = File("$path/${model.pdf!.fileName!}");
     bool result = await PathHelper.fileExists('$path/${model.pdf!.fileName!}');
 
+
     print("============87============++++");
-    ref.read(courseProvider).getCategoryPdfFromDatabase();
-    final data = ref.read(courseProvider).downloadPdfResponses;
-    print(data);
-    if (data.isEmpty) {
-      currantResult = false;
-    }
-    print("============94============++++$currantResult");
 
-    if (result) {
-      debugPrint('True');
 
-      //'$path/${model.pdf!.fileName!}'
-      _getSinglePdf(model.pdf?.url ?? "", model: model);
-      showCustomSnackBar('File Already Exists', type: true);
-      _pdfModel = null;
-      notifyListeners();
-    } else {
+    //if (result) {
+    //  debugPrint('True');
+
+    //  //'$path/${model.pdf!.fileName!}'
+    //  _getSinglePdf(model.pdf?.url ?? "", model: model);
+    //  showCustomSnackBar('File Already Exists', type: true);
+    //  _pdfModel = null;
+    //  notifyListeners();
+    //} else {
       debugPrint('False');
       await DownloadHelper.instance.download(
         model.pdfUrl!,
@@ -118,15 +114,12 @@ class DownloadNotifier extends ChangeNotifier {
               notifyListeners();
             }
             if (tempProgress == 1.0) {
-              print('==========121==============++++${_isDownloadComplete}');
               if (!_isDownloadComplete) {
                 _isDownloadComplete = true;
                 _isPdfDownloading = false;
                 debugPrint(
-                    'Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-                _saveCategoryAndVideo(model.pdf?.url ?? "",
-                    pdfModel: model,
-                    isPdf: true); //pdf download- download provider
+                    'Is Downloading == $_isPdfDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+                _saveCategoryAndVideo(model.pdf?.url ?? "", pdfModel: model, isPdf: true); //pdf download- download provider
                 _pdfModel = null;
                 notifyListeners();
               }
@@ -136,7 +129,7 @@ class DownloadNotifier extends ChangeNotifier {
           }
         },
       );
-    }
+   // }
   }
 
   void download({VideoResponse? model}) async {
@@ -170,13 +163,13 @@ class DownloadNotifier extends ChangeNotifier {
     debugPrint('File Path :: $path/${model.video!.fileName!}');
     bool result =
         await PathHelper.fileExists('$path/${model.video!.fileName!}');
-    if (result) {
-      debugPrint('True');
-      _getSingleVideo('$path/${model.video!.fileName!}', model: model);
-      showCustomSnackBar('File Already Exists', type: true);
-      _model = null;
-      notifyListeners();
-    } else {
+   // if (result) {
+   //   debugPrint('True');
+   //   _getSingleVideo('$path/${model.video!.fileName!}', model: model);
+   //   showCustomSnackBar('File Already Exists', type: true);
+   //   _model = null;
+   //   notifyListeners();
+   // } else {
       debugPrint('False');
       try {
         await DownloadHelper.instance.download(
@@ -211,7 +204,7 @@ class DownloadNotifier extends ChangeNotifier {
         _model = null;
         showCustomSnackBar(e.toString());
       }
-    }
+   // }
   }
 
   void downloadPlayList({VideoResponse? model}) async {
@@ -250,13 +243,13 @@ class DownloadNotifier extends ChangeNotifier {
     debugPrint('File Path :: $path/${model.video!.fileName!}');
     bool result =
         await PathHelper.fileExists('$path/${model.video!.fileName!}');
-    if (result) {
-      debugPrint('True');
-      _getSingleVideo('$path/${model.video!.fileName!}', model: model);
-      showCustomSnackBar('File Already Exists', type: true);
-      _model = null;
-      notifyListeners();
-    } else {
+   // if (result) {
+   //   debugPrint('True');
+   //   _getSingleVideo('$path/${model.video!.fileName!}', model: model);
+   //   showCustomSnackBar('File Already Exists', type: true);
+   //   _model = null;
+   //   notifyListeners();
+   // } else {
       debugPrint('False');
       try {
         await DownloadHelper.instance.download(
@@ -291,7 +284,7 @@ class DownloadNotifier extends ChangeNotifier {
         _model = null;
         showCustomSnackBar(e.toString());
       }
-    }
+   // }
   }
 
   Future<void> _checkDirectory(bool isPdf) async {
@@ -330,7 +323,6 @@ class DownloadNotifier extends ChangeNotifier {
     print('-------335------++++${videoFile}');
     CategoryModal? res;
     PdfModel? Pdfres;
-    //if (model == null) return;
     final dbHelper = ref.read(databaseProvider);
     print("-------340------++++${pdfModel?.categoryId}");
     if (isPdf) {
@@ -347,17 +339,19 @@ class DownloadNotifier extends ChangeNotifier {
         print("-------352------++++${Pdfres.toJson()}");
 
         PdfModel vModal = PdfModel(
-            categoryId: pdfModel?.id,
-            pdfId: pdfModel!.id!.toString(),
-            pdfName: pdfModel.title,
-            categoryTitle: pdfModel.categoryTitle,
+            categoryId: pdfModel?.categoryId,
+            pdfId: pdfModel?.pdf?.id.toString(),
+            pdfName: pdfModel?.title,
+            categoryTitle: pdfModel?.categoryTitle,
             pdfFile: videoFile);
         int vRes = await dbHelper.savePDF(vModal);
-        if (vRes == 1){
+        if (vRes > 0){
+          Pdfcomplate=true;
+          _isPdfDownloading = false;
           showCustomSnackBar('PDF Save Successfully download');
           _isDownloadComplete = false;
-          Pdfres = null;
           _pdfModel = null;
+          Pdfres = null;
           notifyListeners();
         }
       } else {
@@ -376,19 +370,21 @@ class DownloadNotifier extends ChangeNotifier {
               .getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
           PdfModel vModal = PdfModel(
               categoryId: pdfModel?.categoryId,
-              pdfId: pdfModel!.id!.toString(),
-              pdfName: pdfModel.title,
-              categoryTitle: pdfModel.categoryTitle,
+              pdfId: pdfModel?.pdf?.id.toString(),
+              pdfName: pdfModel?.title,
+              categoryTitle: pdfModel?.categoryTitle,
               pdfFile: videoFile);
           print("-------383------++++$res");
           print(vModal.toJson());
           int vRes = await dbHelper.savePDF(vModal);
           print("--------386-----++++$vRes");
           if (vRes > 0){
+            Pdfcomplate=true;
+            _isPdfDownloading = false;
             showCustomSnackBar('PDF Save Successfully download');
             _isDownloadComplete = false;
-            Pdfres = null;
             _pdfModel = null;
+            Pdfres = null;
             notifyListeners();
           }
         }
@@ -397,16 +393,18 @@ class DownloadNotifier extends ChangeNotifier {
       if (res != null) {
         if (model == null) return;
         VideoModal vModal = VideoModal(
-            categoryId: res.id,
+            categoryId: model.categoryId,
             videoId: model.video?.id.toString(),
             videoName: model.title,
             videoFile: videoFile,
             videoDuration: model.duration);
         int vRes = await dbHelper.saveVideo(vModal);
         if (vRes > 0){
-          showCustomSnackBar('Video Save Successfully download');
+        complate=true;
+        showCustomSnackBar('Video Save Successfully download');
           _isDownloadComplete = false;
           res = null;
+          notifyListeners();
         }
       } else {
         CategoryModal modal = CategoryModal(
@@ -419,16 +417,18 @@ class DownloadNotifier extends ChangeNotifier {
         print("after category s--->${cRes}");
         if (cRes > 0) {
           VideoModal vModal = VideoModal(
-              categoryId: int.parse(res?.categoryId ?? "0"),
+              categoryId: int.parse(res?.categoryId ?? ""),
               videoId:model?.video?.id.toString(),
               videoName: model?.title,
               videoFile: videoFile,
               videoDuration: model?.duration);
           int vRes = await dbHelper.saveVideo(vModal);
           if (vRes > 0){
-            showCustomSnackBar('Video Save Successfully download');
+        complate=true;
+        showCustomSnackBar('Video Save Successfully download');
             _isDownloadComplete = false;
             res = null;
+            notifyListeners();
 
           }
         }

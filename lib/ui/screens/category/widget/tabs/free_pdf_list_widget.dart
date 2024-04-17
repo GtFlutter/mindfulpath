@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/navigation.dart';
+import 'package:meditation_app/provider/course_provider.dart';
+import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/resource_provider/free_pdfs_provider.dart';
 
 import '../../../../../data/model/response/category_list_reponse.dart';
@@ -42,6 +44,19 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
     super.dispose();
   }
 
+  Future<void> refreshh() async {
+    Future.delayed(Duration.zero, () async {
+      final coursePRead = ref.read(courseProvider);
+      final coursePWatch = ref.watch(courseProvider);
+      await coursePRead.getCategoryPdfFromDatabase();
+     // for(final category in coursePWatch.downloadPdfResponses){
+      print('+++++++++_________----------+++++++${widget.category.id}');
+        await coursePRead.getPdfFromDatabase(widget.category.id??0);
+
+      //}
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -69,6 +84,17 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
     }
     if (provider.pdfsResponse!.list!.isEmpty) {
       return const Center(child: Text('Free PDF\'s Is Empty'));
+    }
+
+
+
+    final downloadP = ref.watch(downloadProvider);
+
+    print('++++++++++===========++++++++++${downloadP.Pdfcomplate}');
+    if (downloadP.Pdfcomplate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).Pdfcomplate = false;
+      setState(() {});
     }
 
     return ListView.separated(

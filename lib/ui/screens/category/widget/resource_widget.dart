@@ -4,6 +4,8 @@ import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
+import 'package:meditation_app/provider/download_provider.dart';
+import 'package:meditation_app/provider/resource_provider/paid_videos_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
@@ -42,6 +44,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   @override
   void initState() {
     super.initState();
+    print('_______________________________________46_${widget.category.isPurchased}');
     filterIndex = 0;
     courseIndex = 0;
     _tabController = TabController(initialIndex: courseIndex, length: 4, vsync: this);
@@ -90,6 +93,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   @override
   Widget build(BuildContext context) {
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
+
+    var provider = ref.watch(paidVideosProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,7 +124,8 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                   );
                   return;
                 }
-                if (!(widget.category.isPurchased!)) {
+                print('_______________________________________126_${widget.category.isPurchased}');
+                if (!(widget.category.isPurchased??false)) {
                   buyNow(context, categoryId: widget.category.id.toString());
                   return;
                 }else{

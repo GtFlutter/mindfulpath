@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/data/model/response/pdfs_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/course_provider.dart';
@@ -81,8 +82,10 @@ class DetailItem extends ConsumerStatefulWidget {
   final bool isDownloaded;
   final bool? isShow;
   final GestureTapCallback? onToggleBookmark;
+  final bool? isRemove;
+  final void Function()? pressRemove;
 
-  const DetailItem.video( {
+  const DetailItem.video({
     super.key,
     required this.appStyle,
     required VideoResponse this.model,
@@ -90,6 +93,8 @@ class DetailItem extends ConsumerStatefulWidget {
     required this.onToggleBookmark,
     required this.isDownloaded,
     this.isShow,
+    this.isRemove,
+    this.pressRemove,
   })  : title = null,
         subTitle = null,
         pdfModel = null;
@@ -102,9 +107,12 @@ class DetailItem extends ConsumerStatefulWidget {
     required String this.title,
     required String this.subTitle,
     required this.isDownloaded,
+    this.isRemove,
+    this.pressRemove,
     this.isShow,
   })  : model = null,
         onToggleBookmark = null;
+
   @override
   ConsumerState<DetailItem> createState() => _DetailItemState();
 }
@@ -127,29 +135,27 @@ class _DetailItemState extends ConsumerState<DetailItem> {
           playlistP.getPlaylistList();
         }
 
-
         getCategory();
-
       },
     );
     super.initState();
   }
 
-  getCategory()async{
+  getCategory() async {
     final coursePRead = ref.read(courseProvider);
     final coursePWatch = ref.watch(courseProvider);
     await coursePRead.getCategoryPdfFromDatabase();
     await coursePRead.getCategoryFromDatabase();
 
-    for(final category in coursePWatch.downloadPdfResponses){
-      await coursePRead.getPdfFromDatabase(category.categoryId??0);
-    }
+    /*for(final category in coursePWatch.downloadPdfResponses){
+    }*/
+    await coursePRead.getPdfFromDatabase(widget.pdfModel?.categoryId ?? 0);
 
-    for(final category in coursePWatch.downloadResponse){
-      await coursePRead.getVideoFromDatabase(int.parse(category.categoryId??""));
+    /* for(final category in coursePWatch.downloadResponse){
+      print('-------------149${category.categoryId}');
 
-    }
-
+    }*/
+    await coursePRead.getVideoFromDatabase(widget.model?.categoryId ?? 0);
   }
 
   @override
@@ -169,7 +175,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
     final playlistP = ref.watch(playListProvider);
 
-    print('--------------->${widget.model?.categoryTitle}');
+
 
     return Container(
       decoration: ShapeDecoration(
@@ -240,7 +246,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                           Flexible(
                             child: Text(
                               isVideo
-                                  ? widget.model?.category?.title??""
+                                  ? widget.model?.category?.title ?? ""
                                   : widget.subTitle ?? '',
                               style: textStyle.copyWith(
                                   color: AppColors.categoryNameColor),
@@ -248,6 +254,20 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          SizedBox(width: widget.appStyle.scaleX(120)),
+                          widget.isRemove==true?IconButton(
+                            onPressed: () {
+                             widget.pressRemove!();
+                            },
+                            icon: SvgPicture.asset(
+                              SvgPaths.remove,
+                              height: 17,
+                              fit: BoxFit.contain,
+                            ),
+                            style: IconButton.styleFrom(
+                                tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap),
+                          ):const SizedBox.shrink()
                         ],
                       ),
                     ],
@@ -274,49 +294,61 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   Row(
                     children: [
                       if (!widget.isDownloaded)
-                         Consumer(
-                                builder: (context, ref, child) {
-                                  final downloadP = ref.watch(downloadProvider);
-                                  final getCat=ref.read(courseProvider).downloadVideoResponse.any((element) =>
-                                  int.parse(element.videoId??"")==widget.model?.video?.id
-                                  );
-                                  if (getCat) {
-                                    return const SizedBox.shrink();
-                                  }else{
-                                    if (downloadP.isDownloading &&
-                                        widget.model?.categoryId == downloadP.model?.categoryId) {
-                                      return SizedBox(
-                                        height: 15,
-                                        width: 15,
-                                        child: CircularProgressIndicator(
-                                          strokeCap: StrokeCap.butt,
-                                          strokeWidth: 2,
-                                          value: downloadP.progress,
-                                        ),
-                                      );
-                                    } else {
-                                      return OutlinedIconButton.svg(
-                                        SvgPaths.download,
-                                        appStyle: widget.appStyle,
-                                        // svgIconSrc: SvgPaths.bookmarkSelected,
-                                        onTap: () {
-                                          print(
-                                              "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
-                                          if (downloadP.model == null) {
-                                            downloadP.download(model: widget.model);
-                                          } else if (widget.model!.id !=
-                                              downloadP.model!.id) {
-                                            showCustomSnackBar(
-                                                'Another Video is in progress');
-                                          }
-                                        },
-                                      );
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final downloadP = ref.watch(downloadProvider);
+                            final getCat = ref
+                                .watch(courseProvider)
+                                .downloadVideoResponse
+                                .any((element) =>
+                                    int.parse(element.videoId ?? "") ==
+                                    widget.model?.video?.id);
+                            print('------------------>${getCat}');
+                            ref
+                                .watch(courseProvider)
+                                .downloadVideoResponse
+                                .any((e) {
+                              print('------------------292>${e.videoId}');
+                              return true;
+                            });
+                            print(
+                                '------------------294>${widget.model?.video?.id}');
+                            if (getCat) {
+                              return const SizedBox.shrink();
+                            } else {
+                              if (downloadP.isDownloading &&
+                                  widget.model?.categoryId ==
+                                      downloadP.model?.categoryId) {
+                                return SizedBox(
+                                  height: 15,
+                                  width: 15,
+                                  child: CircularProgressIndicator(
+                                    strokeCap: StrokeCap.butt,
+                                    strokeWidth: 2,
+                                    value: downloadP.progress,
+                                  ),
+                                );
+                              } else {
+                                return OutlinedIconButton.svg(
+                                  SvgPaths.download,
+                                  appStyle: widget.appStyle,
+                                  // svgIconSrc: SvgPaths.bookmarkSelected,
+                                  onTap: () {
+                                    print(
+                                        "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                    if (downloadP.model == null) {
+                                      downloadP.download(model: widget.model);
+                                    } else if (widget.model!.id !=
+                                        downloadP.model!.id) {
+                                      showCustomSnackBar(
+                                          'Another Video is in progress');
                                     }
-                                  }
-
-
-                                },
-                              ),
+                                  },
+                                );
+                              }
+                            }
+                          },
+                        ),
                       const SizedBox(
                         width: 10,
                       ),
@@ -413,51 +445,72 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   const Spacer(),
                 ],
               )
-            else
-              if (!widget.isDownloaded)
-              widget.isShow == true ?
-              Consumer(
-                builder: (context, ref, child) {
-                  final downloadP = ref.watch(downloadProvider);
-                  final getCat=ref.read(courseProvider).downloadPdfResponse.any((element) =>
-                  int.parse(element.pdfId??"")==widget.pdfModel?.pdf?.id
-                  );
-                  if(getCat){
-                    return const SizedBox.shrink();
-                  }else{
-                    if (downloadP.isPdfDownloading &&
-                        widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
-                      return SizedBox(
-                        height: 15,
-                        width: 15,
-                        child: CircularProgressIndicator(
-                          strokeCap: StrokeCap.butt,
-                          strokeWidth: 2,
-                          value: downloadP.progress,
-                        ),
-                      );
-                    } else {
-                      return OutlinedIconButton.svg(
-                        SvgPaths.download,
-                        appStyle: widget.appStyle,
-                        // svgIconSrc: SvgPaths.bookmarkSelected,
-                        onTap: () {
-                          print('---------------------?${downloadP.pdfModel?.categoryId??0}');
-                          if (downloadP.pdfModel == null) {
-                            print(widget.pdfModel?.categoryId ?? "");
-                            downloadP.pdfDownload(model: widget.pdfModel);
-                          } else if (widget.pdfModel!.id !=
-                              downloadP.pdfModel!.id) {
-                            showCustomSnackBar('Another PDF is in progress');
+            else if (!widget.isDownloaded)
+              widget.isShow == true
+                  ? Consumer(
+                      builder: (context, ref, child) {
+                        final downloadP = ref.watch(downloadProvider);
+                        final getCat = ref
+                            .read(courseProvider)
+                            .downloadPdfResponse
+                            .any((element) =>
+                                int.parse(element.pdfId ?? "") ==
+                                widget.pdfModel?.pdf?.id);
+
+                        ref.watch(courseProvider).downloadPdfResponse.any((e) {
+                          print(
+                              '________))))))))))((((((((((4355(((${e.pdfId}');
+
+                          return true;
+                        });
+                        print(
+                            '________))))))))))((((((((((4399(((${widget.pdfModel?.pdf?.id}');
+
+                        print(
+                            '________*****************________442(((${widget.pdfModel?.categoryId}');
+                        print(
+                            '________*****************________443(((${downloadP.pdfModel?.categoryId}');
+                        print(
+                            '________*****************________444(((${downloadP.isPdfDownloading}');
+
+                        if (getCat) {
+                          return const SizedBox.shrink();
+                        } else {
+                          if (downloadP.isPdfDownloading &&
+                              widget.pdfModel?.categoryId ==
+                                  downloadP.pdfModel?.categoryId) {
+                            return SizedBox(
+                              height: 15,
+                              width: 15,
+                              child: CircularProgressIndicator(
+                                strokeCap: StrokeCap.butt,
+                                strokeWidth: 2,
+                                value: downloadP.progress,
+                              ),
+                            );
+                          } else {
+                            return OutlinedIconButton.svg(
+                              SvgPaths.download,
+                              appStyle: widget.appStyle,
+                              // svgIconSrc: SvgPaths.bookmarkSelected,
+                              onTap: () {
+                                print(
+                                    '---------------------?${downloadP.pdfModel?.categoryId ?? 0}');
+                                if (downloadP.pdfModel == null) {
+                                  print(widget.pdfModel?.categoryId ?? "");
+                                  downloadP.pdfDownload(model: widget.pdfModel);
+                                } else if (widget.pdfModel!.id !=
+                                    downloadP.pdfModel!.id) {
+                                  showCustomSnackBar(
+                                      'Another PDF is in progress');
+                                }
+                              },
+                            );
                           }
-                        },
-                      );
-                    }
-                  }
-
-
-                },
-              ):const SizedBox.shrink(),
+                        }
+                      },
+                    )
+                  : const SizedBox.shrink(),
             SizedBox(width: widget.appStyle.scaleX(10)),
           ],
         ),
@@ -485,95 +538,4 @@ class _DetailItemState extends ConsumerState<DetailItem> {
       },
     );
   }
-
-// void _download() async {
-//   if (!ref.read(authProvider).isUserLoggedIn) {
-//     showCustomSnackBar(
-//       'Please log in to bookmark.',
-//       action: SnackBarAction(
-//         label: 'Log In',
-//         backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-//         textColor: Colors.brown.shade800,
-//         onPressed: () => appRouter.go(RoutePath.signIn),
-//       ),
-//       duration: const Duration(seconds: 5),
-//     );
-//     return;
-//   }
-//   if (!widget.model!.category!.isPurchased!) {
-//     buyNow(context, categoryId: widget.model!.category!.id.toString());
-//     return;
-//   }
-//   await _checkDirectory();
-//   String path = await PathHelper.getDownloadDirectoryPath();
-//   debugPrint('File Path :: $path/${widget.model!.video!.fileName!}');
-//   bool result = await PathHelper.fileExists('$path/${widget.model!.video!.fileName!}');
-//   if (result) {
-//     debugPrint('True');
-//     getSingleVideo('$path/${widget.model!.video!.fileName!}');
-//     showCustomSnackBar('File Already Exists', type: true);
-//   } else {
-//     debugPrint('False');
-//     await DownloadHelper.instance.download(
-//       widget.model!.videoUrl!,
-//       '$path/${widget.model!.video!.fileName!}',
-//       onReceiveProgress: (count, total) {
-//         debugPrint('Count :: $count --*-- Total :: $total');
-//         if (total != -1) {
-//           _progress = ((count / total * 100).roundToDouble())/100;
-//           if (!_isDownloadComplete) if (!_isDownloading) _isDownloading = true;
-//           if (_progress == 1.0) {
-//             if (!_isDownloadComplete) {
-//               _isDownloadComplete = true;
-//               _isDownloading = false;
-//               debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-//               _saveCategoryAndVideo('$path/${widget.model!.video!.fileName!}');
-//             }
-//           }
-//           if (context.mounted) setState(() {});
-//           debugPrint("Total Progress 1 :: $_progress%");
-//         }
-//       },
-//     );
-//   }
-// }
-//
-// Future<void> _checkDirectory() async {
-//   String path = await PathHelper.getDownloadDirectoryPath();
-//   debugPrint('Path :: $path');
-//   bool result = await PathHelper.directoryExits(path);
-//   if (!result) {
-//     Directory directory = await PathHelper.createDirectory(path, recursive: true);
-//     debugPrint('Directory Path :: ${directory.path}');
-//   }
-// }
-//
-// Future<void> getSingleVideo(String videoFile) async {
-//   final dbHelper = ref.read(databaseProvider);
-//   VideoModal? res = await dbHelper.getSingleVideo(widget.model!.id!.toString());
-//   if (res == null) {
-//     _saveCategoryAndVideo(videoFile);
-//   }
-// }
-//
-// Future<void> _saveCategoryAndVideo(String videoFile) async {
-//   final dbHelper = ref.read(databaseProvider);
-//   CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
-//   if (res != null) {
-//     VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
-//     int vRes = await dbHelper.saveVideo(vModal);
-//     if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
-//   } else {
-//     CategoryModal modal = CategoryModal(categoryId: widget.model!.categoryId!.toString(), categoryName: widget.model!.categoryTitle, categoryImage: widget.model!.category!.imageResponse!.imageUrl);
-//     int cRes = await dbHelper.saveCategory(modal);
-//     if (cRes == 1) {
-//       CategoryModal? res = await dbHelper.getSingleCategory(widget.model!.categoryId!.toString());
-//       if (res != null) {
-//         VideoModal vModal = VideoModal(categoryId: res.id, videoId: widget.model!.id!.toString(),videoName: widget.model!.title, videoFile: videoFile, videoDuration: widget.model!.duration);
-//         int vRes = await dbHelper.saveVideo(vModal);
-//         if (vRes == 1) showCustomSnackBar('Video Save Successfully download');
-//       }
-//     }
-//   }
-// }
 }

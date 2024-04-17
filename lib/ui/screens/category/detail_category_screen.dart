@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
+import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
@@ -10,6 +12,7 @@ import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import 'package:meditation_app/ui/screens/category/widget/resource_widget.dart';
+import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
@@ -52,6 +55,8 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
     super.initState();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
@@ -62,6 +67,9 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
     var videoCtrl = ref.watch(videoProvider);
 
     var isVideoAvailable = videoCtrl.video != null;
+
+    print('_______7789878_________${widget.categoryListResponse.isPurchased}');
+
     return PopScope(
       canPop: !isVideoAvailable,
       onPopInvoked: (didPop) {

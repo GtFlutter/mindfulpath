@@ -26,6 +26,8 @@ class AuthNotifier extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool plan = false;
+
   void startProgress() {
     if (!_isLoading) {
       _isLoading = true;

@@ -6,6 +6,8 @@ import 'package:meditation_app/data/model/body/resource_type.dart';
 import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
+import 'package:meditation_app/provider/course_provider.dart';
+import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
@@ -29,7 +31,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
     final bookmarkNotifier = ref.read(bookmarkProvider);
     Future.delayed(Duration.zero, () {
       bookmarkNotifier.getBookmarkList();
-
       ref.watch(videoProvider).clearVideo();
     });
     super.initState();
@@ -39,6 +40,20 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   void deactivate() {
     ref.read(videoProvider.notifier).isSelected=null;
     super.deactivate();
+  }
+
+
+  Future<void> refreshh() async{
+    Future.delayed(Duration.zero, () async {
+      final coursePRead = ref.read(courseProvider);
+      final coursePWatch = ref.watch(courseProvider);
+      await coursePRead.getCategoryFromDatabase();
+      for(final category in coursePWatch.downloadResponse){
+       await coursePRead.getVideoFromDatabase(int.parse(category.categoryId??""));
+
+        }
+    });
+
   }
 
   void playVideo(BookmarkListResponse bookmarkListResponse,
@@ -77,6 +92,16 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
     var isVideoAvailable = videoCtrl.video != null;
 
     final bookmarkNotifier = ref.watch(bookmarkProvider);
+    final downloadP = ref.watch(downloadProvider);
+
+    print('______-------BookMark--------_____979479_______${downloadP.complate}');
+    if(downloadP.complate==true){
+      refreshh();
+      ref.read(downloadProvider.notifier).complate=false;
+      setState((){});
+    }
+
+
     return SafeArea(
       left: false,
       right: false,

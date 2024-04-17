@@ -1,11 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/media_image_card.dart';
+import 'package:meditation_app/util/assets.dart';
 
 
 class DDIModal {
@@ -38,11 +42,19 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
+    var getCategory=0;
 
     var radius = widget.appStyle.scaleX(10);
     var dimension = widget.appStyle.scaleX(97);
+    final coursePro = ref.watch(courseProvider);
 
-    print('------------->${widget.model.videoFile}');
+    coursePro.downloadResponse.any((element){
+      getCategory=int.parse(element.categoryId??"");
+      return true;
+    });
+
+
+
     return GestureDetector(
       onTap: (){
         widget.onPlay!();
@@ -99,13 +111,37 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(width: widget.appStyle.scaleX(5)),
-                            Flexible(
-                              child: Text(
-                                '${widget.model.categoryName}',
-                                style: textStyle.copyWith(color: AppColors.categoryNameColor),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            Text(
+                              '${widget.model.categoryName}',
+                              style: textStyle.copyWith(color: AppColors.categoryNameColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(width: widget.appStyle.scaleX(150)),
+
+                            IconButton(
+                              onPressed: (){
+                                  setState(() {
+                                    if(coursePro.downloadVideoResponse.length==1){
+                                      coursePro.ref.read(courseProvider.notifier).pushData=true;
+                                       coursePro.ref.read(courseProvider.notifier).deleteCategoryVideo(getCategory,context);
+                                       coursePro.ref.read(courseProvider.notifier).deleteVideo(int.parse(widget.model.videoId??""),context);
+
+                                    }else{
+                                      coursePro.ref.read(courseProvider.notifier).deleteVideo(int.parse(widget.model.videoId??""),context);
+                                    }
+                                  });
+
+
+                              },
+                              icon: SvgPicture.asset(
+                                SvgPaths.remove,
+                                height: 17,
+                                fit: BoxFit.contain,
                               ),
+                              style: IconButton.styleFrom(
+                                  tapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap),
                             ),
                           ],
                         ),

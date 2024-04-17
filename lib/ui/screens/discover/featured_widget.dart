@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/ui/common/paginated_list_view.dart';
 import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.dart';
 
@@ -26,7 +27,10 @@ class _FeaturedListWidgetState extends ConsumerState<FeaturedWidget> {
   void initState() {
     Future.delayed(
       Duration.zero,
-      () => ref.read(featuredVideosProvider).getFeatureVideoList(1, false),
+      () {
+        ref.read(featuredVideosProvider).getFeatureVideoList(1, false);
+      }
+
     );
     super.initState();
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/navigation.dart';
+import 'package:meditation_app/provider/course_provider.dart';
+import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_pdfs_provider.dart';
 import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
@@ -25,6 +27,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
   @override
   void initState() {
     Future.delayed(Duration.zero, ()  {
+      print('______________________________________30__${widget.category.isPurchased}');
       if (!(widget.category.isPurchased!)) {
         buyNow(context, categoryId: widget.category.id.toString());
       }
@@ -42,6 +45,14 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> refreshh() async {
+    Future.delayed(Duration.zero, () async {
+      final coursePRead = ref.read(courseProvider);
+      await coursePRead.getCategoryPdfFromDatabase();
+      await coursePRead.getPdfFromDatabase(widget.category.id??0);
+    });
   }
 
   @override
@@ -70,6 +81,14 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
       return const Center(child: Text('Free PDF\'s Is Empty'));
     }
 
+    final downloadP = ref.watch(downloadProvider);
+
+    if (downloadP.Pdfcomplate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).Pdfcomplate = false;
+      setState(() {});
+    }
+
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: _controller,
@@ -84,7 +103,8 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
         return GestureDetector(
           onTap: () {
-            if (widget.category.isPurchased!) {
+            print('______________________________________106__${widget.category.isPurchased}');
+            if (widget.category.isPurchased??false) {
               viewPdf(model.pdfUrl);
             } else {
               buyNow(context, categoryId: widget.category.id.toString());

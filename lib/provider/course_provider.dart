@@ -1,16 +1,23 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/model/response/purchased_video_response.dart';
 import 'package:meditation_app/data/repositories/course_repo.dart';
+import 'package:meditation_app/database/database_consts.dart';
 import 'package:meditation_app/database/database_helper.dart';
 import 'package:meditation_app/database/database_model.dart';
+import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/repo_provider/course_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite/sqlite_api.dart';
+import 'package:sqflite_migration/sqflite_migration.dart';
 
 final courseProvider = ChangeNotifierProvider<CourseNotifier>((ref) {
   final repo = ref.watch(courseRepoProvider);
@@ -26,8 +33,26 @@ class CourseNotifier extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool pushData = false;
+
+
   List<PurchasedVideoResponse> _purchasedVideoResponse = [];
   List<PurchasedVideoResponse> get purchasedVideoResponse => _purchasedVideoResponse;
+
+  static late Database _db;
+  final _configs = MigrationConfig(initializationScript: DatabaseConsts.initialScript, migrationScripts: []);
+
+  Future<Database> get db async {
+    _db = await openDB();
+    return _db;
+  }
+
+  Future<Database> openDB() async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'meditation_DB.db');
+
+    return await openDatabaseWithMigration(path, _configs);
+  }
 
   void _startLoading() {
     if (!_isLoading) {
@@ -118,7 +143,7 @@ class CourseNotifier extends ChangeNotifier {
   Future<void> getVideoFromDatabase(int categoryId) async {
     _startLoading();
     List<VideoModal> list = await ref.read(databaseProvider).getVideo(categoryId);
-    _downloadVideoResponse = list;
+    _downloadVideoResponse.addAll(list);
     _stopLoading();
   }
 
@@ -134,4 +159,49 @@ class CourseNotifier extends ChangeNotifier {
     debugPrint("Length Of PDF : ${_downloadPdfResponse.length}");
     _stopLoading();
   }
+
+  void deleteVideo(int videoId,BuildContext context) async {
+    var dbClient = await db;
+    final result = await dbClient.delete(
+      DatabaseConsts.videoTable,
+      where: 'video_id = ?',
+      whereArgs: [videoId],
+    );
+    if(result==1){
+        //Navigator.popUntil(context, ModalRoute.withName(RoutePath.libraryScreen));
+       // Navigator.pushReplacementNamed(context,RoutePath.coursesListScreen);
+        Navigator.pop(context);
+
+
+    }
+  }
+
+  void deleteCategoryVideo(int categoryId,BuildContext context) async {
+    var dbClient = await db;
+    final result = await dbClient.delete(
+      DatabaseConsts.categoryTable,
+      where: 'category_id = ?',
+      whereArgs: [categoryId],
+    );
+  }
+
+  void deleteCategoryPdf(int categoryId,BuildContext context) async {
+    var dbClient = await db;
+    final result = await dbClient.delete(
+      DatabaseConsts.categoryPdfTable,
+      where: 'category_id = ?',
+      whereArgs: [categoryId],
+    );
+  }
+
+  void deletePdf(int pdfId,BuildContext context) async {
+    var dbClient = await db;
+    final result = await dbClient.delete(
+      DatabaseConsts.pdfTable,
+      where: 'pdf_id = ?',
+      whereArgs: [pdfId],
+    );
+
+  }
+
 }

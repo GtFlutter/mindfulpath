@@ -30,10 +30,12 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
   @override
   void initState() {
     ref.read(bookmarkProvider.notifier).islandScap = false;
-
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    Future.delayed(Duration.zero, () {
-      getCategory();
+    Future.delayed(Duration.zero, () async {
+      print('hhhhhhhhhhhhhhhhhhhhhh35');
+      ref.read(courseProvider.notifier).downloadPdfResponses.clear();
+      ref.read(courseProvider.notifier).downloadPdfResponse.clear();
+      await getCategory();
     });
 
     super.initState();
@@ -47,7 +49,6 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
 
   getCategory()async{
     await ref.read(courseProvider).getCategoryPdfFromDatabase();
-
     for(final category in ref.watch(courseProvider).downloadPdfResponses){
       await ref.read(courseProvider).getPdfFromDatabase(category.categoryId??0);
     }
@@ -58,6 +59,9 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
+
+    print('hhhhhhhhhhhhhhhhhhhhhh63');
+
 
     return SafeArea(
       bottom: false,
