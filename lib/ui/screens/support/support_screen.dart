@@ -61,22 +61,22 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
 
     var supportP = ref.watch(supportProvider);
     print('--------------->${supportP.name}');
-    _nameCtrl.text = supportP.name ?? "";
-    _emailCtrl.text = supportP.email ?? "";
-    _descriptionCtrl.text = supportP.descr ?? "";
+    if (supportP.name?.isNotEmpty ?? false) {
+      _nameCtrl.text = supportP.name ?? "";
+      _emailCtrl.text = supportP.email ?? "";
+      _descriptionCtrl.text = supportP.descr ?? "";
+    }
 
     return AbsorbPointer(
       absorbing: supportP.isLoading,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        // resizeToAvoidBottomInset: false,
         extendBody: true,
         appBar: CustomAppBar(
           screenSize: size,
           style: _style,
           title: 'Support',
-          dataBackMng:
-              supportP.name == null || supportP.name == "" ? false : true,
+          dataBackMng: supportP.name == null || supportP.name == "" ? false : true,
         ),
         body: BackgroundImage(
           alignment: Alignment.topCenter,
@@ -113,8 +113,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       ),
                       keyboardType: TextInputType.text,
                       textCapitalization: TextCapitalization.words,
-                      style: CustomeTextFieldStyle.valueStyle(
-                          style: _style, valueSize: 12.5),
+                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
                     TextField(
@@ -135,8 +134,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                         errorText: supportP.emailErrorText,
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      style: CustomeTextFieldStyle.valueStyle(
-                          style: _style, valueSize: 12.5),
+                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
                     TextField(
@@ -161,8 +159,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       maxLines: 6,
                       maxLength: 200,
                       textAlignVertical: TextAlignVertical.top,
-                      style: CustomeTextFieldStyle.valueStyle(
-                          style: _style, valueSize: 12.5),
+                      style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
                     supportP.name == null || supportP.name == ""
@@ -170,8 +167,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                             readOnly: !_disableField,
                             canRequestFocus: _disableField,
                             showCursor: _disableField,
-                            magnifierConfiguration:
-                                TextMagnifierConfiguration.disabled,
+                            magnifierConfiguration: TextMagnifierConfiguration.disabled,
                             onTap: () {
                               context.go(RoutePath.supportSectionScreenPath);
                             },
@@ -181,7 +177,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                               labelSize: 15,
                               floatingLabelSize: 15,
                             ).copyWith(
-                              labelText: 'Support section',
+                              labelText: 'Support Section',
                               labelStyle: _style.text.font(
                                 mulishSemiBold600,
                                 sizePx: 15,
@@ -196,8 +192,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                                 ),
                               ),
                             ),
-                            style: CustomeTextFieldStyle.valueStyle(
-                                style: _style, valueSize: 12.5),
+                            style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
                           )
                         : const SizedBox.shrink(),
                   ],
@@ -232,14 +227,10 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
       ref.read(supportProvider).setEmailError(error: 'Please Enter Your Email');
       return;
     } else if (!email.isEmail) {
-      ref
-          .read(supportProvider)
-          .setEmailError(error: 'Please Enter Your Valid Email');
+      ref.read(supportProvider).setEmailError(error: 'Please Enter Your Valid Email');
       return;
     } else if (description.isEmpty) {
-      ref
-          .read(supportProvider)
-          .setDescriptionError(error: 'Please Enter Your Description');
+      ref.read(supportProvider).setDescriptionError(error: 'Please Enter Your Description');
       return;
     } else {
       FocusManager.instance.primaryFocus?.unfocus();

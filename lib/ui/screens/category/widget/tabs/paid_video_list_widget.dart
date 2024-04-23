@@ -114,7 +114,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
             index: '$index',
             isDownloaded: provider.downloadedVideo.any((element) =>
                 element.id == provider.videosResponse?.list?[index].id),
-            onToggleBookmark: () => toggleItemBookmark(model.video?.id,
+            onToggleBookmark: () => toggleItemBookmark(model.id,
                 isRemove: model.bookmarked ?? false),
           ),
         );
@@ -127,6 +127,8 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
   void toggleItemBookmark(int? itemId, {bool isRemove = false}) {
     if (itemId == null) return;
     ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
+    ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
+
   }
 
   void playVideo(VideoResponse model) {

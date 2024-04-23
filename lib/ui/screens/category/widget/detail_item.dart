@@ -130,8 +130,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     Future.delayed(
       Duration.zero,
       () {
-        if (playlistP.playlistListResponse != null &&
-            playlistP.playlistListResponse!.isNotEmpty) {
+        if (playlistP.playlistListResponse != null && playlistP.playlistListResponse!.isNotEmpty) {
           playlistP.getPlaylistList();
         }
 
@@ -166,16 +165,13 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle =
-        widget.appStyle.text.font(mulishRegular400, sizePx: 9);
+    TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
     var radius = widget.appStyle.scaleX(10);
     var dimension = widget.appStyle.scaleX(97);
     bool isVideo = widget.model != null;
     var pdfIconSize = isVideo ? 0.0 : widget.appStyle.scaleX(30);
 
     final playlistP = ref.watch(playListProvider);
-
-
 
     return Container(
       decoration: ShapeDecoration(
@@ -222,8 +218,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 children: [
                   Text(
                     isVideo ? '${widget.model!.title}' : widget.title ?? '',
-                    style: widget.appStyle.text.font(mulishSemiBold600,
-                        sizePx: 14, color: Colors.white),
+                    style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -237,37 +232,20 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         children: [
                           Text(
                             '●',
-                            style: widget.appStyle.text.font(mulishSemiBold600,
-                                sizePx: 14, color: AppColors.primaryColor),
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           SizedBox(width: widget.appStyle.scaleX(5)),
                           Flexible(
                             child: Text(
-                              isVideo
-                                  ? widget.model?.category?.title ?? ""
-                                  : widget.subTitle ?? '',
-                              style: textStyle.copyWith(
-                                  color: AppColors.categoryNameColor),
+                              isVideo ? widget.model?.category?.title ?? "" : widget.subTitle ?? '',
+                              style: textStyle.copyWith(color: AppColors.categoryNameColor),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           SizedBox(width: widget.appStyle.scaleX(120)),
-                          widget.isRemove==true?IconButton(
-                            onPressed: () {
-                             widget.pressRemove!();
-                            },
-                            icon: SvgPicture.asset(
-                              SvgPaths.remove,
-                              height: 17,
-                              fit: BoxFit.contain,
-                            ),
-                            style: IconButton.styleFrom(
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap),
-                          ):const SizedBox.shrink()
                         ],
                       ),
                     ],
@@ -275,6 +253,18 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 ],
               ),
             ),
+            if (widget.isRemove ?? false)
+              IconButton(
+                onPressed: () {
+                  widget.pressRemove!();
+                },
+                icon: SvgPicture.asset(
+                  SvgPaths.remove,
+                  height: 17,
+                  fit: BoxFit.contain,
+                ),
+                style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+              ),
             if (isVideo)
               Column(
                 mainAxisSize: MainAxisSize.max,
@@ -282,10 +272,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 children: [
                   const Spacer(),
                   OutlinedIconButton.svg(
-                    widget.model!.bookmarked != null &&
-                            widget.model!.bookmarked!
-                        ? SvgPaths.bookmarkSelected
-                        : SvgPaths.bookmarkUnselected,
+                    widget.model!.bookmarked != null && widget.model!.bookmarked! ? SvgPaths.bookmarkSelected : SvgPaths.bookmarkUnselected,
                     appStyle: widget.appStyle,
                     // svgIconSrc: SvgPaths.bookmarkSelected,
                     onTap: widget.onToggleBookmark,
@@ -297,28 +284,17 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         Consumer(
                           builder: (context, ref, child) {
                             final downloadP = ref.watch(downloadProvider);
-                            final getCat = ref
-                                .watch(courseProvider)
-                                .downloadVideoResponse
-                                .any((element) =>
-                                    int.parse(element.videoId ?? "") ==
-                                    widget.model?.video?.id);
+                            final getCat = ref.watch(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model?.video?.id);
                             print('------------------>${getCat}');
-                            ref
-                                .watch(courseProvider)
-                                .downloadVideoResponse
-                                .any((e) {
+                            ref.watch(courseProvider).downloadVideoResponse.any((e) {
                               print('------------------292>${e.videoId}');
                               return true;
                             });
-                            print(
-                                '------------------294>${widget.model?.video?.id}');
+                            print('------------------294>${widget.model?.video?.id}');
                             if (getCat) {
                               return const SizedBox.shrink();
                             } else {
-                              if (downloadP.isDownloading &&
-                                  widget.model?.categoryId ==
-                                      downloadP.model?.categoryId) {
+                              if (downloadP.isDownloading && widget.model?.categoryId == downloadP.model?.categoryId) {
                                 return SizedBox(
                                   height: 15,
                                   width: 15,
@@ -334,14 +310,11 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () {
-                                    print(
-                                        "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                    print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
                                     if (downloadP.model == null) {
                                       downloadP.download(model: widget.model);
-                                    } else if (widget.model!.id !=
-                                        downloadP.model!.id) {
-                                      showCustomSnackBar(
-                                          'Another Video is in progress');
+                                    } else if (widget.model!.id != downloadP.model!.id) {
+                                      showCustomSnackBar('Another Video is in progress');
                                     }
                                   },
                                 );
@@ -356,75 +329,48 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         menuChildren: [
                           MenuItemButton(
                             onPressed: () {
-                              if (widget.model!.video != null &&
-                                  widget.model!.video!.id != null) {
-                                createPlaylist(context,
-                                    videoId:
-                                        widget.model!.video?.id?.toString());
+                              if (widget.model!.video != null && widget.model!.video!.id != null) {
+                                createPlaylist(context, videoId: widget.model!.video?.id?.toString());
                               }
                             },
                             child: Text(
                               'Create Playlist',
-                              style: widget.appStyle.text.font(
-                                  mulishSemiBold600,
-                                  sizePx: 12,
-                                  color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                             ),
                           ),
                           SubmenuButton(
                             menuChildren: [
                               if (playlistP.playlistListResponse != null) ...[
-                                ...List.generate(
-                                    playlistP.playlistListResponse!.length,
-                                    (index) {
+                                ...List.generate(playlistP.playlistListResponse!.length, (index) {
                                   return PopupMenuItem(
                                     height: widget.appStyle.scaleX(24),
                                     onTap: () async {
-                                      await playlistP.addToPlaylist(
-                                          playlistP
-                                              .playlistListResponse![index].id
-                                              .toString(),
-                                          widget.model!.video!.id!.toString());
+                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
                                     },
                                     child: Text(
-                                      playlistP.playlistListResponse![index]
-                                              .title ??
-                                          '',
-                                      style: widget.appStyle.text.font(
-                                          mulishSemiBold600,
-                                          sizePx: 12,
-                                          color: AppColors.deleteMenuText),
+                                      playlistP.playlistListResponse![index].title ?? '',
+                                      style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                                     ),
                                   );
                                 })
                               ]
                             ],
                             menuStyle: const MenuStyle(
-                              padding:
-                                  MaterialStatePropertyAll(EdgeInsets.zero),
-                              backgroundColor: MaterialStatePropertyAll(
-                                  AppColors.popupMenuItemColor),
+                              padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                              backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
                             ),
-                            style: SubmenuButton.styleFrom(
-                                backgroundColor: AppColors.popupMenuItemColor,
-                                surfaceTintColor: AppColors.popupMenuItemColor,
-                                iconColor: Colors.grey),
+                            style: SubmenuButton.styleFrom(backgroundColor: AppColors.popupMenuItemColor, surfaceTintColor: AppColors.popupMenuItemColor, iconColor: Colors.grey),
                             child: Text(
                               'Add to Playlist',
-                              style: widget.appStyle.text.font(
-                                  mulishSemiBold600,
-                                  sizePx: 12,
-                                  color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                             ),
                           ),
                         ],
                         style: const MenuStyle(
                           // padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                          backgroundColor: MaterialStatePropertyAll(
-                              AppColors.popupMenuItemColor),
+                          backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
                           visualDensity: VisualDensity(vertical: -4),
-                          surfaceTintColor: MaterialStatePropertyAll(
-                              AppColors.popupMenuItemColor),
+                          surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
                         ),
                         builder: (context, controller, child) {
                           return OutlinedIconButton.svg(
@@ -450,35 +396,23 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   ? Consumer(
                       builder: (context, ref, child) {
                         final downloadP = ref.watch(downloadProvider);
-                        final getCat = ref
-                            .read(courseProvider)
-                            .downloadPdfResponse
-                            .any((element) =>
-                                int.parse(element.pdfId ?? "") ==
-                                widget.pdfModel?.pdf?.id);
+                        final getCat = ref.read(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.pdf?.id);
 
                         ref.watch(courseProvider).downloadPdfResponse.any((e) {
-                          print(
-                              '________))))))))))((((((((((4355(((${e.pdfId}');
+                          print('________))))))))))((((((((((4355(((${e.pdfId}');
 
                           return true;
                         });
-                        print(
-                            '________))))))))))((((((((((4399(((${widget.pdfModel?.pdf?.id}');
+                        print('________))))))))))((((((((((4399(((${widget.pdfModel?.pdf?.id}');
 
-                        print(
-                            '________*****************________442(((${widget.pdfModel?.categoryId}');
-                        print(
-                            '________*****************________443(((${downloadP.pdfModel?.categoryId}');
-                        print(
-                            '________*****************________444(((${downloadP.isPdfDownloading}');
+                        print('________*****************________442(((${widget.pdfModel?.categoryId}');
+                        print('________*****************________443(((${downloadP.pdfModel?.categoryId}');
+                        print('________*****************________444(((${downloadP.isPdfDownloading}');
 
                         if (getCat) {
                           return const SizedBox.shrink();
                         } else {
-                          if (downloadP.isPdfDownloading &&
-                              widget.pdfModel?.categoryId ==
-                                  downloadP.pdfModel?.categoryId) {
+                          if (downloadP.isPdfDownloading && widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
                             return SizedBox(
                               height: 15,
                               width: 15,
@@ -494,15 +428,12 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               appStyle: widget.appStyle,
                               // svgIconSrc: SvgPaths.bookmarkSelected,
                               onTap: () {
-                                print(
-                                    '---------------------?${downloadP.pdfModel?.categoryId ?? 0}');
+                                print('---------------------?${downloadP.pdfModel?.categoryId ?? 0}');
                                 if (downloadP.pdfModel == null) {
                                   print(widget.pdfModel?.categoryId ?? "");
                                   downloadP.pdfDownload(model: widget.pdfModel);
-                                } else if (widget.pdfModel!.id !=
-                                    downloadP.pdfModel!.id) {
-                                  showCustomSnackBar(
-                                      'Another PDF is in progress');
+                                } else if (widget.pdfModel!.id != downloadP.pdfModel!.id) {
+                                  showCustomSnackBar('Another PDF is in progress');
                                 }
                               },
                             );
@@ -526,9 +457,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
         return ProviderScope(
           parent: ProviderScope.containerOf(context, listen: false),
           child: Dialog(
-            shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(widget.appStyle.scaleX(10))),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10))),
             child: CreatePlaylistDialog(
               widget.appStyle,
               videoId: videoId,

@@ -134,6 +134,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                               key: const ValueKey('value'),
                               videoId: videoCtrl.video!.videoId,
                               url: videoCtrl.video!.videoUrl,
+                              duration:videoCtrl.video!.duration,
                               style: _style,
                               isLandscape: isLandscape,
                               onBackPress: () {

@@ -16,6 +16,7 @@ import '../outlined_icon_button.dart';
 class AppVideoPlayer extends ConsumerStatefulWidget {
   final String url;
   final int videoId;
+  final String duration;
   final AppStyle style;
   final bool isLandscape;
   final VoidCallback? onBackPress;
@@ -25,6 +26,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
   const AppVideoPlayer({
     super.key,
     required this.url,
+    required this.duration,
     required this.style,
     this.onBackPress,
     required this.isLandscape,
@@ -41,7 +43,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   late VideoPlayerController _controller;
   bool _isBuffering = false;
   double _progress = 0.1;
-
+  String pos="";
   bool _showReload = false;
 
   Timer? _watchTimer;
@@ -67,11 +69,15 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
         Uri.parse(widget.url),
       );
     }
+
     _controller = videoPlayerController
       ..initialize()
       ..setLooping(false).then(
         (value) {
           _controller.addListener(listner);
+          // _controller.position.then((position) {
+          //    pos = getFormattedDuration(position ?? const Duration());});
+
           setState(() {});
           toggleVideo();
         },
@@ -86,15 +92,16 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   }
 
   void listner() {
-    double newValue = _controller.value.position.inMilliseconds /
-        _controller.value.duration.inMilliseconds;
+    double newValue = _controller.value.position.inMilliseconds / _controller.value.duration.inMilliseconds;
     if (_progress != newValue) {
-      setState(() {
+      setState(
+        () {
           _isBuffering = _controller.value.isBuffering;
           //_progress = newValue.clamp(0, 1).toDouble();
           _showReload = _controller.value.position >= _controller.value.duration;
           _progress = _controller.value.position.inSeconds.toDouble();
-       },);
+        },
+      );
     }
     if (_controller.value.isPlaying) {
       if (!widget.isFileUrl) {
@@ -102,9 +109,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           // _watchTimeInSeconds += _period; // Increment watch time
           // Call API to update watch duration and video ID
           if (!_isBuffering && _controller.value.isInitialized) {
-            ref
-                .read(dashboardProvider)
-                .storeVideoWatchedTime(widget.videoId, _period);
+            ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
           }
         });
       }
@@ -154,14 +159,11 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           AspectRatio(
             aspectRatio: isInitialized ? _controller.value.aspectRatio : 16 / 9,
             child: ClipRRect(
-              borderRadius: widget.isLandscape
-                  ? BorderRadius.zero
-                  : BorderRadius.circular(widget.style.scaleX(25)),
+              borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)),
               child: VideoPlayer(_controller),
             ),
           ),
-          if (!isInitialized || (_isBuffering && !_showReload))
-            const CircularProgressIndicator(),
+          if (!isInitialized || (_isBuffering && !_showReload)) const CircularProgressIndicator(),
           if (_showReload && isInitialized)
             IconButton(
               onPressed: toggleVideo,
@@ -175,13 +177,9 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: EdgeInsets.only(
-                        left: widget.style.scaleX(15),
-                        top: widget.style.scaleX(10)),
+                    padding: EdgeInsets.only(left: widget.style.scaleX(15), top: widget.style.scaleX(10)),
                     child: OutlinedIconButton.icon(
-                      icon: Icon(Icons.arrow_back_ios_rounded,
-                          size: widget.style
-                              .scaleX(widget.isLandscape ? 20 : 15)),
+                      icon: Icon(Icons.arrow_back_ios_rounded, size: widget.style.scaleX(widget.isLandscape ? 20 : 15)),
                       appStyle: widget.style,
                       onTap: widget.onBackPress,
                     ),
@@ -202,10 +200,8 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                       borderRadius: widget.isLandscape
                           ? BorderRadius.zero
                           : BorderRadius.only(
-                              bottomLeft:
-                                  Radius.circular(widget.style.scaleX(25)),
-                              bottomRight:
-                                  Radius.circular(widget.style.scaleX(25)),
+                              bottomLeft: Radius.circular(widget.style.scaleX(25)),
+                              bottomRight: Radius.circular(widget.style.scaleX(25)),
                             ),
                     ),
                     gradient: LinearGradient(
@@ -241,8 +237,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                             iconSize: widget.isLandscape ? 23 : 20,
                             onTap: toggleAudio,
                           ),
-                          if (widget.isLandscape)
-                            SizedBox(width: widget.style.scaleX(15)),
+                          if (widget.isLandscape) SizedBox(width: widget.style.scaleX(15)),
                           OutlinedIconButton.svg(
                             SvgPaths.maximize,
                             appStyle: widget.style,
@@ -252,31 +247,25 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                           ),
                         ],
                       ),
-                      SizedBox(
-                          height:
-                              widget.style.scaleX(widget.isLandscape ? 10 : 5)),
+                      SizedBox(height: widget.style.scaleX(widget.isLandscape ? 10 : 5)),
                       Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: widget.style.scaleX(8)),
+                        padding: EdgeInsets.symmetric(horizontal: widget.style.scaleX(8)),
                         child: SliderTheme(
                           data: Theme.of(context).sliderTheme.copyWith(
-                            trackHeight: widget.style.scaleX(4),
-                            overlayShape: SliderComponentShape.noOverlay,
-                            thumbShape: RoundSliderThumbShape(
-                                enabledThumbRadius: widget.style.scaleX(6)),
-                            trackShape: CustomTrackShape(),
-                          ),
+                                trackHeight: widget.style.scaleX(4),
+                                overlayShape: SliderComponentShape.noOverlay,
+                                thumbShape: RoundSliderThumbShape(enabledThumbRadius: widget.style.scaleX(6)),
+                                trackShape: CustomTrackShape(),
+                              ),
                           child: Slider(
                             value: _progress,
                             min: 0.0,
-                            max:
-                            _controller.value.duration.inSeconds.toDouble(),
+                            max: _controller.value.duration.inSeconds.toDouble(),
                             onChanged: (progress) {
                               setState(() {
                                 _progress = progress;
                               });
-                              _controller
-                                  .seekTo(Duration(seconds: progress.toInt()));
+                              _controller.seekTo(Duration(seconds: progress.toInt()));
                             },
                             activeColor: AppColors.primaryColor,
                             // thumbColor: AppColors.primaryColor,
@@ -284,8 +273,27 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                           ),
                         ),
                       ),
-                      if (widget.isLandscape)
-                        SizedBox(height: widget.style.scaleX(15)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: widget.style.scaleX(8)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            FutureBuilder<Duration?>(
+                              future: _controller.position,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final position = snapshot.data!;
+                                  return Text('${position.inMinutes}:${(position.inSeconds % 60).toString().padLeft(2, '0')}');
+                                } else {
+                                  return const CircularProgressIndicator();
+                                }
+                              },
+                            ),
+                            Text(stringToDuration(widget.duration)),
+                          ],
+                        ),
+                      ),
+                      if (widget.isLandscape) SizedBox(height: widget.style.scaleX(15)),
                     ],
                   ),
                 ),
@@ -294,5 +302,23 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
         ],
       ),
     );
+  }
+
+  String stringToDuration(String durationString) {
+    List<String> durationParts = durationString.split(':');
+    if(durationParts.length>=3){
+    int hours = int.parse(durationParts[0]);
+    int minutes = int.parse(durationParts[1]);
+    List<String> seconds = durationParts[2].split('.');
+    Duration duration = Duration(hours: hours, minutes: minutes, seconds: int.parse(seconds[0]));
+    return "${hours == 0 ? "00" : hours}:${minutes == 0 ? "00" : minutes}:${int.parse(seconds[0])}";}
+    return "00:00";
+    // return Duration(hours: hours, minutes: minutes, seconds: int.parse(seconds[0]));
+  }
+  String getFormattedDuration(Duration duration) {
+    int hours = duration.inHours;
+    int minutes = duration.inMinutes.remainder(60);
+    int seconds = duration.inSeconds.remainder(60);
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 }

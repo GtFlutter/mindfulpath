@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meditation_app/data/model/response/playlist_details_response.dart';
+import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
@@ -127,7 +128,7 @@ class _BookmarkItemState extends ConsumerState<SubPlayListItem> {
               MediaImageCard(
                 appStyle: widget.appStyle,
                 imgUrl: widget.model.video!.thumbnailImageUrl ?? "",
-                duration: '0',
+                duration: (widget.model.video?.duration ?? "").toDuration,
                 imgRadius: widget.appStyle.scaleX(25),
                 imgSize: widget.appStyle.scaleX(90),
               ),

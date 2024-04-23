@@ -89,7 +89,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: isVideoAvailable ? null : CustomAppBar(screenSize: size, style: _style),
+        appBar: isVideoAvailable && isLandscape ? null : CustomAppBar(screenSize: size, style: _style),
         body: BackgroundImage.network(
           imgUrl: widget.categoryListResponse.imageResponse?.imageUrl ?? AppConstants.placeHolder,
           hideImage: isLandscape && isVideoAvailable,
@@ -117,6 +117,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                           key: const ValueKey('value'),
                           videoId: videoCtrl.video!.videoId,
                           url: videoCtrl.video!.videoUrl,
+                          duration:videoCtrl.video!.duration,
                           style: _style,
                           isLandscape: isLandscape,
                           onBackPress: () {

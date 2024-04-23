@@ -84,8 +84,9 @@ class NotificationServices {
     Future.delayed(Duration.zero, () {
       _flutterLocalNotificationsPlugin.show(
           0,
-          message.notification!.title.toString(),
-          message.notification!.body.toString(),
+          message.notification?.title ?? "",
+          // (message.notification?.body ?? ""),
+          null,
           notificationDetails);
     });
   }

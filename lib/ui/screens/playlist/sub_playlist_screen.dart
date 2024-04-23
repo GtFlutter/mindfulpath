@@ -112,7 +112,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
               video: DIModel(
                   thumbnailUrl: model.video?.thumbnailImageUrl ?? '',
                   videoUrl: model.video?.videoUrl ?? "",
-                  duration: "10",
+                  duration: model.video?.duration ?? "",
                   title: model.video?.title ?? '',
                   categoryName: model.categoryTitle ?? '',
                   videoId: model.videoId ?? 0,
@@ -122,7 +122,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     }
 
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar:isLandscape && isVideoAvailable?null: CustomAppBar(
         screenSize: size,
         style: _style,
         title: widget.title,
@@ -164,6 +164,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                   key: const ValueKey('value'),
                                   videoId: videoCtrl.video!.videoId,
                                   url: videoCtrl.video!.videoUrl,
+                                  duration:videoCtrl.video!.duration,
                                   style: _style,
                                   isLandscape: isLandscape,
                                   onBackPress: () {

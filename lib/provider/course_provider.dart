@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,13 +11,11 @@ import 'package:meditation_app/data/repositories/course_repo.dart';
 import 'package:meditation_app/database/database_consts.dart';
 import 'package:meditation_app/database/database_helper.dart';
 import 'package:meditation_app/database/database_model.dart';
-import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/repo_provider/course_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
 import 'package:sqflite_migration/sqflite_migration.dart';
 
 final courseProvider = ChangeNotifierProvider<CourseNotifier>((ref) {
@@ -25,18 +24,22 @@ final courseProvider = ChangeNotifierProvider<CourseNotifier>((ref) {
 });
 
 class CourseNotifier extends ChangeNotifier {
-
   final CourseRepo repo;
   final ChangeNotifierProviderRef<CourseNotifier> ref;
+
   CourseNotifier(this.ref, this.repo);
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
+  bool _isPDFLoading = false;
+
+  bool get isPDFLoading => _isPDFLoading;
 
   bool pushData = false;
 
-
   List<PurchasedVideoResponse> _purchasedVideoResponse = [];
+
   List<PurchasedVideoResponse> get purchasedVideoResponse => _purchasedVideoResponse;
 
   static late Database _db;
@@ -68,6 +71,18 @@ class CourseNotifier extends ChangeNotifier {
     }
   }
 
+  void startPDFLoading() {
+    if (!_isPDFLoading) {
+      _isPDFLoading = true;
+      notifyListeners();
+    }
+  }
+
+  void stopPDFLoading() {
+    _isPDFLoading = false;
+    notifyListeners();
+  }
+
   Future<void> getPurchasedList() async {
     _startLoading();
     Response response = await repo.getPurchasedList();
@@ -88,6 +103,7 @@ class CourseNotifier extends ChangeNotifier {
   }
 
   List<PurchasedVideoResponse> _cpVideoResponse = [];
+
   List<PurchasedVideoResponse> get cpVideoResponse => _cpVideoResponse;
 
   Future<void> getCurrentlyProgressList() async {
@@ -110,34 +126,36 @@ class CourseNotifier extends ChangeNotifier {
   }
 
   List<CategoryModal> _downloadResponse = [];
+
   List<CategoryModal> get downloadResponse => _downloadResponse;
 
   Future<void> getCategoryFromDatabase() async {
     _startLoading();
 
     List<CategoryModal> list = await ref.read(databaseProvider).getCategory();
-    debugPrint('VIDEO CATEGORYIES :: ${list.length}');
+    debugPrint('downloaded VIDEO CATEGORYIES :: ${list.length}');
     _downloadResponse = list;
     _stopLoading();
   }
 
   List<PdfModel> _downloadPdfResponses = [];
+
   List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
   int index = 0;
-
 
   Future<void> getCategoryPdfFromDatabase() async {
     _startLoading();
     List<PdfModel> list = await ref.read(databaseProvider).getPdfCategory();
     print(list.length);
-    index=list.length;
-    print(list);
+    index = list.length;
+    print("getCategoryPdfFromDatabase====>$list");
     print("================123456=====================");
-    _downloadPdfResponses=list;
+    _downloadPdfResponses = list;
     _stopLoading();
   }
 
   List<VideoModal> _downloadVideoResponse = [];
+
   List<VideoModal> get downloadVideoResponse => _downloadVideoResponse;
 
   Future<void> getVideoFromDatabase(int categoryId) async {
@@ -148,26 +166,52 @@ class CourseNotifier extends ChangeNotifier {
   }
 
   final List<PdfModel> _downloadPdfResponse = [];
+
   List<PdfModel> get downloadPdfResponse => _downloadPdfResponse;
 
+  final List<PdfModel> _downloadPdfResponseTemp = [];
+
+  List<PdfModel> get downloadPdfResponseTemp => _downloadPdfResponseTemp;
 
   Future<void> getPdfFromDatabase(int id) async {
     _startLoading();
-    List<PdfModel> list = await ref.read(databaseProvider).getPdf(id);
+    List<PdfModel> list = [];
+    list = await ref.read(databaseProvider).getPdf(id);
     _downloadPdfResponse.addAll(list);
-    debugPrint("Length ${list.length}");
-    debugPrint("Length Of PDF : ${_downloadPdfResponse.length}");
+    notifyListeners();
+    log("Length ${list.length}---");
+    log("Length Of PDF : ${_downloadPdfResponse.length}");
     _stopLoading();
   }
 
-  void deleteVideo(int videoId,BuildContext context) async {
+  Future<void> getPdfFromDatabaseTemp() async {
+    log("1st time called......");
+    _downloadPdfResponse.clear();
+    _downloadPdfResponseTemp.clear();
+    _downloadPdfResponses.clear();
+    // notifyListeners();
+    // _startLoading();
+    await getCategoryPdfFromDatabase();
+    for (final category in _downloadPdfResponses) {
+      List<PdfModel> list = [];
+      list = await ref.read(databaseProvider).getPdf(category.categoryId ?? 0);
+      _downloadPdfResponseTemp.addAll(list);
+      log("Length ${list.length}---");
+    }
+    // _stopLoading();
+    _downloadPdfResponse.addAll(_downloadPdfResponseTemp);
+    notifyListeners();
+    log("Length Of PDF : ${_downloadPdfResponse.length}");
+  }
+
+  Future<void> deleteVideo(int videoId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
       DatabaseConsts.videoTable,
       where: 'video_id = ?',
       whereArgs: [videoId],
     );
-    if(result==1){
+    if(result==1 && downloadVideoResponse.length==1){
         //Navigator.popUntil(context, ModalRoute.withName(RoutePath.libraryScreen));
        // Navigator.pushReplacementNamed(context,RoutePath.coursesListScreen);
         Navigator.pop(context);
@@ -176,7 +220,7 @@ class CourseNotifier extends ChangeNotifier {
     }
   }
 
-  void deleteCategoryVideo(int categoryId,BuildContext context) async {
+  Future<void> deleteCategoryVideo(int categoryId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
       DatabaseConsts.categoryTable,
@@ -185,7 +229,7 @@ class CourseNotifier extends ChangeNotifier {
     );
   }
 
-  void deleteCategoryPdf(int categoryId,BuildContext context) async {
+  Future<void> deleteCategoryPdf(int categoryId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
       DatabaseConsts.categoryPdfTable,
@@ -194,14 +238,12 @@ class CourseNotifier extends ChangeNotifier {
     );
   }
 
-  void deletePdf(int pdfId,BuildContext context) async {
+  Future<void> deletePdf(int pdfId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
       DatabaseConsts.pdfTable,
       where: 'pdf_id = ?',
       whereArgs: [pdfId],
     );
-
   }
-
 }

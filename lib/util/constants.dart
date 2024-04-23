@@ -8,7 +8,7 @@ class AppConstants {
 
   static const String WENT_WRONG = 'Something went wrong! Please try again';
 
-  static const int kPerPage = 10;
+  static const int kPerPage = 50;
 
   static const String placeHolder =
       'https://images.pexels.com/photos/6740518/pexels-photo-6740518.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1';

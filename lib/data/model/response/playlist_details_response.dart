@@ -122,6 +122,7 @@ class Video {
   int? canViewFreeUser;
   String? thumbnailImageUrl;
   String? videoUrl;
+  String? duration;
 
   Video(
       {this.id,
@@ -130,6 +131,7 @@ class Video {
         this.uniqueId,
         this.canViewFreeUser,
         this.thumbnailImageUrl,
+        this.duration,
         this.videoUrl});
 
   Video.fromJson(Map<String, dynamic> json) {
@@ -140,6 +142,7 @@ class Video {
     canViewFreeUser = json['can_view_free_user'];
     thumbnailImageUrl = json['thumbnail_image_url'];
     videoUrl = json['video_url'];
+    duration = json['duration'];
   }
 
   Map<String, dynamic> toJson() {
@@ -151,6 +154,7 @@ class Video {
     data['can_view_free_user'] = this.canViewFreeUser;
     data['thumbnail_image_url'] = this.thumbnailImageUrl;
     data['video_url'] = this.videoUrl;
+    data['duration'] = this.duration;
     return data;
   }
 }

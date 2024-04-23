@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meditation_app/database/database_model.dart';
 import 'package:meditation_app/helper/navigation.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
@@ -10,33 +13,42 @@ class DownloadPdfCategoryScreen extends ConsumerStatefulWidget {
   const DownloadPdfCategoryScreen({super.key});
 
   @override
-  ConsumerState<DownloadPdfCategoryScreen> createState() =>
-      _DownloadPdfCategoryScreenState();
+  ConsumerState<DownloadPdfCategoryScreen> createState() => _DownloadPdfCategoryScreenState();
 }
 
-class _DownloadPdfCategoryScreenState
-    extends ConsumerState<DownloadPdfCategoryScreen>
-    with AutomaticKeepAliveClientMixin {
+class _DownloadPdfCategoryScreenState extends ConsumerState<DownloadPdfCategoryScreen> with AutomaticKeepAliveClientMixin {
   static AppStyle _style = AppStyle();
   final ScrollController _controller = ScrollController();
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () async {
-      ref.read(courseProvider.notifier).downloadPdfResponses.clear();
-      ref.read(courseProvider.notifier).downloadPdfResponse.clear();
-      await getCategorys();
+    Future.delayed(Duration.zero, ()  {
+      // if (ref.read(courseProvider).downloadPdfResponse.isNotEmpty) return;
+       getCategorys();
+      //  getPDFData();
     });
     super.initState();
   }
-
-  getCategorys()async{
-    await ref.read(courseProvider).getCategoryPdfFromDatabase();
-    for(final category in ref.watch(courseProvider).downloadPdfResponses){
-      await ref.read(courseProvider.notifier).getPdfFromDatabase(category.categoryId??0);
-    }
-
+  getPDFData() async {
+    if (ref.read(courseProvider).downloadPdfResponse.isNotEmpty) return;
+    await ref.read(courseProvider).getPdfFromDatabaseTemp();
   }
+
+  getCategorys() async {
+    if (ref.read(courseProvider.notifier).downloadPdfResponse.isNotEmpty) return;
+    log("inti caaallllleeddddd");
+    ref.read(courseProvider.notifier).downloadPdfResponses.clear();
+    ref.read(courseProvider.notifier).downloadPdfResponse.clear();
+    final coursePro = ref.read(courseProvider);
+    coursePro.stopPDFLoading();
+    await coursePro.getCategoryPdfFromDatabase();
+    if (coursePro.downloadPdfResponses.isEmpty) return;
+    for (final category in coursePro.downloadPdfResponses) {
+      await ref.read(courseProvider.notifier).getPdfFromDatabase(category.categoryId ?? 0);
+    }
+    coursePro.stopPDFLoading();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -48,24 +60,8 @@ class _DownloadPdfCategoryScreenState
     super.build(context);
 
     Size size = MediaQuery.sizeOf(context);
-    _style = AppStyle(screenSize: size);
-
     final courseP = ref.watch(courseProvider);
-    var getCategory = 0;
-    int? getPdfId = 0;
-
-
-    courseP.downloadPdfResponses.any((element) {
-      getCategory = element.categoryId ?? 0;
-      return true;
-    });
-
-    courseP.downloadPdfResponse.any((element) {
-      getPdfId = int.parse(element.pdfId ?? "");
-
-      return true;
-    });
-
+    _style = AppStyle(screenSize: size);
 
     return Scaffold(
         appBar: CustomAppBar(
@@ -74,91 +70,95 @@ class _DownloadPdfCategoryScreenState
           title: 'Downloaded Pdf',
         ),
         extendBodyBehindAppBar: true,
-        body: Padding(
-          padding: const EdgeInsets.only(top: 100, left: 20, right: 20),
-          child: ListView.separated(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: _controller,
-            scrollDirection: Axis.vertical,
-            padding: EdgeInsets.only(
-              bottom: _style.scale * 100,
-              top: _style.scale * 10,
-            ),
-            itemCount: courseP.downloadPdfResponse.length,
-            itemBuilder: (context, index) {
-              var models = courseP.downloadPdfResponse.toSet().toList();
-             // print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!${models.length}');
+        // body: courseP.isPDFLoading == false && courseP.downloadPdfResponse.isNotEmpty
+        body:courseP.downloadPdfResponse.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.only(top: 100, left: 20, right: 20),
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _controller,
+                  scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.only(
+                    bottom: _style.scale * 100,
+                    top: _style.scale * 10,
+                  ),
+                  itemCount: courseP.downloadPdfResponse.length,
+                  itemBuilder: (context, index) {
+                    // var models = courseP.downloadPdfResponse.toSet().toList();
+                    if (courseP.pushData == true) {
+                      // courseP.downloadPdfResponse.clear();
+                      courseP.pushData = false;
+                      // getCategorys();
+                      //  courseP.getPdfFromDatabaseTemp();
+                    }
+                    PdfModel model = PdfModel();
+                    if (courseP.downloadPdfResponse.isNotEmpty) {
+                      model = courseP.downloadPdfResponse[index];
+                    }
 
-              print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!${courseP.pushData}');
+                    return GestureDetector(
+                      onTap: () {
+                        viewPdf(model.pdfFile);
+                      },
+                      child: DetailItem.pdf(
+                        appStyle: _style,
+                        title: model.pdfName ?? '',
+                        subTitle: model.categoryTitle ?? "",
+                        index: '$index',
+                        isShow: false,
+                        isRemove: true,
+                        isDownloaded: false,
+                        pressRemove: () async {
+                          print('courseP.downloadPdfResponse.length ${courseP.downloadPdfResponse.length}');
+                          if (courseP.downloadPdfResponse.length == 1) {
+                            // courseP.startPDFLoading();
+                            courseP.pushData = true;
+                            await courseP.deleteCategoryPdf(model.categoryId ?? 0, context);
+                            await courseP.deletePdf(int.parse(model.pdfId ?? "0"), context);
 
-              if(courseP.pushData==true){
-                courseP.downloadPdfResponse.clear();
-                courseP.ref.read(courseProvider.notifier).pushData=false;
-                getCategorys();
-
-              }
-
-              var model = models[index];
-
-              return GestureDetector(
-                onTap: () {
-                  viewPdf(model.pdfFile);
-                },
-                child: DetailItem.pdf(
-                  appStyle: _style,
-                  title: model.pdfName ?? '',
-                  subTitle: model.categoryTitle ?? "",
-                  index: '$index',
-                  isShow: false,
-                  isRemove: true,
-                  isDownloaded: false,
-                  pressRemove: () async {
-                    print('AEIOU__________96 ${courseP.downloadPdfResponse.length}');
-                      print('AEIOU__________97 ${getCategory}');
-                      print('AEIOU__________98 ${getPdfId}');
-                        if (courseP.downloadPdfResponse.length == 1) {
-                          courseP.ref.read(courseProvider.notifier).pushData = true;
-                          courseP.ref
-                              .read(courseProvider.notifier)
-                              .deleteCategoryPdf(getCategory, context);
-                          courseP.ref
-                              .read(courseProvider.notifier)
-                              .deletePdf(getPdfId??0, context);
-
-                          courseP.downloadPdfResponses.clear();
-                          courseP.downloadPdfResponse.clear();
-                          await courseP.getCategoryPdfFromDatabase();
-                          for(final category in courseP.downloadPdfResponses){
-                            await ref.read(courseProvider.notifier).getPdfFromDatabase(category.categoryId??0);
+                            courseP.downloadPdfResponses.clear();
+                            courseP.downloadPdfResponse.clear();
+                            // await courseP.getCategoryPdfFromDatabase();
+                            // for (final category in courseP.downloadPdfResponses) {
+                            //   await courseP.getPdfFromDatabase(category.categoryId ?? 0);
+                            // }
+                            // courseP.stopPDFLoading();
+                            setState(() {});
+                          } else {
+                            log("else ............called");
+                            // courseP.startPDFLoading();
+                            courseP.pushData = true;
+                            await courseP.deletePdf(int.parse(model.pdfId ?? "0"), context);
+                            /*// courseP.downloadPdfResponses.clear();
+                            // courseP.downloadPdfResponse.clear();
+                            // await courseP.getCategoryPdfFromDatabase();
+                            //   for (final category in courseP.downloadPdfResponses) {
+                            //     await courseP.getPdfFromDatabase(category.categoryId ?? 0);
+                            //   }
+                            //
+                            //
+                            // courseP.stopPDFLoading();
+                             courseP.getPdfFromDatabaseTemp();*/
+                            courseP.downloadPdfResponse.removeAt(index);
+                            setState(() {});
                           }
-
-                          setState(() {});
-
-                        } else {
-                          courseP.ref.read(courseProvider.notifier).pushData = true;
-                          courseP.ref
-                              .read(courseProvider.notifier)
-                              .deletePdf(getPdfId??0, context);
-                          courseP.downloadPdfResponses.clear();
-                          courseP.downloadPdfResponse.clear();
-                          await courseP.getCategoryPdfFromDatabase();
-                          for(final category in courseP.downloadPdfResponses){
-                            await ref.read(courseProvider.notifier).getPdfFromDatabase(category.categoryId??0);
-                          }
-
-                          setState(() {});
-                        }
-
-
-
+                        },
+                      ),
+                    );
                   },
+                  separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
                 ),
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) =>
-                SizedBox(height: _style.scaleX(25)),
-          ),
-        ));
+              )
+            : Center(
+                child:courseP.isPDFLoading? const CircularProgressIndicator():SizedBox.shrink(),
+              ));
+  }
+
+  @override
+  void deactivate() {
+    ref.read(courseProvider.notifier).downloadPdfResponse.clear();
+    ref.read(courseProvider.notifier).downloadPdfResponses.clear();
+    super.deactivate();
   }
 
   void viewPdf(String? pdfUrl) {

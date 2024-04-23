@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/database/database_model.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
@@ -12,7 +11,6 @@ import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import 'package:meditation_app/ui/screens/category/widget/download_detail_item.dart';
-import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
@@ -25,13 +23,10 @@ class DownloadDetailCategoryScreen extends ConsumerStatefulWidget {
   const DownloadDetailCategoryScreen({super.key, required this.categoryModal});
 
   @override
-  ConsumerState<DownloadDetailCategoryScreen> createState() =>
-      _DetailCategoryScreenState();
+  ConsumerState<DownloadDetailCategoryScreen> createState() => _DetailCategoryScreenState();
 }
 
-class _DetailCategoryScreenState
-    extends ConsumerState<DownloadDetailCategoryScreen>
-    with AutomaticKeepAliveClientMixin {
+class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScreen> with AutomaticKeepAliveClientMixin {
   static AppStyle _style = AppStyle();
 
   @override
@@ -39,9 +34,7 @@ class _DetailCategoryScreenState
     Future.delayed(
       Duration.zero,
       () {
-        ref.read(courseProvider).getVideoFromDatabase(
-            int.parse(widget.categoryModal.categoryId ?? ""));
-
+        ref.read(courseProvider).getVideoFromDatabase(int.parse(widget.categoryModal.categoryId ?? ""));
       },
     );
     /* Future.delayed(Duration.zero, () {
@@ -51,9 +44,10 @@ class _DetailCategoryScreenState
     },);*/
     super.initState();
   }
+
   @override
   void deactivate() {
-    ref.read(videoProvider.notifier).isSelected=null;
+    ref.read(videoProvider.notifier).isSelected = null;
     ref.read(courseProvider.notifier).downloadVideoResponse.clear();
     super.deactivate();
   }
@@ -61,8 +55,7 @@ class _DetailCategoryScreenState
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    bool isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
+    bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     Size size = MediaQuery.sizeOf(context);
     _style = AppStyle(screenSize: size);
     TextStyle textStyle = _style.text.font(mulishRegular400, sizePx: 14);
@@ -81,8 +74,7 @@ class _DetailCategoryScreenState
         }
         if (isVideoAvailable) {
           if (MediaQuery.orientationOf(context) == Orientation.landscape) {
-            SystemChrome.setPreferredOrientations(
-                [DeviceOrientation.portraitUp]);
+            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
           }
           videoCtrl.clearVideo();
           return;
@@ -93,9 +85,7 @@ class _DetailCategoryScreenState
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: isVideoAvailable
-            ? null
-            : CustomAppBar(screenSize: size, style: _style),
+        appBar: isVideoAvailable ? null : CustomAppBar(screenSize: size, style: _style),
         body: BackgroundImage.network(
           // imgUrl: widget.categoryListResponse.imageResponse?.imageUrl ?? AppConstants.placeHolder,
           imgUrl: AppConstants.placeHolder,
@@ -105,9 +95,7 @@ class _DetailCategoryScreenState
             right: false,
             bottom: false,
             child: Padding(
-              padding: isLandscape && isVideoAvailable
-                  ? EdgeInsets.zero
-                  : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+              padding: isLandscape && isVideoAvailable ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -119,39 +107,31 @@ class _DetailCategoryScreenState
                         width: !isLandscape ? null : double.infinity,
                         height: !isLandscape ? null : double.infinity,
                         alignment: !isLandscape ? null : Alignment.topCenter,
-                        constraints: !isLandscape
-                            ? BoxConstraints(maxHeight: size.height * 0.4)
-                            : null,
+                        constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                         child: AppVideoPlayer(
                           key: const ValueKey('value'),
-                          videoId: videoCtrl.video?.id??0,
-                          url: videoCtrl.video?.videoFile??'',
+                          videoId: videoCtrl.video?.id ?? 0,
+                          url: videoCtrl.video?.videoFile ?? '',
+                          duration: videoCtrl.video!.videoDuration ?? "",
                           style: _style,
                           isLandscape: isLandscape,
                           onBackPress: () {
-                            if (MediaQuery.orientationOf(context) ==
-                                Orientation.landscape) {
-                              SystemChrome.setPreferredOrientations(
-                                  [DeviceOrientation.portraitUp]);
+                            if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                             }
-                            ref.read(videoProvider.notifier).isSelected=null;
-                            ref.read(bookmarkProvider.notifier).islandScap=false;
+                            ref.read(videoProvider.notifier).isSelected = null;
+                            ref.read(bookmarkProvider.notifier).islandScap = false;
                             videoCtrl.clearVideo();
                           },
                           isFileUrl: true,
                           onFullScreen: () {
-                            if (MediaQuery.orientationOf(context) ==
-                                Orientation.portrait) {
-                              SystemChrome.setPreferredOrientations(
-                                  [DeviceOrientation.landscapeLeft]);
-                              ref.read(bookmarkProvider.notifier).islandScap =
-                                  true;
+                            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                              ref.read(bookmarkProvider.notifier).islandScap = true;
                             } else {
-                              ref.read(bookmarkProvider.notifier).islandScap =
-                                  false;
+                              ref.read(bookmarkProvider.notifier).islandScap = false;
 
-                              SystemChrome.setPreferredOrientations(
-                                  [DeviceOrientation.portraitUp]);
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                             }
                           },
                         ),
@@ -165,8 +145,7 @@ class _DetailCategoryScreenState
                         children: [
                           Text(
                             videoCtrl.video?.videoName ?? '',
-                            style: _style.text.font(mulishSemiBold600,
-                                sizePx: 20, color: Colors.white),
+                            style: _style.text.font(mulishSemiBold600, sizePx: 20, color: Colors.white),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.left,
@@ -181,9 +160,7 @@ class _DetailCategoryScreenState
                                 children: [
                                   Text(
                                     '●',
-                                    style: _style.text.font(mulishSemiBold600,
-                                        sizePx: 14,
-                                        color: AppColors.primaryColor),
+                                    style: _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -191,13 +168,11 @@ class _DetailCategoryScreenState
                                   Flexible(
                                     child: Text(
                                       videoCtrl.video?.categoryName ?? '',
-                                      style: textStyle.copyWith(
-                                          color: AppColors.autherNameColor),
+                                      style: textStyle.copyWith(color: AppColors.autherNameColor),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-
                                 ],
                               ),
                             ],
@@ -215,48 +190,56 @@ class _DetailCategoryScreenState
                       ),
                     ),
                   !isLandscape
-                    ?Expanded(
-                        flex: 3,
-                        child: ListView.separated(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          // controller: _controller,
-                          scrollDirection: Axis.vertical,
-                          padding: EdgeInsets.only(
-                            bottom: _style.scale * 100,
-                            top: _style.scale * 10,
-                          ),
-                          itemCount: courseP.downloadVideoResponse.length,
-                          itemBuilder: (context, index) {
-                            VideoModal item =
-                                courseP.downloadVideoResponse[index];
-                            var model = DDIModal(
-                                id: item.id,
-                                videoId: item.videoId,
-                                videoName: item.videoName,
-                                videoFile: item.videoFile,
-                                videoDuration: item.videoDuration,
-                                categoryId: widget.categoryModal.id.toString(),
-                                categoryName: widget.categoryModal.categoryName,
-                                categoryImage:
-                                    widget.categoryModal.categoryImage);
-                            return GestureDetector(
-                              //onTap: () => playVideo(model),
-                              child: DownloadDetailItem(
-                                IsSelected: ref.read(videoProvider.notifier).isSelected,
-                                onPlay: (){
-                                  ref.read(videoProvider.notifier).isSelected=index;
-                                  playVideo(model);
-                                },
-                                appStyle: _style,
-                                index: index,
-                                model: model,
-                              ),
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) =>
-                              SizedBox(height: _style.scaleX(25)),
-                        )): const SizedBox.shrink(),
-
+                      ? Expanded(
+                          flex: 3,
+                          child: ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            // controller: _controller,
+                            scrollDirection: Axis.vertical,
+                            padding: EdgeInsets.only(
+                              bottom: _style.scale * 100,
+                              top: _style.scale * 10,
+                            ),
+                            itemCount: courseP.downloadVideoResponse.length,
+                            itemBuilder: (context, index) {
+                              VideoModal item = courseP.downloadVideoResponse[index];
+                              var model = DDIModal(
+                                  id: item.id,
+                                  videoId: item.videoId,
+                                  videoName: item.videoName,
+                                  videoFile: item.videoFile,
+                                  videoDuration: item.videoDuration,
+                                  categoryId: widget.categoryModal.id.toString(),
+                                  categoryName: widget.categoryModal.categoryName,
+                                  categoryImage: widget.categoryModal.categoryImage);
+                              return GestureDetector(
+                                //onTap: () => playVideo(model),
+                                child: DownloadDetailItem(
+                                  IsSelected: ref.read(videoProvider.notifier).isSelected,
+                                  onPlay: () {
+                                    ref.read(videoProvider.notifier).isSelected = index;
+                                    playVideo(model);
+                                  },
+                                  onRemovePress: () async {
+                                    if (courseP.downloadVideoResponse.length == 1) {
+                                      courseP.pushData = true;
+                                     await  courseP.deleteCategoryVideo(widget.categoryModal.id ?? 0, context);
+                                    await  courseP.deleteVideo(int.parse(item.videoId ?? ""), context);
+                                    } else {
+                                      await courseP.deleteVideo(int.parse(item.videoId ?? ""), context);
+                                    }
+                                    courseP.downloadVideoResponse.removeAt(index);
+                                    setState(() {});
+                                  },
+                                  appStyle: _style,
+                                  index: index,
+                                  model: model,
+                                ),
+                              );
+                            },
+                            separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                          ))
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),

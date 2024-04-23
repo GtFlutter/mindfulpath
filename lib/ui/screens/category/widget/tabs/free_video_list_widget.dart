@@ -139,8 +139,10 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
               appStyle: _style,
               model: model,
               index: '$index',
-              onToggleBookmark: () => toggleItemBookmark(model.video?.id,
-                  isRemove: model.bookmarked ?? false),
+              onToggleBookmark: () {
+                toggleItemBookmark(model.id,
+                  isRemove: model.bookmarked ?? false);
+              },
               isDownloaded:isDownloaded ,
             ));
       },
@@ -149,9 +151,10 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     );
   }
 
-  void toggleItemBookmark(int? itemId, {bool isRemove = false}) {
+  Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false}) async {
     if (itemId == null) return;
-    ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
+   await  ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
+    ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
   }
 
   void playVideo(VideoResponse model) {

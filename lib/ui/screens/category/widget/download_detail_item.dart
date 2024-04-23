@@ -31,7 +31,8 @@ class DownloadDetailItem extends ConsumerStatefulWidget {
   final int? index;
   final int? IsSelected;
   final void Function()? onPlay;
-  const DownloadDetailItem({super.key, required this.appStyle, required this.model,this.index,this.onPlay,this.IsSelected});
+  final void Function()? onRemovePress;
+  const DownloadDetailItem({super.key, required this.appStyle, required this.model,this.index,this.onPlay,this.IsSelected,this.onRemovePress});
 
   @override
   ConsumerState<DownloadDetailItem> createState() => _DetailItemState();
@@ -118,38 +119,41 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(width: widget.appStyle.scaleX(150)),
-
-                            IconButton(
-                              onPressed: (){
-                                  setState(() {
-                                    if(coursePro.downloadVideoResponse.length==1){
-                                      coursePro.ref.read(courseProvider.notifier).pushData=true;
-                                       coursePro.ref.read(courseProvider.notifier).deleteCategoryVideo(getCategory,context);
-                                       coursePro.ref.read(courseProvider.notifier).deleteVideo(int.parse(widget.model.videoId??""),context);
-
-                                    }else{
-                                      coursePro.ref.read(courseProvider.notifier).deleteVideo(int.parse(widget.model.videoId??""),context);
-                                    }
-                                  });
-
-
-                              },
-                              icon: SvgPicture.asset(
-                                SvgPaths.remove,
-                                height: 17,
-                                fit: BoxFit.contain,
-                              ),
-                              style: IconButton.styleFrom(
-                                  tapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap),
-                            ),
                           ],
                         ),
+
                       ],
                     ),
+
                   ],
                 ),
               ),
+              IconButton(
+                onPressed: (){
+                  widget.onRemovePress!();
+                  // setState(() async {
+                  //   if(coursePro.downloadVideoResponse.length==1){
+                  //     coursePro.ref.read(courseProvider.notifier).pushData=true;
+                  //     coursePro.ref.read(courseProvider.notifier).deleteCategoryVideo(getCategory,context);
+                  //     coursePro.ref.read(courseProvider.notifier).deleteVideo(int.parse(widget.model.videoId??""),context);
+                  //
+                  //   }else{
+                  //    await  coursePro.ref.read(courseProvider.notifier).deleteVideo(int.parse(widget.model.videoId??""),context);
+                  //   }
+                  // });
+
+
+                },
+                icon: SvgPicture.asset(
+                  SvgPaths.remove,
+                  height: 17,
+                  fit: BoxFit.contain,
+                ),
+                style: IconButton.styleFrom(
+                    tapTargetSize:
+                    MaterialTapTargetSize.shrinkWrap),
+              ),
+
             ],
           ),
         ),

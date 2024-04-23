@@ -53,7 +53,7 @@ class SupportSectionTicketItem extends StatelessWidget {
                   ),
                   SizedBox(height: _style.scaleX(7.5)),
                   Text(
-                    ticket.updatedAt == null ? '' : ticket.updatedAt!.toStringFormat2,
+                    ticket.updatedAt == null ? '' : ticket.updatedAt!.toLocal().toStringFormat2,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: _style.text.font(

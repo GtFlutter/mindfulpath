@@ -84,11 +84,6 @@ class DownloadNotifier extends ChangeNotifier {
     String path = await PathHelper.getDownloadDirectoryPath(false);
     debugPrint('File Path :: $path/${model.pdf!.fileName!}');
     bool result = await PathHelper.fileExists('$path/${model.pdf!.fileName!}');
-
-
-    print("============87============++++");
-
-
     //if (result) {
     //  debugPrint('True');
 
@@ -98,14 +93,11 @@ class DownloadNotifier extends ChangeNotifier {
     //  _pdfModel = null;
     //  notifyListeners();
     //} else {
-      debugPrint('False');
       await DownloadHelper.instance.download(
         model.pdfUrl!,
         '$path/${model.pdf!.fileName!}',
         onReceiveProgress: (count, total) {
-          print("============110============++++");
-          print(model.categoryId);
-
+          print("model category id-->${model.categoryId}");
           debugPrint('Count :: $count --*-- Total :: $total');
           if (total != -1) {
             tempProgress = ((count / total * 100).roundToDouble()) / 100;
@@ -126,6 +118,8 @@ class DownloadNotifier extends ChangeNotifier {
             }
             setProgress(tempProgress);
             debugPrint("Total Progress 1 :: $_progress%");
+          } else{
+            _pdfModel=null;
           }
         },
       );
