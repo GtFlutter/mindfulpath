@@ -8,6 +8,7 @@ import 'package:meditation_app/data/model/body/user_body.dart';
 import 'package:meditation_app/helper/date_converter.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/notification_services.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/provider/user_provider.dart';
 import 'package:meditation_app/ui/common/adaptive_date_picker.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
@@ -23,15 +24,15 @@ import '../../../theme/text_field_style.dart';
 import '../../../util/constants.dart';
 
 class CreateProfileScreen extends ConsumerStatefulWidget {
-  final String phoneNo;
-  final String password;
+   String? phoneNo;
+   String? password;
 
   /// First Variable [PhoneNo] and Second Variable [Password]
   CreateProfileScreen({
     super.key,
-    required (String, String) value,
-  })  : phoneNo = value.$1,
-        password = value.$2;
+     (String, String)? value,
+  })  : phoneNo = value?.$1 ?? "",
+        password = value?.$2 ?? "";
 
   @override
   ConsumerState<CreateProfileScreen> createState() =>
@@ -55,6 +56,12 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   void initState() {
     Future.delayed(Duration.zero, () {
       ref.read(userProvider).clearAllErrorText(notifie: false);
+      final socialUserData = ref.read(authProvider).socialUserData;
+      if(socialUserData!=null){
+        print("callleeddddd social data");
+        _nameCtrl.text=socialUserData.userName ?? "";
+        _emailCtrl.text=socialUserData.mobileOrEmail ?? "";
+      }
       getFirebaseNotification();
     });
     super.initState();
@@ -251,20 +258,32 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
     } else {
       gender = _gender!.trim();
     }
-    String phoneNo = widget.phoneNo.trim();
-    String password = widget.password.trim();
+    String phoneNo = widget.phoneNo?.trim() ?? "";
+    String password = widget.password?.trim() ?? "";
 
-    if (phoneNo.isEmpty ||
+    // if (phoneNo.isEmpty ||
+    //     password.isEmpty ||
+    //     password.contains(RegExp(r'\s')) ||
+    //     password.length < AppConstants.PWD_MIN_LENGTH ||
+    //     password.length > AppConstants.PWD_MAX_LENGTH) {
+    //   showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+    //   if (context.canPop()) {
+    //     context.pop();
+    //   }
+    //   return;
+    // }
+    if ((ref.read(authProvider).socialUserData?.socialId?.isEmpty ?? false) &&(phoneNo.isEmpty ||
         password.isEmpty ||
         password.contains(RegExp(r'\s')) ||
         password.length < AppConstants.PWD_MIN_LENGTH ||
-        password.length > AppConstants.PWD_MAX_LENGTH) {
+        password.length > AppConstants.PWD_MAX_LENGTH)) {
       showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
       if (context.canPop()) {
         context.pop();
       }
       return;
-    } else if (name.isEmpty) {
+    }
+    else if (name.isEmpty) {
       ref.read(userProvider).setNameError(error: 'Please Enter Your Full Name');
       return;
     } else if (email.isEmpty) {
@@ -285,9 +304,11 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
       return;
     } else {
       print('------------>${fcm}');
+      final authPro= ref.read(authProvider);
       ref.read(userProvider).createUserProfile(
             UserBody.register(
-                name, email, phoneNo, dateOfBirth, gender, password, fcm ?? ""),
+                name, email, phoneNo, dateOfBirth, gender, password, fcm ?? "",googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "":"",facebookId:  !(authPro.socialUserData?.isGoogleLogin ??
+                false) ? authPro.socialUserData?.socialId ?? "":""),
           );
     }
   }

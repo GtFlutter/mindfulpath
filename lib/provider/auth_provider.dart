@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
@@ -13,6 +15,10 @@ import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/util/constants.dart';
 
+import '../data/model/response/check_social_user_response.dart';
+import '../notification_services.dart';
+import '../ui/screens/authentication/create_profile_screen.dart';
+
 final authProvider = ChangeNotifierProvider<AuthNotifier>((ref) {
   final repo = ref.watch(authRepoProvider);
   return AuthNotifier(repo);
@@ -20,10 +26,14 @@ final authProvider = ChangeNotifierProvider<AuthNotifier>((ref) {
 
 class AuthNotifier extends ChangeNotifier {
   final AuthRepo repo;
+  NotificationServices notificationServices = NotificationServices();
+  SocialUserData? socialUserData;
+  String? mobileOrEmail;
 
   AuthNotifier(this.repo);
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   bool plan = false;
@@ -43,12 +53,7 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   /// Password is required for type == SendOTP.register, If You Want To Replace Screen Then add shouldReplace = true
-  Future<void> requestOTP(
-      {required String countryCode,
-      required String phoneNo,
-      required SendOTP type,
-      String? password,
-      bool shouldReplace = false}) async {
+  Future<void> requestOTP({required String countryCode, required String phoneNo, required SendOTP type, String? password, bool shouldReplace = false}) async {
     assert(!(type == SendOTP.register && password == null));
     if (!shouldReplace) {
       startProgress();
@@ -103,6 +108,90 @@ class AuthNotifier extends ChangeNotifier {
     showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
   }
 
+  ///check social user exist or not
+  Future<bool> checkSocialUser(CheckSocialUserRequest request) async {
+    startProgress();
+    Response response = await repo.checkSocialUser(request);
+    if (response.statusCode != 200) {
+      stopProgress();
+      ApiChecker.checkApi(response);
+      return false;
+    }
+    if (response.statusCode == 200) {
+      try {
+        stopProgress();
+        var jsonData = jsonDecode(response.body);
+        final data = CheckSocialUserResponse.fromJson(jsonData);
+        if (data.data != null) {
+          if (data.data?.token != null) {
+            showCustomSnackBar('Sign In Successfully', type: true);
+            await repo.clearUserData();
+            await repo.saveUserToken(data.data?.token ?? "");
+            BuildContext? context = rootNavigator.currentContext;
+            if (context != null && context.mounted && data.data?.token != null) {
+              context.go(RoutePath.discoverScreen);
+            } else if (context != null && context.mounted) {
+              context.go(RoutePath.signIn);
+            }
+          } else {
+            stopProgress();
+            BuildContext? context = rootNavigator.currentContext;
+            if (context != null && context.mounted) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CreateProfileScreen(),
+                  ));
+            }
+          }
+        }
+        return true;
+      } catch (_) {
+        stopProgress();
+        showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+      }
+    }
+    return false;
+  }
+
+  ///google login
+  Future googleLogin() async {
+    try {
+      final gLogin = GoogleSignIn(scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']);
+      await gLogin.signOut();
+      GoogleSignInAccount? account = await gLogin.signIn();
+      if (account == null) {
+        stopProgress();
+        throw Exception('User account not found');
+      }
+      await gLogin.signOut();
+      startProgress();
+      String? fcmToken = await notificationServices.getDeviceToken();
+      CheckSocialUserRequest request = CheckSocialUserRequest(socialId: account.id, email: account.email, fcmToken: fcmToken);
+      log('Account :: $account', name: 'GoogleAccount');
+
+      bool? response = await checkSocialUser(request);
+      // if (response == null) {
+      //   throw Exception(unKnownError);
+      // }
+      if (response) {
+        socialUserData = SocialUserData(userName: account.displayName, mobileOrEmail: account.email, socialId: account.id, isSocialLogin: true, fcmToken: fcmToken, isGoogleLogin: true);
+
+        mobileOrEmail = account.email;
+      }
+      stopProgress();
+    } on Exception catch (e) {
+      stopProgress();
+      showCustomSnackBar(e.toString().replaceAll('Exception:', ''), type: false);
+    } catch (e) {
+      stopProgress();
+      log('Google Login Error :: $e', name: 'LoginError');
+    } finally {
+      stopProgress();
+    }
+    notifyListeners();
+  }
+
   /// Password is required for type == SendOTP.register
   Future<void> verifyOTP({
     required String countryCode,
@@ -130,9 +219,9 @@ class AuthNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> loginUser(String phoneNo, String password,String fcmToken) async {
+  Future<void> loginUser(String phoneNo, String password, String fcmToken) async {
     startProgress();
-    Response response = await repo.loginUser(phoneNo, password,fcmToken);
+    Response response = await repo.loginUser(phoneNo, password, fcmToken);
     if (response.statusCode != 200) {
       stopProgress();
       ApiChecker.checkApi(response);
@@ -145,14 +234,15 @@ class AuthNotifier extends ChangeNotifier {
         if (token != null) {
           await repo.saveUserToken(token);
         }
-        stopProgress();
         showCustomSnackBar('Sign In Successfully', type: true);
+        stopProgress();
         BuildContext? context = rootNavigator.currentContext;
         if (context != null && context.mounted && token != null) {
           context.go(RoutePath.discoverScreen);
         } else if (context != null && context.mounted) {
           context.go(RoutePath.signIn);
         }
+
       } catch (_) {
         stopProgress();
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
@@ -179,6 +269,8 @@ class AuthNotifier extends ChangeNotifier {
     startProgress();
     await repo.logoutUser();
     await repo.clearUserData();
+    socialUserData=null;
+    mobileOrEmail=null;
     stopProgress();
     BuildContext? context = rootNavigator.currentContext;
     if (context != null && context.mounted) {

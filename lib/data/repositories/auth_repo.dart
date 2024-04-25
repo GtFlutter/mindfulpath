@@ -1,22 +1,34 @@
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
 import 'package:meditation_app/data/model/body/user_body.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../model/response/check_social_user_response.dart';
 
 enum SendOTP {
   register('register'),
   forgotPwd('forgot_pwd');
 
   final String value;
+
   const SendOTP(this.value);
 }
 
 class AuthRepo {
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
+
   AuthRepo({required this.apiClient, required this.sharedPreferences});
+
+  Future<Response> checkSocialUser(CheckSocialUserRequest request) async {
+    var body = request.toJson();
+    return await apiClient.postData(AppConfigs.checkSocialUser, body);
+  }
 
   Future<Response> requestOTP(String phoneNo, SendOTP type) async {
     return await apiClient.postData(
@@ -34,15 +46,26 @@ class AuthRepo {
 
   Future<Response> createUserProfile(UserBody model) async {
     return await apiClient.postData(AppConfigs.registerUser, model.toJson);
+    /*
+    * {
+      if (model.phoneNo?.isNotEmpty ?? false) 'phone_no': model.phoneNo,
+      if (model.password?.isNotEmpty ?? false) 'password': model.password,
+      'name': model.name,
+      'email': model.email,
+      'birth_date': model.birthDate,
+      'gender': model.gender,
+      if (model.googleId?.isNotEmpty ?? false)'google_id': model.googleId,
+      if (model.facebookId?.isNotEmpty ?? false)'facebookId': model.facebookId,
+      'fcm_token': model.fcmToken,
+    }*/
   }
 
   Future<Response> updateUserProfile(UserBody model) async {
     return await apiClient.postData(AppConfigs.updateUserProfile, model.toJson);
   }
 
-  Future<Response> loginUser(String phoneNo, String password,String fcmToken) async {
-    return await apiClient
-        .postData(AppConfigs.loginUser, {'phone_no': phoneNo, 'password': password, 'fcm_token': fcmToken});
+  Future<Response> loginUser(String phoneNo, String password, String fcmToken) async {
+    return await apiClient.postData(AppConfigs.loginUser, {'phone_no': phoneNo, 'password': password, 'fcm_token': fcmToken});
   }
 
   Future<Response> logoutUser() async {
@@ -73,6 +96,7 @@ class AuthRepo {
     debugPrint(' Clearing User Token');
     apiClient.token = null;
     apiClient.updateHeader(null);
+
     return sharedPreferences.clear();
   }
 

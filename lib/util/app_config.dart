@@ -16,6 +16,7 @@ class AppConfigs {
   static const String logoutUser = '/log-out';
   static const String getUserProfile = '/get-user-profile';
   static const String updateUserProfile = '/update-profile';
+  static const String checkSocialUser = '/check-social-user';
   // For Forgot Password : Only OTP Verification Require, No Auth Require
   // Do OTP Verification via [sendOTP] and then [verifyOTP]
   static const String resetPassword = '/reset-password';

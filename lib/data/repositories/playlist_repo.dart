@@ -11,6 +11,7 @@ class PlaylistRepo {
   PlaylistRepo(this.apiClient, this.sharedPreferences);
 
   Future<Response> getPlaylist({int page = 1}) async {
+    return await apiClient.getData('${AppConfigs.getPlaylist}?perPage=10&page=$page');
     return await apiClient.getData('${AppConfigs.getPlaylist}?perPage=${AppConstants.kPerPage}&page=$page');
   }
 

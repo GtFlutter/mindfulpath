@@ -10,6 +10,7 @@ import '../../../../../data/model/response/videos_response.dart';
 import '../../../../../database/database_helper.dart';
 import '../../../../../database/database_model.dart';
 import '../../../../../provider/bookmark_provider.dart';
+import '../../../../../provider/playlist_provider.dart';
 import '../../../../../provider/resource_provider/free_videos_provider.dart';
 import '../../../../../provider/video_provider.dart';
 import '../../../../../theme/styles.dart';
@@ -32,8 +33,11 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
 
   @override
   void initState() {
+    final playlistP = ref.read(playListProvider);
+
     Future.delayed(Duration.zero, () async {
       ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
+      // playlistP.getPlaylistList();
       await initCall();
     });
 

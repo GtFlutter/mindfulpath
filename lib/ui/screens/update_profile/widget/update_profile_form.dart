@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/body/user_body.dart';
 import 'package:meditation_app/helper/date_converter.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/update_profile/widget/chnage_password_sheet.dart';
 import 'package:meditation_app/util/assets.dart';
@@ -20,6 +21,7 @@ import '../../../common/adaptive_date_picker.dart';
 
 class OnNextController {
   void Function()? onNext;
+
   void dispose() => onNext = null;
 }
 
@@ -89,7 +91,7 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
   @override
   void initState() {
     if (widget.user.name == null ||
-        widget.user.phoneNo == null ||
+        // widget.user.phoneNo == null ||
         widget.user.email == null ||
         widget.user.birthDate == null ||
         widget.user.gender == null) {
@@ -102,7 +104,7 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
     ref.read(userProvider).clearAllErrorText(notifie: false);
 
     _nameCtrl.text = widget.user.name!;
-    _numberCtrl.text = widget.user.phoneNo!;
+    _numberCtrl.text = widget.user.phoneNo ?? "";
     _emailCtrl.text = widget.user.email!;
     _dateCtrl.text = widget.user.birthDate!.toStringFormat1;
     _dateOfBirth = widget.user.birthDate!;
@@ -186,28 +188,31 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
                       textCapitalization: TextCapitalization.words,
                       style: CustomeTextFieldStyle.valueStyle(style: _style),
                     ),
-                    SizedBox(height: _style.scale * 27.5),
-                    TextField(
-                      controller: _numberCtrl,
-                      cursorColor: CustomeTextFieldStyle.cursorColor,
-                      showCursor: _disableField,
-                      magnifierConfiguration: TextMagnifierConfiguration.disabled,
-                      decoration: CustomeTextFieldStyle.inputDecoration(
-                        style: _style,
-                        enabled: _disableField,
-                      ).copyWith(
-                        labelText: 'Number',
-                        enabled: _disableField,
+                    if (ref.read(authProvider).socialUserData?.socialId?.isEmpty ?? true) ...[
+                      SizedBox(height: _style.scale * 27.5),
+                      TextField(
+                        controller: _numberCtrl,
+                        cursorColor: CustomeTextFieldStyle.cursorColor,
+                        showCursor: _disableField,
+                        magnifierConfiguration: TextMagnifierConfiguration.disabled,
+                        decoration: CustomeTextFieldStyle.inputDecoration(
+                          style: _style,
+                          enabled: _disableField,
+                        ).copyWith(
+                          labelText: 'Number',
+                          enabled: _disableField,
+                        ),
+                        keyboardType: TextInputType.none,
+                        readOnly: !_disableField,
+                        canRequestFocus: _disableField,
+                        autofocus: _disableField,
+                        style: CustomeTextFieldStyle.valueStyle(style: _style, enabled: _disableField),
                       ),
-                      keyboardType: TextInputType.none,
-                      readOnly: !_disableField,
-                      canRequestFocus: _disableField,
-                      autofocus: _disableField,
-                      style: CustomeTextFieldStyle.valueStyle(style: _style, enabled: _disableField),
-                    ),
+                    ],
                     SizedBox(height: _style.scale * 27.5),
                     TextField(
                       controller: _emailCtrl,
+                      readOnly: ref.read(authProvider).socialUserData?.socialId?.isNotEmpty ?? false,
                       cursorColor: CustomeTextFieldStyle.cursorColor,
                       onChanged: (_) {
                         userP.setEmailError();
@@ -266,26 +271,27 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
                       },
                     ),
                     SizedBox(height: _style.scale * 27.5),
-                    TextField(
-                      readOnly: !_disableField,
-                      canRequestFocus: _disableField,
-                      showCursor: _disableField,
-                      magnifierConfiguration: TextMagnifierConfiguration.disabled,
-                      onTap: changePassword,
-                      keyboardType: TextInputType.none,
-                      decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
-                        labelText: 'Change Password',
-                        suffixIcon: UnconstrainedBox(
-                          child: SvgPicture.asset(
-                            SvgPaths.arrowRight,
-                            height: _style.scaleX(20),
-                            width: _style.scaleX(20),
-                            fit: BoxFit.contain,
+                    if (ref.read(authProvider).socialUserData?.socialId?.isEmpty ?? true)
+                      TextField(
+                        readOnly: !_disableField,
+                        canRequestFocus: _disableField,
+                        showCursor: _disableField,
+                        magnifierConfiguration: TextMagnifierConfiguration.disabled,
+                        onTap: changePassword,
+                        keyboardType: TextInputType.none,
+                        decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                          labelText: 'Change Password',
+                          suffixIcon: UnconstrainedBox(
+                            child: SvgPicture.asset(
+                              SvgPaths.arrowRight,
+                              height: _style.scaleX(20),
+                              width: _style.scaleX(20),
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
+                        style: CustomeTextFieldStyle.valueStyle(style: _style),
                       ),
-                      style: CustomeTextFieldStyle.valueStyle(style: _style),
-                    ),
                   ],
                 ),
               ),

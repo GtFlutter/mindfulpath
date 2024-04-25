@@ -63,7 +63,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
     var videoCtrl = ref.watch(offlineVideoProvider);
     final courseP = ref.watch(courseProvider);
 
-    print('---------------->${videoCtrl.video?.videoName ?? ""}');
+    print('------vid ---------->${videoCtrl.video?.videoName ?? ""}');
+    print('-----catId----------->${widget.categoryModal.categoryId ?? ""}');
 
     var isVideoAvailable = videoCtrl.video != null;
     return PopScope(
@@ -223,7 +224,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                   onRemovePress: () async {
                                     if (courseP.downloadVideoResponse.length == 1) {
                                       courseP.pushData = true;
-                                     await  courseP.deleteCategoryVideo(widget.categoryModal.id ?? 0, context);
+                                     await  courseP.deleteCategoryVideo(int.parse(widget.categoryModal.categoryId ?? "0"), context);
                                     await  courseP.deleteVideo(int.parse(item.videoId ?? ""), context);
                                     } else {
                                       await courseP.deleteVideo(int.parse(item.videoId ?? ""), context);

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -130,9 +132,12 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     Future.delayed(
       Duration.zero,
       () {
-        if (playlistP.playlistListResponse != null && playlistP.playlistListResponse!.isNotEmpty) {
-          playlistP.getPlaylistList();
-        }
+        playlistP.getPlaylistList();
+        // print("playlist gettttttt........=>${playlistP.playlistListResponse == null}=====${playlistP.playlistListResponse?.isEmpty}.");
+        // if (playlistP.playlistListResponse != null && playlistP.playlistListResponse!.isNotEmpty) {
+        //   print("playlist gettttttt.........");
+        //   playlistP.getPlaylistList();
+        // }
 
         getCategory();
       },
@@ -329,8 +334,10 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         menuChildren: [
                           MenuItemButton(
                             onPressed: () {
-                              if (widget.model!.video != null && widget.model!.video!.id != null) {
-                                createPlaylist(context, videoId: widget.model!.video?.id?.toString());
+                              log("create playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
+
+                              if (widget.model!.video != null && widget.model!.id != null) {
+                                createPlaylist(context, videoId: widget.model?.id?.toString());
                               }
                             },
                             child: Text(
@@ -345,7 +352,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   return PopupMenuItem(
                                     height: widget.appStyle.scaleX(24),
                                     onTap: () async {
-                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
+                                      log("add to playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
+                                      // await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
+                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString());
                                     },
                                     child: Text(
                                       playlistP.playlistListResponse![index].title ?? '',

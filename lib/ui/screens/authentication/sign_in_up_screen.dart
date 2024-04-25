@@ -229,7 +229,9 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                     children: [
                       Spacer(),
                       IconButton.outlined(
-                        onPressed: onGoogleLogin,
+                        onPressed: (){
+                          ref.read(authProvider).googleLogin();
+                        },
                         icon: SvgPicture.asset(
                           SvgPaths.googleLogo,
                           width: _style.scale * 36,
