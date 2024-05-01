@@ -63,12 +63,18 @@ class VideosResponse {
   @JsonKey(name: 'list')
   final List<VideoResponse>? list;
 
+  @JsonKey(name: 'cat_list')
+  final CategoryListResponse? category;
+
+
+
   VideosResponse({
     required this.currentPage,
     required this.limit,
     required this.total,
     required this.lastPage,
     required this.list,
+    this.category
   });
 
   factory VideosResponse.fromJson(Map<String, dynamic> json) => _$VideosResponseFromJson(json);

@@ -39,4 +39,9 @@ class PlaylistRepo {
     var body = {'playlist_id': playlistId, 'video_id': videoId};
     return await apiClient.postData(AppConfigs.addToPlaylist, body);
   }
+
+  Future<Response> removeFromPlaylist(String playlistId, String videoId) async {
+    var body = {'playlist_id': playlistId, 'video_id': videoId};
+    return await apiClient.postData(AppConfigs.removeFromPlaylist, body);
+  }
 }

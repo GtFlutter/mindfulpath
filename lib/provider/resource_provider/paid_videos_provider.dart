@@ -39,32 +39,34 @@ class PaidVideosNotifier extends VideoResourceNotifier {
   bool _loading = false;
   bool get loading => _loading;
   @override
-  void startLoading() {
+  void startLoading({bool? isLoading}) {
+    if(isLoading==false)return;
     _loading = true;
     notifyListeners();
   }
 
   @override
-  void stopLoading() {
+  void stopLoading({bool? isLoading}) {
+    if(isLoading==false)return;
     _loading = false;
     notifyListeners();
   }
 
   @override
-  Future<void> fetchVideos(int categoryId) async {
-    startLoading();
+  Future<void> fetchVideos(int categoryId, {bool? isLoading}) async {
+    startLoading(isLoading:isLoading ?? true);
     Response response = await repo.getVideos(categoryId: categoryId, offset: 1, resourceType: ResourceType.paid);
     if (response.statusCode != 200) {
-      stopLoading();
+      stopLoading(isLoading:isLoading ?? true);
       ApiChecker.checkApi(response);
     } else {
       try {
         var json = jsonDecode(response.body);
         _videosResponse = VideosResponse.fromJson(json['data']);
-        stopLoading();
+        stopLoading(isLoading:isLoading ?? true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
-        stopLoading();
+        stopLoading(isLoading:isLoading ?? true);
       }
     }
   }

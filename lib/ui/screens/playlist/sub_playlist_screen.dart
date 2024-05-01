@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 import 'package:meditation_app/ui/screens/playlist/sub_playlist_item.dart';
 
+import '../../../provider/course_provider.dart';
+import '../../../provider/download_provider.dart';
 import '../../../theme/styles.dart';
 import '../bookmark/widget/bookmark_item.dart';
 
@@ -57,10 +60,22 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     super.initState();
   }
 
+  Future<void> refreshh() async {
+    log("playlist refresh...");
+    Future.delayed(Duration.zero, () async {
+      final coursePRead = ref.read(courseProvider);
+      final coursePWatch = ref.watch(courseProvider);
+      await coursePRead.getCategoryFromDatabase();
+      for (final category in coursePWatch.downloadResponse) {
+        await coursePRead.getVideoFromDatabase(int.parse(category.categoryId ?? ""));
+      }
+    });
+  }
+
   @override
   void deactivate() {
     print("sfsdfsdfsdfsdfsdfsdfsdfsdfsdfdsf");
-    ref.read(videoProvider.notifier).isSelected=null;
+    ref.read(videoProvider.notifier).isSelected = null;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     ref.read(bookmarkProvider.notifier).islandScap = false;
     super.deactivate();
@@ -76,8 +91,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
         final double elevation = lerpDouble(0, 6, animValue)!;
 
         return Padding(
-          padding: EdgeInsets.only(
-              bottom: _style.scaleX(12.5), top: _style.scaleX(12.5)),
+          padding: EdgeInsets.only(bottom: _style.scaleX(12.5), top: _style.scaleX(12.5)),
           child: Material(
             elevation: elevation,
             color: draggableItemColor,
@@ -101,16 +115,23 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     _style = AppStyle(screenSize: size);
     var videoCtrl = ref.watch(videoProvider);
     var isVideoAvailable = videoCtrl.video != null;
-    bool isLandscape =
-        MediaQuery.orientationOf(context) == Orientation.landscape;
+    bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
 
     final playlistP = ref.watch(playListProvider);
+    final downloadP = ref.watch(downloadProvider);
+
+    print('______-------playlist--------_____979479_______${downloadP.complate}');
+    if (downloadP.complate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).complate = false;
+      setState(() {});
+    }
     void playVideo(PlaylistVideoList model) {
       print('------------****${model.video!.videoUrl}');
       ref.read(videoProvider).playVideo(
             DetailedVideoModel(
               video: DIModel(
-                  thumbnailUrl: model.video?.thumbnailImageUrl ?? '',
+                  thumbnailUrl: model.video != null ? model.video!.thumbnailImageUrlSrc ?? '' : '',
                   videoUrl: model.video?.videoUrl ?? "",
                   duration: model.video?.duration ?? "",
                   title: model.video?.title ?? '',
@@ -122,11 +143,13 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     }
 
     return Scaffold(
-      appBar:isLandscape && isVideoAvailable?null: CustomAppBar(
-        screenSize: size,
-        style: _style,
-        title: widget.title,
-      ),
+      appBar: isLandscape && isVideoAvailable
+          ? null
+          : CustomAppBar(
+              screenSize: size,
+              style: _style,
+              title: widget.title,
+            ),
       extendBodyBehindAppBar: true,
       body: BackgroundImage(
         child: SafeArea(
@@ -135,61 +158,44 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : playlistP.playlistDetailResponse == null ||
-                      playlistP.playlistDetailResponse!.data!.playlistVideoList!
-                          .isEmpty
+              : playlistP.playlistDetailResponse == null || playlistP.playlistDetailResponse!.data!.playlistVideoList!.isEmpty
                   ? const Center(child: Text('No Data Found'))
                   : Padding(
-                      padding: isLandscape && isVideoAvailable
-                          ? EdgeInsets.zero
-                          : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+                      padding: isLandscape && isVideoAvailable ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           if (isVideoAvailable) ...[
-                            if (!isLandscape)
-                              SizedBox(height: _style.scaleX(25)),
+                            if (!isLandscape) SizedBox(height: _style.scaleX(25)),
                             Flexible(
                               flex: isLandscape ? 1 : 0,
                               child: Container(
                                 width: !isLandscape ? null : double.infinity,
                                 height: !isLandscape ? null : double.infinity,
-                                alignment:
-                                    !isLandscape ? null : Alignment.topCenter,
-                                constraints: !isLandscape
-                                    ? BoxConstraints(
-                                        maxHeight: size.height * 0.4)
-                                    : null,
+                                alignment: !isLandscape ? null : Alignment.topCenter,
+                                constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                                 child: AppVideoPlayer(
                                   key: const ValueKey('value'),
                                   videoId: videoCtrl.video!.videoId,
                                   url: videoCtrl.video!.videoUrl,
-                                  duration:videoCtrl.video!.duration,
+                                  duration: videoCtrl.video!.duration,
                                   style: _style,
                                   isLandscape: isLandscape,
                                   onBackPress: () {
-                                    if (MediaQuery.orientationOf(context) ==
-                                        Orientation.landscape) {
-
+                                    if (MediaQuery.orientationOf(context) == Orientation.landscape) {
                                       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                                     }
-                                    ref.read(videoProvider.notifier).isSelected=null;
-                                    ref.read(bookmarkProvider.notifier).islandScap=false;
+                                    ref.read(videoProvider.notifier).isSelected = null;
+                                    ref.read(bookmarkProvider.notifier).islandScap = false;
 
                                     videoCtrl.clearVideo();
                                   },
                                   isFileUrl: false,
                                   onFullScreen: () {
-                                    if (MediaQuery.orientationOf(context) ==
-                                        Orientation.portrait) {
-
-
+                                    if (MediaQuery.orientationOf(context) == Orientation.portrait) {
                                       ref.read(bookmarkProvider.notifier).islandScap = true;
                                       SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                                    }
-                                    else {
-
-
+                                    } else {
                                       ref.read(bookmarkProvider.notifier).islandScap = false;
                                       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                                     }
@@ -201,7 +207,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                             const SizedBox.shrink(),
                           !isLandscape
                               ? Expanded(
-                                child: ListView.separated(
+                                  child: ListView.separated(
                                     shrinkWrap: true,
                                     scrollDirection: Axis.vertical,
                                     padding: EdgeInsets.only(
@@ -209,12 +215,9 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                       right: _style.scale * 10,
                                       left: _style.scale * 10,
                                     ),
-                                    itemCount: playlistP.playlistDetailResponse
-                                            ?.data?.playlistVideoList?.length ??
-                                        0,
+                                    itemCount: playlistP.playlistDetailResponse?.data?.playlistVideoList?.length ?? 0,
                                     itemBuilder: (context, index) {
-                                      var model = playlistP.playlistDetailResponse
-                                          ?.data?.playlistVideoList?[index];
+                                      var model = playlistP.playlistDetailResponse?.data?.playlistVideoList?[index];
 
                                       return GestureDetector(
                                           //key: Key('$index'),
@@ -225,17 +228,19 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                             key: Key('$index'),
                                             appStyle: _style,
                                             model: model!,
-                                            onPlay: (){
-                                              ref.read(videoProvider.notifier).isSelected=index;
+                                            onPlay: () {
+                                              ref.read(videoProvider.notifier).isSelected = index;
                                               playVideo(model);
+                                            },
+                                            onRemovePress: () async {
+                                              await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString());
+                                              playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
                                             },
                                             index: index,
                                             url: model.video?.videoUrl ?? "",
                                           ));
                                     },
-                                    separatorBuilder:
-                                        (BuildContext context, int index) =>
-                                            SizedBox(height: _style.scaleX(25)),
+                                    separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
                                     /* onReorder: (int oldIndex, int newIndex) {
                                                     setState(() {
                                                       if (oldIndex < newIndex) {
@@ -247,7 +252,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                   },*/
                                     // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
                                   ),
-                              )
+                                )
                               : const SizedBox.shrink(),
                         ],
                       ),

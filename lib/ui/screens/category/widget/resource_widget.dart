@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
-import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_videos_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
@@ -13,6 +14,7 @@ import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_w
 import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
+import '../../../../provider/dashboard_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../common/custom_dropdown_button.dart';
 import 'custom_selecteable_button.dart';
@@ -21,9 +23,10 @@ import 'tabs/free_video_list_widget.dart';
 import 'tabs/paid_pdf_list_widget.dart';
 
 class ResourceDetailCategory extends ConsumerStatefulWidget {
-  final CategoryListResponse category;
+  CategoryListResponse category;
+  bool? isFromPdfNotification;
 
-  const ResourceDetailCategory({super.key, required this.category});
+  ResourceDetailCategory({super.key, required this.category, this.isFromPdfNotification});
 
   @override
   ConsumerState<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
@@ -32,7 +35,6 @@ class ResourceDetailCategory extends ConsumerStatefulWidget {
 class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
   final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF')];
-
   static AppStyle _style = AppStyle();
 
   /// Either 0(Video) or 1(PDF)
@@ -44,9 +46,16 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   @override
   void initState() {
     super.initState();
+    ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
     print('_______________________________________46_${widget.category.isPurchased}');
-    filterIndex = 0;
-    courseIndex = 0;
+    if (widget.isFromPdfNotification ?? false) {
+      filterIndex = 1;
+      courseIndex = 2;
+    } else {
+      filterIndex = 0;
+      courseIndex = 0;
+    }
+
     _tabController = TabController(initialIndex: courseIndex, length: 4, vsync: this);
   }
 
@@ -95,6 +104,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
 
     var provider = ref.watch(paidVideosProvider);
+    var dashboardPro = ref.watch(dashboardProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +120,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
             CustomSelecteableButton(
               text: 'Paid',
               selected: courseIndex == 1,
-              onTap: () {
+              onTap: () async {
                 if (!ref.read(authProvider).isUserLoggedIn) {
                   showCustomSnackBar(
                     'Please login to view paid video.',
@@ -124,14 +134,29 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                   );
                   return;
                 }
-                print('_______________________________________126_${widget.category.isPurchased}');
-                if (!(widget.category.isPurchased??false)) {
-                  buyNow(context, categoryId: widget.category.id.toString());
+                print('_______________________________________126_${provider.videosResponse?.category?.isPurchased}');
+                // if (!(provider.videosResponse?.list?.first.category?.isPurchased ?? false)|| !(widget.category.isPurchased ?? false)) {
+                if (!(provider.videosResponse?.category?.isPurchased ?? false)) {
+                  log("ttthhhiiissss ccaakkkeddd  1111");
+                  await buyNow(context, categoryId: widget.category.id.toString());
+                  await provider.fetchVideos(widget.category.id ?? 0);
+                  // await  dashboardPro.getCategoryList();
+                  // dashboardPro.categoryListResponse?.map((e) {
+                  //   if(e.id==widget.category.id){
+                  //     widget.category=e;
+                  //     setState(() {
+                  //
+                  //     });
+                  //   }
+                  // });
+
+                  // provider.fetchVideos(widget.category.id ?? 0);
                   return;
-                }else{
+                } else {
+                  log("ttthhhiiissss ccaakkkeddd");
                   _changeCourseType(1);
                 }
-              } ,
+              },
             ),
             const Spacer(),
             Container(
@@ -164,9 +189,15 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
             controller: _tabController,
             children: [
               FreeVideoListWidget(category: widget.category),
-              PaidVideoListWidget(category: widget.category),
+              PaidVideoListWidget(
+                category: widget.category,
+                isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
+              ),
               FreePdfListWidget(category: widget.category),
-              PaidPdfListWidget(category: widget.category),
+              PaidPdfListWidget(
+                category: widget.category,
+                isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
+              ),
             ],
           ),
         ),
@@ -177,6 +208,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
 
 class DemoWIdget1 extends StatefulWidget {
   final String title;
+
   const DemoWIdget1({super.key, required this.title});
 
   @override

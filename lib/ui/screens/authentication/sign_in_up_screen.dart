@@ -69,9 +69,9 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   getFirebaseNotification() async {
     NotificationServices notificationServices = NotificationServices();
     notificationServices.requestNotificationPermission();
-    notificationServices.firebaseInit(context);
+    notificationServices.firebaseInit();
     await notificationServices.forgroundMessage();
-    await notificationServices.setupInteractMessage(context);
+    await notificationServices.setupInteractMessage();
     notificationServices.getDeviceToken().then((value) {
       print("device token");
       print(value);

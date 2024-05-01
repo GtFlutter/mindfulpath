@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,26 +83,23 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
     await coursePRead.getCategoryFromDatabase();
 
     for (final category in coursePWatch.downloadResponse) {
-      await coursePRead
-          .getVideoFromDatabase(int.parse(category.categoryId ?? ""));
+      await coursePRead.getVideoFromDatabase(int.parse(category.categoryId ?? ""));
     }
   }
 
   getDownload() async {
     final downloadP = ref.read(downloadProvider);
-    result = await downloadP.checkVideoIsDownload(
-        widget.model.bookmarkVideoResponse!.id.toString(), false);
+    log("video id in bookmark----${widget.model.bookmarkVideoResponse!.id}");
+    result = await downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false);
   }
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle =
-        widget.appStyle.text.font(mulishRegular400, sizePx: 9);
+    TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
     String timeStr = widget.model.bookmarkVideoResponse!.duration ?? "";
     List<String> timeComponents = timeStr.split(":");
     int minute = int.parse(timeComponents[1]);
-    int second =
-        int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
+    int second = int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
     print("Minute: $minute, Second: $second");
 
 //primaryColor
@@ -115,19 +113,13 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(widget.appStyle.scaleX(25)),
             side: BorderSide(
-              color: (ref.watch(videoProvider).isSelected == widget.index)
-                  ? AppColors.primaryColor
-                  : AppColors.detailItemBgColor,
+              color: (ref.watch(videoProvider).isSelected == widget.index) ? AppColors.primaryColor : AppColors.detailItemBgColor,
               width: widget.appStyle.scaleX(0.5),
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
           ),
         ),
-        margin: widget.dragable && !widget.dragging
-            ? EdgeInsets.only(
-                bottom: widget.appStyle.scaleX(12.5),
-                top: widget.appStyle.scaleX(12.5))
-            : null,
+        margin: widget.dragable && !widget.dragging ? EdgeInsets.only(bottom: widget.appStyle.scaleX(12.5), top: widget.appStyle.scaleX(12.5)) : null,
         padding: EdgeInsets.fromLTRB(
           widget.appStyle.scaleX(29),
           widget.appStyle.scaleX(30.5),
@@ -141,11 +133,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
             children: [
               MediaImageCard(
                 appStyle: widget.appStyle,
-                imgUrl: widget.model.bookmarkVideoResponse != null
-                    ? widget.model.bookmarkVideoResponse!
-                            .thumbnailImageUrlSrc ??
-                        ''
-                    : '',
+                imgUrl: widget.model.bookmarkVideoResponse != null ? widget.model.bookmarkVideoResponse!.thumbnailImageUrlSrc ?? '' : '',
                 duration: minute == 0 ? '${second} Sec' : '${minute} Min',
                 imgRadius: widget.appStyle.scaleX(25),
                 imgSize: widget.appStyle.scaleX(90),
@@ -155,16 +143,14 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding:
-                          EdgeInsets.only(left: widget.appStyle.scaleX(25)),
+                      padding: EdgeInsets.only(left: widget.appStyle.scaleX(25)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             '${widget.model.videoTitle}',
-                            style: widget.appStyle.text.font(mulishSemiBold600,
-                                sizePx: 14, color: Colors.white),
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -173,22 +159,15 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             TextSpan(
-                              style: textStyle.copyWith(
-                                  color: AppColors.autherNameColor),
+                              style: textStyle.copyWith(color: AppColors.autherNameColor),
                               children: [
                                 TextSpan(
                                   text: '  ● ',
-                                  style: widget.appStyle.text.font(
-                                      mulishSemiBold600,
-                                      sizePx: 14,
-                                      color: AppColors.primaryColor),
+                                  style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                 ),
                                 TextSpan(
-                                  text: widget.model.bookmarkVideoResponse
-                                          ?.category?.title ??
-                                      "",
-                                  style: textStyle.copyWith(
-                                      color: AppColors.categoryNameColor),
+                                  text: widget.model.bookmarkVideoResponse?.category?.title ?? "",
+                                  style: textStyle.copyWith(color: AppColors.categoryNameColor),
                                 ),
                               ],
                             ),
@@ -198,8 +177,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                     ),
                     const Spacer(),
                     Padding(
-                      padding:
-                          EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
+                      padding: EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
                       child: Row(
                         children: [
                           IconButton(
@@ -209,9 +187,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                               height: widget.appStyle.scaleX(16),
                               fit: BoxFit.contain,
                             ),
-                            style: IconButton.styleFrom(
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap),
+                            style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                           ),
                           IconButton(
                             onPressed: () {
@@ -224,28 +200,19 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                               height: widget.appStyle.scaleX(16),
                               fit: BoxFit.contain, // 155861
                             ),
-                            style: IconButton.styleFrom(
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap),
+                            style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                           ),
                           Consumer(
                             builder: (context, ref, child) {
                               final downloadP = ref.watch(downloadProvider);
                               final coursePWatch = ref.watch(courseProvider);
-                              final getCat = ref
-                                  .read(courseProvider)
-                                  .downloadVideoResponse
-                                  .any((element) =>
-                                      int.parse(element.videoId ?? "") ==
-                                      widget.model.bookmarkVideoResponse?.video
-                                          ?.id);
+                              final getCat = ref.read(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.video?.id);
+                              log("getcat-----1 $getCat");
 
                               if (getCat == true) {
                                 return const SizedBox.shrink();
                               } else {
-                                if (downloadP.isDownloading &&
-                                    widget.model.bookmarkVideoResponse!.id ==
-                                        downloadP.model!.id) {
+                                if (downloadP.isDownloading && widget.model.bookmarkVideoResponse!.id == downloadP.model!.id) {
                                   return SizedBox(
                                     height: 15,
                                     width: 15,
@@ -260,14 +227,9 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                     return IconButton(
                                       onPressed: () {
                                         if (downloadP.model == null) {
-                                          downloadP.download(
-                                              model: widget
-                                                  .model.bookmarkVideoResponse);
-                                        } else if (widget.model
-                                                .bookmarkVideoResponse!.id !=
-                                            downloadP.model!.id) {
-                                          showCustomSnackBar(
-                                              'Another Video is in progress');
+                                          downloadP.download(model: widget.model.bookmarkVideoResponse);
+                                        } else if (widget.model.bookmarkVideoResponse!.id != downloadP.model!.id) {
+                                          showCustomSnackBar('Another Video is in progress');
                                         }
                                       },
                                       icon: SvgPicture.asset(
@@ -275,9 +237,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                         height: widget.appStyle.scaleX(16),
                                         fit: BoxFit.contain,
                                       ),
-                                      style: IconButton.styleFrom(
-                                          tapTargetSize:
-                                              MaterialTapTargetSize.shrinkWrap),
+                                      style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                                     );
                                   } else {
                                     return const SizedBox.shrink();
@@ -295,8 +255,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
               if (widget.dragable)
                 Align(
                   alignment: Alignment.center,
-                  child: SvgPicture.asset(SvgPaths.drag,
-                      width: widget.appStyle.scaleX(15), fit: BoxFit.contain),
+                  child: SvgPicture.asset(SvgPaths.drag, width: widget.appStyle.scaleX(15), fit: BoxFit.contain),
                 ),
             ],
           ),

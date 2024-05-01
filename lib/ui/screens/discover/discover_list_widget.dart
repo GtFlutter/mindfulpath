@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/navigation.dart';
+import 'package:meditation_app/notification_services.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/screens/discover/widget/discover_item.dart';
+
 import '../../../provider/dashboard_provider.dart';
 
 class DiscoverListWidget extends ConsumerStatefulWidget {
@@ -19,6 +20,9 @@ class _DiscoverLayoutState extends ConsumerState<DiscoverListWidget> {
   @override
   void initState() {
     Future.delayed(Duration.zero, ref.read(dashboardProvider).init);
+    NotificationServices().getDeviceToken().then((value) {
+      print("device token----->$value");
+    });
     super.initState();
   }
 

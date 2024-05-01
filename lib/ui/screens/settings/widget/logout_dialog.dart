@@ -100,8 +100,8 @@ class LogoutDialog extends ConsumerWidget {
 }
 
 
-void buyNow(BuildContext context,{required String categoryId}) {
-  showDialog(
+Future<void> buyNow(BuildContext context,{required String categoryId}) async {
+  await showDialog(
     context: context,
     barrierDismissible: false,
     builder: (c) {
@@ -178,7 +178,7 @@ class BuyNowDialog extends ConsumerWidget {
                           onPressed: () async {
                             // bool result = await dashboardP.purchaseCategory(categoryId);
                             // if (result) ref.read(paidVideosProvider).fetchVideos(int.parse(categoryId));
-                            Navigator.of(context).push(MaterialPageRoute(
+                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => UsePaypal(
                                 clientId: 'AY6pLhhWX00Vac5a3WWDSq2E-uM24d-2r263Qo3a0FHvh755tEw5lh8tTkbTl24VB2vgceToCyqMqjLa',
                                 secretKey: 'EHT63o9JrnCT_VJH1_OXHmJmZCGY_sYQShbMQAIHXbt0q9kqt2WFsUl6bLK1KutTrvDLnbrrtbIUmL0h',

@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
-import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
 import 'package:meditation_app/data/model/response/playlist_details_response.dart';
 import 'package:meditation_app/data/model/response/playlist_list_response.dart';
 import 'package:meditation_app/data/repositories/playlist_repo.dart';
@@ -18,19 +17,21 @@ final playListProvider = ChangeNotifierProvider<PlaylistNotifier>((ref) {
 });
 
 class PlaylistNotifier extends ChangeNotifier {
-
   PlaylistRepo repo;
+
   PlaylistNotifier(this.repo);
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   List<PlaylistListResponse>? _playlistListResponse;
+
   List<PlaylistListResponse>? get playlistListResponse => _playlistListResponse;
 
   Playlist_Detail_Response? _playlistDetailResponse;
-  Playlist_Detail_Response? get playlistDetailResponse => _playlistDetailResponse;
 
+  Playlist_Detail_Response? get playlistDetailResponse => _playlistDetailResponse;
 
   void startLoading() {
     if (!_isLoading) {
@@ -97,6 +98,7 @@ class PlaylistNotifier extends ChangeNotifier {
   }
 
   bool _isCreatePlaylistLoading = false;
+
   bool get isCreatePlaylistLoading => _isCreatePlaylistLoading;
 
   void startCreatePlaylistLoading() {
@@ -146,12 +148,33 @@ class PlaylistNotifier extends ChangeNotifier {
   Future<bool> addToPlaylist(String playlistId, String videoId) async {
     Response response = await repo.addToPlaylist(playlistId, videoId);
     debugPrint('RESPONSE CODE :: ${response.statusCode}');
+    var json = jsonDecode(response.body);
     if (response.statusCode != 200) {
       ApiChecker.checkApi(response);
     } else {
-      showCustomSnackBar('Added In Playlist Successfully  ', type: true);
+      // showCustomSnackBar('Added In Playlist Successfully  ', type: true);
+      showCustomSnackBar(json["message"], type: true);
       return true;
     }
+    return false;
+  }
+
+  Future<bool> removeFromPlaylist(String playlistId, String videoId) async {
+    startLoading();
+    Response response = await repo.removeFromPlaylist(playlistId, videoId);
+
+    debugPrint('RESPONSE CODE :: ${response.statusCode}');
+    var json = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      stopLoading();
+      ApiChecker.checkApi(response);
+    } else {
+      stopLoading();
+      // showCustomSnackBar('Added In Playlist Successfully  ', type: true);
+      showCustomSnackBar(json["message"], type: true);
+      return true;
+    }
+    stopLoading();
     return false;
   }
 }

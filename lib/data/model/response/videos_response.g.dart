@@ -15,6 +15,9 @@ VideosResponse _$VideosResponseFromJson(Map<String, dynamic> json) =>
       list: (json['list'] as List<dynamic>?)
           ?.map((e) => VideoResponse.fromJson(e as Map<String, dynamic>))
           .toList(),
+      category: json['cat_list'] == null
+          ? null
+          : CategoryListResponse.fromJson(json['cat_list']),
     );
 
 VideoResponse _$VideoResponseFromJson(Map<String, dynamic> json) =>

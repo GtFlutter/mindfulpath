@@ -16,8 +16,9 @@ import '../detail_item.dart';
 
 class PaidVideoListWidget extends ConsumerStatefulWidget {
   final CategoryListResponse category;
+  final bool isPurchased;
 
-  const PaidVideoListWidget({super.key, required this.category});
+  const PaidVideoListWidget({super.key, required this.category,required this.isPurchased});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -33,7 +34,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
   void initState() {
     Future.delayed(Duration.zero, () async {
       print('______________________________________35__${widget.category.isPurchased}');
-      if (!(widget.category.isPurchased??false)) {
+      if (!(widget.isPurchased)) {
         buyNow(context, categoryId: widget.category.id.toString());
       }
       ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
@@ -102,6 +103,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
         return GestureDetector(
           onTap: () {
             print('______________________________________103__${model.category?.isPurchased}');
+            // if (model.category?.isPurchased??false) {
             if (model.category?.isPurchased??false) {
               playVideo(model);
             } else {

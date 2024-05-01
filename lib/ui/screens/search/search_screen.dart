@@ -131,15 +131,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           if (text.isEmpty) {
                             return;
                           }
-                          dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
+                          // setState(() {
+                            dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
+                          // });
                         },
                         style: _style.text.font(mulishMedium500, sizePx: 11, color: Colors.white, spacingPc: 10),
                         textAlignVertical: TextAlignVertical.top,
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Hinted search text',
-                          hintStyle:
-                              _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
+                          hintStyle: _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
                           contentPadding: EdgeInsets.only(bottom: _style.scaleX(16)),
                           constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                           alignLabelWithHint: true,
@@ -177,7 +178,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               Expanded(
                 child: showSearchResult
-                    ? dashboardNotifier.isSearchLoading || dashboardNotifier.data == null ? Center(child: CircularProgressIndicator(),) : SearchResultsList(style: _style, model: dashboardNotifier.data!.list!,)
+                    ? dashboardNotifier.isSearchLoading || dashboardNotifier.data == null
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : SearchResultsList(
+                            style: _style,
+                            model: dashboardNotifier.data!.list!,
+                          )
                     : RecentSearchResultList(
                         style: _style,
                         onRecentSearchTap: setSearchValue,

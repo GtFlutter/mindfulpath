@@ -1,3 +1,5 @@
+import 'package:meditation_app/data/model/response/videos_response.dart';
+
 class Playlist_Detail_Response {
   bool? status;
   String? message;
@@ -72,7 +74,8 @@ class PlaylistVideoList {
   String? createdAt;
   String? updatedAt;
   String? categoryTitle;
-  Video? video;
+  // Video? video;
+  VideoResponse? video;
 
   PlaylistVideoList(
       {this.id,
@@ -94,7 +97,7 @@ class PlaylistVideoList {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     categoryTitle = json['category_title'];
-    video = json['video'] != null ? new Video.fromJson(json['video']) : null;
+    video = json['video'] != null ? new VideoResponse.fromJson(json['video']) : null;
   }
 
   Map<String, dynamic> toJson() {

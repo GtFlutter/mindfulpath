@@ -36,9 +36,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   getFirebaseNotification() async {
     NotificationServices notificationServices = NotificationServices();
     notificationServices.requestNotificationPermission();
-    notificationServices.firebaseInit(context);
+    notificationServices.firebaseInit();
     await notificationServices.forgroundMessage();
-    await notificationServices.setupInteractMessage(context);
+    await notificationServices.setupInteractMessage();
 
   }
 

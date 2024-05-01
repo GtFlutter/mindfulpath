@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
 import 'package:meditation_app/data/model/body/resource_type.dart';
@@ -62,6 +63,8 @@ class DashboardRepo {
     ///      30m-45m       1800   - 2700
     ///      45m-60m       2700   - 3600
     ///         >60m       null   - 3600
+    debugPrint("~~~~~~~~query text----$queryText");
+
     return await apiClient.postData(AppConfigs.searchVideos, {
       if (categoryId != null) 'category_id': categoryId,
       'searched_title': queryText,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -44,6 +46,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
 
 
   Future<void> refreshh() async{
+    log("bookmark refresh...");
     Future.delayed(Duration.zero, () async {
       final coursePRead = ref.read(courseProvider);
       final coursePWatch = ref.watch(courseProvider);

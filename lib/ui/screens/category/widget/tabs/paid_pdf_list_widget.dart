@@ -13,8 +13,9 @@ import '../detail_item.dart';
 
 class PaidPdfListWidget extends ConsumerStatefulWidget {
   final CategoryListResponse category;
+  final bool isPurchased;
 
-  const PaidPdfListWidget({super.key, required this.category});
+  const PaidPdfListWidget({super.key, required this.category,required this.isPurchased});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _PaidPdfListWidgetState();
@@ -28,7 +29,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
   void initState() {
     Future.delayed(Duration.zero, ()  {
       print('______________________________________30__${widget.category.isPurchased}');
-      if (!(widget.category.isPurchased!)) {
+      if (!(widget.isPurchased)) {
         buyNow(context, categoryId: widget.category.id.toString());
       }
       ref.read(paidPdfsProvider).fetchPdfs(widget.category.id!);

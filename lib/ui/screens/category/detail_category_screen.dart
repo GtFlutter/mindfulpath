@@ -23,10 +23,12 @@ import 'widget/intro_widget.dart';
 class DetailCategoryScreen extends ConsumerStatefulWidget {
   final CategoryListResponse categoryListResponse;
   final DIModel? initialVideo;
-  const DetailCategoryScreen({
+  bool? isFromPdfNotification;
+   DetailCategoryScreen({
     super.key,
     required this.categoryListResponse,
     required this.initialVideo,
+    this.isFromPdfNotification,
   });
 
   @override
@@ -195,6 +197,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                       flex: 3,
                       child: ResourceDetailCategory(
                         category: widget.categoryListResponse,
+                        isFromPdfNotification: widget.isFromPdfNotification ?? false,
                       ),
                     ),
                 ],

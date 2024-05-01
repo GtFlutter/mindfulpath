@@ -48,6 +48,7 @@ class AppConfigs {
   static const String createPlaylist = '/create-playlist';
   static const String deletePlaylist = '/delete-playlist';
   static const String addToPlaylist = '/add-to-playlist';
+  static const String removeFromPlaylist = '/remove-from-playlist';
 
   /// [Analytics]
   static const String getStatistics = '/get-statistics';

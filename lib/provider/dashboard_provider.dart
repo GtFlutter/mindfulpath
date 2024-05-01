@@ -97,13 +97,15 @@ class DashboardNotifier extends ChangeNotifier {
 
   Future<void> searchVideo(String queryText, {required QueryTime queryTime, int offset = 1, int? categoryId}) async {
     startSearchLoading();
+    _data=null;
     Response response = await repo.searchVideos(queryText, queryTime: queryTime, offset: offset, categoryId: categoryId);
     if (response.statusCode != 200) {
       ApiChecker.checkApi(response);
     } else {
       var json = jsonDecode(response.body);
       _data = VideosResponse.fromJson(json['data']);
-      debugPrint('Response Body :: ${response.body}');
+      notifyListeners();
+      debugPrint('search Response Body :: ${response.body}');
     }
     stopSearchLoading();
   }
