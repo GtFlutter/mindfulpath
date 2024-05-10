@@ -56,7 +56,7 @@ class DashboardRepo {
     String queryText, {
     required QueryTime queryTime,
     required int offset,
-    int? categoryId,
+    List<int>? categoryId,
   }) async {
     ///   Time in min  start_time - end_time
     ///      <30m          0      - 1800
@@ -66,8 +66,8 @@ class DashboardRepo {
     debugPrint("~~~~~~~~query text----$queryText");
 
     return await apiClient.postData(AppConfigs.searchVideos, {
-      if (categoryId != null) 'category_id': categoryId,
-      'searched_title': queryText,
+      if (categoryId?.isNotEmpty ?? false) 'category_id': categoryId,
+      if(queryText.isNotEmpty)'searched_title': queryText,
       if (queryTime.startTimeInMinutes != null) 'start_time': queryTime.startTimeInMinutes! * 60,
       'end_time': queryTime.endTimeInMinutes * 60,
       'page': offset,

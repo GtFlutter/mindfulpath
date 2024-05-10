@@ -75,7 +75,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           );
                         }
                         return FlutterSwitch(
-                          value: data.isNotificationMute == null ? false : data.isNotificationMute == 1,
+                          value: data.isNotificationMute == null ? false : data.isNotificationMute == 0,
                           width: _style.scaleX(35),
                           height: _style.scaleX(22),
                           borderRadius: _style.scaleX(20),

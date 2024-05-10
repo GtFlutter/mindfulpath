@@ -39,7 +39,7 @@ class FilterIconButton extends StatelessWidget {
           children: [
             Text(
               title,
-              style: _style.text.font(mulishMedium500, sizePx: 10),
+              style: _style.text.font(mulishMedium500, sizePx: 13),
             ),
             SizedBox(width: _style.scaleX(7.5)),
             SvgPicture.asset(

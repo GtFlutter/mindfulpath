@@ -17,7 +17,7 @@ class UsePaypal extends StatefulWidget {
   final Function onSuccess, onCancel, onError;
   final String returnURL, cancelURL, note, clientId, secretKey;
   final List transactions;
-  final bool sandboxMode;
+  final bool sandboxMode,isFromSearch;
   const UsePaypal({
     super.key,
     required this.onSuccess,
@@ -29,6 +29,7 @@ class UsePaypal extends StatefulWidget {
     required this.clientId,
     required this.secretKey,
     this.sandboxMode = false,
+    this.isFromSearch =false,
     this.note = '',
   });
 
@@ -187,7 +188,8 @@ class UsePaypalState extends State<UsePaypal> {
                         accessToken: accessToken,
                         onSuccess: widget.onSuccess,
                         onCancel: widget.onCancel,
-                        onError: widget.onError)),
+                        onError: widget.onError,
+                    isFromSearch: widget.isFromSearch)),
               );
             }
             if (request.url.contains(widget.cancelURL)) {

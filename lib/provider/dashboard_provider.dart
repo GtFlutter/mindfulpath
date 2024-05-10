@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,8 +26,16 @@ class DashboardNotifier extends ChangeNotifier {
 
   DashboardNotifier(this.repo, this.ref);
 
+  bool islandScap=false;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+// ///search screen parameters
+//   List<CategoryListResponse> selectedCategories = [];
+//   List<String> selectedCatTitle = [];
+//   QueryTime? selectedQueryTime;
+//   final TextEditingController controller = TextEditingController();
 
   void startLoading() {
     if (!_isLoading) {
@@ -95,7 +104,7 @@ class DashboardNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> searchVideo(String queryText, {required QueryTime queryTime, int offset = 1, int? categoryId}) async {
+  Future<void> searchVideo(String queryText, {required QueryTime queryTime, int offset = 1, List<int>? categoryId}) async {
     startSearchLoading();
     _data=null;
     Response response = await repo.searchVideos(queryText, queryTime: queryTime, offset: offset, categoryId: categoryId);
@@ -104,6 +113,7 @@ class DashboardNotifier extends ChangeNotifier {
     } else {
       var json = jsonDecode(response.body);
       _data = VideosResponse.fromJson(json['data']);
+
       notifyListeners();
       debugPrint('search Response Body :: ${response.body}');
     }

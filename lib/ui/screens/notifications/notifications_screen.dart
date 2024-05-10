@@ -6,16 +6,17 @@ import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/notifications/notificationlist_provider.dart';
 
+import '../../../data/model/response/category_list_reponse.dart';
 import '../../../theme/styles.dart';
 import '../../common/custom_app_bar.dart';
-
+import '../category/detail_category_screen.dart';
+import '../discover/discover_screen.dart';
 
 class NotificationsScreens extends ConsumerStatefulWidget {
   const NotificationsScreens({super.key});
 
   @override
-  ConsumerState<NotificationsScreens> createState() =>
-      _NotificationsScreensState();
+  ConsumerState<NotificationsScreens> createState() => _NotificationsScreensState();
 }
 
 class _NotificationsScreensState extends ConsumerState<NotificationsScreens> {
@@ -35,14 +36,11 @@ class _NotificationsScreensState extends ConsumerState<NotificationsScreens> {
     super.initState();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
     var notiList = ref.watch(notificationListProvider);
-
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -56,52 +54,86 @@ class _NotificationsScreensState extends ConsumerState<NotificationsScreens> {
         alignment: Alignment.topCenter,
         child: SafeArea(
           bottom: false,
-          child: notiList.isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : notiList.notificationListResponse == null ||
-                      notiList.notificationListResponse!.data!.notificationData!
-                          .isEmpty
-                  ? const Center(child: Text('No Notification Found'))
-                  : ListView.separated(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      padding: EdgeInsets.only(
-                        left: _style.scaleX(20),
-                        top: _style.scaleX(60),
-                        bottom: _style.scaleX(30),
+          child: SingleChildScrollView(
+            child: notiList.isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : notiList.notificationListResponse == null || notiList.notificationListResponse!.data!.notificationData!.isEmpty
+                    ? const Center(child: Text('No Notification Found'))
+                    : ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        padding: EdgeInsets.only(
+                          left: _style.scaleX(20),
+                          top: _style.scaleX(60),
+                          bottom: _style.scaleX(30),
+                        ),
+                        itemCount: notiList.notificationListResponse?.data?.notificationData?.length ?? 0,
+                        itemBuilder: (context, index) {
+                          print('---------index---->${index}');
+            
+                          final model = notiList.notificationListResponse?.data?.notificationData?[index];
+            
+                          String utcTime = model?.createdAt ?? "";
+                          DateTime dateTime = DateTime.parse(utcTime);
+                          String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm a').format(dateTime);
+            
+                          print('------------->${formattedDateTime ?? ""}');
+                          return InkWell(
+                            onTap: () {
+                              final isCategoryPurchased =
+                                  notiList.notificationListResponse?.data?.purchaseCategoryData?.contains(notiList.notificationListResponse?.data?.notificationData?[index].catData?.id ?? 0);
+                              final isDataPaid = model?.type == "video"
+                                  ? (notiList.notificationListResponse?.data?.notificationData?[index].itmData?.videoType ?? 0) == 1
+                                  : (notiList.notificationListResponse?.data?.notificationData?[index].itmData?.pdfType ?? 0) == 1;
+                              print(
+                                  '---------index---->${index}------${notiList.notificationListResponse?.data?.purchaseCategoryData}==${notiList.notificationListResponse?.data?.notificationData?[index].catData?.id}-->$isCategoryPurchased----$isDataPaid');
+                              final category = notiList.notificationListResponse?.data?.notificationData?[index].catData?.copyWith(isPurchased: isCategoryPurchased);
+                              if (model?.type == "video") {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (ctx) => DetailCategoryScreen(
+                                              categoryListResponse: category ?? CategoryListResponse(),
+                                              initialVideo: null,
+                                              isPaid: isDataPaid,
+                                              isFromPaidVideoNotification: true,
+                                            )));
+                              }
+                              if (model?.type == "pdf") {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (ctx) => DetailCategoryScreen(
+                                              categoryListResponse: category ?? CategoryListResponse(),
+                                              initialVideo: null,
+                                              isFromPdfNotification: true,
+                                              isPaid: isDataPaid,
+                                              isPDFView: true,
+                                            )));
+                              }
+                              if (model?.type == "category") {
+                                Navigator.push(context, MaterialPageRoute(builder: (ctx) => const DiscoverScreen()));
+                              }
+                            },
+                            child: NotificationItem(
+                              message: model?.message ?? "",
+                              url: model?.image ?? "",
+                              receviedAt: formattedDateTime,
+                              appStyle: _style,
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return SizedBox(height: _style.scaleX(30));
+                        },
                       ),
-                      itemCount: notiList.notificationListResponse?.data
-                              ?.notificationData?.length ??0,
-                      itemBuilder: (context, index) {
-                        print('---------index---->${index}');
-
-                        final model = notiList.notificationListResponse?.data
-                            ?.notificationData?[index];
-
-                        String utcTime = model?.createdAt??"";
-                        DateTime dateTime = DateTime.parse(utcTime);
-                        String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm a').format(dateTime);
-
-
-                        print('------------->${formattedDateTime ?? ""}');
-                        return NotificationItem(
-                          message: model?.message ?? "",
-                          url: model?.image ?? "",
-                          receviedAt: formattedDateTime,
-                          appStyle: _style,
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(height: _style.scaleX(30));
-                      },
-                    ),
+          ),
         ),
       ),
     );
   }
-
 }
 
 class NotificationItem extends StatelessWidget {
@@ -110,12 +142,7 @@ class NotificationItem extends StatelessWidget {
   final String receviedAt;
   final AppStyle appStyle;
 
-  const NotificationItem(
-      {super.key,
-      required this.message,
-      required this.receviedAt,
-      required this.url,
-      required this.appStyle});
+  const NotificationItem({super.key, required this.message, required this.receviedAt, required this.url, required this.appStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -135,14 +162,11 @@ class NotificationItem extends StatelessWidget {
               SizedBox(height: appStyle.scaleX(5)),
               Text(
                 receviedAt,
-                style: appStyle.text.font(mulishSemiBold600,
-                    sizePx: 9, color: const Color(0xFF717171)),
+                style: appStyle.text.font(mulishSemiBold600, sizePx: 9, color: const Color(0xFF717171)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              Divider(
-                  color: AppColors.primaryColor,
-                  endIndent: appStyle.scaleX(10)),
+              Divider(color: AppColors.primaryColor, endIndent: appStyle.scaleX(10)),
             ],
           ),
         ),

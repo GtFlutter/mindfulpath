@@ -6,6 +6,7 @@ class CompletePayment extends StatefulWidget {
   final Function onSuccess, onCancel, onError;
   final PaypalServices services;
   final String url, executeUrl, accessToken;
+  final bool isFromSearch;
   const CompletePayment({
     super.key,
     required this.onSuccess,
@@ -15,6 +16,7 @@ class CompletePayment extends StatefulWidget {
     required this.url,
     required this.executeUrl,
     required this.accessToken,
+    required this.isFromSearch,
   });
 
   @override
@@ -45,10 +47,11 @@ class _CompletePaymentState extends State<CompletePayment> {
         params['status'] = 'success';
         params['data'] = resp['data'];
         await widget.onSuccess(params);
+        if(widget.isFromSearch){
         setState(() {
           loading = false;
           loadingError = false;
-        });
+        });}
         if (context.mounted) Navigator.pop(context);
       } else {
         if (resp['exception'] != null && resp['exception'] == true) {

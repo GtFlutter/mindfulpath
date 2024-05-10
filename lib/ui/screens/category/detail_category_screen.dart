@@ -24,11 +24,17 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
   final CategoryListResponse categoryListResponse;
   final DIModel? initialVideo;
   bool? isFromPdfNotification;
+  bool? isFromPaidVideoNotification;
+  bool? isPaid;
+  bool? isPDFView;
    DetailCategoryScreen({
     super.key,
     required this.categoryListResponse,
     required this.initialVideo,
     this.isFromPdfNotification,
+     this.isPaid,
+     this.isPDFView,
+     this.isFromPaidVideoNotification
   });
 
   @override
@@ -198,6 +204,8 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                       child: ResourceDetailCategory(
                         category: widget.categoryListResponse,
                         isFromPdfNotification: widget.isFromPdfNotification ?? false,
+                        isPaid: widget.isPaid ?? false,
+                        isFromPaidVideoNotification:widget.isFromPaidVideoNotification ?? false ,
                       ),
                     ),
                 ],

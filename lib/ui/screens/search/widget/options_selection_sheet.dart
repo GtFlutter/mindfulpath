@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
@@ -15,7 +17,7 @@ class OptionsSelectionSheet extends StatefulWidget {
   final bool multiSelect;
   final bool useGridLayout;
   final String title;
-  final void Function(List<CategoryListResponse>)? onCategorySelect;
+  final void Function(List<CategoryListResponse>, List<String>)? onCategorySelect;
   final void Function(QueryTime)? onTimeSelect;
 
   OptionsSelectionSheet.singleSelect({
@@ -26,32 +28,36 @@ class OptionsSelectionSheet extends StatefulWidget {
     required this.title,
     required this.onTimeSelect,
   })  : selectedItems = selectedItem == null ? [] : [selectedItem],
-        multiSelect = false, categoryList = [], onCategorySelect = null;
+        multiSelect = false,
+        categoryList = [],
+        onCategorySelect = null;
 
-  OptionsSelectionSheet.multiSelect({
-    super.key,
-    required this.categoryList,
-    required this.selectedItems,
-    this.useGridLayout = false,
-    required this.title,
-    this.onCategorySelect
-  }) : multiSelect = true, queryItems = [], onTimeSelect = null;
+  OptionsSelectionSheet.multiSelect({super.key, required this.categoryList, required this.selectedItems, this.useGridLayout = false, required this.title, this.onCategorySelect})
+      : multiSelect = true,
+        queryItems = [],
+        onTimeSelect = null;
 
   @override
   State<OptionsSelectionSheet> createState() => _OptionsSelectionSheetState();
 }
 
 class _OptionsSelectionSheetState extends State<OptionsSelectionSheet> {
-
   final List<CategoryListResponse> _selectedCategory = [];
 
   @override
   void initState() {
-    if (widget.categoryList.isNotEmpty) _selectedCategory.add(widget.categoryList.first);
+    // if (widget.categoryList.isNotEmpty) _selectedCategory.add(widget.categoryList.first);
+    widget.categoryList.map((e) {
+      if(widget.selectedItems.contains(e.title)){
+        _selectedCategory.add(e);
+      }
+    }).toList();
+    log("init----->${_selectedCategory.length}");
     super.initState();
   }
 
   static AppStyle _style = AppStyle();
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -75,6 +81,7 @@ class _OptionsSelectionSheetState extends State<OptionsSelectionSheet> {
                 ? () {
                     setState(() {
                       widget.selectedItems.clear();
+                      _selectedCategory.clear();
                     });
                   }
                 : null,
@@ -102,7 +109,11 @@ class _OptionsSelectionSheetState extends State<OptionsSelectionSheet> {
                             onTap: () {
                               if (isSelected) {
                                 widget.selectedItems.remove(widget.categoryList[index].title!);
-                                _selectedCategory.remove(widget.categoryList[index]);
+                                // _selectedCategory.remove(widget.categoryList[index]);
+                                _selectedCategory.removeWhere((element) {
+                                  return element.title == widget.categoryList[index].title;
+                                });
+                                log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~${_selectedCategory.length}------${widget.selectedItems}");
                                 setState(() {});
                               } else {
                                 if (!widget.multiSelect && widget.selectedItems.isNotEmpty) {
@@ -111,6 +122,7 @@ class _OptionsSelectionSheetState extends State<OptionsSelectionSheet> {
                                 }
                                 widget.selectedItems.add(widget.categoryList[index].title!);
                                 _selectedCategory.add(widget.categoryList[index]);
+                                log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~${_selectedCategory.length}-----------${widget.selectedItems}");
                                 setState(() {});
                               }
                             },
@@ -161,20 +173,22 @@ class _OptionsSelectionSheetState extends State<OptionsSelectionSheet> {
                     },
                   ),
           ),
-          if (!widget.useGridLayout) Align(
-            alignment: Alignment.center,
-            child: TextButton(
-              onPressed: () {
-                widget.onCategorySelect!(_selectedCategory);
-                context.pop();
-              },
-              style: TextButton.styleFrom(
-                textStyle: _style.text.font(mulishMedium500, sizePx: 12),
-                foregroundColor: Colors.white,
+          if (!widget.useGridLayout)
+            Align(
+              alignment: Alignment.center,
+              child: TextButton(
+                onPressed: () {
+                  log("on save press-----------${widget.selectedItems.length}");
+                  widget.onCategorySelect!(_selectedCategory, widget.selectedItems);
+                  context.pop();
+                },
+                style: TextButton.styleFrom(
+                  textStyle: _style.text.font(mulishMedium500, sizePx: 20),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Save'),
               ),
-              child: const Text('Save'),
             ),
-          ),
         ],
       ),
     );

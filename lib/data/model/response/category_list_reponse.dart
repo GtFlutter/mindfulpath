@@ -53,7 +53,40 @@ class CategoryListResponse {
     data['image'] = imageResponse?.toJson();
     return data;
   }
+
+  CategoryListResponse copyWith({
+    int? id,
+    String? title,
+    String? buttonTitle,
+    String? price,
+    bool? isPurchased,
+    String? createdAt,
+    String? updatedAt,
+    CategoryImageResponse? imageResponse,
+  }) =>
+      CategoryListResponse(
+          id:id ?? this.id,
+          title:title ?? this.title,
+          buttonTitle:buttonTitle ?? this.buttonTitle,
+          price:price ?? this.price,
+          isPurchased:isPurchased ?? this.isPurchased,
+          createdAt:createdAt ?? this.createdAt,
+          updatedAt:updatedAt ?? this.updatedAt,
+          imageResponse:imageResponse ?? this.imageResponse,
+      );
+
+  Map<String, dynamic> toJsonData() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['button_title'] = buttonTitle;
+    data['price'] = buttonTitle;
+    data['is_purchased'] = buttonTitle;
+    data['image'] = imageResponse?.toJson();
+    return data;
+  }
 }
+
 
 class CategoryImageResponse {
   int? id;

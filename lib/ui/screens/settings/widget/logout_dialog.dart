@@ -12,6 +12,7 @@ import 'package:meditation_app/util/constants.dart';
 import '../../../../provider/auth_provider.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
+import '../../search/util/query_time.dart';
 
 class LogoutDialog extends ConsumerWidget {
   const LogoutDialog(this.style, {super.key});
@@ -99,8 +100,7 @@ class LogoutDialog extends ConsumerWidget {
   }
 }
 
-
-Future<void> buyNow(BuildContext context,{required String categoryId}) async {
+Future<void> buyNow(BuildContext context, {required String categoryId, bool? isFromSearch}) async {
   await showDialog(
     context: context,
     barrierDismissible: false,
@@ -111,7 +111,7 @@ Future<void> buyNow(BuildContext context,{required String categoryId}) async {
         parent: ProviderScope.containerOf(context),
         child: Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
-          child: BuyNowDialog(style, categoryId),
+          child: BuyNowDialog(style, categoryId, isFromSearch ?? false),
         ),
       );
     },
@@ -119,10 +119,11 @@ Future<void> buyNow(BuildContext context,{required String categoryId}) async {
 }
 
 class BuyNowDialog extends ConsumerWidget {
-  const BuyNowDialog(this.style, this.categoryId, {super.key});
+  const BuyNowDialog(this.style, this.categoryId, this.isFromSearch, {super.key});
 
   final AppStyle style;
   final String categoryId;
+  final bool? isFromSearch;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -162,8 +163,8 @@ class BuyNowDialog extends ConsumerWidget {
                           onPressed: dashboardP.isPurchaseLoading
                               ? null
                               : () {
-                            if (context.canPop()) context.pop();
-                          },
+                                  if (context.canPop()) context.pop();
+                                },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.white,
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
@@ -176,10 +177,16 @@ class BuyNowDialog extends ConsumerWidget {
                       Expanded(
                         child: FilledButton(
                           onPressed: () async {
+                            // if(isFromSearch ?? false) {
+                            //   context.pop();
+                            // }
+                            // context.pop();
+
                             // bool result = await dashboardP.purchaseCategory(categoryId);
                             // if (result) ref.read(paidVideosProvider).fetchVideos(int.parse(categoryId));
-                             Navigator.of(context).push(MaterialPageRoute(
+                            Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => UsePaypal(
+                                isFromSearch: isFromSearch ?? false,
                                 clientId: 'AY6pLhhWX00Vac5a3WWDSq2E-uM24d-2r263Qo3a0FHvh755tEw5lh8tTkbTl24VB2vgceToCyqMqjLa',
                                 secretKey: 'EHT63o9JrnCT_VJH1_OXHmJmZCGY_sYQShbMQAIHXbt0q9kqt2WFsUl6bLK1KutTrvDLnbrrtbIUmL0h',
                                 cancelURL: 'https://samplesite.com/return',
@@ -206,7 +213,22 @@ class BuyNowDialog extends ConsumerWidget {
                                 onSuccess: (value) async {
                                   log('ON Success :: $value', name: 'On Success');
                                   bool result = await dashboardP.purchaseCategory(categoryId, value['paymentId']);
-                                  if (result) ref.read(paidVideosProvider.notifier).fetchVideos(int.parse(categoryId));
+                                  if (result) {
+                                    log("isFromSearch---->${isFromSearch}");
+                                    if (isFromSearch ?? false) {
+                                      // final dashPro=ref.read(dashboardProvider);
+                                      // List<int>? ids = [];
+                                      // if (dashPro.selectedCategories.isNotEmpty) {
+                                      //   dashPro.selectedCategories.map((e) {
+                                      //     ids.add(e.id ?? 0);
+                                      //   }).toList();
+                                      // }
+                                      // ref.read(dashboardProvider.notifier).searchVideo(dashPro.controller.text, queryTime: dashPro.selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+                                      await ref.read(dashboardProvider).searchVideo("", queryTime: QueryTime.qTime1, categoryId: [int.parse(categoryId)]);
+                                    } else {
+                                       ref.read(paidVideosProvider.notifier).fetchVideos(int.parse(categoryId));
+                                    }
+                                  }
                                 },
                               ),
                             ));

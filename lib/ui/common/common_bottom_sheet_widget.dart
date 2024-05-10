@@ -33,14 +33,14 @@ class CommonBottomSheetWidget extends StatelessWidget {
               onPressed: onCancle,
               icon: SvgPicture.asset(
                 SvgPaths.remove,
-                width: style.scaleX(20),
+                width: style.scaleX(25),
                 fit: BoxFit.fitWidth,
               ),
             ),
           Flexible(
             child: Text(
               title,
-              style: style.text.font(mulishSemiBold600, sizePx: 15),
+              style: style.text.font(mulishSemiBold600, sizePx: 18),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               maxLines: 5,
@@ -49,7 +49,7 @@ class CommonBottomSheetWidget extends StatelessWidget {
           TextButton(
             onPressed: onDone,
             style: TextButton.styleFrom(
-              textStyle: style.text.font(mulishMedium500, sizePx: 12),
+              textStyle: style.text.font(mulishMedium500, sizePx: 15),
               foregroundColor: Colors.white,
             ),
             child: Text(doneLable),

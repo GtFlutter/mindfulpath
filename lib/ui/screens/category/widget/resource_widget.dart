@@ -25,8 +25,11 @@ import 'tabs/paid_pdf_list_widget.dart';
 class ResourceDetailCategory extends ConsumerStatefulWidget {
   CategoryListResponse category;
   bool? isFromPdfNotification;
+  bool? isFromPaidVideoNotification;
+  bool? isPaid;
+  bool? isPDFView;
 
-  ResourceDetailCategory({super.key, required this.category, this.isFromPdfNotification});
+  ResourceDetailCategory({super.key, required this.category, this.isFromPdfNotification, this.isPaid, this.isPDFView, this.isFromPaidVideoNotification});
 
   @override
   ConsumerState<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
@@ -38,25 +41,62 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   static AppStyle _style = AppStyle();
 
   /// Either 0(Video) or 1(PDF)
-  late int filterIndex;
+  // late int filterIndex;
+  int filterIndex = 0;
 
   /// Either 0(Free) or 1(Paid)
-  late int courseIndex;
+  // late int courseIndex;
+  int courseIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
-    print('_______________________________________46_${widget.category.isPurchased}');
-    if (widget.isFromPdfNotification ?? false) {
-      filterIndex = 1;
-      courseIndex = 2;
-    } else {
-      filterIndex = 0;
-      courseIndex = 0;
-    }
-
     _tabController = TabController(initialIndex: courseIndex, length: 4, vsync: this);
+    (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
+
+    Future.delayed(Duration(seconds: 0), () {
+      ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
+    }).then((value) async {
+      if (widget.isFromPdfNotification ?? false) {
+        _changeFilter(ItemName(id: 1, title: 'PDF'));
+        log("isPaid and purchased--->${widget.isPaid}----${widget.category.isPurchased}");
+        if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
+          await buyNow(context, categoryId: widget.category.id.toString());
+          await ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
+          if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
+            _changeCourseType(1);
+          } else {
+            _changeCourseType(0);
+          }
+        } else if ((widget.isPaid ?? false) && (widget.category.isPurchased ?? false)) {
+          log("callleeddddddd");
+          _changeCourseType(1);
+          _changeFilter(ItemName(id: 1, title: 'PDF'));
+          setState(() {});
+        }
+      }
+      else if (widget.isFromPaidVideoNotification ?? false) {
+        log("isPaid and purchased  11--->${widget.isPaid}----${widget.category.isPurchased}");
+        if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
+          await buyNow(context, categoryId: widget.category.id.toString());
+          log("-------->${ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased}---------------");
+          if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
+            _changeCourseType(1);
+          } else {
+            _changeCourseType(0);
+          }
+        } else if ((widget.isPaid ?? false) && (widget.category.isPurchased ?? false)) {
+          log("callleeddddddd");
+          _changeCourseType(1);
+          _changeFilter(ItemName(id: 0, title: 'Video'));
+          setState(() {});
+        }
+      } else {
+        _changeCourseType(0);
+        _changeFilter(ItemName(id: 0, title: 'Video'));
+      }
+    });
+    print('_______________________________________46_${widget.category.isPurchased}');
   }
 
   @override
@@ -105,7 +145,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
 
     var provider = ref.watch(paidVideosProvider);
     var dashboardPro = ref.watch(dashboardProvider);
-
+    log("provider.videosResponse?.category?.isPurchased----------${provider.videosResponse?.category?.isPurchased}");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -139,7 +179,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 if (!(provider.videosResponse?.category?.isPurchased ?? false)) {
                   log("ttthhhiiissss ccaakkkeddd  1111");
                   await buyNow(context, categoryId: widget.category.id.toString());
-                  await provider.fetchVideos(widget.category.id ?? 0);
+                  await provider.fetchVideos(widget.category.id ?? 0, isLoading: filterIndex == 0);
                   // await  dashboardPro.getCategoryList();
                   // dashboardPro.categoryListResponse?.map((e) {
                   //   if(e.id==widget.category.id){

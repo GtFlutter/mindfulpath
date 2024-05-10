@@ -117,7 +117,7 @@ class NotificationServices {
     if (notificationCustomData.type == "video") {
       Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => DetailCategoryScreen(categoryListResponse: notificationCustomData.catData ?? CategoryListResponse(), initialVideo: null)));
     } else if (notificationCustomData.type == "pdf") {
-      Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => DetailCategoryScreen(categoryListResponse: notificationCustomData.catData ?? CategoryListResponse(), initialVideo: null,isFromPdfNotification: true,)));
+      Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => DetailCategoryScreen(categoryListResponse: notificationCustomData.catData ?? CategoryListResponse(), initialVideo: null,isFromPdfNotification: true,isPDFView: true,)));
     }else if (notificationCustomData.type == "category") {
       Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => const DiscoverScreen()));
     }

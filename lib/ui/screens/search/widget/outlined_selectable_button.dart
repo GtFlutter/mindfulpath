@@ -48,7 +48,7 @@ class OutlinedSelectableButton extends StatelessWidget {
           title,
           style: appStyle.text.font(
             mulishSemiBold600,
-            sizePx: 10,
+            sizePx: 13,
             color: selected ? Colors.black : Colors.white,
           ),
           textAlign: TextAlign.center,

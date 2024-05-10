@@ -131,10 +131,10 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
         ),
         margin: widget.dragable && !widget.dragging ? EdgeInsets.only(bottom: widget.appStyle.scaleX(12.5), top: widget.appStyle.scaleX(12.5)) : null,
         padding: EdgeInsets.fromLTRB(
-          widget.appStyle.scaleX(29),
-          widget.appStyle.scaleX(30.5),
-          widget.appStyle.scaleX(29),
-          widget.appStyle.scaleX(14.5),
+          widget.appStyle.scaleX(15),
+          widget.appStyle.scaleX(23),
+          widget.appStyle.scaleX(15),
+          widget.appStyle.scaleX(10),
         ),
         alignment: Alignment.center,
         child: IntrinsicHeight(
@@ -146,7 +146,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                 imgUrl: widget.model.video != null ? widget.model.video!.thumbnailImageUrlSrc ?? '' : '',
                 duration: (widget.model.video?.duration ?? "").toDuration,
                 imgRadius: widget.appStyle.scaleX(25),
-                imgSize: widget.appStyle.scaleX(90),
+                imgSize: widget.appStyle.scaleX(100),
               ),
               Flexible(
                 child: Column(
@@ -164,7 +164,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: widget.appStyle.scaleX(5)),
+                          // SizedBox(height: widget.appStyle.scaleX(5)),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -180,7 +180,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                     ),
                                     TextSpan(
                                       text: widget.model.categoryTitle,
-                                      style: textStyle.copyWith(color: AppColors.categoryNameColor),
+                                      style: textStyle.copyWith(color: AppColors.categoryNameColor,fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -213,7 +213,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                             },
                             icon: SvgPicture.asset(
                               SvgPaths.share,
-                              height: widget.appStyle.scaleX(16),
+                              height: widget.appStyle.scaleX(18),
                               fit: BoxFit.contain, // 155861
                             ),
                             style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -251,7 +251,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                       },
                                       icon: SvgPicture.asset(
                                         SvgPaths.download,
-                                        height: widget.appStyle.scaleX(16),
+                                        height: widget.appStyle.scaleX(18),
                                         fit: BoxFit.contain,
                                       ),
                                       style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),

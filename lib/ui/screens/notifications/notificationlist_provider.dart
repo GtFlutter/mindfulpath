@@ -8,6 +8,8 @@ import 'package:meditation_app/data/repositories/notification_repo.dart';
 import 'package:meditation_app/provider/repo_provider/notifcationlist_repo_provider.dart';
 import 'package:meditation_app/ui/screens/notifications/NotificationResponse.dart';
 
+import '../../../data/model/response/notification_list_response.dart';
+
 
 final notificationListProvider = ChangeNotifierProvider<NotificationlistNotifier>((ref) {
   final repo = ref.watch(notificationListRepoProvider);
@@ -23,8 +25,10 @@ class NotificationlistNotifier extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  NotificationResponse? _notificationListResponse;
-  NotificationResponse? get notificationListResponse => _notificationListResponse;
+  // NotificationResponse? _notificationListResponse;
+  // NotificationResponse? get notificationListResponse => _notificationListResponse;
+  NotificationListResponse? _notificationListResponse;
+  NotificationListResponse? get notificationListResponse => _notificationListResponse;
 
 
 
@@ -53,7 +57,8 @@ class NotificationlistNotifier extends ChangeNotifier {
     } else {
       try {
         var json = jsonDecode(response.body);
-        _notificationListResponse = NotificationResponse.fromJson(json);
+        // _notificationListResponse = NotificationResponse.fromJson(json);
+        _notificationListResponse = NotificationListResponse.fromJson(json);
         if (showProgress) {
           stopLoading();
         } else {

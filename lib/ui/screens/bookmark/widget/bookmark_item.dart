@@ -121,10 +121,14 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
         ),
         margin: widget.dragable && !widget.dragging ? EdgeInsets.only(bottom: widget.appStyle.scaleX(12.5), top: widget.appStyle.scaleX(12.5)) : null,
         padding: EdgeInsets.fromLTRB(
-          widget.appStyle.scaleX(29),
-          widget.appStyle.scaleX(30.5),
-          widget.appStyle.scaleX(29),
-          widget.appStyle.scaleX(14.5),
+          widget.appStyle.scaleX(15),
+          widget.appStyle.scaleX(15),
+          widget.appStyle.scaleX(15),
+          widget.appStyle.scaleX(15),
+          // widget.appStyle.scaleX(29),
+          // widget.appStyle.scaleX(30.5),
+          // widget.appStyle.scaleX(29),
+          // widget.appStyle.scaleX(14.5),
         ),
         alignment: Alignment.center,
         child: IntrinsicHeight(
@@ -163,11 +167,11 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                               children: [
                                 TextSpan(
                                   text: '  ● ',
-                                  style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                                  style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 16, color: AppColors.primaryColor),
                                 ),
                                 TextSpan(
                                   text: widget.model.bookmarkVideoResponse?.category?.title ?? "",
-                                  style: textStyle.copyWith(color: AppColors.categoryNameColor),
+                                  style: textStyle.copyWith(color: AppColors.categoryNameColor,fontSize: 11),
                                 ),
                               ],
                             ),
@@ -184,7 +188,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                             onPressed: widget.onBookmarkRemove,
                             icon: SvgPicture.asset(
                               SvgPaths.remove,
-                              height: widget.appStyle.scaleX(16),
+                              height: widget.appStyle.scaleX(18),
                               fit: BoxFit.contain,
                             ),
                             style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -197,7 +201,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                             },
                             icon: SvgPicture.asset(
                               SvgPaths.share,
-                              height: widget.appStyle.scaleX(16),
+                              height: widget.appStyle.scaleX(18),
                               fit: BoxFit.contain, // 155861
                             ),
                             style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
@@ -234,7 +238,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                       },
                                       icon: SvgPicture.asset(
                                         SvgPaths.download,
-                                        height: widget.appStyle.scaleX(16),
+                                        height: widget.appStyle.scaleX(18),
                                         fit: BoxFit.contain,
                                       ),
                                       style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
