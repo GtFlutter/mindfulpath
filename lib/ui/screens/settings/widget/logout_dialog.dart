@@ -224,9 +224,9 @@ class BuyNowDialog extends ConsumerWidget {
                                       //   }).toList();
                                       // }
                                       // ref.read(dashboardProvider.notifier).searchVideo(dashPro.controller.text, queryTime: dashPro.selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
-                                      await ref.read(dashboardProvider).searchVideo("", queryTime: QueryTime.qTime1, categoryId: [int.parse(categoryId)]);
+                                       ref.read(dashboardProvider).searchVideo("", queryTime: QueryTime.qTime1, categoryId: [int.parse(categoryId)]);
                                     } else {
-                                       ref.read(paidVideosProvider.notifier).fetchVideos(int.parse(categoryId));
+                                       ref.read(paidVideosProvider.notifier).fetchVideos(int.parse(categoryId),isLoading: false);
                                     }
                                   }
                                 },

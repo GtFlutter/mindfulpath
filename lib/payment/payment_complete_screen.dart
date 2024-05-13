@@ -52,7 +52,9 @@ class _CompletePaymentState extends State<CompletePayment> {
           loading = false;
           loadingError = false;
         });}
-        if (context.mounted) Navigator.pop(context);
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
       } else {
         if (resp['exception'] != null && resp['exception'] == true) {
           widget.onError({"message": resp['message']});

@@ -62,7 +62,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         log("isPaid and purchased--->${widget.isPaid}----${widget.category.isPurchased}");
         if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
           await buyNow(context, categoryId: widget.category.id.toString());
-          await ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
           if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
             _changeCourseType(1);
           } else {
@@ -80,13 +79,16 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
           await buyNow(context, categoryId: widget.category.id.toString());
           log("-------->${ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased}---------------");
+          log("starrttt~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+          await ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0);
+          log("starrttt~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sfdsfdsfdsf");
           if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
             _changeCourseType(1);
           } else {
             _changeCourseType(0);
           }
         } else if ((widget.isPaid ?? false) && (widget.category.isPurchased ?? false)) {
-          log("callleeddddddd");
+          log("callleeddddddd~~~~~~~~");
           _changeCourseType(1);
           _changeFilter(ItemName(id: 0, title: 'Video'));
           setState(() {});
@@ -177,9 +179,13 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 print('_______________________________________126_${provider.videosResponse?.category?.isPurchased}');
                 // if (!(provider.videosResponse?.list?.first.category?.isPurchased ?? false)|| !(widget.category.isPurchased ?? false)) {
                 if (!(provider.videosResponse?.category?.isPurchased ?? false)) {
-                  log("ttthhhiiissss ccaakkkeddd  1111");
                   await buyNow(context, categoryId: widget.category.id.toString());
                   await provider.fetchVideos(widget.category.id ?? 0, isLoading: filterIndex == 0);
+                  if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
+                    _changeCourseType(1);
+                  } else {
+                    _changeCourseType(0);
+                  }
                   // await  dashboardPro.getCategoryList();
                   // dashboardPro.categoryListResponse?.map((e) {
                   //   if(e.id==widget.category.id){
