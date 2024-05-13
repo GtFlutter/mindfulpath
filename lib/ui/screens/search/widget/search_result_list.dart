@@ -43,7 +43,7 @@ class SearchResultsList extends ConsumerWidget {
         return GestureDetector(
           onTap: () {
             ref.read(videoProvider.notifier).isSelected = index;
-            playVideo(_model.list![index], _model.list?[0].category ?? CategoryListResponse(), ref,context);
+            playVideo(_model.list![index], _model.list?[index].category ?? CategoryListResponse(), ref,context);
             // context.goToDetailCategoryScreen(
             //     _model[index].category!,
             //     video: DIModel(

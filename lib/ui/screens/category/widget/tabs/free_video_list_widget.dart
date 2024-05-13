@@ -128,15 +128,16 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
         //  print('--135----****${provider.downloadedVideo[index].videoId??" "}');
         //}
         final isDownloaded=provider.downloadedVideo.any((element){
-          return model.id==int.parse(provider.downloadedVideo[index].videoId??"0");
+          // return model.id==int.parse(provider.downloadedVideo[index].videoId??"0");
+          return model.id==int.parse(element.videoId??"0");
         } );
 
 
-        provider.downloadedVideo.map((element) {
-          print(
-              "element.categoryId---${element.videoId}---${provider.videosResponse?.list?[index].id}");
-          return element.id == provider.videosResponse?.list?[index].id;
-        });
+        // provider.downloadedVideo.map((element) {
+        //   print(
+        //       "element.categoryId---${element.videoId}---${provider.videosResponse?.list?[index].id}");
+        //   return element.id == provider.videosResponse?.list?[index].id;
+        // });
         return GestureDetector(
             onTap: () => playVideo(model),
             child: DetailItem.video(

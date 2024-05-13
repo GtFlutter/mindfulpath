@@ -90,12 +90,26 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   void dispose() {
+    videoDataDispose();
     _focusNode.removeListener(focusNodeListener);
     _controller.removeListener(controllerListener);
     _controller.dispose();
     _focusNode.dispose();
 
     super.dispose();
+  }
+
+  void videoDataDispose() {
+    var videoCtrl = ref.read(videoProvider);
+    if (videoCtrl.video != null) {
+      if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      }
+      ref.read(videoProvider.notifier).isSelected = null;
+      ref.read(dashboardProvider.notifier).islandScap = false;
+
+      videoCtrl.clearVideo();
+    }
   }
 
   @override

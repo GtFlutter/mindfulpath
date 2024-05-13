@@ -62,7 +62,7 @@ class _FeaturedVideoScreenState extends State<FeaturedVideoScreen> {
                           border: InputBorder.none,
                           hintText: 'Hinted search text',
                           hintStyle:
-                              _style.text.font(mulishMedium500, sizePx: 10, color: Colors.white.withOpacity(0.5)),
+                              _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white.withOpacity(0.5)),
                           contentPadding: EdgeInsets.only(bottom: _style.scaleX(16)),
                           constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                           alignLabelWithHint: true,

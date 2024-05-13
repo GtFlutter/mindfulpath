@@ -77,7 +77,7 @@ class _NotificationsScreensState extends ConsumerState<NotificationsScreens> {
             
                           String utcTime = model?.createdAt ?? "";
                           DateTime dateTime = DateTime.parse(utcTime);
-                          String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm a').format(dateTime);
+                          String formattedDateTime = DateFormat('yyyy-MM-dd hh:mm a').format(dateTime.toLocal());
             
                           print('------------->${formattedDateTime ?? ""}');
                           return InkWell(
