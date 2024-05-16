@@ -12,6 +12,7 @@ import '../../../../data/model/response/category_list_reponse.dart';
 import '../../../../provider/auth_provider.dart';
 import '../../../../provider/recent_videos_provider.dart';
 import '../../../../provider/video_provider.dart';
+import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../common/custom_snackbar.dart';
 import '../../settings/widget/logout_dialog.dart';
@@ -43,7 +44,8 @@ class SearchResultsList extends ConsumerWidget {
         return GestureDetector(
           onTap: () {
             ref.read(videoProvider.notifier).isSelected = index;
-            playVideo(_model.list![index], _model.list?[index].category ?? CategoryListResponse(), ref,context);
+            playVideo(_model.list![index], _model.list?[index].category ?? CategoryListResponse(), ref, context);
+            ref.read(dashboardProvider.notifier).selectedSearchIndex = index;
             // context.goToDetailCategoryScreen(
             //     _model[index].category!,
             //     video: DIModel(
@@ -56,12 +58,16 @@ class SearchResultsList extends ConsumerWidget {
             //         categoryName: _model[index].categoryTitle!
             //     ));
           },
-          child: DetailItem.video(
-            appStyle: _style,
-            model: _model.list![index],
-            index: '$index',
-            onToggleBookmark: () => toggleItemBookmark(ref, _model.list?[index].video?.id, isRemove: _model.list?[index].bookmarked ?? false),
-            isDownloaded: false,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 20),
+            child: DetailItem.video(
+              appStyle: _style,
+              model: _model.list![index],
+              index: '$index',
+              onToggleBookmark: () => toggleItemBookmark(ref, _model.list?[index].video?.id,
+                  isRemove: _model.list?[index].bookmarked ?? false),
+              isDownloaded: false,
+            ),
           ),
         );
       },
@@ -71,7 +77,8 @@ class SearchResultsList extends ConsumerWidget {
     );
   }
 
-  Future<void> playVideo(VideoResponse videoResponse, CategoryListResponse category, WidgetRef ref, BuildContext context) async {
+  Future<void> playVideo(
+      VideoResponse videoResponse, CategoryListResponse category, WidgetRef ref, BuildContext context) async {
     final detailedVideoModel = DetailedVideoModel(
       category: category,
       video: DIModel(
@@ -89,11 +96,11 @@ class SearchResultsList extends ConsumerWidget {
       showCustomSnackBar('Login to access video', type: false);
       // appRouter.push(RoutePath.signIn);
       return;
-    }else if(!(category.isPurchased ?? false)){
-       buyNow(context, categoryId: category.id.toString(),isFromSearch: true);
-
-    }else{
-    ref.read(videoProvider).playVideo(detailedVideoModel);}
+    } else if (!(category.isPurchased ?? false) && videoResponse.videoType==ResourceType.paid) {
+      buyNow(context, categoryId: category.id.toString(), isFromSearch: true);
+    } else {
+      ref.read(videoProvider).playVideo(detailedVideoModel);
+    }
   }
 
   void toggleItemBookmark(WidgetRef ref, int? itemId, {bool isRemove = false}) {

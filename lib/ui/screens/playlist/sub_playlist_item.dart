@@ -132,9 +132,9 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
         margin: widget.dragable && !widget.dragging ? EdgeInsets.only(bottom: widget.appStyle.scaleX(12.5), top: widget.appStyle.scaleX(12.5)) : null,
         padding: EdgeInsets.fromLTRB(
           widget.appStyle.scaleX(15),
-          widget.appStyle.scaleX(23),
           widget.appStyle.scaleX(15),
-          widget.appStyle.scaleX(10),
+          widget.appStyle.scaleX(15),
+          widget.appStyle.scaleX(15),
         ),
         alignment: Alignment.center,
         child: IntrinsicHeight(
@@ -164,7 +164,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          // SizedBox(height: widget.appStyle.scaleX(5)),
+                          SizedBox(height: widget.appStyle.scaleX(5)),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -185,17 +185,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  widget.onRemovePress!();
-                                },
-                                icon: SvgPicture.asset(
-                                  SvgPaths.remove,
-                                  height: 17,
-                                  fit: BoxFit.contain,
-                                ),
-                                style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                              ),
+
                             ],
                           ),
                         ],
@@ -205,6 +195,17 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                       padding: EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
                       child: Row(
                         children: [
+                          IconButton(
+                            onPressed: () {
+                              widget.onRemovePress!();
+                            },
+                            icon: SvgPicture.asset(
+                              SvgPaths.remove,
+                              height: 17,
+                              fit: BoxFit.contain,
+                            ),
+                            style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                          ),
                           IconButton(
                             onPressed: () {
                               Share.share(

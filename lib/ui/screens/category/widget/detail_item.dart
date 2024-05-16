@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/data/model/response/pdfs_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/course_provider.dart';
+import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
@@ -182,8 +183,13 @@ class _DetailItemState extends ConsumerState<DetailItem> {
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10)),
-        ),
+            borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10)),
+            side: BorderSide(
+                color: (ref.watch(dashboardProvider).selectedSearchIndex != null
+                    ? ref.read(dashboardProvider.notifier).selectedSearchIndex == int.parse(widget.index)
+                        ? AppColors.primaryColor
+                        : AppColors.detailItemBgColor
+                    : AppColors.detailItemBgColor))),
       ),
       alignment: Alignment.center,
       child: IntrinsicHeight(
@@ -237,7 +243,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         children: [
                           Text(
                             '●',
-                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                            style:
+                                widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -277,7 +284,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 children: [
                   const Spacer(),
                   OutlinedIconButton.svg(
-                    widget.model!.bookmarked != null && widget.model!.bookmarked! ? SvgPaths.bookmarkSelected : SvgPaths.bookmarkUnselected,
+                    widget.model!.bookmarked != null && widget.model!.bookmarked!
+                        ? SvgPaths.bookmarkSelected
+                        : SvgPaths.bookmarkUnselected,
                     appStyle: widget.appStyle,
                     // svgIconSrc: SvgPaths.bookmarkSelected,
                     onTap: widget.onToggleBookmark,
@@ -289,7 +298,10 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         Consumer(
                           builder: (context, ref, child) {
                             final downloadP = ref.watch(downloadProvider);
-                            final getCat = ref.watch(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model?.video?.id);
+                            final getCat = ref
+                                .watch(courseProvider)
+                                .downloadVideoResponse
+                                .any((element) => int.parse(element.videoId ?? "") == widget.model?.video?.id);
                             print('------------------>${getCat}');
                             ref.watch(courseProvider).downloadVideoResponse.any((e) {
                               print('------------------292>${e.videoId}');
@@ -315,7 +327,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () {
-                                    print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                    print(
+                                        "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
                                     if (downloadP.model == null) {
                                       downloadP.download(model: widget.model);
                                     } else if (widget.model!.id != downloadP.model!.id) {
@@ -342,7 +355,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             },
                             child: Text(
                               'Create Playlist',
-                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text
+                                  .font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                             ),
                           ),
                           SubmenuButton(
@@ -354,11 +368,14 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                     onTap: () async {
                                       log("add to playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
                                       // await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
-                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString());
+                                      await playlistP.addToPlaylist(
+                                          playlistP.playlistListResponse![index].id.toString(),
+                                          widget.model!.id!.toString());
                                     },
                                     child: Text(
                                       playlistP.playlistListResponse![index].title ?? '',
-                                      style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                                      style: widget.appStyle.text
+                                          .font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                                     ),
                                   );
                                 })
@@ -368,10 +385,14 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               padding: MaterialStatePropertyAll(EdgeInsets.zero),
                               backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
                             ),
-                            style: SubmenuButton.styleFrom(backgroundColor: AppColors.popupMenuItemColor, surfaceTintColor: AppColors.popupMenuItemColor, iconColor: Colors.grey),
+                            style: SubmenuButton.styleFrom(
+                                backgroundColor: AppColors.popupMenuItemColor,
+                                surfaceTintColor: AppColors.popupMenuItemColor,
+                                iconColor: Colors.grey),
                             child: Text(
                               'Add to Playlist',
-                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text
+                                  .font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                             ),
                           ),
                         ],
@@ -405,7 +426,10 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   ? Consumer(
                       builder: (context, ref, child) {
                         final downloadP = ref.watch(downloadProvider);
-                        final getCat = ref.read(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.pdf?.id);
+                        final getCat = ref
+                            .read(courseProvider)
+                            .downloadPdfResponse
+                            .any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.pdf?.id);
 
                         ref.watch(courseProvider).downloadPdfResponse.any((e) {
                           print('________))))))))))((((((((((4355(((${e.pdfId}');
@@ -421,7 +445,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         if (getCat) {
                           return const SizedBox.shrink();
                         } else {
-                          if (downloadP.isPdfDownloading && widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
+                          if (downloadP.isPdfDownloading &&
+                              widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
                             return SizedBox(
                               height: 15,
                               width: 15,

@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:developer';
 
@@ -89,8 +90,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
 
   @override
-  void dispose() {
+  void deactivate() {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    ref.read(dashboardProvider).selectedSearchIndex = null;
     videoDataDispose();
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
     _focusNode.removeListener(focusNodeListener);
     _controller.removeListener(controllerListener);
     _controller.dispose();
@@ -108,7 +116,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ref.read(videoProvider.notifier).isSelected = null;
       ref.read(dashboardProvider.notifier).islandScap = false;
 
-      videoCtrl.clearVideo();
+      videoCtrl.clearVideo(notifie: false);
     }
   }
 
@@ -167,7 +175,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
                             // setState(() {
                             // dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
-                            dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+                            dashboardNotifier.searchVideo(text,
+                                queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
                             if (text.isEmpty) {
                               setState(() {
                                 showSearchResult = true;
@@ -181,7 +190,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Hinted search text',
-                            hintStyle: _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white.withOpacity(0.5)),
+                            hintStyle:
+                                _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white.withOpacity(0.5)),
                             contentPadding: EdgeInsets.only(bottom: _style.scaleX(16)),
                             constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                             alignLabelWithHint: true,
@@ -199,12 +209,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       FilterIconButton(
                         style: _style,
                         title: 'Category',
-                        onTap: selectCategory,
+                        onTap: () {
+                          if (!isVideoAvailable) dashboardNotifier.selectedSearchIndex = null;
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          selectCategory();
+                        },
                       ),
                       FilterIconButton(
                         style: _style,
                         title: _selectedQueryTime != null ? _selectedQueryTime?.title ?? "Time" : 'Time',
-                        onTap: selectTime,
+                        onTap: () {
+                          if (!isVideoAvailable) dashboardNotifier.selectedSearchIndex = null;
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          if (_selectedCategories.isEmpty || _controller.text.isEmpty) {
+                            showCustomSnackBar("Please select a category before selecting a time.");
+                          } else {
+                            selectTime();
+                          }
+                        },
                       ),
                       TextButton(
                         onPressed: () {
@@ -331,7 +353,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 }).toList();
               }
 
-              await dashboardNotifier.searchVideo(_controller.text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+              await dashboardNotifier.searchVideo(_controller.text,
+                  queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
               setState(() {
                 showSearchResult = true;
               });
@@ -376,7 +399,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               }).toList();
             }
 
-            await dashboardNotifier.searchVideo(_controller.text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+            await dashboardNotifier.searchVideo(_controller.text,
+                queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
             // setState(() {
             if (dashboardNotifier.data?.list?.isNotEmpty ?? false) {
               showSearchResult = true;

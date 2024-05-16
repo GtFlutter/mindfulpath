@@ -93,7 +93,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   void listner() {
     double newValue = _controller.value.position.inMilliseconds / _controller.value.duration.inMilliseconds;
-    if (_progress != newValue) {
+    if (_progress != newValue && mounted) {
       setState(
         () {
           _isBuffering = _controller.value.isBuffering;

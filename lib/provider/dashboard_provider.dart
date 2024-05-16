@@ -27,6 +27,7 @@ class DashboardNotifier extends ChangeNotifier {
   DashboardNotifier(this.repo, this.ref);
 
   bool islandScap=false;
+  int? selectedSearchIndex;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
