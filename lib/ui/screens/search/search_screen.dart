@@ -221,10 +221,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         onTap: () {
                           if (!isVideoAvailable) dashboardNotifier.selectedSearchIndex = null;
                           FocusManager.instance.primaryFocus?.unfocus();
-                          if (_selectedCategories.isEmpty || _controller.text.isEmpty) {
-                            showCustomSnackBar("Please select a category before selecting a time.");
-                          } else {
+                          if (_selectedCategories.isNotEmpty || _controller.text.isNotEmpty) {
                             selectTime();
+                          } else {
+                            showCustomSnackBar("Please select a category before selecting a time.");
                           }
                         },
                       ),

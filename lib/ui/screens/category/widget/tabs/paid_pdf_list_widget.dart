@@ -29,9 +29,9 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
   void initState() {
     Future.delayed(Duration.zero, ()  {
       print('______________________________________30__${widget.category.isPurchased}');
-      if (!(widget.isPurchased)) {
-        buyNow(context, categoryId: widget.category.id.toString());
-      }
+      // if (!(widget.isPurchased)) {
+      //   buyNow(context, categoryId: widget.category.id.toString());
+      // }
       ref.read(paidPdfsProvider).fetchPdfs(widget.category.id!);
       initCall();
     });

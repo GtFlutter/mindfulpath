@@ -37,9 +37,9 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
     Future.delayed(Duration.zero, () async {
       print('______________________________________35__${widget.category.isPurchased}-----${widget.isPurchased}---${ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased}');
       // if (!(widget.isPurchased)) {
-      if (!(ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false)) {
-        buyNow(context, categoryId: widget.category.id.toString());
-      }
+      // if (!(ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false)) {
+      //   buyNow(context, categoryId: widget.category.id.toString());
+      // }
       ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
       initCall();
     });

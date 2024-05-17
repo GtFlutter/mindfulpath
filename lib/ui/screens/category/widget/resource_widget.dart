@@ -29,7 +29,13 @@ class ResourceDetailCategory extends ConsumerStatefulWidget {
   bool? isPaid;
   bool? isPDFView;
 
-  ResourceDetailCategory({super.key, required this.category, this.isFromPdfNotification, this.isPaid, this.isPDFView, this.isFromPaidVideoNotification});
+  ResourceDetailCategory(
+      {super.key,
+      required this.category,
+      this.isFromPdfNotification,
+      this.isPaid,
+      this.isPDFView,
+      this.isFromPaidVideoNotification});
 
   @override
   ConsumerState<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
@@ -52,7 +58,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   void initState() {
     super.initState();
     _tabController = TabController(initialIndex: courseIndex, length: 4, vsync: this);
-    (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
+    (widget.isFromPdfNotification ?? false)
+        ? _changeFilter(ItemName(id: 1, title: 'PDF'))
+        : _changeFilter(ItemName(id: 0, title: 'Video'));
 
     Future.delayed(Duration(seconds: 0), () {
       ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
@@ -60,7 +68,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       if (widget.isFromPdfNotification ?? false) {
         _changeFilter(ItemName(id: 1, title: 'PDF'));
         log("isPaid and purchased--->${widget.isPaid}----${widget.category.isPurchased}");
-        if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
+        /* if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
           await buyNow(context, categoryId: widget.category.id.toString());
           if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
             _changeCourseType(1);
@@ -72,11 +80,15 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
           _changeCourseType(1);
           _changeFilter(ItemName(id: 1, title: 'PDF'));
           setState(() {});
+        }*/
+        if (widget.isPaid ?? false) {
+          _changeCourseType(1);
+        } else {
+          _changeCourseType(0);
         }
-      }
-      else if (widget.isFromPaidVideoNotification ?? false) {
+      } else if (widget.isFromPaidVideoNotification ?? false) {
         log("isPaid and purchased  11--->${widget.isPaid}----${widget.category.isPurchased}");
-        if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
+        /*if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
           await buyNow(context, categoryId: widget.category.id.toString());
           log("-------->${ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased}---------------");
           log("starrttt~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -87,11 +99,17 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
           } else {
             _changeCourseType(0);
           }
-        } else if ((widget.isPaid ?? false) && (widget.category.isPurchased ?? false)) {
+        }
+        else if ((widget.isPaid ?? false) && (widget.category.isPurchased ?? false)) {
           log("callleeddddddd~~~~~~~~");
           _changeCourseType(1);
           _changeFilter(ItemName(id: 0, title: 'Video'));
           setState(() {});
+        }*/
+        if (widget.isPaid ?? false) {
+          _changeCourseType(1);
+        } else {
+          _changeCourseType(0);
         }
       } else {
         _changeCourseType(0);
@@ -177,8 +195,8 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                   return;
                 }
                 print('_______________________________________126_${provider.videosResponse?.category?.isPurchased}');
-                // if (!(provider.videosResponse?.list?.first.category?.isPurchased ?? false)|| !(widget.category.isPurchased ?? false)) {
-                if (!(provider.videosResponse?.category?.isPurchased ?? false)) {
+
+                /*if (!(provider.videosResponse?.category?.isPurchased ?? false)) {
                   await buyNow(context, categoryId: widget.category.id.toString());
                   await provider.fetchVideos(widget.category.id ?? 0, isLoading: filterIndex == 0);
                   if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
@@ -186,22 +204,13 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                   } else {
                     _changeCourseType(0);
                   }
-                  // await  dashboardPro.getCategoryList();
-                  // dashboardPro.categoryListResponse?.map((e) {
-                  //   if(e.id==widget.category.id){
-                  //     widget.category=e;
-                  //     setState(() {
-                  //
-                  //     });
-                  //   }
-                  // });
 
-                  // provider.fetchVideos(widget.category.id ?? 0);
                   return;
                 } else {
                   log("ttthhhiiissss ccaakkkeddd");
                   _changeCourseType(1);
-                }
+                }*/
+                _changeCourseType(1);
               },
             ),
             const Spacer(),
