@@ -160,6 +160,7 @@ class CourseNotifier extends ChangeNotifier {
 
   Future<void> getVideoFromDatabase(int categoryId) async {
     _startLoading();
+    _downloadVideoResponse.clear();
     List<VideoModal> list = await ref.read(databaseProvider).getVideo(categoryId);
     _downloadVideoResponse.addAll(list);
     _stopLoading();

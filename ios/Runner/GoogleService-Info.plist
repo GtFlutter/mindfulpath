@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>286417645864-b0msmbqf97uo0850kdc3eudesj5hbnur.apps.googleusercontent.com</string>
+	<string>750868217623-9hk4t4vbqd48otn73ved75r9bcqt52sm.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.286417645864-b0msmbqf97uo0850kdc3eudesj5hbnur</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>286417645864-g9baar30u8cnvpe33ogbnf8hvc733b9o.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.750868217623-9hk4t4vbqd48otn73ved75r9bcqt52sm</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBnj_GtpjDKo2y5WmAzIk0Eg_jIqYgDjWo</string>
+	<string>AIzaSyCQbcXrOfBzKiN3VVAkKC6GdmQgJ8rzkX0</string>
 	<key>GCM_SENDER_ID</key>
-	<string>286417645864</string>
+	<string>750868217623</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.meditationApp</string>
+	<string>com.mindfulpath.app</string>
 	<key>PROJECT_ID</key>
-	<string>maditation-app</string>
+	<string>mindful-path-3bc36</string>
 	<key>STORAGE_BUCKET</key>
-	<string>maditation-app.appspot.com</string>
+	<string>mindful-path-3bc36.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:286417645864:ios:3960e64194862ae586601d</string>
+	<string>1:750868217623:ios:d877b989b60f7824dc8152</string>
 </dict>
 </plist>

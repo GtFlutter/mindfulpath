@@ -311,7 +311,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             if (getCat) {
                               return const SizedBox.shrink();
                             } else {
-                              if (downloadP.isDownloading && widget.model?.categoryId == downloadP.model?.categoryId) {
+                              // if (downloadP.isDownloading && widget.model?.categoryId == downloadP.model?.categoryId) {
+                              if (downloadP.isDownloading && widget.model?.id == downloadP.model?.id) {
                                 return SizedBox(
                                   height: 15,
                                   width: 15,
