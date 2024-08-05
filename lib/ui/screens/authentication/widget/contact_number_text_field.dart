@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_field_style.dart';
@@ -48,7 +49,10 @@ class MobileNumberTextField extends StatelessWidget {
           style: style,
         ),
       ),
-      keyboardType: TextInputType.phone,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+      ],
       style: CustomeTextFieldStyle.valueStyle(style: style),
     );
   }

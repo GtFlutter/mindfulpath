@@ -36,6 +36,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     final playlistP = ref.read(playListProvider);
 
     Future.delayed(Duration.zero, () async {
+      ref.read(videoProvider.notifier).isSelected = null;
       ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
       // playlistP.getPlaylistList();
       await initCall();
@@ -139,7 +140,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
         //   return element.id == provider.videosResponse?.list?[index].id;
         // });
         return GestureDetector(
-            onTap: () => playVideo(model),
+            onTap: () => playVideo(model, index),
             child: DetailItem.video(
               appStyle: _style,
               model: model,
@@ -162,7 +163,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
   }
 
-  void playVideo(VideoResponse model) {
+  void playVideo(VideoResponse model, int index) {
     ref.read(videoProvider).playVideo(
           DetailedVideoModel(
             category: widget.category,
@@ -176,6 +177,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
               videoType: model.videoType ?? ResourceType.paid,
             ),
           ),
+      index: index
         );
   }
 

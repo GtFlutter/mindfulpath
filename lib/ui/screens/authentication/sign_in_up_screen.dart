@@ -37,6 +37,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   final TextEditingController _numberCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
   final FocusNode _pwdFocusNode = FocusNode();
+  final FocusNode _mobileFocusNode = FocusNode();
 
   final String initCountryCode = '+91';
   String _countryCode = '+91';
@@ -94,188 +95,203 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
     _style = AppStyle(screenSize: size);
 
     var authP = ref.watch(authProvider);
-    return AbsorbPointer(
-      absorbing: authP.isLoading,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        resizeToAvoidBottomInset: orientation == Orientation.landscape,
-        extendBody: true,
-        appBar: CustomAuthAppBar(
-          title: widget.isSignIn ? 'Sign in' : 'Sign up',
-          centerTitle: false,
-          automaticallyImplyLeading: false,
-          screenSize: size,
-          style: _style,
-        ),
-        body: BackgroundImage(
-            alignment: Alignment.topCenter,
-            child: SafeArea(
-              child: CustomScrollableColumnLayout(
-                minHeight: _style.scaleX(500),
-                style: _style,
-                children: [
-                  Spacer(flex: 2),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      MobileNumberTextField(
-                        onCountryCodeChanged: setCountryCode,
-                        controller: _numberCtrl,
-                        initialCountryCodeSelection: initCountryCode,
-                        errorText: _numberErrorText,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (_) {
-                          setNumberErrorText();
-                        },
-                        style: _style,
-                      ),
-                      SizedBox(height: size.height * 0.05),
-                      PasswordTextField(
-                        key: ValueKey('siusp1'),
-                        focusNode: _pwdFocusNode,
-                        controller: _passwordCtrl,
-                        errorText: _pwdErrorText,
-                        onChanged: (_) {
-                          setPwdErrorText();
-                        },
-                        style: _style,
-                      ),
-                      if (widget.isSignIn) ...[
-                        SizedBox(height: size.height * 0.015),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: CupertinoButton(
-                            onPressed: () {
-                              context.push(RoutePath.forgotPasswordScreen, extra: !widget.isSignIn);
+    return GestureDetector(
+      onTap: () {
+        if(_mobileFocusNode.hasFocus){
+          _mobileFocusNode.unfocus();
+        }else if(_pwdFocusNode.hasFocus){
+          _pwdFocusNode.unfocus();
+        }
+      },
+      child: AbsorbPointer(
+        absorbing: authP.isLoading,
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          resizeToAvoidBottomInset: orientation == Orientation.landscape,
+          extendBody: true,
+          appBar: CustomAuthAppBar(
+            title: widget.isSignIn ? 'Sign in' : 'Sign up',
+            centerTitle: false,
+            automaticallyImplyLeading: false,
+            screenSize: size,
+            style: _style,
+          ),
+          body: BackgroundImage(
+              alignment: Alignment.topCenter,
+              child: SafeArea(
+                child: CustomScrollableColumnLayout(
+                  minHeight: _style.scaleX(500),
+                  style: _style,
+                  children: [
+                    Spacer(flex: 2),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Focus(
+                          focusNode: _mobileFocusNode,
+                          child: MobileNumberTextField(
+                            onCountryCodeChanged: setCountryCode,
+                            controller: _numberCtrl,
+                            initialCountryCodeSelection: initCountryCode,
+                            errorText: _numberErrorText,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (_) {
+                              setNumberErrorText();
                             },
-                            padding: EdgeInsets.zero,
-                            minSize: 10,
-                            child: Text(
-                              'Forgot Password ?',
-                              style: _style.text.font(mulishSemiBold600, sizePx: 12, color: Colors.white),
-                            ),
+                            style: _style,
                           ),
                         ),
-                        SizedBox(height: _style.scale * 20),
-                      ] else ...[
                         SizedBox(height: size.height * 0.05),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Wrap(
-                            runSpacing: _style.scale * 8,
-                            children: [
-                              Text('By signing, you agree to Calm oasis',
-                                  style:
-                                      _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
-                              CupertinoButton(
-                                onPressed: () {
-                                  context.push(RoutePath.tCPpScreen, extra: false);
-                                },
-                                padding: EdgeInsets.zero,
-                                minSize: 10,
-                                child: Text(
-                                  ' Privacy Policy ',
-                                  style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
-                                ),
+                        PasswordTextField(
+                          key: ValueKey('siusp1'),
+                          focusNode: _pwdFocusNode,
+                          controller: _passwordCtrl,
+                          errorText: _pwdErrorText,
+                          onChanged: (_) {
+                            setPwdErrorText();
+                          },
+                          style: _style,
+                        ),
+                        if (widget.isSignIn) ...[
+                          SizedBox(height: size.height * 0.015),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: CupertinoButton(
+                              onPressed: () {
+                                context.push(RoutePath.forgotPasswordScreen, extra: !widget.isSignIn);
+                              },
+                              padding: EdgeInsets.zero,
+                              minSize: 10,
+                              child: Text(
+                                'Forgot Password ?',
+                                style: _style.text.font(mulishSemiBold600, sizePx: 12, color: Colors.white),
                               ),
-                              Text('and',
-                                  style:
-                                      _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
-                              CupertinoButton(
+                            ),
+                          ),
+                          SizedBox(height: _style.scale * 20),
+                        ] else ...[
+                          SizedBox(height: size.height * 0.05),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Wrap(
+                              runSpacing: _style.scale * 8,
+                              children: [
+                                Text('By signing, you agree to Calm oasis',
+                                    style:
+                                    _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
+                                CupertinoButton(
                                   onPressed: () {
-                                    context.push(RoutePath.tCPpScreen, extra: true);
+                                    context.push(RoutePath.tCPpScreen, extra: false);
                                   },
                                   padding: EdgeInsets.zero,
                                   minSize: 10,
                                   child: Text(
-                                    ' Terms & Conditions',
+                                    ' Privacy Policy ',
+                                    style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
+                                  ),
+                                ),
+                                Text('and',
                                     style:
-                                        _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
-                                  )),
-                            ],
+                                    _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
+                                CupertinoButton(
+                                    onPressed: () {
+                                      context.push(RoutePath.tCPpScreen, extra: true);
+                                    },
+                                    padding: EdgeInsets.zero,
+                                    minSize: 10,
+                                    child: Text(
+                                      ' Terms & Conditions',
+                                      style:
+                                      _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
+                                    )),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: _style.scale * 10),
-                      ],
-                    ],
-                  ),
-                  Spacer(flex: 2),
-                  Row(
-                    children: [
-                      Flexible(
-                          child: Divider(
-                        color: AppColors.dividerColor,
-                        endIndent: _style.scale * 15,
-                        indent: _style.scale * 15,
-                      )),
-                      Text(
-                        'OR SIGN UP WITH',
-                        style: _style.text.font(
-                          mulishSemiBold600,
-                          sizePx: 13,
-                        ),
-                      ),
-                      Flexible(
-                          child: Divider(
-                        color: AppColors.dividerColor,
-                        indent: _style.scale * 15,
-                        endIndent: _style.scale * 15,
-                      )),
-                    ],
-                  ),
-                  // SizedBox(height: _style.scale * 28),
-                  SizedBox(height: size.height * 0.05),
-                  Row(
-                    children: [
-                      Spacer(),
-                      IconButton.outlined(
-                        onPressed: (){
-                          ref.read(authProvider).googleLogin();
-                        },
-                        icon: SvgPicture.asset(
-                          SvgPaths.googleLogo,
-                          width: _style.scale * 36,
-                          height: _style.scale * 36,
-                        ),
-                      ),
-                      SizedBox(width: _style.scale * 40),
-                      IconButton.outlined(
-                        onPressed: onFacebookLogin,
-                        icon: SvgPicture.asset(
-                          SvgPaths.facebookLogo,
-                          width: _style.scale * 36,
-                          height: _style.scale * 36,
-                        ),
-                      ),
-                      Spacer(),
-                    ],
-                  ),
-                  Spacer(flex: 2),
-                  // Don't have an account? Sign up
-                  Text.rich(
-                    TextSpan(
-                      text: '${widget.isSignIn ? 'Don\'t' : 'Already'} have an account?',
-                      style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppTextColor),
-                      children: [
-                        TextSpan(
-                            text: widget.isSignIn ? ' Sign Up' : ' Sign In ',
-                            recognizer: TapGestureRecognizer()..onTap = onSign,
-                            style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.primaryColor)),
+                          SizedBox(height: _style.scale * 10),
+                        ],
                       ],
                     ),
-                  ),
-                  SizedBox(height: _style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
-                  CustomNextButton(
-                    text: widget.isSignIn ? 'Sign In' : 'Next',
-                    onPressed: !authP.isLoading ? onNext : null,
-                    style: _style,
-                    inProgress: authP.isLoading,
-                  ),
+                    Spacer(flex: 2),
+                    Row(
+                      children: [
+                        Flexible(
+                            child: Divider(
+                              color: AppColors.dividerColor,
+                              endIndent: _style.scale * 15,
+                              indent: _style.scale * 15,
+                            )),
+                        Text(
+                          'OR SIGN UP WITH',
+                          style: _style.text.font(
+                            mulishSemiBold600,
+                            sizePx: 13,
+                          ),
+                        ),
+                        Flexible(
+                            child: Divider(
+                              color: AppColors.dividerColor,
+                              indent: _style.scale * 15,
+                              endIndent: _style.scale * 15,
+                            )),
+                      ],
+                    ),
+                    // SizedBox(height: _style.scale * 28),
+                    SizedBox(height: size.height * 0.05),
+                    Row(
+                      children: [
+                        Spacer(),
+                        IconButton.outlined(
+                          onPressed: (){
+                            ref.read(authProvider).googleLogin();
+                          },
+                          icon: SvgPicture.asset(
+                            SvgPaths.googleLogo,
+                            width: _style.scale * 36,
+                            height: _style.scale * 36,
+                          ),
+                        ),
+                        // SizedBox(width: _style.scale * 40),
+                        // IconButton.outlined(
+                        //   onPressed: () {
+                        //     debugPrint("On Facebook Click");
+                        //     ref.read(authProvider).facebookAuth();
+                        //   },
+                        //   icon: SvgPicture.asset(
+                        //     SvgPaths.facebookLogo,
+                        //     width: _style.scale * 36,
+                        //     height: _style.scale * 36,
+                        //   ),
+                        // ),
+                        Spacer(),
+                      ],
+                    ),
+                    Spacer(flex: 2),
+                    // Don't have an account? Sign up
+                    Text.rich(
+                      TextSpan(
+                        text: '${widget.isSignIn ? 'Don\'t' : 'Already'} have an account?',
+                        style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppTextColor),
+                        children: [
+                          TextSpan(
+                              text: widget.isSignIn ? ' Sign Up' : ' Sign In ',
+                              recognizer: TapGestureRecognizer()..onTap = onSign,
+                              style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.primaryColor)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: _style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
+                    CustomNextButton(
+                      text: widget.isSignIn ? 'Sign In' : 'Next',
+                      onPressed: !authP.isLoading ? onNext : null,
+                      style: _style,
+                      inProgress: authP.isLoading,
+                    ),
 
-                  SizedBox(height: _style.scale * 20),
-                ],
-              ),
-            )),
+                    SizedBox(height: _style.scale * 20),
+                  ],
+                ),
+              )),
+        ),
       ),
     );
   }

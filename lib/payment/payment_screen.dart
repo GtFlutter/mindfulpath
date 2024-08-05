@@ -146,7 +146,6 @@ class UsePaypalState extends State<UsePaypal> {
 
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00FFFFFF))
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {

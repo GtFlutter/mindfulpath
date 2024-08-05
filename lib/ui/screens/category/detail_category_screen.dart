@@ -1,33 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
-import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/ui/common/media_player/app_new_video_player.dart';
 import 'package:meditation_app/ui/screens/category/widget/resource_widget.dart';
-import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/constants.dart';
 
 import '../../../theme/styles.dart';
-import '../../common/media_player/app_video_player.dart';
 import 'widget/detail_item.dart';
 import 'widget/intro_widget.dart';
 
 class DetailCategoryScreen extends ConsumerStatefulWidget {
   final CategoryListResponse categoryListResponse;
   final DIModel? initialVideo;
-  bool? isFromPdfNotification;
-  bool? isFromPaidVideoNotification;
-  bool? isPaid;
-  bool? isPDFView;
-   DetailCategoryScreen({
+  final bool? isFromPdfNotification;
+  final bool? isFromPaidVideoNotification;
+  final bool? isPaid;
+  final bool? isPDFView;
+   const DetailCategoryScreen({
     super.key,
     required this.categoryListResponse,
     required this.initialVideo,
@@ -135,13 +132,6 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                             videoCtrl.clearVideo();
                           },
                           isFileUrl: false,
-                          onFullScreen: () {
-                            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                            } else {
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                            }
-                          },
                         ),
                       ),
                     ),
@@ -169,7 +159,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                                   Text(
                                     '●',
                                     style:
-                                        _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                                    _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),

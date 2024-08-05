@@ -110,12 +110,13 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         alignment: !isLandscape ? null : Alignment.topCenter,
                         constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                         child: AppVideoPlayer(
+                          isLandscape: isLandscape,
                           key: const ValueKey('value'),
                           videoId: videoCtrl.video?.id ?? 0,
                           url: videoCtrl.video?.videoFile ?? '',
                           duration: videoCtrl.video!.videoDuration ?? "",
                           style: _style,
-                          isLandscape: isLandscape,
+                          // isLandscape: isLandscape,
                           onBackPress: () {
                             if (MediaQuery.orientationOf(context) == Orientation.landscape) {
                               SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -125,16 +126,16 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                             videoCtrl.clearVideo();
                           },
                           isFileUrl: true,
-                          onFullScreen: () {
-                            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                              ref.read(bookmarkProvider.notifier).islandScap = true;
-                            } else {
-                              ref.read(bookmarkProvider.notifier).islandScap = false;
-
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                            }
-                          },
+                          // onFullScreen: () {
+                          //   if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                          //     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                          //     ref.read(bookmarkProvider.notifier).islandScap = true;
+                          //   } else {
+                          //     ref.read(bookmarkProvider.notifier).islandScap = false;
+                          //
+                          //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                          //   }
+                          // },
                         ),
                       ),
                     ),

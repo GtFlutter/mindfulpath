@@ -28,7 +28,7 @@ class VideoNotifier extends ChangeNotifier {
     playVideo(detailedVideoModel, notifie: true, forceToPlay: true);
   }
 
-  void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false}) {
+  void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false,int? index}) {
     /// Auth User
     bool isLoggedIn = _ref.read(authProvider).isUserLoggedIn;
     if (detailedVideoModel.video.videoType == ResourceType.paid && !isLoggedIn) {
@@ -43,6 +43,7 @@ class VideoNotifier extends ChangeNotifier {
     DIModel? model = _video?.copyWith();
     if ((model == null || model.videoId != detailedVideoModel.videoId) || forceToPlay) {
       _video = detailedVideoModel.video.copyWith();
+      isSelected = index;
       if (notifie) notifyListeners();
       // showCustomSnackBar('New Video Set Video Name: ${_video!.title}', type: true);
       _ref.read(recentVideosProvider).addRecentVideo(detailedVideoModel);

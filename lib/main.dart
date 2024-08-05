@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -24,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+      name: 'Meditation',
       options: DefaultFirebaseOptions.currentPlatform
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -48,6 +50,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // debugPrint('screenSize=$screenSize, scale=$scale');
     return MaterialApp.router(
       title: AppConfigs.APP_NAME,
       debugShowCheckedModeBanner: false,

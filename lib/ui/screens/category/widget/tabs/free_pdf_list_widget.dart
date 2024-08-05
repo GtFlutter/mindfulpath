@@ -123,7 +123,7 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
             subTitle: model.categoryTitle ?? '',
             index: '$index',
             isShow: true,
-            isDownloaded:provider.downloadedPDF.any((element) => model.categoryId==element.categoryId),
+            isDownloaded:provider.downloadedPDF.any((element) => model.pdf!.id.toString()==element.pdfId),
           ),
         );
       },

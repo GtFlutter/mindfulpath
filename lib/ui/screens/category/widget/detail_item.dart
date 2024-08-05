@@ -9,6 +9,7 @@ import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
+import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
 
@@ -179,17 +180,19 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
     final playlistP = ref.watch(playListProvider);
 
+    final videoP = ref.watch(videoProvider);
+
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10)),
             side: BorderSide(
-                color: (ref.watch(dashboardProvider).selectedSearchIndex != null
-                    ? ref.read(dashboardProvider.notifier).selectedSearchIndex == int.parse(widget.index)
-                        ? AppColors.primaryColor
-                        : AppColors.detailItemBgColor
-                    : AppColors.detailItemBgColor))),
+                color: videoP.isSelected != null
+                    ? videoP.isSelected == int.parse(widget.index)
+                    ? AppColors.primaryColor
+                    : AppColors.detailItemBgColor
+                    : AppColors.detailItemBgColor)),
       ),
       alignment: Alignment.center,
       child: IntrinsicHeight(
@@ -437,17 +440,17 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
                           return true;
                         });
-                        print('________))))))))))((((((((((4399(((${widget.pdfModel?.pdf?.id}');
+                        // print('________))))))))))((((((((((4399(((${widget.pdfModel?.pdf?.id}');
 
-                        print('________*****************________442(((${widget.pdfModel?.categoryId}');
-                        print('________*****************________443(((${downloadP.pdfModel?.categoryId}');
-                        print('________*****************________444(((${downloadP.isPdfDownloading}');
+                        // print('________*****************________442(((${widget.pdfModel?.categoryId}');
+                        // print('________*****************________443(((${downloadP.pdfModel?.categoryId}');
+                        // print('________*****************________444(((${downloadP.isPdfDownloading}');
+
 
                         if (getCat) {
                           return const SizedBox.shrink();
                         } else {
-                          if (downloadP.isPdfDownloading &&
-                              widget.pdfModel?.categoryId == downloadP.pdfModel?.categoryId) {
+                          if (downloadP.isPdfDownloading && widget.pdfModel!.id == downloadP.pdfModel!.id) {
                             return SizedBox(
                               height: 15,
                               width: 15,

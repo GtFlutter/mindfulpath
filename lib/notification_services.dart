@@ -52,8 +52,8 @@ class NotificationServices {
 
   void firebaseInit() {
     FirebaseMessaging.onMessage.listen((message) {
+      debugPrint("<------------------------onMessage------------------------------------>${message.notification!.toMap()}");
       debugPrint("<------------------------onMessage------------------------------------>${message.data}");
-      debugPrint("<------------------------onMessage------------------------------------>${message.data['custom']}");
       if (Platform.isIOS) {
         forgroundMessage();
       }
@@ -68,7 +68,7 @@ class NotificationServices {
     AndroidNotificationChannel channel = AndroidNotificationChannel(Random.secure().nextInt(10000).toString(), "High Importance Notifications", importance: Importance.max);
 
     AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(channel.id.toString(), channel.name.toString(), channelDescription: "My Notification", importance: Importance.high, priority: Priority.high, ticker: "ticker");
+        AndroidNotificationDetails(channel.id.toString(), channel.name.toString(), channelDescription: "My Notification", importance: Importance.high, priority: Priority.high, ticker: "ticker",);
 
     const DarwinNotificationDetails darwinNotificationDetails = DarwinNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true);
 
@@ -109,16 +109,17 @@ class NotificationServices {
   }
 
   void handleMessage(RemoteMessage message) {
+    debugPrint("${message.data['type']}");
     BuildContext? ctx = rootNavigator.currentContext;
     if (ctx == null || !ctx.mounted) return;
 
     final notificationCustomData = CustomNotificationData.fromJson(jsonDecode(message.data['custom']));
 
-    if (notificationCustomData.type == "video") {
+    if (message.data['type'] == "video") {
       Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => DetailCategoryScreen(categoryListResponse: notificationCustomData.catData ?? CategoryListResponse(), initialVideo: null)));
-    } else if (notificationCustomData.type == "pdf") {
+    } else if (message.data['type'] == "pdf") {
       Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => DetailCategoryScreen(categoryListResponse: notificationCustomData.catData ?? CategoryListResponse(), initialVideo: null,isFromPdfNotification: true,isPDFView: true,)));
-    }else if (notificationCustomData.type == "category") {
+    }else if (message.data['type'] == "category") {
       Navigator.push(ctx, MaterialPageRoute(builder: (ctx) => const DiscoverScreen()));
     }
   }

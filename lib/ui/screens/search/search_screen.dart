@@ -259,12 +259,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     alignment: !isLandscape ? null : Alignment.topCenter,
                     constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                     child: AppVideoPlayer(
+                      isLandscape: isLandscape,
                       key: const ValueKey('value'),
                       videoId: videoCtrl.video!.videoId,
                       url: videoCtrl.video!.videoUrl,
                       duration: videoCtrl.video!.duration,
                       style: _style,
-                      isLandscape: isLandscape,
+                      // isLandscape: isLandscape,
                       onBackPress: () {
                         if (MediaQuery.orientationOf(context) == Orientation.landscape) {
                           SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -275,15 +276,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         videoCtrl.clearVideo();
                       },
                       isFileUrl: false,
-                      onFullScreen: () {
-                        if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                          ref.read(dashboardProvider.notifier).islandScap = true;
-                          SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                        } else {
-                          ref.read(dashboardProvider.notifier).islandScap = false;
-                          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                        }
-                      },
+                      // onFullScreen: () {
+                      //   if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                      //     ref.read(dashboardProvider.notifier).islandScap = true;
+                      //     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                      //   } else {
+                      //     ref.read(dashboardProvider.notifier).islandScap = false;
+                      //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                      //   }
+                      // },
                     ),
                   ),
                 )

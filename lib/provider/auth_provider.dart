@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -190,6 +192,13 @@ class AuthNotifier extends ChangeNotifier {
       stopProgress();
     }
     notifyListeners();
+  }
+
+  Future<void> facebookAuth() async{
+    final LoginResult loginResult = await FacebookAuth.instance.login();
+    final OAuthCredential facebookAuthCredential = FacebookAuthProvider.credential(loginResult.accessToken!.tokenString);
+    final data = await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+    debugPrint("Facebook Creds ::: ${data.user}");
   }
 
   /// Password is required for type == SendOTP.register

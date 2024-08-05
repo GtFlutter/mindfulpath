@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/media_player/custom_track_shape.dart';
 import 'package:meditation_app/util/assets.dart';
+import 'package:meditation_app/util/constants.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../util/dimensions.dart';
@@ -21,7 +23,6 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
   final bool isLandscape;
   final VoidCallback? onBackPress;
   final bool isFileUrl;
-  final VoidCallback? onFullScreen;
 
   const AppVideoPlayer({
     super.key,
@@ -32,7 +33,6 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
     required this.isLandscape,
     required this.videoId,
     this.isFileUrl = false,
-    this.onFullScreen,
   });
 
   @override
@@ -40,6 +40,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
 }
 
 class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
+
   late VideoPlayerController _controller;
   bool _isBuffering = false;
   double _progress = 0.1;
@@ -54,23 +55,22 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   @override
   void initState() {
     debugPrint(' Video Init :: ${widget.videoId}');
-    super.initState();
     initVideoPlayer();
+    super.initState();
   }
 
   void initVideoPlayer() {
-    VideoPlayerController videoPlayerController;
     if (widget.isFileUrl) {
-      videoPlayerController = VideoPlayerController.file(
+      _controller = VideoPlayerController.file(
         File(widget.url),
       );
     } else {
-      videoPlayerController = VideoPlayerController.networkUrl(
+      _controller = VideoPlayerController.networkUrl(
         Uri.parse(widget.url),
       );
     }
 
-    _controller = videoPlayerController
+    _controller
       ..initialize()
       ..setLooping(false).then(
         (value) {
@@ -87,7 +87,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   @override
   void didUpdateWidget(covariant AppVideoPlayer oldWidget) {
     debugPrint(' Video UpdateWidget');
-    initVideoPlayer();
+    // initVideoPlayer();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -119,7 +119,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     }
   }
 
-  void toggleVideo() async {
+  void seekVideo() async {
     setState(() {
       if (_controller.value.position >= _controller.value.duration) {
         _controller.seekTo(Duration.zero);
@@ -136,21 +136,27 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     }
   }
 
-  @override
-  void dispose() {
-    _watchTimer?.cancel();
-    debugPrint(' Video Disposed ');
-    if (_controller.value.isInitialized) {
-      _controller.removeListener(listner);
+  void toggleVideo(){
+    if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+    } else {
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     }
-    _controller.dispose();
-    super.dispose();
   }
+
+  // @override
+  // void dispose() {
+  //   _watchTimer?.cancel();
+  //   debugPrint(' Video Disposed ');
+  //   if (_controller.value.isInitialized) {
+  //     _controller.removeListener(listner);
+  //   }
+  //   _controller.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    bool isPlaying = _controller.value.isPlaying;
-    bool isMute = _controller.value.volume == 0;
     bool isInitialized = _controller.value.isInitialized;
     return IntrinsicHeight(
       child: Stack(
@@ -166,7 +172,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           if (!isInitialized || (_isBuffering && !_showReload)) const CircularProgressIndicator(),
           if (_showReload && isInitialized)
             IconButton(
-              onPressed: toggleVideo,
+              onPressed: seekVideo,
               icon: const Icon(Icons.replay_rounded),
               iconSize: widget.style.scaleX(widget.isLandscape ? 40 : 35),
             ),
@@ -181,7 +187,16 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                     child: OutlinedIconButton.icon(
                       icon: Icon(Icons.arrow_back_ios_rounded, size: widget.style.scaleX(widget.isLandscape ? 20 : 15)),
                       appStyle: widget.style,
-                      onTap: widget.onBackPress,
+                      onTap: () {
+                        _watchTimer?.cancel();
+                        if (_controller.value.isInitialized) {
+                          _controller.removeListener(listner);
+                        }
+                        _controller.dispose();
+                        if(widget.onBackPress != null && context.mounted){
+                          widget.onBackPress!();
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -223,15 +238,15 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                         children: [
                           if (!_showReload)
                             OutlinedIconButton.svg(
-                              isPlaying ? SvgPaths.pause : SvgPaths.play,
+                              _controller.value.isPlaying ? SvgPaths.pause : SvgPaths.play,
                               appStyle: widget.style,
                               hideBorder: true,
                               iconSize: widget.isLandscape ? 23 : 20,
-                              onTap: toggleVideo,
+                              onTap: seekVideo,
                             ),
                           const Spacer(),
                           OutlinedIconButton.svg(
-                            isMute ? SvgPaths.audioMute : SvgPaths.audioOn,
+                            _controller.value.volume == 0 ? SvgPaths.audioMute : SvgPaths.audioOn,
                             appStyle: widget.style,
                             hideBorder: true,
                             iconSize: widget.isLandscape ? 23 : 20,
@@ -243,7 +258,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                             appStyle: widget.style,
                             hideBorder: true,
                             iconSize: widget.isLandscape ? 23 : 20,
-                            onTap: widget.onFullScreen,
+                            onTap: toggleVideo,
                           ),
                         ],
                       ),
