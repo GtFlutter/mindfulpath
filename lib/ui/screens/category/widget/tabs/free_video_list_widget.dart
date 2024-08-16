@@ -36,7 +36,9 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     final playlistP = ref.read(playListProvider);
 
     Future.delayed(Duration.zero, () async {
-      ref.read(videoProvider.notifier).isSelected = null;
+      if(ref.read(videoProvider).video==null) {
+        ref.read(videoProvider.notifier).isSelected = null;
+      }
       ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
       // playlistP.getPlaylistList();
       await initCall();
@@ -140,11 +142,15 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
         //   return element.id == provider.videosResponse?.list?[index].id;
         // });
         return GestureDetector(
-            onTap: () => playVideo(model, index),
+            onTap: () {
+              provider.selectedIndex=index;
+              playVideo(model, provider.selectedIndex!);
+            },
             child: DetailItem.video(
               appStyle: _style,
               model: model,
               index: '$index',
+              // index: '${provider.selectedIndex}',
               onToggleBookmark: () {
                 toggleItemBookmark(model.id,
                   isRemove: model.bookmarked ?? false);

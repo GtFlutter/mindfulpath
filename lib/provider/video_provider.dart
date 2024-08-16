@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/route/router.dart';
@@ -19,6 +21,8 @@ class VideoNotifier extends ChangeNotifier {
   DIModel? _video;
   DIModel? get video => _video;
   int? isSelected;
+  Duration? watchedDuration;
+  bool isVideoChanged=false;
 
 
   void reInit([DetailedVideoModel? detailedVideoModel]) {
@@ -28,7 +32,7 @@ class VideoNotifier extends ChangeNotifier {
     playVideo(detailedVideoModel, notifie: true, forceToPlay: true);
   }
 
-  void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false,int? index}) {
+  void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false,int? index,bool isVideoChange=true}) {
     /// Auth User
     bool isLoggedIn = _ref.read(authProvider).isUserLoggedIn;
     if (detailedVideoModel.video.videoType == ResourceType.paid && !isLoggedIn) {
@@ -42,11 +46,14 @@ class VideoNotifier extends ChangeNotifier {
     /// If It's Want to faorce to play video then just play video
     DIModel? model = _video?.copyWith();
     if ((model == null || model.videoId != detailedVideoModel.videoId) || forceToPlay) {
+      log("vedio playyyyyyyyyy.......");
       _video = detailedVideoModel.video.copyWith();
       isSelected = index;
+      log("=======vp=====$index==$isSelected}");
       if (notifie) notifyListeners();
       // showCustomSnackBar('New Video Set Video Name: ${_video!.title}', type: true);
       _ref.read(recentVideosProvider).addRecentVideo(detailedVideoModel);
+      isVideoChanged=true;
     } else {
       // showCustomSnackBar('Errorororo', type: false);
     }

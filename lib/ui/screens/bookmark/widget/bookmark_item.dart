@@ -95,6 +95,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
 
   @override
   Widget build(BuildContext context) {
+    var vp=ref.watch(videoProvider);
     TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
     String timeStr = widget.model.bookmarkVideoResponse!.duration ?? "";
     List<String> timeComponents = timeStr.split(":");
@@ -113,7 +114,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(widget.appStyle.scaleX(25)),
             side: BorderSide(
-              color: (ref.watch(videoProvider).isSelected == widget.index) ? AppColors.primaryColor : AppColors.detailItemBgColor,
+              color: (vp.isSelected == widget.index) ? AppColors.primaryColor : AppColors.detailItemBgColor,
               width: widget.appStyle.scaleX(0.5),
               strokeAlign: BorderSide.strokeAlignOutside,
             ),

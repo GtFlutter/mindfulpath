@@ -28,7 +28,7 @@ class DownloadDetailCategoryScreen extends ConsumerStatefulWidget {
 
 class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScreen> with AutomaticKeepAliveClientMixin {
   static AppStyle _style = AppStyle();
-
+  Duration? _lastKnownPosition;
   @override
   void initState() {
     Future.delayed(
@@ -126,16 +126,20 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                             videoCtrl.clearVideo();
                           },
                           isFileUrl: true,
-                          // onFullScreen: () {
-                          //   if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                          //     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                          //     ref.read(bookmarkProvider.notifier).islandScap = true;
-                          //   } else {
-                          //     ref.read(bookmarkProvider.notifier).islandScap = false;
-                          //
-                          //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                          //   }
-                          // },
+                          startPosition: _lastKnownPosition ?? Duration.zero,
+                          onPositionChanged: (position) {
+                            _lastKnownPosition = position;
+                          },
+                          onFullScreen: () {
+                            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                              ref.read(bookmarkProvider.notifier).islandScap = true;
+                            } else {
+                              ref.read(bookmarkProvider.notifier).islandScap = false;
+
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                            }
+                          },
                         ),
                       ),
                     ),

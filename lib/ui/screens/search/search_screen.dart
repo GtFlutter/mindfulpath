@@ -44,6 +44,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   static AppStyle _style = AppStyle();
   bool isFirstTime = true;
   bool showSearchResult = false;
+  Duration? _lastKnownPosition;
+
 
   @override
   void initState() {
@@ -94,6 +96,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     ref.read(dashboardProvider).selectedSearchIndex = null;
     videoDataDispose();
+
     super.deactivate();
   }
 
@@ -276,15 +279,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         videoCtrl.clearVideo();
                       },
                       isFileUrl: false,
-                      // onFullScreen: () {
-                      //   if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                      //     ref.read(dashboardProvider.notifier).islandScap = true;
-                      //     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                      //   } else {
-                      //     ref.read(dashboardProvider.notifier).islandScap = false;
-                      //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                      //   }
-                      // },
+                      startPosition: _lastKnownPosition ?? Duration.zero,
+                      onPositionChanged: (position) {
+                        _lastKnownPosition = position;
+                      },
+                      onFullScreen: () {
+                        if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                          ref.read(dashboardProvider.notifier).islandScap = true;
+                          SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                        } else {
+                          ref.read(dashboardProvider.notifier).islandScap = false;
+                          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                        }
+                      },
                     ),
                   ),
                 )

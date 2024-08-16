@@ -22,6 +22,8 @@ import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
 
+import 'package:video_player/video_player.dart';
+
 class DIModel {
   final int videoId;
   final String thumbnailUrl;
@@ -30,8 +32,10 @@ class DIModel {
   final String title;
   final String categoryName;
   final ResourceType videoType;
+  Duration? position;
+  final VideoPlayerController? controller; // Added controller
 
-  const DIModel({
+  DIModel({
     required this.videoType,
     required this.videoId,
     required this.thumbnailUrl,
@@ -39,16 +43,31 @@ class DIModel {
     required this.duration,
     required this.title,
     required this.categoryName,
+    this.position,
+    this.controller, // Added controller
   });
 
-  DIModel copyWith() => DIModel(
-        videoId: videoId,
-        videoUrl: videoUrl,
-        thumbnailUrl: thumbnailUrl,
-        duration: duration,
-        title: title,
-        categoryName: categoryName,
-        videoType: videoType,
+  DIModel copyWith({
+    int? videoId,
+    String? thumbnailUrl,
+    String? videoUrl,
+    String? duration,
+    String? title,
+    String? categoryName,
+    ResourceType? videoType,
+    Duration? position,
+    VideoPlayerController? controller,
+  }) =>
+      DIModel(
+        videoId: videoId ?? this.videoId,
+        videoUrl: videoUrl ?? this.videoUrl,
+        thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+        duration: duration ?? this.duration,
+        title: title ?? this.title,
+        categoryName: categoryName ?? this.categoryName,
+        videoType: videoType ?? this.videoType,
+        position: position ?? this.position,
+        controller: controller ?? this.controller,
       );
 
   factory DIModel.fromJson(dynamic json) {
@@ -60,6 +79,7 @@ class DIModel {
       title: json['title'] as String,
       categoryName: json['category_name'] as String,
       videoType: ResourceType.fromJson(json['video_type'] as int)!,
+      position: json.containsKey('position') ? Duration(milliseconds: json['position']) : null,
     );
   }
 
@@ -72,9 +92,66 @@ class DIModel {
     data['title'] = title;
     data['category_name'] = categoryName;
     data['video_type'] = videoType.toInt();
+    if (position != null) {
+      data['position'] = position!.inMilliseconds;
+    }
     return data;
   }
 }
+
+// class DIModel {
+//   final int videoId;
+//   final String thumbnailUrl;
+//   final String videoUrl;
+//   final String duration;
+//   final String title;
+//   final String categoryName;
+//   final ResourceType videoType;
+//
+//   const DIModel({
+//     required this.videoType,
+//     required this.videoId,
+//     required this.thumbnailUrl,
+//     required this.videoUrl,
+//     required this.duration,
+//     required this.title,
+//     required this.categoryName,
+//   });
+//
+//   DIModel copyWith() => DIModel(
+//         videoId: videoId,
+//         videoUrl: videoUrl,
+//         thumbnailUrl: thumbnailUrl,
+//         duration: duration,
+//         title: title,
+//         categoryName: categoryName,
+//         videoType: videoType,
+//       );
+//
+//   factory DIModel.fromJson(dynamic json) {
+//     return DIModel(
+//       videoId: json['video_id'] as int,
+//       videoUrl: json['video_url'] as String,
+//       thumbnailUrl: json['thumbnail_url'] as String,
+//       duration: json['duration'] as String,
+//       title: json['title'] as String,
+//       categoryName: json['category_name'] as String,
+//       videoType: ResourceType.fromJson(json['video_type'] as int)!,
+//     );
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data['video_id'] = videoId;
+//     data['video_url'] = videoUrl;
+//     data['thumbnail_url'] = thumbnailUrl;
+//     data['duration'] = duration;
+//     data['title'] = title;
+//     data['category_name'] = categoryName;
+//     data['video_type'] = videoType.toInt();
+//     return data;
+//   }
+// }
 
 class DetailItem extends ConsumerStatefulWidget {
   final AppStyle appStyle;
@@ -181,7 +258,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     final playlistP = ref.watch(playListProvider);
 
     final videoP = ref.watch(videoProvider);
-
+    log("color------${videoP.isSelected}=====${int.parse(widget.index)}");
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
@@ -190,8 +267,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
             side: BorderSide(
                 color: videoP.isSelected != null
                     ? videoP.isSelected == int.parse(widget.index)
-                    ? AppColors.primaryColor
-                    : AppColors.detailItemBgColor
+                        ? AppColors.primaryColor
+                        : AppColors.detailItemBgColor
                     : AppColors.detailItemBgColor)),
       ),
       alignment: Alignment.center,
@@ -246,8 +323,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         children: [
                           Text(
                             '●',
-                            style:
-                                widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                            style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -287,9 +363,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                 children: [
                   const Spacer(),
                   OutlinedIconButton.svg(
-                    widget.model!.bookmarked != null && widget.model!.bookmarked!
-                        ? SvgPaths.bookmarkSelected
-                        : SvgPaths.bookmarkUnselected,
+                    widget.model!.bookmarked != null && widget.model!.bookmarked! ? SvgPaths.bookmarkSelected : SvgPaths.bookmarkUnselected,
                     appStyle: widget.appStyle,
                     // svgIconSrc: SvgPaths.bookmarkSelected,
                     onTap: widget.onToggleBookmark,
@@ -301,10 +375,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         Consumer(
                           builder: (context, ref, child) {
                             final downloadP = ref.watch(downloadProvider);
-                            final getCat = ref
-                                .watch(courseProvider)
-                                .downloadVideoResponse
-                                .any((element) => int.parse(element.videoId ?? "") == widget.model?.video?.id);
+                            final getCat = ref.watch(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model?.video?.id);
                             print('------------------>${getCat}');
                             ref.watch(courseProvider).downloadVideoResponse.any((e) {
                               print('------------------292>${e.videoId}');
@@ -331,8 +402,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () {
-                                    print(
-                                        "download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                    print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
                                     if (downloadP.model == null) {
                                       downloadP.download(model: widget.model);
                                     } else if (widget.model!.id != downloadP.model!.id) {
@@ -359,8 +429,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             },
                             child: Text(
                               'Create Playlist',
-                              style: widget.appStyle.text
-                                  .font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                             ),
                           ),
                           SubmenuButton(
@@ -372,14 +441,11 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                     onTap: () async {
                                       log("add to playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
                                       // await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
-                                      await playlistP.addToPlaylist(
-                                          playlistP.playlistListResponse![index].id.toString(),
-                                          widget.model!.id!.toString());
+                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString());
                                     },
                                     child: Text(
                                       playlistP.playlistListResponse![index].title ?? '',
-                                      style: widget.appStyle.text
-                                          .font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                                      style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                                     ),
                                   );
                                 })
@@ -389,14 +455,10 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               padding: MaterialStatePropertyAll(EdgeInsets.zero),
                               backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
                             ),
-                            style: SubmenuButton.styleFrom(
-                                backgroundColor: AppColors.popupMenuItemColor,
-                                surfaceTintColor: AppColors.popupMenuItemColor,
-                                iconColor: Colors.grey),
+                            style: SubmenuButton.styleFrom(backgroundColor: AppColors.popupMenuItemColor, surfaceTintColor: AppColors.popupMenuItemColor, iconColor: Colors.grey),
                             child: Text(
                               'Add to Playlist',
-                              style: widget.appStyle.text
-                                  .font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                             ),
                           ),
                         ],
@@ -430,10 +492,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   ? Consumer(
                       builder: (context, ref, child) {
                         final downloadP = ref.watch(downloadProvider);
-                        final getCat = ref
-                            .read(courseProvider)
-                            .downloadPdfResponse
-                            .any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.pdf?.id);
+                        final getCat = ref.read(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.pdf?.id);
 
                         ref.watch(courseProvider).downloadPdfResponse.any((e) {
                           print('________))))))))))((((((((((4355(((${e.pdfId}');
@@ -445,7 +504,6 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         // print('________*****************________442(((${widget.pdfModel?.categoryId}');
                         // print('________*****************________443(((${downloadP.pdfModel?.categoryId}');
                         // print('________*****************________444(((${downloadP.isPdfDownloading}');
-
 
                         if (getCat) {
                           return const SizedBox.shrink();

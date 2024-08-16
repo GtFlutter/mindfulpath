@@ -42,6 +42,7 @@ class SubPlayListScreen extends ConsumerStatefulWidget {
 
 class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
   static AppStyle _style = AppStyle();
+  Duration? _lastKnownPosition;
 
   //late List<DIModel> _items;
   @override
@@ -126,7 +127,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
       ref.read(downloadProvider.notifier).complate = false;
       setState(() {});
     }
-    void playVideo(PlaylistVideoList model) {
+    void playVideo(PlaylistVideoList model,int index) {
       print('------------****${model.video!.videoUrl}');
       ref.read(videoProvider).playVideo(
             DetailedVideoModel(
@@ -139,6 +140,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                   videoId: model.videoId ?? 0,
                   videoType: ResourceType.paid),
             ),
+        index: index
           );
     }
 
@@ -181,6 +183,10 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                   url: videoCtrl.video!.videoUrl,
                                   duration: videoCtrl.video!.duration,
                                   style: _style,
+                                  startPosition: _lastKnownPosition ?? Duration.zero,
+                                  onPositionChanged: (position) {
+                                    _lastKnownPosition = position;
+                                  },
                                   // isLandscape: isLandscape,
                                   onBackPress: () {
                                     if (MediaQuery.orientationOf(context) == Orientation.landscape) {
@@ -192,15 +198,15 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                     videoCtrl.clearVideo();
                                   },
                                   isFileUrl: false,
-                                  // onFullScreen: () {
-                                  //   if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                                  //     ref.read(bookmarkProvider.notifier).islandScap = true;
-                                  //     SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-                                  //   } else {
-                                  //     ref.read(bookmarkProvider.notifier).islandScap = false;
-                                  //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-                                  //   }
-                                  // },
+                                  onFullScreen: () {
+                                    if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                                      ref.read(bookmarkProvider.notifier).islandScap = true;
+                                      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                                    } else {
+                                      ref.read(bookmarkProvider.notifier).islandScap = false;
+                                      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                                    }
+                                  },
                                 ),
                               ),
                             )
@@ -231,7 +237,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                             model: model!,
                                             onPlay: () {
                                               ref.read(videoProvider.notifier).isSelected = index;
-                                              playVideo(model);
+                                              playVideo(model,index);
                                             },
                                             onRemovePress: () async {
                                               await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString());

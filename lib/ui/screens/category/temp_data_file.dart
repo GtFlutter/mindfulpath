@@ -3,7 +3,7 @@ import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
 class TempData {
   static List<DIModel> listDiModel = [
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -13,7 +13,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -23,7 +23,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -33,7 +33,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -43,7 +43,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -53,7 +53,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -63,7 +63,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+    DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -73,7 +73,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -83,7 +83,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -93,7 +93,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -103,7 +103,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -113,7 +113,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -123,7 +123,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -133,7 +133,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -143,7 +143,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -153,7 +153,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -163,7 +163,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -173,7 +173,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -183,7 +183,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,
@@ -193,7 +193,7 @@ class TempData {
       title: 'Boosting Your Immunity',
       categoryName: 'Nutrition',
     ),
-    const DIModel(
+     DIModel(
       thumbnailUrl: '',
       videoType: ResourceType.free,
       videoId: -1,

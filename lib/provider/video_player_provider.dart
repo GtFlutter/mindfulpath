@@ -27,7 +27,7 @@ class VideoPlayerNotifier extends ChangeNotifier {
       );
     } else {
       controller = VideoPlayerController.networkUrl(
-        Uri.parse(url),
+        Uri.parse(url),videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true)
       );
     }
 

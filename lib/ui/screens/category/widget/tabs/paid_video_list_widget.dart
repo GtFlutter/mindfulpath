@@ -40,6 +40,9 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
       // if (!(ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false)) {
       //   buyNow(context, categoryId: widget.category.id.toString());
       // }
+      if(ref.read(videoProvider).video==null) {
+        ref.read(videoProvider.notifier).isSelected = null;
+      }
       ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
       initCall();
     });

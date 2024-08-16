@@ -9,10 +9,9 @@ import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
-import 'package:meditation_app/ui/common/media_player/app_new_video_player.dart';
+import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
 import 'package:meditation_app/ui/screens/category/widget/resource_widget.dart';
 import 'package:meditation_app/util/constants.dart';
-
 import '../../../theme/styles.dart';
 import 'widget/detail_item.dart';
 import 'widget/intro_widget.dart';
@@ -24,14 +23,15 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
   final bool? isFromPaidVideoNotification;
   final bool? isPaid;
   final bool? isPDFView;
-   const DetailCategoryScreen({
+
+  const DetailCategoryScreen({
     super.key,
     required this.categoryListResponse,
     required this.initialVideo,
     this.isFromPdfNotification,
-     this.isPaid,
-     this.isPDFView,
-     this.isFromPaidVideoNotification
+    this.isPaid,
+    this.isPDFView,
+    this.isFromPaidVideoNotification,
   });
 
   @override
@@ -40,13 +40,16 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
 
 class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
   static AppStyle _style = AppStyle();
+  Duration? _lastKnownPosition;
 
   @override
   void initState() {
+    super.initState();
     ref.read(videoProvider).clearVideo(notifie: false);
     Future.delayed(
       Duration.zero,
       () {
+
         ref.read(videoProvider).reInit(
               widget.initialVideo != null
                   ? DetailedVideoModel(
@@ -57,10 +60,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
             );
       },
     );
-    super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,6 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
 
     var isVideoAvailable = videoCtrl.video != null;
 
-    print('_______7789878_________${widget.categoryListResponse.isPurchased}');
 
     return PopScope(
       canPop: !isVideoAvailable,
@@ -103,9 +102,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
             right: false,
             bottom: false,
             child: Padding(
-              padding: isLandscape && isVideoAvailable
-                  ? EdgeInsets.zero
-                  : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+              padding: isLandscape && isVideoAvailable ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -122,9 +119,20 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                           key: const ValueKey('value'),
                           videoId: videoCtrl.video!.videoId,
                           url: videoCtrl.video!.videoUrl,
-                          duration:videoCtrl.video!.duration,
+                          duration: videoCtrl.video!.duration,
                           style: _style,
                           isLandscape: isLandscape,
+                          startPosition: _lastKnownPosition ?? Duration.zero,
+                          onPositionChanged: (position) {
+                            _lastKnownPosition = position;
+                          },
+                          onFullScreen: () {
+                            if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+                            } else {
+                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                            }
+                          },
                           onBackPress: () {
                             if (MediaQuery.orientationOf(context) == Orientation.landscape) {
                               SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -158,8 +166,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                                 children: [
                                   Text(
                                     '●',
-                                    style:
-                                    _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+                                    style: _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -195,7 +202,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                         category: widget.categoryListResponse,
                         isFromPdfNotification: widget.isFromPdfNotification ?? false,
                         isPaid: widget.isPaid ?? false,
-                        isFromPaidVideoNotification:widget.isFromPaidVideoNotification ?? false ,
+                        isFromPaidVideoNotification: widget.isFromPaidVideoNotification ?? false,
                       ),
                     ),
                 ],
@@ -207,3 +214,210 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
     );
   }
 }
+
+///old code
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:go_router/go_router.dart';
+// import 'package:meditation_app/data/model/response/category_list_reponse.dart';
+// import 'package:meditation_app/provider/recent_videos_provider.dart';
+// import 'package:meditation_app/provider/video_provider.dart';
+// import 'package:meditation_app/theme/colors.dart';
+// import 'package:meditation_app/theme/text_style.dart';
+// import 'package:meditation_app/ui/common/background_image.dart';
+// import 'package:meditation_app/ui/common/custom_app_bar.dart';
+// import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
+// import 'package:meditation_app/ui/screens/category/widget/resource_widget.dart';
+// import 'package:meditation_app/util/constants.dart';
+//
+// import '../../../theme/styles.dart';
+// import 'widget/detail_item.dart';
+// import 'widget/intro_widget.dart';
+//
+// class DetailCategoryScreen extends ConsumerStatefulWidget {
+//   final CategoryListResponse categoryListResponse;
+//   final DIModel? initialVideo;
+//   final bool? isFromPdfNotification;
+//   final bool? isFromPaidVideoNotification;
+//   final bool? isPaid;
+//   final bool? isPDFView;
+//
+//   const DetailCategoryScreen({super.key, required this.categoryListResponse, required this.initialVideo, this.isFromPdfNotification, this.isPaid, this.isPDFView, this.isFromPaidVideoNotification});
+//
+//   @override
+//   ConsumerState<DetailCategoryScreen> createState() => _DetailCategoryScreenState();
+// }
+//
+// class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
+//   static AppStyle _style = AppStyle();
+//
+//   @override
+//   void initState() {
+//     ref.read(videoProvider).clearVideo(notifie: false);
+//     Future.delayed(
+//       Duration.zero,
+//       () {
+//         ref.read(videoProvider).reInit(
+//               widget.initialVideo != null
+//                   ? DetailedVideoModel(
+//                       category: widget.categoryListResponse,
+//                       video: widget.initialVideo!,
+//                     )
+//                   : null,
+//             );
+//       },
+//     );
+//     super.initState();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+//     Size size = MediaQuery.sizeOf(context);
+//     _style = AppStyle(screenSize: size);
+//     TextStyle textStyle = _style.text.font(mulishRegular400, sizePx: 14);
+//
+//     var videoCtrl = ref.watch(videoProvider);
+//
+//     var isVideoAvailable = videoCtrl.video != null;
+//
+//     print('_______7789878_________${widget.categoryListResponse.isPurchased}');
+//     print('_______videoCtrl.video!.duration_________${videoCtrl.video?.duration}');
+//
+//     return PopScope(
+//       canPop: !isVideoAvailable,
+//       onPopInvoked: (didPop) {
+//         if (didPop) {
+//           return;
+//         }
+//         if (isVideoAvailable) {
+//           if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+//             SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+//           }
+//           videoCtrl.clearVideo();
+//           return;
+//         }
+//         if (context.canPop()) {
+//           context.pop();
+//         }
+//       },
+//       child: Scaffold(
+//         extendBodyBehindAppBar: true,
+//         appBar: isVideoAvailable && isLandscape ? null : CustomAppBar(screenSize: size, style: _style),
+//         body: BackgroundImage.network(
+//           imgUrl: widget.categoryListResponse.imageResponse?.imageUrl ?? AppConstants.placeHolder,
+//           hideImage: isLandscape && isVideoAvailable,
+//           child: SafeArea(
+//             left: false,
+//             right: false,
+//             bottom: false,
+//             child: Padding(
+//               padding: isLandscape && isVideoAvailable ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.center,
+//                 children: [
+//                   if (isVideoAvailable) ...[
+//                     if (!isLandscape) SizedBox(height: _style.scaleX(25)),
+//                     Flexible(
+//                       flex: isLandscape ? 1 : 0,
+//                       child: Container(
+//                         width: !isLandscape ? null : double.infinity,
+//                         height: !isLandscape ? null : double.infinity,
+//                         alignment: !isLandscape ? null : Alignment.topCenter,
+//                         constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
+//                         child: AppVideoPlayer(
+//                           key: const ValueKey('value'),
+//                           videoId: videoCtrl.video!.videoId,
+//                           url: videoCtrl.video!.videoUrl,
+//                           duration:isLandscape?"15": videoCtrl.video!.duration,
+//                           style: _style,
+//                           isLandscape: isLandscape,
+//                           onFullScreen: () {
+//                             if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+//                               SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+//                             } else {
+//                               SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+//                             }
+//                           },
+//                           onBackPress: () {
+//                             if (MediaQuery.orientationOf(context) == Orientation.landscape) {
+//                               SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+//                             }
+//                             videoCtrl.clearVideo();
+//                           },
+//                           isFileUrl: false,
+//                         ),
+//                       ),
+//                     ),
+//                     if (isVideoAvailable && !isLandscape) ...[
+//                       SizedBox(height: _style.scaleX(15)),
+//                       Column(
+//                         mainAxisSize: MainAxisSize.min,
+//                         crossAxisAlignment: CrossAxisAlignment.stretch,
+//                         children: [
+//                           Text(
+//                             videoCtrl.video!.title,
+//                             style: _style.text.font(mulishSemiBold600, sizePx: 20, color: Colors.white),
+//                             maxLines: 1,
+//                             overflow: TextOverflow.ellipsis,
+//                             textAlign: TextAlign.left,
+//                           ),
+//                           SizedBox(height: _style.scaleX(7)),
+//                           Wrap(
+//                             crossAxisAlignment: WrapCrossAlignment.center,
+//                             spacing: _style.scaleX(10),
+//                             children: [
+//                               Row(
+//                                 mainAxisSize: MainAxisSize.min,
+//                                 children: [
+//                                   Text(
+//                                     '●',
+//                                     style: _style.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
+//                                     maxLines: 1,
+//                                     overflow: TextOverflow.ellipsis,
+//                                   ),
+//                                   SizedBox(width: _style.scaleX(5)),
+//                                   Flexible(
+//                                     child: Text(
+//                                       videoCtrl.video!.categoryName,
+//                                       style: textStyle.copyWith(color: AppColors.autherNameColor),
+//                                       maxLines: 1,
+//                                       overflow: TextOverflow.ellipsis,
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ),
+//                             ],
+//                           ),
+//                           SizedBox(height: _style.scaleX(30)),
+//                         ],
+//                       ),
+//                     ],
+//                   ] else
+//                     Expanded(
+//                       flex: !isLandscape ? 2 : 1,
+//                       child: IntroWidget(
+//                         title: widget.categoryListResponse.title ?? '',
+//                         style: _style,
+//                       ),
+//                     ),
+//                   if (!isLandscape || !isVideoAvailable)
+//                     Expanded(
+//                       flex: 3,
+//                       child: ResourceDetailCategory(
+//                         category: widget.categoryListResponse,
+//                         isFromPdfNotification: widget.isFromPdfNotification ?? false,
+//                         isPaid: widget.isPaid ?? false,
+//                         isFromPaidVideoNotification: widget.isFromPaidVideoNotification ?? false,
+//                       ),
+//                     ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
