@@ -286,6 +286,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       onFullScreen: () {
                         if (MediaQuery.orientationOf(context) == Orientation.portrait) {
                           ref.read(dashboardProvider.notifier).islandScap = true;
+                          final temp = ref.read(videoProvider);
+                          temp.isVideoChanged=false;
                           SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                         } else {
                           ref.read(dashboardProvider.notifier).islandScap = false;

@@ -76,6 +76,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           _controller.addListener(listener);
           setState(() {});
           _controller.seekTo(_currentPosition); // Seek to the saved or initial position
+          ref.read(videoProvider.notifier).video?.copyWith(position: _controller.value.position);
           toggleVideo();
         })
         ..setLooping(false);
@@ -93,8 +94,8 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       _currentPosition = Duration.zero;
     } else {
       debugPrint(' ===else===${_controller.value.position}');
-
-      _currentPosition = _controller.value.position; // Save the current position before re-initializing
+      _currentPosition = _currentPosition; // Save the current position before re-initializing
+      // _currentPosition = _controller.value.position; // Save the current position before re-initializing
     }
     initVideoPlayer();
     super.didUpdateWidget(oldWidget);
@@ -152,6 +153,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     if (_controller.value.isInitialized) {
       _currentPosition = _controller.value.position; // Save the current position before disposing
       _controller.removeListener(listener);
+      log("called player disposed");
     }
     _controller.dispose();
     _watchTimer?.cancel();

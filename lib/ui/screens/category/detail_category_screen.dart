@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,7 +40,8 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
   ConsumerState<DetailCategoryScreen> createState() => _DetailCategoryScreenState();
 }
 
-class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
+class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen>
+{
   static AppStyle _style = AppStyle();
   Duration? _lastKnownPosition;
 
@@ -72,7 +75,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
     var videoCtrl = ref.watch(videoProvider);
 
     var isVideoAvailable = videoCtrl.video != null;
-
+    log("lastPosition==> in detail category$_lastKnownPosition");
 
     return PopScope(
       canPop: !isVideoAvailable,

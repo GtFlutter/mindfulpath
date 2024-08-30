@@ -74,6 +74,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
               categoryName: bookmarkListResponse.bookmarkVideoResponse!.title ?? '',
               videoId: bookmarkListResponse.bookmarkVideoResponse!.id!,
               videoType: bookmarkListResponse.bookmarkVideoResponse!.videoType ?? ResourceType.paid,
+
             ),
           ),
           index: index,
@@ -84,8 +85,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
-
-    int? oldSelectedIndex;
     bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
 
     var videoCtrl = ref.watch(videoProvider);
@@ -136,6 +135,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                               onBackPress: () {
                                 if (MediaQuery.orientationOf(context) == Orientation.landscape) {
                                   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
                                 }
                                 ref.read(videoProvider.notifier).isSelected = null;
                                 ref.read(bookmarkProvider.notifier).islandScap = false;
@@ -150,10 +150,13 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                               onFullScreen: () {
                                 log("isVideoChange--->${videoCtrl.isVideoChanged}");
                                 if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                                  final temp = ref.read(videoProvider);
+                                  temp.isVideoChanged=false;
                                   ref.read(bookmarkProvider.notifier).islandScap = true;
                                   SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                                 } else {
                                   ref.read(bookmarkProvider.notifier).islandScap = false;
+
                                   // if (videoCtrl.video != null) {
                                   //   _lastKnownPosition = videoCtrl.video!.controller?.value.position;
                                   //   log("last position during portriet---$_lastKnownPosition");

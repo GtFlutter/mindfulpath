@@ -201,6 +201,8 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                   onFullScreen: () {
                                     if (MediaQuery.orientationOf(context) == Orientation.portrait) {
                                       ref.read(bookmarkProvider.notifier).islandScap = true;
+                                      final temp = ref.read(videoProvider);
+                                      temp.isVideoChanged=false;
                                       SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                                     } else {
                                       ref.read(bookmarkProvider.notifier).islandScap = false;
@@ -238,6 +240,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                             onPlay: () {
                                               ref.read(videoProvider.notifier).isSelected = index;
                                               playVideo(model,index);
+                                              FocusManager.instance.primaryFocus?.unfocus();
                                             },
                                             onRemovePress: () async {
                                               await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString());

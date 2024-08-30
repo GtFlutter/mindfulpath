@@ -20,7 +20,8 @@ dependencies:
   pinput: ^2.2.31
   shared_preferences: ^2.2.0
   syncfusion_flutter_charts: ^22.1.39
-  video_player: ^2.7.0
+  #video_player: ^2.7.0
+  video_player: ^2.9.1
   flutter_html: ^3.0.0-beta.2
   share_plus: ^7.1.0
   json_annotation: ^4.8.1
@@ -46,7 +47,7 @@ dependencies:
 
   #google sign in
   google_sign_in: ^6.2.1
-  firebase_auth: ^5.1.4
+  firebase_auth: ^5.1.1
 
 dev_dependencies:
   flutter_test:
