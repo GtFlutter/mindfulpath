@@ -74,7 +74,9 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       _controller = videoPlayerController
         ..initialize().then((_) {
           _controller.addListener(listener);
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
           _controller.seekTo(_currentPosition); // Seek to the saved or initial position
           ref.read(videoProvider.notifier).video?.copyWith(position: _controller.value.position);
           toggleVideo();
@@ -111,12 +113,13 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   void listener() {
     if (_controller.value.isInitialized) {
-      if(mounted){
-      setState(() {
-        _isBuffering = _controller.value.isBuffering;
-        _showReload = _controller.value.position >= _controller.value.duration;
-        _progress = _controller.value.position.inSeconds.toDouble();
-      });}
+      if (mounted) {
+        setState(() {
+          _isBuffering = _controller.value.isBuffering;
+          _showReload = _controller.value.position >= _controller.value.duration;
+          _progress = _controller.value.position.inSeconds.toDouble();
+        });
+      }
     }
 
     if (_controller.value.isPlaying && !widget.isFileUrl) {

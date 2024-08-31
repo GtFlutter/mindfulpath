@@ -56,6 +56,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       if (dashboardNotifier.categoryListResponse == null && dashboardNotifier.categoryListResponse!.isEmpty) {
         print("=================++++++++++============");
         dashboardNotifier.getCategoryList();
+        ref.watch(videoProvider).clearVideo();
       }
     });
     super.initState();
@@ -238,6 +239,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           _selectedCategories = [];
                           _controller.clear();
                           showSearchResult = false;
+                          videoCtrl.clearVideo();
                           setState(() {});
                         },
                         style: TextButton.styleFrom(

@@ -99,6 +99,7 @@ class SearchResultsList extends ConsumerWidget {
     } else if (!(category.isPurchased ?? false) && videoResponse.videoType==ResourceType.paid) {
       buyNow(context, categoryId: category.id.toString(), isFromSearch: true);
     } else {
+      ref.read(videoProvider.notifier).isVideoChanged=true;
       ref.read(videoProvider).playVideo(detailedVideoModel);
     }
   }

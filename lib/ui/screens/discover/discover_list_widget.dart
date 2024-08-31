@@ -20,9 +20,10 @@ class _DiscoverLayoutState extends ConsumerState<DiscoverListWidget> {
   @override
   void initState() {
     Future.delayed(Duration.zero, ref.read(dashboardProvider).init);
-    NotificationServices().getDeviceToken().then((value) {
-      print("device token----->$value");
-    });
+    ///comment because no any usage of this method and it generate error during ios run
+    // NotificationServices().getDeviceToken().then((value) {
+    //   print("device token----->$value");
+    // });
     super.initState();
   }
   //N3M7JR9MW4
