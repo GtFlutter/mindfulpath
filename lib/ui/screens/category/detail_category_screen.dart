@@ -218,7 +218,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen>
   }
 }
 
-///old code
+///old code without duration start from zero when mode change portrait to landscape
 // import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart';
