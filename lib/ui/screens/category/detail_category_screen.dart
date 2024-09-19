@@ -129,11 +129,11 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen>
                           onPositionChanged: (position) {
                             _lastKnownPosition = position;
                           },
-                          onFullScreen: () {
+                          onFullScreen: () async {
                             if (MediaQuery.orientationOf(context) == Orientation.landscape) {
                               SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                             } else {
-                              SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                             await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                             }
                           },
                           onBackPress: () {
