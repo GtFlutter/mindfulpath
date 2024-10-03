@@ -33,6 +33,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   void initState() {
     final bookmarkNotifier = ref.read(bookmarkProvider);
     Future.delayed(Duration.zero, () {
+      log("init call with mode change");
       bookmarkNotifier.getBookmarkList();
       ref.watch(videoProvider).clearVideo();
     });
@@ -74,7 +75,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
               categoryName: bookmarkListResponse.bookmarkVideoResponse!.title ?? '',
               videoId: bookmarkListResponse.bookmarkVideoResponse!.id!,
               videoType: bookmarkListResponse.bookmarkVideoResponse!.videoType ?? ResourceType.paid,
-
             ),
           ),
           index: index,
@@ -135,7 +135,6 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                               onBackPress: () {
                                 if (MediaQuery.orientationOf(context) == Orientation.landscape) {
                                   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
                                 }
                                 ref.read(videoProvider.notifier).isSelected = null;
                                 ref.read(bookmarkProvider.notifier).islandScap = false;
@@ -147,14 +146,16 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                 _lastKnownPosition = position;
                               },
                               isFileUrl: false,
-                              onFullScreen: () {
+                              onFullScreen: () async {
                                 log("isVideoChange--->${videoCtrl.isVideoChanged}");
                                 if (MediaQuery.orientationOf(context) == Orientation.portrait) {
                                   final temp = ref.read(videoProvider);
-                                  temp.isVideoChanged=false;
+                                  temp.isVideoChanged = false;
                                   ref.read(bookmarkProvider.notifier).islandScap = true;
-                                  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+                                  await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                                 } else {
+                                  // final temp = ref.read(videoProvider);
+                                  // temp.isVideoChanged=false;
                                   ref.read(bookmarkProvider.notifier).islandScap = false;
 
                                   // if (videoCtrl.video != null) {
@@ -162,7 +163,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                   //   log("last position during portriet---$_lastKnownPosition");
                                   //   setState(() {
                                   //   });
-                                    log("last position during portriet---$_lastKnownPosition");
+                                  log("last position during portriet---$_lastKnownPosition");
                                   // }
                                   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                                 }
