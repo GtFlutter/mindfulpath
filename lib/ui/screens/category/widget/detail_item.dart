@@ -15,6 +15,9 @@ import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog
 
 import '../../../../data/model/body/resource_type.dart';
 import '../../../../data/model/response/videos_response.dart';
+import '../../../../helper/route/route_paths.dart';
+import '../../../../helper/route/router.dart';
+import '../../../../provider/auth_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
@@ -422,9 +425,21 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                           MenuItemButton(
                             onPressed: () {
                               log("create playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
-
-                              if (widget.model!.video != null && widget.model!.id != null) {
+                              bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                              if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
                                 createPlaylist(context, videoId: widget.model?.id?.toString());
+                              }else{
+                                showCustomSnackBar(
+                                  'Please login to create playlist.',
+                                  action: SnackBarAction(
+                                    label: 'Log In',
+                                    backgroundColor:
+                                    AppColors.primaryColor.withOpacity(0.8),
+                                    textColor: Colors.brown.shade800,
+                                    onPressed: () => appRouter.go(RoutePath.signIn),
+                                  ),
+                                  duration: const Duration(seconds: 5),
+                                );
                               }
                             },
                             child: Text(

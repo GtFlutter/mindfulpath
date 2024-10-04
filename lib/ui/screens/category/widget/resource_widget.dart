@@ -29,13 +29,7 @@ class ResourceDetailCategory extends ConsumerStatefulWidget {
   bool? isPaid;
   bool? isPDFView;
 
-  ResourceDetailCategory(
-      {super.key,
-      required this.category,
-      this.isFromPdfNotification,
-      this.isPaid,
-      this.isPDFView,
-      this.isFromPaidVideoNotification});
+  ResourceDetailCategory({super.key, required this.category, this.isFromPdfNotification, this.isPaid, this.isPDFView, this.isFromPaidVideoNotification});
 
   @override
   ConsumerState<ResourceDetailCategory> createState() => _ResourceDetailCategoryState();
@@ -58,9 +52,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   void initState() {
     super.initState();
     _tabController = TabController(initialIndex: courseIndex, length: 4, vsync: this);
-    (widget.isFromPdfNotification ?? false)
-        ? _changeFilter(ItemName(id: 1, title: 'PDF'))
-        : _changeFilter(ItemName(id: 0, title: 'Video'));
+    (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
 
     Future.delayed(Duration(seconds: 0), () {
       ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
@@ -143,10 +135,12 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     _tabController.animateTo(goTo);
   }
 
-  void _changeFilter(ItemName? value) {
+  void _changeFilter(ItemName? value,) {
+    log("====value==>${value?.id}");
     if (value == null || value.id == filterIndex) return;
     setState(() {
       filterIndex = value.id;
+      // _changeTab(filterIndex, courseIndex);
       _changeTab(filterIndex, courseIndex);
     });
   }
@@ -231,7 +225,12 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 items: _filters,
                 width: _style.scaleX(120),
                 maxHeight: _style.scaleX(150),
-                onChanged: _changeFilter,
+                onChanged: (value) {
+                  _changeCourseType(0);
+                  _changeFilter(ItemName(id: value?.id ?? 0, title: value!.title));
+
+                  // _changeCourseType(0);
+                },
                 hint: 'Filter',
               ),
             ),

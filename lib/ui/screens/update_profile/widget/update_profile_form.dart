@@ -80,7 +80,7 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
             UserBody.update(
               name,
               email,
-              widget.user.phoneNo!,
+              widget.user.phoneNo ?? "",
               dateTime,
               gender,
             ),

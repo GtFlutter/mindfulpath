@@ -326,7 +326,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   final position = snapshot.data;
-                                  return Text('${position?.inMinutes ?? 0}:${(position?.inSeconds ?? 0 % 60).toString().padLeft(2, '0')}');
+                                  return Text('${position?.inMinutes ?? 0}:${((position?.inSeconds ?? 0) % 60).toString().padLeft(2, '0')}');
                                 } else {
                                   return const CircularProgressIndicator();
                                 }
@@ -348,6 +348,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   }
 
   String stringToDuration(String durationString) {
+    log("duration string.....:$durationString");
     List<String> durationParts = durationString.split(':');
     if (durationParts.length >= 3) {
       int hours = int.parse(durationParts[0]);
