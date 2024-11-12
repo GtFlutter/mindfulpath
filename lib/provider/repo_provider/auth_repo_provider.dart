@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/auth_repo.dart';
-import '../base/shared_preferences_provider.dart';
 import '../base/api_client_provider.dart';
+import '../base/shared_preferences_provider.dart';
 
 final authRepoProvider = Provider<AuthRepo>((ref) {
   final sharedPreferences = ref.watch(sharedPreferencesProvider);

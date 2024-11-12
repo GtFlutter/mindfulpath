@@ -6,7 +6,6 @@ import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/repositories/notification_repo.dart';
 import 'package:meditation_app/provider/repo_provider/notifcationlist_repo_provider.dart';
-import 'package:meditation_app/ui/screens/notifications/NotificationResponse.dart';
 
 import '../../../data/model/response/notification_list_response.dart';
 

@@ -10,21 +10,21 @@ class CustomNotificationData {
   CustomNotificationData.fromJson(Map<String, dynamic> json) {
     type = json['type'];
     pdfData = json['pdf_data'] != null
-        ? new PdfData.fromJson(json['pdf_data'])
+        ? PdfData.fromJson(json['pdf_data'])
         : null;
     catData = json['cat_data'] != null
-        ? new CategoryListResponse.fromJson(json['cat_data'])
+        ? CategoryListResponse.fromJson(json['cat_data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['type'] = this.type;
-    if (this.pdfData != null) {
-      data['pdf_data'] = this.pdfData!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['type'] = type;
+    if (pdfData != null) {
+      data['pdf_data'] = pdfData!.toJson();
     }
-    if (this.catData != null) {
-      data['cat_data'] = this.catData!.toJson();
+    if (catData != null) {
+      data['cat_data'] = catData!.toJson();
     }
     return data;
   }
@@ -70,24 +70,24 @@ class PdfData {
     thumbnailImageUrl = json['thumbnail_image_url'];
     pdfUrl = json['pdf_url'];
     image = json['image'];
-    pdf = json['pdf'] != null ? new Pdf.fromJson(json['pdf']) : null;
+    pdf = json['pdf'] != null ? Pdf.fromJson(json['pdf']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['title'] = this.title;
-    data['category_id'] = this.categoryId;
-    data['unique_id'] = this.uniqueId;
-    data['can_view_free_user'] = this.canViewFreeUser;
-    data['pdf_type'] = this.pdfType;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['thumbnail_image_url'] = this.thumbnailImageUrl;
-    data['pdf_url'] = this.pdfUrl;
-    data['image'] = this.image;
-    if (this.pdf != null) {
-      data['pdf'] = this.pdf!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['category_id'] = categoryId;
+    data['unique_id'] = uniqueId;
+    data['can_view_free_user'] = canViewFreeUser;
+    data['pdf_type'] = pdfType;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['thumbnail_image_url'] = thumbnailImageUrl;
+    data['pdf_url'] = pdfUrl;
+    data['image'] = image;
+    if (pdf != null) {
+      data['pdf'] = pdf!.toJson();
     }
     return data;
   }
@@ -122,14 +122,14 @@ class Pdf {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['type_id'] = this.typeId;
-    data['file_name'] = this.fileName;
-    data['type'] = this.type;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['image_url'] = this.imageUrl;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['type_id'] = typeId;
+    data['file_name'] = fileName;
+    data['type'] = type;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['image_url'] = imageUrl;
     return data;
   }
 }
@@ -159,19 +159,19 @@ class CatData {
     price = json['price'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    image = json['image'] != null ? new Image.fromJson(json['image']) : null;
+    image = json['image'] != null ? Image.fromJson(json['image']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['title'] = this.title;
-    data['button_title'] = this.buttonTitle;
-    data['price'] = this.price;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    if (this.image != null) {
-      data['image'] = this.image!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['button_title'] = buttonTitle;
+    data['price'] = price;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    if (image != null) {
+      data['image'] = image!.toJson();
     }
     return data;
   }
@@ -195,12 +195,12 @@ class Image {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['type_id'] = this.typeId;
-    data['file_name'] = this.fileName;
-    data['type'] = this.type;
-    data['image_url'] = this.imageUrl;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['type_id'] = typeId;
+    data['file_name'] = fileName;
+    data['type'] = type;
+    data['image_url'] = imageUrl;
     return data;
   }
 }

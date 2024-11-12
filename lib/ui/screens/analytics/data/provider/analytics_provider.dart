@@ -8,8 +8,8 @@ import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/body/analytics_body.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/analytics_result_model.dart';
-import 'package:meditation_app/ui/screens/analytics/data/repo/analytics_repo.dart';
 import 'package:meditation_app/ui/screens/analytics/data/provider/analytics_repo_provider.dart';
+import 'package:meditation_app/ui/screens/analytics/data/repo/analytics_repo.dart';
 
 import '../../helper/analytics_enums.dart';
 import '../model/response/category_and_video_name_model.dart';
@@ -57,25 +57,25 @@ class AnalyticsNotifier extends ChangeNotifier {
     if (notifie) notifyListeners();
   }
 
-  void onCategoryChanged(ItemName? value) {
+  void onCategoryChanged(ItemName? value, {bool isAudio = false}) {
     _category = value;
     _resetVideos(notifie: false);
     notifyListeners();
 
     if (value != null) {
-      getVideoNamesList(value.id);
+      getVideoNamesList(value.id, isAudio: isAudio);
     } else {
-      getAnalytics();
+      getAnalytics(isAudio!);
     }
   }
 
-  void onVideoChanged(ItemName? value) {
+  void onVideoChanged(ItemName? value, {bool isAudio = false}) {
     _video = value;
     notifyListeners();
-    getAnalytics();
+    getAnalytics(isAudio);
   }
 
-  void onDurationTypeChanged(FilterDuration? value) async {
+  void onDurationTypeChanged(FilterDuration? value, bool isAudio) async {
     if (value != null && value == FilterDuration.custom) {
       BuildContext? context = rootNavigator.currentContext;
       if (context != null && context.mounted) {
@@ -98,27 +98,27 @@ class AnalyticsNotifier extends ChangeNotifier {
           _duration = range;
           _durationtype = FilterDuration.custom;
           notifyListeners();
-          getAnalytics();
+          getAnalytics(isAudio);
         }
       }
     } else {
       _setDuration(value ?? FilterDuration.day);
-      getAnalytics();
+      getAnalytics(isAudio);
     }
   }
 
-  void reset({bool notifie = true}) {
+  void reset(bool isAudio, {bool notifie = true}) {
     _category = null;
     _resetVideos(notifie: false);
     _setDuration(FilterDuration.day, notifie: false);
     if (notifie) notifyListeners();
-    getAnalytics();
+    getAnalytics(isAudio);
   }
 
   // category_list
   // video_list
 
-  Future<void> getCategoryNamesList() async {
+  Future<void> getCategoryNamesList(bool isAudio) async {
     _resetCategories(notifie: false);
     _resetVideos(notifie: false);
     _startLoading();
@@ -147,10 +147,10 @@ class AnalyticsNotifier extends ChangeNotifier {
       notifyListeners();
     }
 
-    getAnalytics();
+    getAnalytics(isAudio);
   }
 
-  Future<void> getVideoNamesList(int categoryId) async {
+  Future<void> getVideoNamesList(int categoryId, {bool isAudio = false}) async {
     _resetVideos(notifie: false);
     _startLoading();
 
@@ -179,10 +179,10 @@ class AnalyticsNotifier extends ChangeNotifier {
       notifyListeners();
     }
 
-    getAnalytics();
+    getAnalytics(isAudio);
   }
 
-  Future<void> getAnalytics() async {
+  Future<void> getAnalytics(bool isAudio) async {
     _result = null;
     _startLoading();
 
@@ -190,6 +190,8 @@ class AnalyticsNotifier extends ChangeNotifier {
       AnalyticsBody(
         categoryId: _category?.id,
         videoId: _video?.id,
+        isAudio: isAudio,
+        selectedType: isAudio ? AnalyticsType.audio : AnalyticsType.video,
         duration: _duration,
       ),
     );

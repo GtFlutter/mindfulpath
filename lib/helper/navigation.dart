@@ -10,7 +10,7 @@ extension OnContext on BuildContext {
     return push(RoutePath.pdfViewer, extra: url);
   }
 
-  void goToDetailCategoryScreen(CategoryListResponse category, {DIModel? video}) {
-    return go(RoutePath.detailCategoryScreenPath, extra: (category, video));
+  void goToDetailCategoryScreen(CategoryListResponse category, {DIModel? video,required bool isAudio}) {
+    return go(RoutePath.detailCategoryScreenPath, extra: (category, video, isAudio));
   }
 }

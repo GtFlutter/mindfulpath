@@ -165,7 +165,7 @@ class _AnalyticsChartState extends State<AnalyticsChart> {
             },
           ),
           tooltipBehavior: _tooltip,
-          series: <ChartSeries<_ChartData, String>>[
+          series: [
             ColumnSeries<_ChartData, String>(
               dataSource: data,
               xValueMapper: (_ChartData data, _) => data.x.capitalizeFirstLetter,

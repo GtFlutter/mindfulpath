@@ -6,11 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
-import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/contact_number_text_field.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 
 import '../../../theme/colors.dart';
 import '../../../theme/styles.dart';

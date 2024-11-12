@@ -111,7 +111,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           // Call API to update watch duration and video ID
           if (!_isBuffering && _controller.value.isInitialized) {
             ref.read(videoProvider).watchedDuration=_period;
-            ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
+            ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period, false);
           }
         });
       }

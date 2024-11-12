@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/videos_response.dart';
@@ -12,11 +10,9 @@ import '../../../../data/model/response/category_list_reponse.dart';
 import '../../../../provider/auth_provider.dart';
 import '../../../../provider/recent_videos_provider.dart';
 import '../../../../provider/video_provider.dart';
-import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../common/custom_snackbar.dart';
 import '../../settings/widget/logout_dialog.dart';
-import '../util/query_time.dart';
 
 class SearchResultsList extends ConsumerWidget {
   const SearchResultsList({super.key, required AppStyle style, required VideosResponse model})

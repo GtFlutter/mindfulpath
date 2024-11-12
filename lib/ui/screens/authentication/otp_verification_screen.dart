@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
+import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
-import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
-import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:pinput/pinput.dart';
 
 import '../../../provider/auth_provider.dart';

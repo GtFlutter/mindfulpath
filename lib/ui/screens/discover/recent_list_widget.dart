@@ -52,7 +52,7 @@ class _FeaturedListWidgetState extends ConsumerState<RecentListWidget> {
               var dataModel = provider.list[index];
               return GestureDetector(
                 onTap: () {
-                  context.goToDetailCategoryScreen(dataModel.category!, video: dataModel.video);
+                  context.goToDetailCategoryScreen(dataModel.category!, video: dataModel.video, isAudio: true);
                 },
                 child: FeaturedItem(
                   widget.clipper,

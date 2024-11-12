@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
@@ -11,7 +11,7 @@ import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/media_player/custom_track_shape.dart';
 import 'package:meditation_app/util/assets.dart';
 import 'package:video_player/video_player.dart';
-import '../../../theme/text_style.dart';
+
 import '../../../util/dimensions.dart';
 import '../outlined_icon_button.dart';
 /// all working but bookmark screen and playlist screen landscape to portrait second start from zero
@@ -152,7 +152,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
         if (!_isBuffering && _controller.value.isInitialized) {
           if(mounted)
           ref.read(videoProvider).watchedDuration = _period;
-          await ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period);
+          await ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period, false);
         }
       });
     } else {

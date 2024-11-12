@@ -6,7 +6,6 @@ import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
-import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/playlist/sub_playlist_screen.dart';

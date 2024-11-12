@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
+import 'package:meditation_app/provider/resource_provider/free_audios_provider.dart';
 
 import '../../../../../data/model/body/resource_type.dart';
 import '../../../../../data/model/response/category_list_reponse.dart';
@@ -10,7 +11,6 @@ import '../../../../../data/model/response/videos_response.dart';
 import '../../../../../database/database_helper.dart';
 import '../../../../../database/database_model.dart';
 import '../../../../../provider/bookmark_provider.dart';
-import '../../../../../provider/playlist_provider.dart';
 import '../../../../../provider/resource_provider/free_videos_provider.dart';
 import '../../../../../provider/video_provider.dart';
 import '../../../../../theme/styles.dart';
@@ -18,8 +18,9 @@ import '../detail_item.dart';
 
 class FreeVideoListWidget extends ConsumerStatefulWidget {
   final CategoryListResponse category;
+  final bool isAudio;
 
-  const FreeVideoListWidget({super.key, required this.category});
+  const FreeVideoListWidget({super.key, required this.category, required this.isAudio});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -33,16 +34,21 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
 
   @override
   void initState() {
-    final playlistP = ref.read(playListProvider);
 
-    Future.delayed(Duration.zero, () async {
-      if(ref.read(videoProvider).video==null) {
-        ref.read(videoProvider.notifier).isSelected = null;
-      }
-      ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
-      // playlistP.getPlaylistList();
-      await initCall();
-    });
+    if(widget.isAudio){
+      Future.delayed(Duration.zero, () async {
+        ref.read(freeAudiosProvider.notifier).fetchAudios(widget.category.id??0);
+        await initCall();
+      });
+    }else{
+      Future.delayed(Duration.zero, () async {
+        if(ref.read(videoProvider).video==null) {
+          ref.read(videoProvider.notifier).isSelected = null;
+        }
+        ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
+        await initCall();
+      });
+    }
 
     super.initState();
   }
@@ -58,13 +64,6 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     provider.downloadedVideo = await ref
         .read(databaseProvider)
         .getVideo(int.parse(res?.categoryId ?? "0"));
-    print("category id---${widget.category.id}");
-    print("getSingleCategory-------${res?.toJson()}");
-    print("getSingleCategory-------***${provider.downloadedVideo}");
-    if (provider.downloadedVideo.isNotEmpty) {
-      print(
-          "downloaded vedio----${provider.downloadedVideo.first.toJson()}---");
-    }
   }
 
   @override
@@ -76,11 +75,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     Future.delayed(Duration.zero, () async {
       final coursePRead = ref.read(courseProvider);
       await coursePRead.getCategoryFromDatabase();
-      //for(final category in coursePWatch.downloadResponse){
-       // await coursePRead.getVideoFromDatabase(int.parse(category.categoryId??""));
         await coursePRead.getVideoFromDatabase(widget.category.id??0);
-
-    //  }
     });
 
   }
@@ -90,23 +85,21 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     super.build(context);
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
     var provider = ref.watch(freeVideosProvider);
+    var audioP = ref.watch(freeAudiosProvider);
 
-    if (provider.loading) {
+    if (provider.loading || audioP.loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (provider.videosResponse == null ||
-        provider.videosResponse!.list == null) {
+    if (widget.isAudio ? (audioP.videosResponse == null || audioP.videosResponse!.list == null) : (provider.videosResponse == null || provider.videosResponse!.list == null)) {
       return const Center(child: Text('Unable to find data!'));
     }
-    if (provider.videosResponse!.list!.isEmpty) {
+    if (widget.isAudio ? audioP.videosResponse!.list!.isEmpty : provider.videosResponse!.list!.isEmpty) {
       return const Center(child: Text('Free Videos Is Empty'));
     }
 
     final downloadP = ref.watch(downloadProvider);
 
-   // print('______-------video--------_____175_______${downloadP.isDownloading}');
-    print('______-------video--------_____175_______${downloadP.complate}');
     if(downloadP.complate==true){
       refreshh();
       ref.read(downloadProvider.notifier).complate=false;
@@ -122,25 +115,13 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
         bottom: _style.scale * 100,
         top: _style.scale * 10,
       ),
-      itemCount: provider.videosResponse!.list!.length,
+      itemCount: widget.isAudio ? audioP.videosResponse!.list!.length : provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
-        var model = provider.videosResponse!.list![index];
-        print('------**${model}');
-//model.id==null?false:model.id == int.parse(provider.downloadedVideo[index].videoId??"0")
-        //if(provider.downloadedVideo[index].videoId!=null){
-        //  print('--135----****${provider.downloadedVideo[index].videoId??" "}');
-        //}
+        var model = widget.isAudio ? audioP.videosResponse!.list![index] : provider.videosResponse!.list![index];
         final isDownloaded=provider.downloadedVideo.any((element){
-          // return model.id==int.parse(provider.downloadedVideo[index].videoId??"0");
           return model.id==int.parse(element.videoId??"0");
         } );
 
-
-        // provider.downloadedVideo.map((element) {
-        //   print(
-        //       "element.categoryId---${element.videoId}---${provider.videosResponse?.list?[index].id}");
-        //   return element.id == provider.videosResponse?.list?[index].id;
-        // });
         return GestureDetector(
             onTap: () {
               provider.selectedIndex=index;
@@ -148,6 +129,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
             },
             child: DetailItem.video(
               appStyle: _style,
+              isAudio: widget.isAudio,
               model: model,
               index: '$index',
               // index: '${provider.selectedIndex}',
@@ -165,8 +147,12 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
 
   Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false}) async {
     if (itemId == null) return;
-   await  ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
-    ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
+   await  ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: widget.isAudio);
+   if(widget.isAudio){
+     ref.read(freeAudiosProvider.notifier).fetchAudios(widget.category.id??0);
+   }else{
+     ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
+   }
   }
 
   void playVideo(VideoResponse model, int index) {
@@ -183,7 +169,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
               videoType: model.videoType ?? ResourceType.paid,
             ),
           ),
-      index: index
+      index: index, isAudioFile: widget.isAudio
         );
   }
 

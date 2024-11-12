@@ -5,7 +5,6 @@ import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/helper/navigation.dart';
 
 import '../../data/model/body/resource_type.dart';
-
 import '../../provider/bookmark_provider.dart';
 import '../../theme/styles.dart';
 import '../screens/category/widget/detail_item.dart';
@@ -66,6 +65,7 @@ class FeatureVideoList extends ConsumerWidget {
                 }
                 context.goToDetailCategoryScreen(
                   dataModel.category!,
+                  isAudio: false,
                   video: DIModel(
                     thumbnailUrl: dataModel.imgUrl ?? '',
                     videoType: ResourceType.free,

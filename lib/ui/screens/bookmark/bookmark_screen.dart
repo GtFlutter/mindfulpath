@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +11,8 @@ import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
+import 'package:meditation_app/theme/text_style.dart';
+import 'package:meditation_app/ui/common/media_player/app_audio_player.dart';
 import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
 import 'package:meditation_app/ui/screens/bookmark/widget/bookmark_item.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
@@ -28,6 +29,8 @@ class BookmarkScreen extends ConsumerStatefulWidget {
 class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   static AppStyle _style = AppStyle();
   Duration? _lastKnownPosition;
+
+  bool showAudioFile = false;
 
   @override
   void initState() {
@@ -62,6 +65,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
     BookmarkListResponse bookmarkListResponse,
     CategoryListResponse category,
     int index,
+      bool isAudioFile
   ) {
     print('------------****${bookmarkListResponse.bookmarkVideoResponse!.videoUrl}');
     ref.read(videoProvider).playVideo(
@@ -78,6 +82,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
             ),
           ),
           index: index,
+      isAudioFile: isAudioFile
         );
   }
 
@@ -88,18 +93,16 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
     bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
 
     var videoCtrl = ref.watch(videoProvider);
-    var isVideoAvailable = videoCtrl.video != null;
+    var isVideoAvailable = videoCtrl.isAudioFileAvailable ? false : videoCtrl.video != null;
+    var isAudioAvailable = videoCtrl.isAudioFileAvailable && videoCtrl.video != null;
 
     final bookmarkNotifier = ref.watch(bookmarkProvider);
     final downloadP = ref.watch(downloadProvider);
-    log("lastPosition==>$_lastKnownPosition");
-    print('______-------BookMark--------_____979479_______${downloadP.complate}');
     if (downloadP.complate == true) {
       refreshh();
       ref.read(downloadProvider.notifier).complate = false;
       setState(() {});
     }
-
     return SafeArea(
       left: false,
       right: false,
@@ -115,6 +118,44 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Video',
+                            style: _style.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: SizedBox(
+                              height: _style.scaleX(40),
+                              child: FittedBox(
+                                fit: BoxFit.fill,
+                                child: Switch(
+                                  value: showAudioFile,
+                                  onChanged: (value) {
+                                    showAudioFile = value;
+                                    if(value){
+                                      bookmarkNotifier.getAudioBookmarks();
+                                    }else{
+                                      bookmarkNotifier.getBookmarkList();
+                                    }
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'Audio',
+                            style: _style.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                       if (isVideoAvailable) ...[
                         if (!isLandscape) SizedBox(height: _style.scaleX(25)),
                         Flexible(
@@ -154,24 +195,22 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                   ref.read(bookmarkProvider.notifier).islandScap = true;
                                   await SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                                 } else {
-                                  // final temp = ref.read(videoProvider);
-                                  // temp.isVideoChanged=false;
                                   ref.read(bookmarkProvider.notifier).islandScap = false;
-
-                                  // if (videoCtrl.video != null) {
-                                  //   _lastKnownPosition = videoCtrl.video!.controller?.value.position;
-                                  //   log("last position during portriet---$_lastKnownPosition");
-                                  //   setState(() {
-                                  //   });
-                                  log("last position during portriet---$_lastKnownPosition");
-                                  // }
                                   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
                                 }
                               },
                             ),
                           ),
                         )
-                      ] else
+                      ] else if(isAudioAvailable)...[
+                        AppAudioPlayer(
+                          style: _style,
+                          audioId: videoCtrl.video!.videoId,
+                          audioUrl: videoCtrl.video!.videoUrl,
+                          audioImage: videoCtrl.video!.thumbnailUrl,
+                        ),
+                        SizedBox(height: _style.scaleX(24)),
+                      ]else
                         const SizedBox.shrink(),
                       !isLandscape
                           ? Expanded(
@@ -192,17 +231,17 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                     onTap: () {},
                                     child: BookmarkItem(
                                       appStyle: _style,
-                                      model: bookmarkNotifier.bookmarkListResponse![index],
+                                      model: model,
                                       index: index,
                                       IsSelected: videoCtrl.isSelected,
                                       onPlay: () {
                                         videoCtrl.isSelected = index;
-                                        playVideo(model, bookmarkNotifier.category![index], index);
+                                        playVideo(model, bookmarkNotifier.category![index], index, showAudioFile);
                                       },
-                                      url: bookmarkNotifier.bookmarkListResponse![index].bookmarkVideoResponse!.videoUrlSrc,
+                                      url: model.bookmarkVideoResponse!.videoUrlSrc,
                                       onBookmarkRemove: () async {
-                                        if (bookmarkNotifier.bookmarkListResponse![index].videoId == null) return;
-                                        await ref.read(bookmarkProvider).toggleBookmark(bookmarkNotifier.bookmarkListResponse![index].videoId!, isRemove: true);
+                                        if (model.videoId == null) return;
+                                        await ref.read(bookmarkProvider).toggleBookmark(model.videoId!, isRemove: true);
                                         bookmarkNotifier.bookmarkListResponse!.removeAt(index);
                                       },
                                     ),

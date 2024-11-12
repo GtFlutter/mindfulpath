@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
+
 import 'featured_item_painter.dart';
 
 class FeaturedItem extends StatelessWidget {

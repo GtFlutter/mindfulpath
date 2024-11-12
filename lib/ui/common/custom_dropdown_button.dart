@@ -2,8 +2,8 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/helper/string_converter.dart';
-import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
+import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 
 import '../../theme/colors.dart';
 import '../../theme/styles.dart';

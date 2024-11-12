@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:meditation_app/theme/text_style.dart';
-import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
+import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 
 import '../../../../../theme/styles.dart';
 import '../../../../common/custom_dropdown_button.dart';
@@ -13,6 +12,7 @@ class AnalyticsFilter extends StatefulWidget {
   final List<FilterDuration> durationtypes;
   final ItemName? categoryValue;
   final ItemName? videoValue;
+  final ItemName? selectedItem;
   final FilterDuration? durationtypeValue;
   final ValueChanged<ItemName?> onCategoryChanged;
   final ValueChanged<ItemName?> onVideoChanged;
@@ -21,19 +21,20 @@ class AnalyticsFilter extends StatefulWidget {
   final Size screenSize;
 
   const AnalyticsFilter(
-    this.style,
-    this.screenSize, {
-    super.key,
-    required this.categories,
-    required this.videos,
-    required this.durationtypes,
-    required this.categoryValue,
-    required this.videoValue,
-    required this.durationtypeValue,
-    required this.onCategoryChanged,
-    required this.onVideoChanged,
-    required this.onDurationTypeChanged,
-  });
+      this.style,
+      this.screenSize, {
+        super.key,
+        this.selectedItem,
+        required this.categories,
+        required this.videos,
+        required this.durationtypes,
+        required this.categoryValue,
+        required this.videoValue,
+        required this.durationtypeValue,
+        required this.onCategoryChanged,
+        required this.onVideoChanged,
+        required this.onDurationTypeChanged,
+      });
 
   @override
   State<AnalyticsFilter> createState() => _AnalyticsFilterState();
@@ -62,12 +63,12 @@ class _AnalyticsFilterState extends State<AnalyticsFilter> {
               ),
             ),
           ),
-          /*Expanded(
+          Expanded(
             child: Align(
               alignment: Alignment.center,
               child: CustomDropDownButton<ItemName>(
                 key: const ValueKey<int>(1),
-                value: widget.videoValue,
+                value: widget.selectedItem,
                 appStyle: widget.style,
                 items: widget.videos,
                 maxHeight: widget.screenSize.height * 0.6,
@@ -76,13 +77,13 @@ class _AnalyticsFilterState extends State<AnalyticsFilter> {
                 hint: 'Videos',
               ),
             ),
-          ),*/
-          ConstrainedBox(
+          ),
+          /*ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight:  widget.screenSize.height * 0.6,
                 maxWidth: widget.screenSize.shortestSide * 0.4,
               ),
-              child: Text("Videos",style: widget.style.text.font(mulishMedium500, sizePx: 12.5, color: Colors.white),)),
+              child: Text("Videos",style: widget.style.text.font(mulishMedium500, sizePx: 12.5, color: Colors.white),)),*/
           Expanded(
             child: Align(
               alignment: Alignment.centerRight,

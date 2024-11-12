@@ -11,7 +11,6 @@ import 'package:meditation_app/helper/path_helper.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
-import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';

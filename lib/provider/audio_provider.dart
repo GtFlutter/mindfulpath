@@ -12,19 +12,18 @@ import '../ui/screens/category/widget/detail_item.dart';
 import 'auth_provider.dart';
 import 'recent_videos_provider.dart';
 
-final videoProvider = ChangeNotifierProvider<VideoNotifier>((ref) {
-  return VideoNotifier(ref);
+final audioProvider = ChangeNotifierProvider<AudioNotifier>((ref) {
+  return AudioNotifier(ref);
 });
 
-class VideoNotifier extends ChangeNotifier {
-  final ChangeNotifierProviderRef<VideoNotifier> _ref;
-  VideoNotifier(this._ref);
+class AudioNotifier extends ChangeNotifier {
+  final ChangeNotifierProviderRef<AudioNotifier> _ref;
+  AudioNotifier(this._ref);
   DIModel? _video;
   DIModel? get video => _video;
   int? isSelected;
   Duration? watchedDuration;
   bool isVideoChanged=false;
-  bool isAudioFileAvailable=false;
 
 
   void reInit([DetailedVideoModel? detailedVideoModel]) {
@@ -34,7 +33,7 @@ class VideoNotifier extends ChangeNotifier {
     playVideo(detailedVideoModel, notifie: true, forceToPlay: true);
   }
 
-  void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false,int? index,bool isVideoChange=true, bool isAudioFile = false}) {
+  void playVideo(DetailedVideoModel detailedVideoModel, {bool notifie = true, bool forceToPlay = false,int? index,bool isVideoChange=true}) {
     /// Auth User
     bool isLoggedIn = _ref.read(authProvider).isUserLoggedIn;
     if (detailedVideoModel.video.videoType == ResourceType.paid && !isLoggedIn) {
@@ -47,7 +46,6 @@ class VideoNotifier extends ChangeNotifier {
     /// Also If Video Playing Is Same Requested Video Then Don't Chnage Video
     /// If It's Want to faorce to play video then just play video
     DIModel? model = _video?.copyWith();
-    isAudioFileAvailable = isAudioFile;
     if ((model == null || model.videoId != detailedVideoModel.videoId) || forceToPlay) {
       log("vedio playyyyyyyyyy.......");
       _video = detailedVideoModel.video.copyWith();

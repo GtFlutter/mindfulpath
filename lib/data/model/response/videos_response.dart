@@ -77,7 +77,7 @@ class VideosResponse {
     this.category
   });
 
-  factory VideosResponse.fromJson(Map<String, dynamic> json) => _$VideosResponseFromJson(json);
+  factory VideosResponse.fromJson(Map<String, dynamic> json, bool isFromAudio) => _$VideosResponseFromJson(json, isFromAudio);
 }
 
 @JsonSerializable()
@@ -140,7 +140,7 @@ class VideoResponse {
   String? get imgUrl => thumbnailImageUrlSrc ?? image?.url;
   String? get videoUrl => videoUrlSrc ?? video?.url;
 
-  factory VideoResponse.fromJson(Map<String, dynamic> json) => _$VideoResponseFromJson(json);
+  factory VideoResponse.fromJson(Map<String, dynamic> json, bool isFromAudio) => _$VideoResponseFromJson(json, isFromAudio);
   Map<String, dynamic> toJson() => _$VideoResponseToJson(this);
 
   static categoryToJson(CategoryListResponse? category) => category?.toJson();

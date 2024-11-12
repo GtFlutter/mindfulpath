@@ -89,7 +89,6 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
 
   getDownload() async {
     final downloadP = ref.read(downloadProvider);
-    log("video id in bookmark----${widget.model.bookmarkVideoResponse!.id}");
     result = await downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false);
   }
 

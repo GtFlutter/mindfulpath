@@ -6,12 +6,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/data/model/response/pdfs_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/course_provider.dart';
-import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/playlist/widget/create_playlist_dialog.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../../data/model/body/resource_type.dart';
 import '../../../../data/model/response/videos_response.dart';
@@ -24,8 +24,6 @@ import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
-
-import 'package:video_player/video_player.dart';
 
 class DIModel {
   final int videoId;
@@ -164,7 +162,7 @@ class DetailItem extends ConsumerStatefulWidget {
   final String? subTitle;
   final String index;
   final bool isDownloaded;
-  final bool? isShow;
+  final bool? isShow, isAudio;
   final GestureTapCallback? onToggleBookmark;
   final bool? isRemove;
   final void Function()? pressRemove;
@@ -178,6 +176,7 @@ class DetailItem extends ConsumerStatefulWidget {
     required this.isDownloaded,
     this.isShow,
     this.isRemove,
+    this.isAudio,
     this.pressRemove,
   })  : title = null,
         subTitle = null,
@@ -188,6 +187,7 @@ class DetailItem extends ConsumerStatefulWidget {
     required this.appStyle,
     required this.index,
     this.pdfModel,
+    this.isAudio = false,
     required String this.title,
     required String this.subTitle,
     required this.isDownloaded,
@@ -454,9 +454,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   return PopupMenuItem(
                                     height: widget.appStyle.scaleX(24),
                                     onTap: () async {
-                                      log("add to playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
+                                      // log("add to playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
                                       // await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.video!.id!.toString());
-                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString());
+                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio!);
                                     },
                                     child: Text(
                                       playlistP.playlistListResponse![index].title ?? '',

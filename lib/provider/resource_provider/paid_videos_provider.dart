@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' show Response;
+
 import '../../data/api/api_checker.dart';
 import '../../data/model/body/resource_type.dart';
 import '../../data/model/response/videos_response.dart';
@@ -62,7 +64,7 @@ class PaidVideosNotifier extends VideoResourceNotifier {
     } else {
       try {
         var json = jsonDecode(response.body);
-        _videosResponse = VideosResponse.fromJson(json['data']);
+        _videosResponse = VideosResponse.fromJson(json['data'], false);
         stopLoading(isLoading:isLoading ?? true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);

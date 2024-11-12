@@ -14,7 +14,11 @@ class BookmarkRepo {
     return await apiClient.getData('${AppConfigs.getBookmarks}?perPage=${AppConstants.kPerPage}&page=$page');
   }
 
-  Future<Response> toggleBookmark(int videoId) async {
-    return await apiClient.postData(AppConfigs.toggleBookmark, {'video_id': videoId});
+  Future<Response> getAudioBookmarks({int page = 1}) async {
+    return await apiClient.getData('${AppConfigs.getAudioBookmarks}?perPage=${AppConstants.kPerPage}&page=$page');
+  }
+
+  Future<Response> toggleBookmark(int videoId, bool isAudio) async {
+    return await apiClient.postData(AppConfigs.toggleBookmark, {isAudio ? 'audio_id' : 'video_id': videoId});
   }
 }

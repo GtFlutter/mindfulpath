@@ -35,13 +35,13 @@ class PlaylistRepo {
     return await apiClient.postData(AppConfigs.deletePlaylist, {'playlist_id': id});
   }
 
-  Future<Response> addToPlaylist(String playlistId, String videoId) async {
-    var body = {'playlist_id': playlistId, 'video_id': videoId};
+  Future<Response> addToPlaylist(String playlistId, String videoId, bool isAudio) async {
+    var body = {'playlist_id': playlistId, isAudio ? 'audio_id' : 'video_id': videoId};
     return await apiClient.postData(AppConfigs.addToPlaylist, body);
   }
 
-  Future<Response> removeFromPlaylist(String playlistId, String videoId) async {
-    var body = {'playlist_id': playlistId, 'video_id': videoId};
+  Future<Response> removeFromPlaylist(String playlistId, String videoId, bool isAudio) async {
+    var body = {'playlist_id': playlistId, isAudio ? 'audio_id' : 'video_id': videoId};
     return await apiClient.postData(AppConfigs.removeFromPlaylist, body);
   }
 }

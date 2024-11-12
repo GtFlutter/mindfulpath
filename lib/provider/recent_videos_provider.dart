@@ -1,10 +1,12 @@
 import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/base/shared_preferences_provider.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../data/model/response/category_list_reponse.dart';
 
 class DetailedVideoModel {

@@ -29,9 +29,9 @@ class PlaylistNotifier extends ChangeNotifier {
 
   List<PlaylistListResponse>? get playlistListResponse => _playlistListResponse;
 
-  Playlist_Detail_Response? _playlistDetailResponse;
+  PlaylistDetailResponse? _playlistDetailResponse;
 
-  Playlist_Detail_Response? get playlistDetailResponse => _playlistDetailResponse;
+  PlaylistDetailResponse? get playlistDetailResponse => _playlistDetailResponse;
 
   void startLoading() {
     if (!_isLoading) {
@@ -79,20 +79,11 @@ class PlaylistNotifier extends ChangeNotifier {
       if (showProgress) stopLoading();
       ApiChecker.checkApi(response);
     } else {
-      try {
-        print('sgsdgdgsgsd ----****** ${jsonDecode(response.body)}');
-        print('sgsdgdgsgsd ----++++++ ${Playlist_Detail_Response.fromJson(jsonDecode(response.body))}');
-
-        _playlistDetailResponse = Playlist_Detail_Response.fromJson(jsonDecode(response.body));
-        print('sgsdgdgsgsd ----*****86* ${_playlistDetailResponse}');
-        if (showProgress) {
-          stopLoading();
-        } else {
-          notifyListeners();
-        }
-      } catch (e) {
-        showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
-        if (showProgress) stopLoading();
+      _playlistDetailResponse = PlaylistDetailResponse.fromJson(jsonDecode(response.body));
+      if (showProgress) {
+        stopLoading();
+      } else {
+        notifyListeners();
       }
     }
   }
@@ -145,8 +136,8 @@ class PlaylistNotifier extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> addToPlaylist(String playlistId, String videoId) async {
-    Response response = await repo.addToPlaylist(playlistId, videoId);
+  Future<bool> addToPlaylist(String playlistId, String videoId, bool isAudio) async {
+    Response response = await repo.addToPlaylist(playlistId, videoId, isAudio);
     debugPrint('RESPONSE CODE :: ${response.statusCode}');
     var json = jsonDecode(response.body);
     if (response.statusCode != 200) {
@@ -159,9 +150,9 @@ class PlaylistNotifier extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> removeFromPlaylist(String playlistId, String videoId) async {
+  Future<bool> removeFromPlaylist(String playlistId, String videoId, bool isAudio) async {
     startLoading();
-    Response response = await repo.removeFromPlaylist(playlistId, videoId);
+    Response response = await repo.removeFromPlaylist(playlistId, videoId, isAudio);
 
     debugPrint('RESPONSE CODE :: ${response.statusCode}');
     var json = jsonDecode(response.body);

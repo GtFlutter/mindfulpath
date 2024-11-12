@@ -28,20 +28,26 @@ class BookmarkListResponse {
 
   BookmarkListResponse({this.id, this.userId, this.videoId, this.videoTitle, this.createdAt, this.updatedAt, this.bookmarkVideoResponse});
 
-  BookmarkListResponse.fromJson(dynamic json) {
+  BookmarkListResponse.fromJson(dynamic json, bool isFromAudio) {
     id = json['id'];
     userId = json['user_id'];
-    videoId = json['video_id'];
-    videoTitle = json['video_title'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    if (json['video'] != null) bookmarkVideoResponse = VideoResponse.fromJson(json['video']);
+    if (json['video'] != null) {
+      videoTitle = json['video_title'];
+      videoId = json['video_id'];
+      bookmarkVideoResponse = VideoResponse.fromJson(json['video'], false);
+    } else if (json['audio'] != null) {
+      videoId = json['audio_id'];
+      videoTitle = json['audio_title'];
+      bookmarkVideoResponse = VideoResponse.fromJson(json['audio'], true);
+    }
   }
 
-  static List<BookmarkListResponse> listFromJson(dynamic jsonList) {
+  static List<BookmarkListResponse> listFromJson(dynamic jsonList, bool isFromAudio) {
     List<BookmarkListResponse> list = [];
     for (var json in jsonList) {
-      list.add(BookmarkListResponse.fromJson(json));
+      list.add(BookmarkListResponse.fromJson(json, isFromAudio));
     }
     return list;
   }

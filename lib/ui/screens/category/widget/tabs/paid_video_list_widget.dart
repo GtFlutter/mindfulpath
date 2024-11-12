@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/recent_videos_provider.dart';
+import 'package:meditation_app/provider/resource_provider/paid_audios_provider.dart';
 import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../../../data/model/body/resource_type.dart';
@@ -19,8 +18,9 @@ import '../detail_item.dart';
 class PaidVideoListWidget extends ConsumerStatefulWidget {
   final CategoryListResponse category;
   final bool isPurchased;
+  final bool isAudio;
 
-  const PaidVideoListWidget({super.key, required this.category,required this.isPurchased});
+  const PaidVideoListWidget({super.key, required this.category,required this.isPurchased, required this.isAudio});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -34,18 +34,21 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, () async {
-      print('______________________________________35__${widget.category.isPurchased}-----${widget.isPurchased}---${ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased}');
-      // if (!(widget.isPurchased)) {
-      // if (!(ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false)) {
-      //   buyNow(context, categoryId: widget.category.id.toString());
-      // }
-      if(ref.read(videoProvider).video==null) {
-        ref.read(videoProvider.notifier).isSelected = null;
-      }
-      ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
-      initCall();
-    });
+
+    if(widget.isAudio){
+      Future.delayed(Duration.zero, () async {
+        ref.read(paidAudiosProvider.notifier).fetchAudios(widget.category.id??0);
+        await initCall();
+      });
+    }else{
+      Future.delayed(Duration.zero, () async {
+        if(ref.read(videoProvider).video==null) {
+          ref.read(videoProvider.notifier).isSelected = null;
+        }
+        ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
+        await initCall();
+      });
+    }
     super.initState();
   }
 
@@ -73,17 +76,17 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
     super.build(context);
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
     var provider = ref.watch(paidVideosProvider);
+    var audioP = ref.watch(paidAudiosProvider);
 
-    if (provider.loading) {
+    if (provider.loading || audioP.loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (provider.videosResponse == null ||
-        provider.videosResponse!.list == null) {
+    if (widget.isAudio ? (audioP.videosResponse == null || audioP.videosResponse!.list == null) : (provider.videosResponse == null || provider.videosResponse!.list == null)) {
       return const Center(child: Text('Unable to find data!'));
     }
-    if (provider.videosResponse!.list!.isEmpty) {
-      return const Center(child: Text('Paid Videos Is Empty'));
+    if (widget.isAudio ? audioP.videosResponse!.list!.isEmpty : provider.videosResponse!.list!.isEmpty) {
+      return const Center(child: Text('Free Videos Is Empty'));
     }
 
     final downloadP = ref.watch(downloadProvider);
@@ -102,14 +105,12 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
         bottom: _style.scale * 100,
         top: _style.scale * 10,
       ),
-      itemCount: provider.videosResponse!.list!.length,
+      itemCount: widget.isAudio ? audioP.videosResponse!.list!.length : provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
-        var model = provider.videosResponse!.list![index];
+        var model = widget.isAudio ? audioP.videosResponse!.list![index] : provider.videosResponse!.list![index];
 
         return GestureDetector(
           onTap: () {
-            print('______________________________________103__${model.category?.isPurchased}');
-            // if (model.category?.isPurchased??false) {
             if (model.category?.isPurchased??false) {
               playVideo(model);
             } else {
@@ -119,9 +120,10 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
           child: DetailItem.video(
             appStyle: _style,
             model: model,
+            isAudio: widget.isAudio,
             index: '$index',
             isDownloaded: provider.downloadedVideo.any((element) =>
-                element.id == provider.videosResponse?.list?[index].id),
+            element.id == provider.videosResponse?.list?[index].id),
             onToggleBookmark: () => toggleItemBookmark(model.id,
                 isRemove: model.bookmarked ?? false),
           ),
@@ -135,25 +137,30 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
   void toggleItemBookmark(int? itemId, {bool isRemove = false}) {
     if (itemId == null) return;
     ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
-    ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
+    if(widget.isAudio){
+      ref.read(paidAudiosProvider.notifier).fetchAudios(widget.category.id??0);
+    }else{
+      ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
+    }
 
   }
 
   void playVideo(VideoResponse model) {
     ref.read(videoProvider).playVideo(
-          DetailedVideoModel(
-            category: widget.category,
-            video: DIModel(
-              thumbnailUrl: model.imgUrl ?? '',
-              videoUrl: model.videoUrl!,
-              duration: model.duration ?? '',
-              title: model.title ?? '',
-              categoryName: widget.category.title ?? '',
-              videoId: model.id!,
-              videoType: model.videoType ?? ResourceType.paid,
-            ),
+        DetailedVideoModel(
+          category: widget.category,
+          video: DIModel(
+            thumbnailUrl: model.imgUrl ?? '',
+            videoUrl: model.videoUrl!,
+            duration: model.duration ?? '',
+            title: model.title ?? '',
+            categoryName: widget.category.title ?? '',
+            videoId: model.id!,
+            videoType: model.videoType ?? ResourceType.paid,
           ),
-        );
+        ),
+        isAudioFile: widget.isAudio
+    );
   }
 
   @override

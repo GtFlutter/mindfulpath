@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' show Response;
+import 'package:meditation_app/provider/resource_provider/audio_resource_notifier_model.dart';
 
 import '../../data/api/api_checker.dart';
 import '../../data/model/body/resource_type.dart';
@@ -11,20 +12,19 @@ import '../../database/database_model.dart';
 import '../../ui/common/custom_snackbar.dart';
 import '../../util/constants.dart';
 import '../repo_provider/dashboard_repo_provider.dart';
-import 'video_resource_notifier_model.dart';
 
-final freeVideosProvider = ChangeNotifierProvider<FreeVideosNotifier>((ref) {
+final freeAudiosProvider = ChangeNotifierProvider<FreeVideosNotifier>((ref) {
   final repo = ref.watch(dashboardRepoProvider);
   return FreeVideosNotifier(repo);
 });
 
-class FreeVideosNotifier extends VideoResourceNotifier {
+class FreeVideosNotifier extends AudioResourceNotifier {
   final DashboardRepo repo;
   FreeVideosNotifier(this.repo);
 
   VideosResponse? _videosResponse;
   VideosResponse? get videosResponse => _videosResponse;
-int? selectedIndex;
+  int? selectedIndex;
   List<VideoModal> downloadedVideo=[];
 
 
@@ -55,16 +55,16 @@ int? selectedIndex;
   }
 
   @override
-  Future<void> fetchVideos(int categoryId) async {
+  Future<void> fetchAudios(int categoryId) async {
     startLoading();
-    Response response = await repo.getVideos(categoryId: categoryId, offset: 1, resourceType: ResourceType.free);
+    Response response = await repo.getAudios(categoryId: categoryId, offset: 1, resourceType: ResourceType.free);
     if (response.statusCode != 200) {
       stopLoading();
       ApiChecker.checkApi(response);
     } else {
       try {
         var json = jsonDecode(response.body);
-        _videosResponse = VideosResponse.fromJson(json['data'], false);
+        _videosResponse = VideosResponse.fromJson(json['data'], true);
         stopLoading();
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);

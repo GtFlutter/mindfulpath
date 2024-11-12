@@ -11,9 +11,11 @@ import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/ui/common/media_player/app_audio_player.dart';
 import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
 import 'package:meditation_app/ui/screens/category/widget/resource_widget.dart';
 import 'package:meditation_app/util/constants.dart';
+
 import '../../../theme/styles.dart';
 import 'widget/detail_item.dart';
 import 'widget/intro_widget.dart';
@@ -24,7 +26,7 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
   final bool? isFromPdfNotification;
   final bool? isFromPaidVideoNotification;
   final bool? isPaid;
-  final bool? isPDFView;
+  final bool? isPDFView, iAudioView;
 
   const DetailCategoryScreen({
     super.key,
@@ -33,6 +35,7 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
     this.isFromPdfNotification,
     this.isPaid,
     this.isPDFView,
+    this.iAudioView = false,
     this.isFromPaidVideoNotification,
   });
 
@@ -40,8 +43,8 @@ class DetailCategoryScreen extends ConsumerStatefulWidget {
   ConsumerState<DetailCategoryScreen> createState() => _DetailCategoryScreenState();
 }
 
-class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen>
-{
+class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
+
   static AppStyle _style = AppStyle();
   Duration? _lastKnownPosition;
 
@@ -52,7 +55,6 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen>
     Future.delayed(
       Duration.zero,
       () {
-
         ref.read(videoProvider).reInit(
               widget.initialVideo != null
                   ? DetailedVideoModel(
@@ -74,11 +76,12 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen>
 
     var videoCtrl = ref.watch(videoProvider);
 
-    var isVideoAvailable = videoCtrl.video != null;
+    var isVideoAvailable = videoCtrl.isAudioFileAvailable ? false : videoCtrl.video != null;
+    var isAudioAvailable = videoCtrl.isAudioFileAvailable && videoCtrl.video != null;
     log("lastPosition==> in detail category$_lastKnownPosition");
 
     return PopScope(
-      canPop: !isVideoAvailable,
+      canPop: !isVideoAvailable || !isAudioAvailable,
       onPopInvoked: (didPop) {
         if (didPop) {
           return;
@@ -190,7 +193,15 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen>
                         ],
                       ),
                     ],
-                  ] else
+                  ] else if(isAudioAvailable && videoCtrl.video != null)...[
+                    AppAudioPlayer(
+                      style: _style,
+                      audioId: videoCtrl.video!.videoId,
+                      audioUrl: videoCtrl.video!.videoUrl,
+                      audioImage: videoCtrl.video!.thumbnailUrl,
+                    ),
+                    SizedBox(height: _style.scaleX(24)),
+                  ]else
                     Expanded(
                       flex: !isLandscape ? 2 : 1,
                       child: IntroWidget(

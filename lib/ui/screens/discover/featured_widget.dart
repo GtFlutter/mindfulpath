@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/ui/common/paginated_list_view.dart';
 import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.dart';
 

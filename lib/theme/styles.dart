@@ -1,7 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:ui';
+
 import 'package:flutter/material.dart' show Colors, TextStyle, debugPrint, immutable;
+
 import 'colors.dart';
 
 @immutable

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
@@ -13,6 +14,7 @@ import 'package:meditation_app/provider/repo_provider/bookmark_repo_provider.dar
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
+
 import '../helper/route/route_paths.dart';
 import 'resource_provider/free_videos_provider.dart';
 import 'resource_provider/paid_videos_provider.dart';
@@ -83,7 +85,7 @@ class BookmarkNotifier extends ChangeNotifier {
     } else {
       try {
         var json = jsonDecode(response.body);
-        _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_video_list']);
+        _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_video_list'], false);
         _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
         print('------------>>>>>${_category!.first.id}');
         stopLoading();
@@ -94,7 +96,28 @@ class BookmarkNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleBookmark(int itemId, {bool isRemove = false}) async {
+  Future<void> getAudioBookmarks() async {
+    startLoading();
+    Response response = await repo.getAudioBookmarks();
+    debugPrint('RESPONSE CODE :: ${response.statusCode}');
+    if (response.statusCode != 200) {
+      stopLoading();
+      ApiChecker.checkApi(response);
+    } else {
+      try {
+        var json = jsonDecode(response.body);
+        _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
+        _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
+        print('------------>>>>>${_category!.first.id}');
+        stopLoading();
+      } catch (e) {
+        //showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+        stopLoading();
+      }
+    }
+  }
+
+  Future<void> toggleBookmark(int itemId, {bool isRemove = false, bool isAudio = false}) async {
     if (!ref.read(authProvider).isUserLoggedIn) {
       showCustomSnackBar(
         'Please login to bookmark.',
@@ -112,7 +135,7 @@ class BookmarkNotifier extends ChangeNotifier {
     showCustomSnackBar(isRemove ? 'UnBookmarking...' : 'Bookmarking...');
     startToggleLoading();
 
-    Response response = await repo.toggleBookmark(itemId);
+    Response response = await repo.toggleBookmark(itemId, isAudio);
     if (response.statusCode != 200) {
       stopToggleLoading();
       ApiChecker.checkApi(response);

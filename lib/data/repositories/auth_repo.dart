@@ -1,10 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_client.dart';
 import 'package:meditation_app/data/model/body/user_body.dart';
-import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

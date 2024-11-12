@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -7,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/firebase_options.dart';
-import 'package:meditation_app/provider/base/shared_preferences_provider.dart';
 import 'package:meditation_app/helper/route/router.dart';
+import 'package:meditation_app/provider/base/shared_preferences_provider.dart';
 import 'package:meditation_app/theme/theme.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,3 +67,100 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage remoteMessage) as
   final send = IsolateNameServer.lookupPortByName('notification');
   send?.send(remoteMessage.data);
 }
+
+/*import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:meditation_app/theme/theme.dart';
+import 'package:meditation_app/util/app_config.dart';
+
+Future<void> main() async {
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarColor: Colors.transparent,
+    ),
+  );
+
+  return runApp(
+      const MainApp()
+  );
+}
+
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: AppConfigs.APP_NAME,
+      debugShowCheckedModeBanner: false,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.dark,
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+
+  // *****
+  // *****
+  // *****
+  // *****
+  // *****
+
+  void patternProgramming1(){
+    int row = 5;
+    for (int i = 1; i <= row; i++) {
+      for (int j = 1; j <= row; j++) {
+        print("*");
+      }
+      print("\n");
+    }
+  }
+
+  // *
+  // **
+  // ***
+  // ****
+  // *****
+
+  void patternProgramming2(){
+    int row = 5;
+    for (int i = 1; i <= row; i++) {
+      for (int j = 1; j <= i; j++) {
+        print("*");
+      }
+      print("\n");
+    }
+  }
+
+  // *****
+  // ****
+  // ***
+  // **
+  // *
+
+  void patternProgramming3(){
+    int row = 5;
+    for(int i = row ; i >= 1 ; i++){
+      for(int j = i ; j >= 1 ; j++){
+        print("*");
+      }
+      print("\n");
+    }
+  }
+
+}*/

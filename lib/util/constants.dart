@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:video_player/video_player.dart';
+
 
 class AppConstants {
   /// Password Max Length

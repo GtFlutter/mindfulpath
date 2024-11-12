@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meditation_app/data/model/response/playlist_details_response.dart';
+import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
-import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/common/media_image_card.dart';
@@ -47,10 +47,12 @@ class SubPlayListItem extends ConsumerStatefulWidget {
 
 class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
   bool result = true;
+  VideoResponse? model;
 
   @override
   void initState() {
-    final downloadP = ref.read(downloadProvider);
+
+    model = widget.model.video!;
 
     Future.delayed(
       Duration.zero,
@@ -63,23 +65,6 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
     super.initState();
   }
 
-  //
-  // getCategory()async{
-  //   final coursePRead = ref.read(courseProvider);
-  //   final coursePWatch = ref.watch(courseProvider);
-  //   await coursePRead.getCategoryPdfFromDatabase();
-  //   await coursePRead.getCategoryFromDatabase();
-  //
-  //   for(final category in coursePWatch.downloadPdfResponses){
-  //     await coursePRead.getPdfFromDatabase(category.categoryId??0);
-  //   }
-  //
-  //   for(final category in coursePWatch.downloadResponse){
-  //     await coursePRead.getVideoFromDatabase(int.parse(category.categoryId??""));
-  //
-  //   }
-  //
-  // }
   getCategory() async {
     final coursePRead = ref.read(courseProvider);
     final coursePWatch = ref.watch(courseProvider);
@@ -98,20 +83,16 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
 
   getDownload() async {
     final downloadP = ref.read(downloadProvider);
-    log("video id in playlist----${widget.model.video!.id}");
-    result = await downloadP.checkVideoIsDownload(widget.model.video!.id.toString(), false);
+    // log("video id in playlist----${widget.isAudio ? widget.model.audio!.id : widget.model.video!.id}");
+    // result = await downloadP.checkVideoIsDownload(widget.model.video!.id.toString(), false);
+    if(model != null){
+      result = await downloadP.checkVideoIsDownload(model!.id.toString(), false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
-    String timeStr = widget.model.video!.duration ?? "";
-    List<String> timeComponents = timeStr.split(":");
-    int minute = int.parse(timeComponents[1]);
-    int second = int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
-    print("Minute: $minute, Second: $second");
-    // final bookmarkNotifier = ref.watch(bookmarkProvider);
-    final playlistProvider = ref.watch(playListProvider);
 
     return GestureDetector(
       onTap: () {
@@ -141,12 +122,17 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MediaImageCard(
-                appStyle: widget.appStyle,
-                imgUrl: widget.model.video != null ? widget.model.video!.thumbnailImageUrlSrc ?? '' : '',
-                duration: (widget.model.video?.duration ?? "").toDuration,
-                imgRadius: widget.appStyle.scaleX(25),
-                imgSize: widget.appStyle.scaleX(100),
+              Builder(
+                builder: (context) {
+                  debugPrint("Nothing asncajksnc ${model!.thumbnailImageUrlSrc}");
+                  return MediaImageCard(
+                    appStyle: widget.appStyle,
+                    imgUrl: model!.thumbnailImageUrlSrc!,
+                    duration: (widget.model.video?.duration ?? "").toDuration,
+                    imgRadius: widget.appStyle.scaleX(25),
+                    imgSize: widget.appStyle.scaleX(100),
+                  );
+                }
               ),
               Flexible(
                 child: Column(
@@ -159,7 +145,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '${widget.model.videoTitle}',
+                            '${model!.title}',
                             style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -179,7 +165,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                       style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                     ),
                                     TextSpan(
-                                      text: widget.model.categoryTitle,
+                                      text: model!.categoryTitle,
                                       style: textStyle.copyWith(color: AppColors.categoryNameColor,fontSize: 11),
                                     ),
                                   ],

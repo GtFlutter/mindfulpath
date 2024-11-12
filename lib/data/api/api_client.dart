@@ -81,13 +81,11 @@ class ApiClient {
     try {
       log('===> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
       log('===> API Body: $body');
-      http.Response response = await http
-          .post(
+      http.Response response = await http.post(
             Uri.parse(appBaseUrl + uri),
             body: jsonEncode(body),
             headers: headers ?? _mainHeaders,
-          )
-          .timeout(_timeoutIn);
+          ).timeout(_timeoutIn);
       return handleResponse(response, uri);
     } catch (_) {
       return _errorResponse;

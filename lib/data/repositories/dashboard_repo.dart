@@ -26,6 +26,14 @@ class DashboardRepo {
     return await apiClient.postData(AppConfigs.getVideos, _toBody(categoryId, resourceType, offset));
   }
 
+  Future<Response> getAudios({
+    required int categoryId,
+    required int offset,
+    required ResourceType resourceType,
+  }) async {
+    return await apiClient.postData(AppConfigs.getAudios, _toBody(categoryId, resourceType, offset));
+  }
+
   Future<Response> getPdfs({
     required int categoryId,
     required int offset,
@@ -41,10 +49,10 @@ class DashboardRepo {
         'perPage': AppConstants.kPerPage * 10,
       };
 
-  Future<Response> storeVideoWatchedTime(int videoId, Duration duration) async {
+  Future<Response> storeVideoWatchedTime(int videoId, Duration duration, bool isAudio) async {
     return await apiClient.postData(
       AppConfigs.storeWatchedVideoDuration,
-      {'video_id': videoId, 'duration': duration.inSeconds},
+      {isAudio ? 'audio_id' : 'video_id': videoId, 'duration': duration.inSeconds},
     );
   }
 

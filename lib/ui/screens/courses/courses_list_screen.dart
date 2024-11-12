@@ -128,9 +128,9 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
                 style: _style,
                 onPressed: () {
                   if (isPurchased) {
-                    context.goToDetailCategoryScreen(courseP.purchasedVideoResponse[index].categoryResponse!);
+                    context.goToDetailCategoryScreen(courseP.purchasedVideoResponse[index].categoryResponse!,isAudio: false);
                   } else if (isCurrentlyProgress) {
-                    context.goToDetailCategoryScreen(courseP.cpVideoResponse[index].categoryResponse!);
+                    context.goToDetailCategoryScreen(courseP.cpVideoResponse[index].categoryResponse!,isAudio: false);
                   }else {
                     context.push(RoutePath.downloadDetailCategoryScreenPath, extra: courseP.downloadResponse[index]);
                   }

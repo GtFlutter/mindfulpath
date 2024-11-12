@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,8 +79,8 @@ class DashboardNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> storeVideoWatchedTime(int videoId, Duration duration) async {
-    Response response = await repo.storeVideoWatchedTime(videoId, duration);
+  Future<void> storeVideoWatchedTime(int videoId, Duration duration, bool isAudio) async {
+    Response response = await repo.storeVideoWatchedTime(videoId, duration, isAudio);
     if (response.statusCode != 200) {
       ApiChecker.checkApi(response);
       return;
@@ -113,7 +112,7 @@ class DashboardNotifier extends ChangeNotifier {
       ApiChecker.checkApi(response);
     } else {
       var json = jsonDecode(response.body);
-      _data = VideosResponse.fromJson(json['data']);
+      _data = VideosResponse.fromJson(json['data'], false);
 
       notifyListeners();
       debugPrint('search Response Body :: ${response.body}');

@@ -6,12 +6,12 @@ import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
+import 'package:meditation_app/provider/resource_provider/paid_audios_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_videos_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_widget.dart';
-import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../../provider/dashboard_provider.dart';
@@ -37,21 +37,19 @@ class ResourceDetailCategory extends ConsumerStatefulWidget {
 
 class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
-  final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF')];
+  final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF'), ItemName(id: 2, title: 'Audio')];
   static AppStyle _style = AppStyle();
 
   /// Either 0(Video) or 1(PDF)
-  // late int filterIndex;
   int filterIndex = 0;
 
   /// Either 0(Free) or 1(Paid)
-  // late int courseIndex;
   int courseIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(initialIndex: courseIndex, length: 4, vsync: this);
+    _tabController = TabController(initialIndex: courseIndex, length: 6, vsync: this);
     (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
 
     Future.delayed(Duration(seconds: 0), () {
@@ -60,19 +58,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       if (widget.isFromPdfNotification ?? false) {
         _changeFilter(ItemName(id: 1, title: 'PDF'));
         log("isPaid and purchased--->${widget.isPaid}----${widget.category.isPurchased}");
-        /* if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
-          await buyNow(context, categoryId: widget.category.id.toString());
-          if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
-            _changeCourseType(1);
-          } else {
-            _changeCourseType(0);
-          }
-        } else if ((widget.isPaid ?? false) && (widget.category.isPurchased ?? false)) {
-          log("callleeddddddd");
-          _changeCourseType(1);
-          _changeFilter(ItemName(id: 1, title: 'PDF'));
-          setState(() {});
-        }*/
         if (widget.isPaid ?? false) {
           _changeCourseType(1);
         } else {
@@ -80,24 +65,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         }
       } else if (widget.isFromPaidVideoNotification ?? false) {
         log("isPaid and purchased  11--->${widget.isPaid}----${widget.category.isPurchased}");
-        /*if ((widget.isPaid ?? false) && !(widget.category.isPurchased ?? false)) {
-          await buyNow(context, categoryId: widget.category.id.toString());
-          log("-------->${ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased}---------------");
-          log("starrttt~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-          await ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0);
-          log("starrttt~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sfdsfdsfdsf");
-          if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
-            _changeCourseType(1);
-          } else {
-            _changeCourseType(0);
-          }
-        }
-        else if ((widget.isPaid ?? false) && (widget.category.isPurchased ?? false)) {
-          log("callleeddddddd~~~~~~~~");
-          _changeCourseType(1);
-          _changeFilter(ItemName(id: 0, title: 'Video'));
-          setState(() {});
-        }*/
         if (widget.isPaid ?? false) {
           _changeCourseType(1);
         } else {
@@ -108,7 +75,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         _changeFilter(ItemName(id: 0, title: 'Video'));
       }
     });
-    print('_______________________________________46_${widget.category.isPurchased}');
   }
 
   @override
@@ -128,6 +94,10 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       goTo = 2;
     } else if (filterIndex == 1 && courseTypeIndex == 1) {
       goTo = 3;
+    } else if (filterIndex == 2 && courseTypeIndex == 0) {
+      goTo = 4;
+    } else if (filterIndex == 2 && courseTypeIndex == 1) {
+      goTo = 5;
     } else {
       goTo = throw ArgumentError();
     }
@@ -136,7 +106,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   }
 
   void _changeFilter(ItemName? value,) {
-    log("====value==>${value?.id}");
     if (value == null || value.id == filterIndex) return;
     setState(() {
       filterIndex = value.id;
@@ -158,6 +127,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
 
     var provider = ref.watch(paidVideosProvider);
+    var audioProvider = ref.watch(paidAudiosProvider);
     var dashboardPro = ref.watch(dashboardProvider);
     log("provider.videosResponse?.category?.isPurchased----------${provider.videosResponse?.category?.isPurchased}");
     return Column(
@@ -188,22 +158,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                   );
                   return;
                 }
-                print('_______________________________________126_${provider.videosResponse?.category?.isPurchased}');
-
-                /*if (!(provider.videosResponse?.category?.isPurchased ?? false)) {
-                  await buyNow(context, categoryId: widget.category.id.toString());
-                  await provider.fetchVideos(widget.category.id ?? 0, isLoading: filterIndex == 0);
-                  if (ref.read(paidVideosProvider.notifier).videosResponse?.category?.isPurchased ?? false) {
-                    _changeCourseType(1);
-                  } else {
-                    _changeCourseType(0);
-                  }
-
-                  return;
-                } else {
-                  log("ttthhhiiissss ccaakkkeddd");
-                  _changeCourseType(1);
-                }*/
                 _changeCourseType(1);
               },
             ),
@@ -242,9 +196,10 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-              FreeVideoListWidget(category: widget.category),
+              FreeVideoListWidget(category: widget.category, isAudio: false,),
               PaidVideoListWidget(
                 category: widget.category,
+                isAudio: false,
                 isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
               ),
               FreePdfListWidget(category: widget.category),
@@ -252,34 +207,16 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 category: widget.category,
                 isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
               ),
+              FreeVideoListWidget(category: widget.category,isAudio: true,),
+              PaidVideoListWidget(
+                category: widget.category,
+                isAudio: true,
+                isPurchased: audioProvider.videosResponse?.category?.isPurchased ?? false,
+              ),
             ],
           ),
         ),
       ],
     );
   }
-}
-
-class DemoWIdget1 extends StatefulWidget {
-  final String title;
-
-  const DemoWIdget1({super.key, required this.title});
-
-  @override
-  State<DemoWIdget1> createState() => _DemoWIdget1State();
-}
-
-class _DemoWIdget1State extends State<DemoWIdget1> with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return SizedBox.expand(
-      child: Center(
-        child: Text(widget.title),
-      ),
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
 }

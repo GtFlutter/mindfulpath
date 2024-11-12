@@ -14,6 +14,7 @@ import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
+import 'package:meditation_app/ui/common/media_player/app_audio_player.dart';
 import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 import 'package:meditation_app/ui/screens/playlist/sub_playlist_item.dart';
@@ -75,7 +76,6 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
 
   @override
   void deactivate() {
-    print("sfsdfsdfsdfsdfsdfsdfsdfsdfsdfdsf");
     ref.read(videoProvider.notifier).isSelected = null;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     ref.read(bookmarkProvider.notifier).islandScap = false;
@@ -115,13 +115,13 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
     var videoCtrl = ref.watch(videoProvider);
-    var isVideoAvailable = videoCtrl.video != null;
+    var isVideoAvailable = videoCtrl.isAudioFileAvailable ? false : videoCtrl.video != null;
+    var isAudioAvailable = videoCtrl.isAudioFileAvailable && videoCtrl.video != null;
     bool isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
 
     final playlistP = ref.watch(playListProvider);
     final downloadP = ref.watch(downloadProvider);
 
-    print('______-------playlist--------_____979479_______${downloadP.complate}');
     if (downloadP.complate == true) {
       refreshh();
       ref.read(downloadProvider.notifier).complate = false;
@@ -140,7 +140,8 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                   videoId: model.videoId ?? 0,
                   videoType: ResourceType.paid),
             ),
-        index: index
+        index: index,
+        isAudioFile: model.video!.videoUrlSrc!.split('.').last.contains('mp3')
           );
     }
 
@@ -212,6 +213,14 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                 ),
                               ),
                             )
+                          ] else if(isAudioAvailable)...[
+                            AppAudioPlayer(
+                              style: _style,
+                              audioId: videoCtrl.video!.videoId,
+                              audioUrl: videoCtrl.video!.videoUrl,
+                              audioImage: videoCtrl.video!.thumbnailUrl,
+                            ),
+                            SizedBox(height: _style.scaleX(24)),
                           ] else
                             const SizedBox.shrink(),
                           !isLandscape
@@ -243,7 +252,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                               FocusManager.instance.primaryFocus?.unfocus();
                                             },
                                             onRemovePress: () async {
-                                              await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString());
+                                              await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
                                               playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
                                             },
                                             index: index,

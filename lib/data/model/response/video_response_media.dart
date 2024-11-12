@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'video_response_media.g.dart';
 
 @JsonSerializable()

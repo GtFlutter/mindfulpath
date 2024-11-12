@@ -8,7 +8,6 @@ import 'package:meditation_app/data/repositories/dashboard_repo.dart';
 import 'package:meditation_app/provider/repo_provider/dashboard_repo_provider.dart';
 
 import '../data/api/api_checker.dart';
-
 import '../ui/common/custom_snackbar.dart';
 
 final featuredVideosProvider = ChangeNotifierProvider<FeaturedVideosNotifier>((ref) {
@@ -59,13 +58,13 @@ class FeaturedVideosNotifier extends ChangeNotifier {
         }
         if (offset == 1 || _data == null) {
           if (reload) _data = null;
-          _data = VideosResponse.fromJson(json['data']);
+          _data = VideosResponse.fromJson(json['data'], false);
           if (!reload && offset == 1 && showProgress) {
             stopLoading(notifie: false);
           }
           notifyListeners();
         } else if (_data != null) {
-          var tempModel = VideosResponse.fromJson(json['data']);
+          var tempModel = VideosResponse.fromJson(json['data'], false);
           _data!.total = tempModel.total;
           _data!.currentPage = tempModel.currentPage;
           _data!.lastPage = tempModel.lastPage;

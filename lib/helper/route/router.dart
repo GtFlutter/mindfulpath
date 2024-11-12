@@ -14,19 +14,20 @@ import 'package:meditation_app/ui/screens/category/detail_category_screen.dart';
 import 'package:meditation_app/ui/screens/category/download_detail_category_screen.dart';
 import 'package:meditation_app/ui/screens/courses/courses_list_screen.dart';
 import 'package:meditation_app/ui/screens/discover/discover_screen.dart';
-import 'package:meditation_app/ui/screens/search/featured_video_screen.dart';
-import 'package:meditation_app/ui/screens/update_profile/update_profile_screen.dart';
 import 'package:meditation_app/ui/screens/library/library_screen.dart';
 import 'package:meditation_app/ui/screens/notifications/notifications_screen.dart';
 import 'package:meditation_app/ui/screens/playlist/sub_playlist_screen.dart';
 import 'package:meditation_app/ui/screens/profile/profile_screen.dart';
+import 'package:meditation_app/ui/screens/search/featured_video_screen.dart';
 import 'package:meditation_app/ui/screens/search/search_screen.dart';
 import 'package:meditation_app/ui/screens/settings/settings_screen.dart';
+import 'package:meditation_app/ui/screens/settings/tc_pp_screen.dart';
 import 'package:meditation_app/ui/screens/shellnav/shell_route.dart';
 import 'package:meditation_app/ui/screens/splash_screen.dart';
-import 'package:meditation_app/ui/screens/settings/tc_pp_screen.dart';
 import 'package:meditation_app/ui/screens/support/support_screen.dart';
 import 'package:meditation_app/ui/screens/support/support_section_screen.dart';
+import 'package:meditation_app/ui/screens/update_profile/update_profile_screen.dart';
+
 import '../../ui/screens/category/widget/detail_item.dart';
 
 final GlobalKey<NavigatorState> rootNavigator = GlobalKey(debugLabel: 'root');
@@ -222,10 +223,11 @@ final appRouter = GoRouter(
                 parentNavigatorKey: rootNavigator,
                 path: RoutePath.detailCategoryScreen,
                 builder: (context, state) {
-                  if (state.extra != null && state.extra is (CategoryListResponse, DIModel?)) {
-                    var (category, video) = state.extra as (CategoryListResponse, DIModel?);
+                  if (state.extra != null && state.extra is (CategoryListResponse, DIModel?, bool)) {
+                    var (category, video, isAudio) = state.extra as (CategoryListResponse, DIModel?, bool);
                     return DetailCategoryScreen(
                       key: state.pageKey,
+                      iAudioView: isAudio,
                       categoryListResponse: category,
                       initialVideo: video,
                     );

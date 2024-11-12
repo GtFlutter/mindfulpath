@@ -214,7 +214,7 @@ class BuyNowDialog extends ConsumerWidget {
                                   log('ON Success :: $value', name: 'On Success');
                                   bool result = await dashboardP.purchaseCategory(categoryId, value['paymentId']);
                                   if (result) {
-                                    log("isFromSearch---->${isFromSearch}");
+                                    log("isFromSearch---->$isFromSearch");
                                     if (isFromSearch ?? false) {
                                       // final dashPro=ref.read(dashboardProvider);
                                       // List<int>? ids = [];

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/date_converter.dart';
-import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
+import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 import 'package:meditation_app/ui/screens/analytics/data/provider/analytics_provider.dart';
+import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 import 'package:meditation_app/ui/screens/analytics/helper/analytics_extensions.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_chart.dart';
 import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_details.dart';
@@ -25,11 +26,17 @@ class AnalyticsScreen extends ConsumerStatefulWidget {
 class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   static AppStyle _style = AppStyle();
 
+  ItemName? selectedItem;
+  List<ItemName> listVideoAudio = [ItemName(id: 0, title: 'Videos'), ItemName(id: 1, title: 'Audios')];
+
   @override
   void initState() {
     ref.read(analyticsProvider).initData(notifie: false);
+    selectedItem = listVideoAudio.first;
     if (ref.read(authProvider).isUserLoggedIn) {
-      Future.delayed(Duration.zero, ref.read(analyticsProvider).getCategoryNamesList);
+      Future.delayed(Duration.zero, () {
+        ref.read(analyticsProvider).getCategoryNamesList(selectedItem == ItemName(id: 1,title: 'Audios'));
+      },);
     }
     super.initState();
   }
@@ -55,7 +62,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         automaticallyImplyLeading: false,
         actions: [
           TextButton(
-            onPressed: prov.loading ? null : () => prov.reset(),
+            onPressed: prov.loading ? null : () => prov.reset(selectedItem == ItemName(id: 1,title: 'Audios')),
             child: const Text('Reset'),
           ),
         ],
@@ -68,10 +75,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               return const SignInRequire();
             }
 
-            // if (prov.categories.isEmpty) {
-            //   return NoDataFound(onRetry: () {});
-            // }
-
             String resultOf = '${prov.duration.start.toStringFormat3}${prov.durationtype != FilterDuration.day ? ' To ${prov.duration.end.toStringFormat3}' : ''}';
 
             return Column(
@@ -83,13 +86,22 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     size,
                     categoryValue: prov.categoryId,
                     videoValue: prov.videoId,
+                    selectedItem: selectedItem,
                     durationtypeValue: prov.durationtype,
                     categories: prov.categories,
-                    videos: prov.videos,
+                    videos: listVideoAudio,
                     durationtypes: FilterDuration.toList(),
-                    onCategoryChanged: prov.onCategoryChanged,
-                    onVideoChanged: prov.onVideoChanged,
-                    onDurationTypeChanged: prov.onDurationTypeChanged,
+                    onCategoryChanged: (value) => prov.onCategoryChanged(value, isAudio: selectedItem == ItemName(id: 1,title: 'Audios')),
+                    onVideoChanged: (value) {
+                      selectedItem = value;
+                      if(value == listVideoAudio.first){
+                        prov.getAnalytics(false);
+                      }else{
+                        prov.getAnalytics(true);
+                      }
+                      setState(() {});
+                    },
+                    onDurationTypeChanged: (value) => prov.onDurationTypeChanged(value, selectedItem == ItemName(id: 1,title: 'Audios')),
                   ),
                 ),
                 if (prov.loading)
@@ -103,7 +115,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            prov.reslut == null ? 'Something went wron' : 'No Data Found',
+                            prov.reslut == null ? 'Something went wrong' : 'No Data Found',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),

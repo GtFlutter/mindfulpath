@@ -1,22 +1,22 @@
 import 'package:meditation_app/data/model/response/videos_response.dart';
 
-class Playlist_Detail_Response {
+class PlaylistDetailResponse {
   bool? status;
   String? message;
   Data? data;
 
-  Playlist_Detail_Response({this.status, this.message, this.data});
+  PlaylistDetailResponse({this.status, this.message, this.data});
 
-  Playlist_Detail_Response.fromJson(Map<String, dynamic> json) {
+  PlaylistDetailResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['message'] = this.message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
+    data['message'] = message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -42,7 +42,7 @@ class Data {
     if (json['playlist_video_list'] != null) {
       playlistVideoList = <PlaylistVideoList>[];
       json['playlist_video_list'].forEach((v) {
-        playlistVideoList!.add(new PlaylistVideoList.fromJson(v));
+        playlistVideoList!.add(PlaylistVideoList.fromJson(v));
       });
     }
     currentPage = json['current_page'];
@@ -52,15 +52,15 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.playlistVideoList != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (playlistVideoList != null) {
       data['playlist_video_list'] =
-          this.playlistVideoList!.map((v) => v.toJson()).toList();
+          playlistVideoList!.map((v) => v.toJson()).toList();
     }
-    data['current_page'] = this.currentPage;
-    data['per_page'] = this.perPage;
-    data['total'] = this.total;
-    data['last_page'] = this.lastPage;
+    data['current_page'] = currentPage;
+    data['per_page'] = perPage;
+    data['total'] = total;
+    data['last_page'] = lastPage;
     return data;
   }
 }
@@ -97,21 +97,25 @@ class PlaylistVideoList {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     categoryTitle = json['category_title'];
-    video = json['video'] != null ? new VideoResponse.fromJson(json['video']) : null;
+    if(json['video'] != null){
+      video = json['video'] != null ? VideoResponse.fromJson(json['video'], false) : null;
+    }else if(json['audio'] != null){
+      video = json['audio'] != null ? VideoResponse.fromJson(json['audio'], true) : null;
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['user_id'] = this.userId;
-    data['playlist_id'] = this.playlistId;
-    data['video_id'] = this.videoId;
-    data['video_title'] = this.videoTitle;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
-    data['category_title'] = this.categoryTitle;
-    if (this.video != null) {
-      data['video'] = this.video!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['user_id'] = userId;
+    data['playlist_id'] = playlistId;
+    data['video_id'] = videoId;
+    data['video_title'] = videoTitle;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['category_title'] = categoryTitle;
+    if (video != null) {
+      data['video'] = video!.toJson();
     }
     return data;
   }
@@ -149,15 +153,15 @@ class Video {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['title'] = this.title;
-    data['category_id'] = this.categoryId;
-    data['unique_id'] = this.uniqueId;
-    data['can_view_free_user'] = this.canViewFreeUser;
-    data['thumbnail_image_url'] = this.thumbnailImageUrl;
-    data['video_url'] = this.videoUrl;
-    data['duration'] = this.duration;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['title'] = title;
+    data['category_id'] = categoryId;
+    data['unique_id'] = uniqueId;
+    data['can_view_free_user'] = canViewFreeUser;
+    data['thumbnail_image_url'] = thumbnailImageUrl;
+    data['video_url'] = videoUrl;
+    data['duration'] = duration;
     return data;
   }
 }
