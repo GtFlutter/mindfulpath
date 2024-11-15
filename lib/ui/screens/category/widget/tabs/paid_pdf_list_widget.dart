@@ -117,6 +117,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
             title: model.title ?? '',
             subTitle: model.categoryTitle ?? '',
             index: '$index',
+            seletedItemId: model.id,
             isShow: true,
             isDownloaded: provider.downloadedPDF.any((element) => element.id==provider.pdfsResponse?.list?[index].id),
           ),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/course_provider.dart';
@@ -23,29 +25,31 @@ class FreeVideoListWidget extends ConsumerStatefulWidget {
   const FreeVideoListWidget({super.key, required this.category, required this.isAudio});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _FreeVideoListWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _FreeVideoListWidgetState();
 }
 
-class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
-    with AutomaticKeepAliveClientMixin {
+class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with AutomaticKeepAliveClientMixin {
   final ScrollController _controller = ScrollController();
   static AppStyle _style = AppStyle();
 
   @override
   void initState() {
-
-    if(widget.isAudio){
+    if (ref.read(videoProvider).video == null) {
+      ref.read(videoProvider.notifier).isSelected = null;
+      ref.read(videoProvider.notifier).selectedItemId = null;
+    }
+    if (widget.isAudio) {
       Future.delayed(Duration.zero, () async {
-        ref.read(freeAudiosProvider.notifier).fetchAudios(widget.category.id??0);
+        ref.read(freeAudiosProvider.notifier).fetchAudios(widget.category.id ?? 0);
         await initCall();
       });
-    }else{
+    } else {
       Future.delayed(Duration.zero, () async {
-        if(ref.read(videoProvider).video==null) {
-          ref.read(videoProvider.notifier).isSelected = null;
-        }
-        ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
+        // if(ref.read(videoProvider).video==null) {
+        //   ref.read(videoProvider.notifier).isSelected = null;
+        //   ref.read(videoProvider.notifier).selectedItemId = null;
+        // }
+        ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id ?? 0);
         await initCall();
       });
     }
@@ -56,14 +60,9 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
   Future<void> initCall() async {
     var provider = ref.read(freeVideosProvider);
 
-
     ///to get downloaded video for if already downloaded then hide button so....
-    CategoryModal? res = await ref
-        .read(databaseProvider)
-        .getSingleCategory(widget.category.id!.toString());
-    provider.downloadedVideo = await ref
-        .read(databaseProvider)
-        .getVideo(int.parse(res?.categoryId ?? "0"));
+    CategoryModal? res = await ref.read(databaseProvider).getSingleCategory(widget.category.id!.toString());
+    provider.downloadedVideo = await ref.read(databaseProvider).getVideo(int.parse(res?.categoryId ?? "0"));
   }
 
   @override
@@ -71,13 +70,13 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
     _controller.dispose();
     super.dispose();
   }
-  Future<void> refreshh() async{
+
+  Future<void> refreshh() async {
     Future.delayed(Duration.zero, () async {
       final coursePRead = ref.read(courseProvider);
       await coursePRead.getCategoryFromDatabase();
-        await coursePRead.getVideoFromDatabase(widget.category.id??0);
+      await coursePRead.getVideoFromDatabase(widget.category.id ?? 0);
     });
-
   }
 
   @override
@@ -100,12 +99,11 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
 
     final downloadP = ref.watch(downloadProvider);
 
-    if(downloadP.complate==true){
+    if (downloadP.complate == true) {
       refreshh();
-      ref.read(downloadProvider.notifier).complate=false;
-      setState((){});
+      ref.read(downloadProvider.notifier).complate = false;
+      setState(() {});
     }
-
 
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -118,13 +116,13 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
       itemCount: widget.isAudio ? audioP.videosResponse!.list!.length : provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = widget.isAudio ? audioP.videosResponse!.list![index] : provider.videosResponse!.list![index];
-        final isDownloaded=provider.downloadedVideo.any((element){
-          return model.id==int.parse(element.videoId??"0");
-        } );
-
+        final isDownloaded = provider.downloadedVideo.any((element) {
+          return model.id == int.parse(element.videoId ?? "0");
+        });
+        log("id in free video widget list----->${model.id}");
         return GestureDetector(
             onTap: () {
-              provider.selectedIndex=index;
+              provider.selectedIndex = index;
               playVideo(model, provider.selectedIndex!);
             },
             child: DetailItem.video(
@@ -132,45 +130,44 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget>
               isAudio: widget.isAudio,
               model: model,
               index: '$index',
+              seletedItemId: model.id,
               // index: '${provider.selectedIndex}',
               onToggleBookmark: () {
-                toggleItemBookmark(model.id,
-                  isRemove: model.bookmarked ?? false);
+                toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false);
               },
-              isDownloaded:isDownloaded ,
+              isDownloaded: isDownloaded,
             ));
       },
-      separatorBuilder: (BuildContext context, int index) =>
-          SizedBox(height: _style.scaleX(25)),
+      separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
     );
   }
 
   Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false}) async {
     if (itemId == null) return;
-   await  ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: widget.isAudio);
-   if(widget.isAudio){
-     ref.read(freeAudiosProvider.notifier).fetchAudios(widget.category.id??0);
-   }else{
-     ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id??0);
-   }
+    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: widget.isAudio);
+    if (widget.isAudio) {
+      ref.read(freeAudiosProvider.notifier).fetchAudios(widget.category.id ?? 0);
+    } else {
+      ref.read(freeVideosProvider.notifier).fetchVideos(widget.category.id ?? 0);
+    }
   }
 
   void playVideo(VideoResponse model, int index) {
     ref.read(videoProvider).playVideo(
-          DetailedVideoModel(
-            category: widget.category,
-            video: DIModel(
-              thumbnailUrl: model.imgUrl ?? '',
-              videoUrl: model.videoUrl!,
-              duration: model.duration ?? '',
-              title: model.title ?? '',
-              categoryName: widget.category.title ?? '',
-              videoId: model.id!,
-              videoType: model.videoType ?? ResourceType.paid,
-            ),
+        DetailedVideoModel(
+          category: widget.category,
+          video: DIModel(
+            thumbnailUrl: model.imgUrl ?? '',
+            videoUrl: model.videoUrl!,
+            duration: model.duration ?? '',
+            title: model.title ?? '',
+            categoryName: widget.category.title ?? '',
+            videoId: model.id!,
+            videoType: model.videoType ?? ResourceType.paid,
           ),
-      index: index, isAudioFile: widget.isAudio
-        );
+        ),
+        index: index,
+        isAudioFile: widget.isAudio);
   }
 
   @override

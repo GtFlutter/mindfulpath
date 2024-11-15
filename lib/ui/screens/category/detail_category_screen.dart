@@ -79,6 +79,8 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
     var isVideoAvailable = videoCtrl.isAudioFileAvailable ? false : videoCtrl.video != null;
     var isAudioAvailable = videoCtrl.isAudioFileAvailable && videoCtrl.video != null;
     log("lastPosition==> in detail category$_lastKnownPosition");
+    log("lastPosition==>111111 in detail category$isAudioAvailable-----$isVideoAvailable");
+
 
     return PopScope(
       canPop: !isVideoAvailable || !isAudioAvailable,
@@ -193,15 +195,24 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                         ],
                       ),
                     ],
-                  ] else if(isAudioAvailable && videoCtrl.video != null)...[
-                    AppAudioPlayer(
-                      style: _style,
-                      audioId: videoCtrl.video!.videoId,
-                      audioUrl: videoCtrl.video!.videoUrl,
-                      audioImage: videoCtrl.video!.thumbnailUrl,
+                  ]
+                  else if(isAudioAvailable && videoCtrl.video != null)...[
+                    Container(
+                      // width: !isLandscape ? null : double.infinity,
+                      // height: !isLandscape ? null : double.infinity,
+                      alignment: !isLandscape ? null : Alignment.topCenter,
+                      constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
+                      child: AppAudioPlayer(
+                        style: _style,
+                        audioId: videoCtrl.video!.videoId,
+                        duration: videoCtrl.video!.duration,
+                        audioUrl: videoCtrl.video!.videoUrl,
+                        audioImage: videoCtrl.video!.thumbnailUrl,
+                      ),
                     ),
                     SizedBox(height: _style.scaleX(24)),
-                  ]else
+                  ]
+                  else
                     Expanded(
                       flex: !isLandscape ? 2 : 1,
                       child: IntroWidget(
@@ -209,7 +220,7 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                         style: _style,
                       ),
                     ),
-                  if (!isLandscape || !isVideoAvailable)
+                  if (!isLandscape || !isVideoAvailable )
                     Expanded(
                       flex: 3,
                       child: ResourceDetailCategory(

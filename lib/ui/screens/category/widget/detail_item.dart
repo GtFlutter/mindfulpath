@@ -161,6 +161,7 @@ class DetailItem extends ConsumerStatefulWidget {
   final String? title;
   final String? subTitle;
   final String index;
+  final int? seletedItemId;
   final bool isDownloaded;
   final bool? isShow, isAudio;
   final GestureTapCallback? onToggleBookmark;
@@ -172,6 +173,7 @@ class DetailItem extends ConsumerStatefulWidget {
     required this.appStyle,
     required VideoResponse this.model,
     required this.index,
+    this.seletedItemId,
     required this.onToggleBookmark,
     required this.isDownloaded,
     this.isShow,
@@ -186,6 +188,7 @@ class DetailItem extends ConsumerStatefulWidget {
     super.key,
     required this.appStyle,
     required this.index,
+    this.seletedItemId,
     this.pdfModel,
     this.isAudio = false,
     required String this.title,
@@ -262,14 +265,17 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
     final videoP = ref.watch(videoProvider);
     log("color------${videoP.isSelected}=====${int.parse(widget.index)}");
+    log("color 222------${videoP.selectedItemId}=====${widget.seletedItemId})}");
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10)),
             side: BorderSide(
-                color: videoP.isSelected != null
-                    ? videoP.isSelected == int.parse(widget.index)
+                // color: videoP.isSelected != null
+                //     ? videoP.isSelected == int.parse(widget.index)
+                color: videoP.selectedItemId != null
+                    ? videoP.selectedItemId == widget.seletedItemId
                         ? AppColors.primaryColor
                         : AppColors.detailItemBgColor
                     : AppColors.detailItemBgColor)),

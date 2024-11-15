@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:http/http.dart';
 import 'package:meditation_app/data/api/api_checker.dart';
 import 'package:meditation_app/data/model/response/playlist_details_response.dart';
 import 'package:meditation_app/data/model/response/playlist_list_response.dart';
+import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/data/repositories/playlist_repo.dart';
 import 'package:meditation_app/provider/repo_provider/playlist_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
@@ -25,6 +27,8 @@ class PlaylistNotifier extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  List<PlaylistVideoList>? playlistVideoListResponse;
+  List<PlaylistVideoList>? playlistAudioListResponse;
   List<PlaylistListResponse>? _playlistListResponse;
 
   List<PlaylistListResponse>? get playlistListResponse => _playlistListResponse;
@@ -80,6 +84,21 @@ class PlaylistNotifier extends ChangeNotifier {
       ApiChecker.checkApi(response);
     } else {
       _playlistDetailResponse = PlaylistDetailResponse.fromJson(jsonDecode(response.body));
+      playlistVideoListResponse = playlistVideoListResponse ?? [];
+      playlistAudioListResponse = playlistAudioListResponse ?? [];
+      if (_playlistDetailResponse != null) {
+        _playlistDetailResponse?.data?.playlistVideoList?.map(
+          (e) {
+            if (e.videoId != null) {
+              playlistVideoListResponse?.add(e);
+            } else {
+              playlistAudioListResponse?.add(e);
+            }
+          },
+
+        ).toList();
+        notifyListeners();
+      }
       if (showProgress) {
         stopLoading();
       } else {

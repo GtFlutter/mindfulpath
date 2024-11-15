@@ -43,6 +43,9 @@ class BookmarkNotifier extends ChangeNotifier {
   List<BookmarkListResponse>? _bookmarkListResponse;
   List<BookmarkListResponse>? get bookmarkListResponse => _bookmarkListResponse;
 
+  List<BookmarkListResponse>? _bookmarkAudioListResponse;
+  List<BookmarkListResponse>? get bookmarkAudioListResponse => _bookmarkAudioListResponse;
+
   List<CategoryListResponse>? _category;
   List<CategoryListResponse>? get category => _category;
 
@@ -106,7 +109,8 @@ class BookmarkNotifier extends ChangeNotifier {
     } else {
       try {
         var json = jsonDecode(response.body);
-        _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
+        // _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
+        _bookmarkAudioListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
         _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
         print('------------>>>>>${_category!.first.id}');
         stopLoading();

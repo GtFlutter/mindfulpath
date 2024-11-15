@@ -34,7 +34,10 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
 
   @override
   void initState() {
-
+    if(ref.read(videoProvider).video==null) {
+      ref.read(videoProvider.notifier).isSelected = null;
+      ref.read(videoProvider.notifier).selectedItemId = null;
+    }
     if(widget.isAudio){
       Future.delayed(Duration.zero, () async {
         ref.read(paidAudiosProvider.notifier).fetchAudios(widget.category.id??0);
@@ -42,9 +45,10 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
       });
     }else{
       Future.delayed(Duration.zero, () async {
-        if(ref.read(videoProvider).video==null) {
-          ref.read(videoProvider.notifier).isSelected = null;
-        }
+        // if(ref.read(videoProvider).video==null) {
+        //   ref.read(videoProvider.notifier).isSelected = null;
+        //   ref.read(videoProvider.notifier).selectedItemId = null;
+        // }
         ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id??0);
         await initCall();
       });
@@ -121,6 +125,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
             appStyle: _style,
             model: model,
             isAudio: widget.isAudio,
+            seletedItemId: model.id,
             index: '$index',
             isDownloaded: provider.downloadedVideo.any((element) =>
             element.id == provider.videosResponse?.list?[index].id),

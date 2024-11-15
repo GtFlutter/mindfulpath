@@ -22,6 +22,7 @@ class VideoNotifier extends ChangeNotifier {
   DIModel? _video;
   DIModel? get video => _video;
   int? isSelected;
+  int? selectedItemId;
   Duration? watchedDuration;
   bool isVideoChanged=false;
   bool isAudioFileAvailable=false;
@@ -52,6 +53,8 @@ class VideoNotifier extends ChangeNotifier {
       log("vedio playyyyyyyyyy.......");
       _video = detailedVideoModel.video.copyWith();
       isSelected = index;
+      selectedItemId=detailedVideoModel.video.videoId;
+      log("=======iddd=====$selectedItemId==${detailedVideoModel.video.videoId}}");
       log("=======vp=====$index==$isSelected}");
       if (notifie) notifyListeners();
       // showCustomSnackBar('New Video Set Video Name: ${_video!.title}', type: true);
@@ -65,6 +68,13 @@ class VideoNotifier extends ChangeNotifier {
   void clearVideo({bool notifie = true}) {
     _video = null;
     if (notifie) notifyListeners();
+  }
+
+  void deactivateAudioPlayer(){
+    isAudioFileAvailable=false;
+    _video=null;
+    selectedItemId=null;
+    notifyListeners();
   }
 }
 
@@ -94,4 +104,6 @@ class OfflineVideoNotifier extends ChangeNotifier {
     _video = null;
     if (notify) notifyListeners();
   }
+
+
 }
