@@ -24,7 +24,7 @@ class PaidAudioNotifier extends AudioResourceNotifier {
 
   VideosResponse? _videosResponse;
   VideosResponse? get videosResponse => _videosResponse;
-  List<VideoModal> downloadedVideo=[];
+  List<VideoModal> downloadedAudio=[];
 
 
   @override

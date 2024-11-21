@@ -20,7 +20,27 @@ class DatabaseHelper {
     return _db;
   }
 
-  final _configs = MigrationConfig(initializationScript: DatabaseConsts.initialScript, migrationScripts: []);
+  final _configs = MigrationConfig(initializationScript: DatabaseConsts.initialScript, migrationScripts: [
+    '''
+    CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioTable} (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "video_id" TEXT,
+      "video_name" TEXT,
+      "video_file" TEXT,
+      "video_duration" TEXT,
+      "category_id" TEXT
+    );
+    '''
+    '''
+    CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioCategoryTable} (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "category_id" TEXT,
+      "category_name" TEXT,
+      "category_image" TEXT
+    );
+    ''',
+
+  ]);
 
   Future<Database> openDB() async {
     final databasePath = await getDatabasesPath();
@@ -182,6 +202,85 @@ class DatabaseHelper {
       return tempList;
     } else {
       return tempList;
+    }
+  }
+
+
+  ///for audio.......
+
+
+  Future<int> saveAudioCategory(CategoryModal modal) async {
+    var dbClient = await db;
+    int res;
+    try {
+      res = await dbClient.insert(DatabaseConsts.audioCategoryTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.audioCategoryTable} saved to db");
+    } catch (e) {
+      await dbClient.delete(DatabaseConsts.audioCategoryTable);
+      res = await dbClient.insert(DatabaseConsts.audioCategoryTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.audioCategoryTable} saved to db with Error");
+    }
+    return res;
+  }
+
+  Future<CategoryModal?> getAudioSingleCategory(String categoryId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.audioCategoryTable, where: 'category_id = ?', whereArgs: [categoryId]);
+    if (res.isNotEmpty) {
+      return CategoryModal.fromJson(res.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<CategoryModal>> getAudioCategory() async {
+    List<CategoryModal> tempList = [];
+    var dbClient = await db;
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.audioCategoryTable);
+    debugPrint("Res getCategory:: $res");
+    if (res.isNotEmpty) {
+      tempList = CategoryModal.listFromJson(res);
+      return tempList;
+    } else {
+      return tempList;
+    }
+  }
+
+  Future<int> saveAudio(VideoModal modal) async {
+    var dbClient = await db;
+    int res;
+    try {
+      res = await dbClient.insert(DatabaseConsts.audioTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.audioTable} saved to db");
+    } catch (e) {
+      await dbClient.delete(DatabaseConsts.audioTable);
+      res = await dbClient.insert('AudioTable', modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.audioTable} saved to db with Error");
+    }
+    return res;
+  }
+
+  Future<List<VideoModal>> getAudio(int categoryId) async {
+    print("category id in database helper---$categoryId");
+    List<VideoModal> tempList = [];
+    var dbClient = await db;
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.audioTable, where: 'category_id = ?', whereArgs: [categoryId]);
+    debugPrint("Res getAudio:: $res");
+    if (res.isNotEmpty) {
+      tempList = VideoModal.listFromJson(res);
+      return tempList;
+    } else {
+      return tempList;
+    }
+  }
+
+  Future<VideoModal?> getSingleAudio(String videoId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.audioTable, where: 'video_id = ?', whereArgs: [videoId]);
+    if (res.isNotEmpty) {
+      return VideoModal.fromJson(res.first);
+    } else {
+      return null;
     }
   }
 }

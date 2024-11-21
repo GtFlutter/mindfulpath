@@ -31,6 +31,10 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   Duration? _lastKnownPosition;
 
   bool showAudioFile = false;
+  final ExpansionTileController expansionTileController =
+  ExpansionTileController();
+  final ExpansionTileController expansionTileController1 =
+  ExpansionTileController();
 
   @override
   void initState() {
@@ -56,8 +60,12 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
       final coursePRead = ref.read(courseProvider);
       final coursePWatch = ref.watch(courseProvider);
       await coursePRead.getCategoryFromDatabase();
+      await coursePRead.getAudioCategoryFromDatabase();
       for (final category in coursePWatch.downloadResponse) {
         await coursePRead.getVideoFromDatabase(int.parse(category.categoryId ?? ""));
+      }
+      for (final category in coursePWatch.downloadAudioCategoryResponse) {
+        await coursePRead.getAudioFromDatabase(int.parse(category.categoryId ?? ""));
       }
     });
   }
@@ -100,6 +108,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
     final bookmarkNotifier = ref.watch(bookmarkProvider);
     final downloadP = ref.watch(downloadProvider);
     if (downloadP.complate == true) {
+      ///TODO...........
       refreshh();
       ref.read(downloadProvider.notifier).complate = false;
       setState(() {});
@@ -112,8 +121,8 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
           ? const Center(
         child: CircularProgressIndicator(),
       )
-          : bookmarkNotifier.bookmarkListResponse == null || bookmarkNotifier.bookmarkListResponse!.isEmpty
-          ? const Center(child: Text('No Data Found'))
+          // : bookmarkNotifier.bookmarkListResponse == null || bookmarkNotifier.bookmarkListResponse!.isEmpty
+          // ? const Center(child: Text('No Data Found'))
           : Padding(
         padding: isLandscape && isVideoAvailable ? EdgeInsets.zero : EdgeInsets.symmetric(horizontal: _style.scaleX(20)),
         child: Column(
@@ -221,8 +230,17 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                   Theme(
                     data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                     child: ExpansionTile(title: Text("Bookmark Videos"),
+                      onExpansionChanged: (expanded) {
+                        setState(() {
+                          if(expanded) {
+                            expansionTileController1.collapse();
+                          }
+
+                        });
+                      },
+                      controller: expansionTileController,
                       children: [
-                        if(bookmarkNotifier.bookmarkListResponse!.isNotEmpty)...[SizedBox(height: 300,
+                        if(bookmarkNotifier.bookmarkListResponse?.isNotEmpty ?? false)...[SizedBox(height: 300,
                           child: ListView.separated(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
@@ -239,6 +257,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                               return GestureDetector(
                                 onTap: () {},
                                 child: BookmarkItem(
+                                  isAudio: false,
                                   appStyle: _style,
                                   model: model,
                                   index: index,
@@ -266,8 +285,17 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                   Expanded(
                     child: Theme(data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(title: Text("Bookmarked Audios"),
+                        onExpansionChanged: (expanded) {
+                          setState(() {
+                            if(expanded) {
+                              expansionTileController.collapse();
+                            }
+
+                          });
+                        },
+                        controller: expansionTileController1,
                         children: [
-                          if(bookmarkNotifier.bookmarkAudioListResponse!.isNotEmpty)...[ListView.separated(
+                          if(bookmarkNotifier.bookmarkAudioListResponse?.isNotEmpty ?? false)...[ListView.separated(
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
                             padding: EdgeInsets.only(
@@ -283,6 +311,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                               return GestureDetector(
                                 onTap: () {},
                                 child: BookmarkItem(
+                                  isAudio: true,
                                   appStyle: _style,
                                   model: model,
                                   index: index,

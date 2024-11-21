@@ -83,6 +83,7 @@ final offlineVideoProvider = ChangeNotifierProvider<OfflineVideoNotifier>((ref) 
 class OfflineVideoNotifier extends ChangeNotifier {
   DDIModal? _video;
   DDIModal? get video => _video;
+  bool isAudioFileAvailable=false;
 
   void reInit([DDIModal? ddiModal]) {
     if (ddiModal == null) {
@@ -91,9 +92,10 @@ class OfflineVideoNotifier extends ChangeNotifier {
     playVideo(ddiModal, forceToPlay: true);
   }
 
-  void playVideo(DDIModal ddiModal, {bool notify = true, bool forceToPlay = false}) {
+  void playVideo(DDIModal ddiModal, {bool notify = true, bool forceToPlay = false,bool isAudioFile = false}) {
 
     DDIModal? model = _video;
+    isAudioFileAvailable = isAudioFile;
     if ((model == null || model.videoId != ddiModal.videoId) || forceToPlay) {
       _video = ddiModal;
       if (notify) notifyListeners();
@@ -103,6 +105,13 @@ class OfflineVideoNotifier extends ChangeNotifier {
   void clearVideo({bool notify = true}) {
     _video = null;
     if (notify) notifyListeners();
+  }
+
+  void deactivateAudioPlayer(){
+    isAudioFileAvailable=false;
+    _video=null;
+    // selectedItemId=null;
+    notifyListeners();
   }
 
 

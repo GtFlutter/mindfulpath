@@ -15,8 +15,7 @@ import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
-final downloadProvider =
-    ChangeNotifierProvider<DownloadNotifier>((ref) => DownloadNotifier(ref));
+final downloadProvider = ChangeNotifierProvider<DownloadNotifier>((ref) => DownloadNotifier(ref));
 
 class DownloadNotifier extends ChangeNotifier {
   final ChangeNotifierProviderRef<DownloadNotifier> ref;
@@ -26,23 +25,28 @@ class DownloadNotifier extends ChangeNotifier {
   bool complate = false;
   bool Pdfcomplate = false;
 
-
   bool _isDownloading = false;
+
   bool get isDownloading => _isDownloading;
 
   bool _isPdfDownloading = false;
+
   bool get isPdfDownloading => _isPdfDownloading;
 
   bool _isDownloadComplete = false;
+
   bool get isDownloadComplete => _isDownloadComplete;
 
   double _progress = 0.0;
+
   double get progress => _progress;
 
   VideoResponse? _model;
+
   VideoResponse? get model => _model;
 
   PdfResponse? _pdfModel;
+
   PdfResponse? get pdfModel => _pdfModel;
 
   void setProgress(double value) {
@@ -92,37 +96,36 @@ class DownloadNotifier extends ChangeNotifier {
     //  _pdfModel = null;
     //  notifyListeners();
     //} else {
-      await DownloadHelper.instance.download(
-        model.pdfUrl!,
-        '$path/${model.pdf!.fileName!}',
-        onReceiveProgress: (count, total) {
-          print("model category id-->${model.categoryId}");
-          debugPrint('Count :: $count --*-- Total :: $total');
-          if (total != -1) {
-            tempProgress = ((count / total * 100).roundToDouble()) / 100;
-            if (!_isDownloadComplete && !_isPdfDownloading) {
-              _isPdfDownloading = true;
+    await DownloadHelper.instance.download(
+      model.pdfUrl!,
+      '$path/${model.pdf!.fileName!}',
+      onReceiveProgress: (count, total) {
+        print("model category id-->${model.categoryId}");
+        debugPrint('Count :: $count --*-- Total :: $total');
+        if (total != -1) {
+          tempProgress = ((count / total * 100).roundToDouble()) / 100;
+          if (!_isDownloadComplete && !_isPdfDownloading) {
+            _isPdfDownloading = true;
+            notifyListeners();
+          }
+          if (tempProgress == 1.0) {
+            if (!_isDownloadComplete) {
+              _isDownloadComplete = true;
+              _isPdfDownloading = false;
+              debugPrint('Is Downloading == $_isPdfDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+              _saveCategoryAndVideo(model.pdf?.url ?? "", pdfModel: model, isPdf: true); //pdf download- download provider
+              _pdfModel = null;
               notifyListeners();
             }
-            if (tempProgress == 1.0) {
-              if (!_isDownloadComplete) {
-                _isDownloadComplete = true;
-                _isPdfDownloading = false;
-                debugPrint(
-                    'Is Downloading == $_isPdfDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-                _saveCategoryAndVideo(model.pdf?.url ?? "", pdfModel: model, isPdf: true); //pdf download- download provider
-                _pdfModel = null;
-                notifyListeners();
-              }
-            }
-            setProgress(tempProgress);
-            debugPrint("Total Progress 1 :: $_progress%");
-          } else{
-            _pdfModel=null;
           }
-        },
-      );
-   // }
+          setProgress(tempProgress);
+          debugPrint("Total Progress 1 :: $_progress%");
+        } else {
+          _pdfModel = null;
+        }
+      },
+    );
+    // }
   }
 
   void download({VideoResponse? model}) async {
@@ -154,52 +157,119 @@ class DownloadNotifier extends ChangeNotifier {
     print("check directory");
     String path = await PathHelper.getDownloadDirectoryPath(false);
     debugPrint('File Path :: $path/${model.video!.fileName!}');
-    bool result =
-        await PathHelper.fileExists('$path/${model.video!.fileName!}');
-   // if (result) {
-   //   debugPrint('True');
-   //   _getSingleVideo('$path/${model.video!.fileName!}', model: model);
-   //   showCustomSnackBar('File Already Exists', type: true);
-   //   _model = null;
-   //   notifyListeners();
-   // } else {
-      debugPrint('False');
-      try {
-        await DownloadHelper.instance.download(
-          model.videoUrl!,
-          '$path/${model.video!.fileName!}',
-          onReceiveProgress: (count, total) async {
-            debugPrint('Count :: $count --*-- Total :: $total');
-            if (total != -1) {
-              tempProgress = ((count / total * 100).roundToDouble()) / 100;
-              if (!_isDownloadComplete && !_isDownloading) {
-                _isDownloading = true;
+    bool result = await PathHelper.fileExists('$path/${model.video!.fileName!}');
+    // if (result) {
+    //   debugPrint('True');
+    //   _getSingleVideo('$path/${model.video!.fileName!}', model: model);
+    //   showCustomSnackBar('File Already Exists', type: true);
+    //   _model = null;
+    //   notifyListeners();
+    // } else {
+    debugPrint('False');
+    try {
+      await DownloadHelper.instance.download(
+        model.videoUrl!,
+        '$path/${model.video!.fileName!}',
+        onReceiveProgress: (count, total) async {
+          debugPrint('Count :: $count --*-- Total :: $total');
+          if (total != -1) {
+            tempProgress = ((count / total * 100).roundToDouble()) / 100;
+            if (!_isDownloadComplete && !_isDownloading) {
+              _isDownloading = true;
+              notifyListeners();
+            }
+            if (tempProgress == 1.0) {
+              if (!_isDownloadComplete) {
+                _isDownloadComplete = true;
+                _isDownloading = false;
+                debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+                await _saveCategoryAndVideo('$path/${model.video!.fileName!}', //video download-download provider
+                    model: model); //video download-download provider
+                _model = null;
                 notifyListeners();
               }
-              if (tempProgress == 1.0) {
-                if (!_isDownloadComplete) {
-                  _isDownloadComplete = true;
-                  _isDownloading = false;
-                  debugPrint(
-                      'Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-                  await _saveCategoryAndVideo('$path/${model.video!.fileName!}',
-                      model: model); //video download-download provider
-                  _model = null;
-                  notifyListeners();
-                }
-              }
-              setProgress(tempProgress);
-              debugPrint("Total Progress 1 :: $_progress%");
             }
-          },
-        );
-      } catch (e) {
-        _model = null;
-        showCustomSnackBar(e.toString());
-      }
-   // }
+            setProgress(tempProgress);
+            debugPrint("Total Progress of video :: $_progress%");
+          }
+        },
+      );
+    } catch (e) {
+      _model = null;
+      showCustomSnackBar(e.toString());
+    }
+    // }
   }
 
+  ///download audio
+  void downloadAudio({VideoResponse? model}) async {
+    print("call---downloadAudio-${model?.category?.isPurchased}");
+    BuildContext? context = rootNavigator.currentContext;
+    if (context == null) return;
+    if (model == null) return;
+    print("audio model----$model");
+    _model = model;
+    notifyListeners();
+    double tempProgress = 0.0;
+    if (!ref.read(authProvider).isUserLoggedIn) {
+      _model = null;
+      showCustomSnackBar(
+        'Please login to download a Audio.',
+        action: SnackBarAction(
+          label: 'Log In',
+          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+          textColor: Colors.brown.shade800,
+          onPressed: () => appRouter.go(RoutePath.signIn),
+        ),
+        duration: const Duration(seconds: 5),
+      );
+      return;
+    }
+
+    await _checkDirectory(false, isAudio: true);
+    print("check directory to download audio");
+    String path = await PathHelper.getDownloadDirectoryPath(false, isAudio: true);
+    String fileName = Uri.parse(model.videoUrl ?? "").pathSegments.last;
+    print("File name: $fileName");
+    bool result = await PathHelper.fileExists('$path/$fileName');
+    debugPrint('False');
+    try {
+      await DownloadHelper.instance.download(
+        model.videoUrl!,
+        '$path/$fileName',
+        onReceiveProgress: (count, total) async {
+          debugPrint('Count :: $count --*-- Total :: $total');
+          if (total != -1) {
+            tempProgress = ((count / total * 100).roundToDouble()) / 100;
+            if (!_isDownloadComplete && !_isDownloading) {
+              _isDownloading = true;
+              notifyListeners();
+            }
+            if (tempProgress == 1.0) {
+              if (!_isDownloadComplete) {
+                _isDownloadComplete = true;
+                _isDownloading = false;
+                debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+                await _saveCategoryAndVideo('$path/$fileName', //audio download-download provider
+                    model: model,
+                    isAudio: true);
+                _model = null;
+                notifyListeners();
+              }
+            }
+            setProgress(tempProgress);
+            debugPrint("Total Progress 1 :: $_progress%");
+          }
+        },
+      );
+    } catch (e) {
+      _model = null;
+      showCustomSnackBar(e.toString());
+    }
+    // }
+  }
+
+  ///non usable method
   void downloadPlayList({VideoResponse? model}) async {
     print("call----${model?.category?.isPurchased}");
 
@@ -234,59 +304,55 @@ class DownloadNotifier extends ChangeNotifier {
     print("check directory");
     String path = await PathHelper.getDownloadDirectoryPath(false);
     debugPrint('File Path :: $path/${model.video!.fileName!}');
-    bool result =
-        await PathHelper.fileExists('$path/${model.video!.fileName!}');
-   // if (result) {
-   //   debugPrint('True');
-   //   _getSingleVideo('$path/${model.video!.fileName!}', model: model);
-   //   showCustomSnackBar('File Already Exists', type: true);
-   //   _model = null;
-   //   notifyListeners();
-   // } else {
-      debugPrint('False');
-      try {
-        await DownloadHelper.instance.download(
-          model.videoUrl!,
-          '$path/${model.video!.fileName!}',
-          onReceiveProgress: (count, total) async {
-            debugPrint('Count :: $count --*-- Total :: $total');
-            if (total != -1) {
-              tempProgress = ((count / total * 100).roundToDouble()) / 100;
-              if (!_isDownloadComplete && !_isDownloading) {
-                _isDownloading = true;
+    bool result = await PathHelper.fileExists('$path/${model.video!.fileName!}');
+    // if (result) {
+    //   debugPrint('True');
+    //   _getSingleVideo('$path/${model.video!.fileName!}', model: model);
+    //   showCustomSnackBar('File Already Exists', type: true);
+    //   _model = null;
+    //   notifyListeners();
+    // } else {
+    debugPrint('False');
+    try {
+      await DownloadHelper.instance.download(
+        model.videoUrl!,
+        '$path/${model.video!.fileName!}',
+        onReceiveProgress: (count, total) async {
+          debugPrint('Count :: $count --*-- Total :: $total');
+          if (total != -1) {
+            tempProgress = ((count / total * 100).roundToDouble()) / 100;
+            if (!_isDownloadComplete && !_isDownloading) {
+              _isDownloading = true;
+              notifyListeners();
+            }
+            if (tempProgress == 1.0) {
+              if (!_isDownloadComplete) {
+                _isDownloadComplete = true;
+                _isDownloading = false;
+                debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
+                await _saveCategoryAndVideo('$path/${model.video!.fileName!}', model: model); //video download-download provider
+                _model = null;
                 notifyListeners();
               }
-              if (tempProgress == 1.0) {
-                if (!_isDownloadComplete) {
-                  _isDownloadComplete = true;
-                  _isDownloading = false;
-                  debugPrint(
-                      'Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-                  await _saveCategoryAndVideo('$path/${model.video!.fileName!}',
-                      model: model); //video download-download provider
-                  _model = null;
-                  notifyListeners();
-                }
-              }
-              setProgress(tempProgress);
-              debugPrint("Total Progress 1 :: $_progress%");
             }
-          },
-        );
-      } catch (e) {
-        _model = null;
-        showCustomSnackBar(e.toString());
-      }
-   // }
+            setProgress(tempProgress);
+            debugPrint("Total Progress 1 :: $_progress%");
+          }
+        },
+      );
+    } catch (e) {
+      _model = null;
+      showCustomSnackBar(e.toString());
+    }
+    // }
   }
 
-  Future<void> _checkDirectory(bool isPdf) async {
-    String path = await PathHelper.getDownloadDirectoryPath(isPdf);
+  Future<void> _checkDirectory(bool isPdf, {bool? isAudio = false}) async {
+    String path = await PathHelper.getDownloadDirectoryPath(isPdf, isAudio: isAudio);
     debugPrint('Path :: $path');
     bool result = await PathHelper.directoryExits(path);
     if (!result) {
-      Directory directory =
-          await PathHelper.createDirectory(path, recursive: true);
+      Directory directory = await PathHelper.createDirectory(path, recursive: true);
       debugPrint('Directory Path :: ${directory.path}');
     }
   }
@@ -309,8 +375,8 @@ class DownloadNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> _saveCategoryAndVideo(String videoFile,
-      {VideoResponse? model, PdfResponse? pdfModel, bool isPdf = false}) async {
+  ///save category vedio ,pdf,audio
+  Future<void> _saveCategoryAndVideo(String videoFile, {VideoResponse? model, PdfResponse? pdfModel, bool isPdf = false, bool isAudio = false}) async {
     print('-------333------++++${model}');
     print('-------334------++++${pdfModel}');
     print('-------335------++++${videoFile}');
@@ -319,11 +385,11 @@ class DownloadNotifier extends ChangeNotifier {
     final dbHelper = ref.read(databaseProvider);
     print("-------340------++++${pdfModel?.categoryId}");
     if (isPdf) {
-      Pdfres = await dbHelper
-          .getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
+      Pdfres = await dbHelper.getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
+    } else if (isAudio) {
+      res = await dbHelper.getAudioSingleCategory(model?.categoryId?.toString() ?? "");
     } else {
-      res =
-          await dbHelper.getSingleCategory(model?.categoryId?.toString() ?? "");
+      res = await dbHelper.getSingleCategory(model?.categoryId?.toString() ?? "");
     }
     print("-------348------++++${res?.toJson()}");
 
@@ -331,15 +397,10 @@ class DownloadNotifier extends ChangeNotifier {
       if (Pdfres != null) {
         print("-------352------++++${Pdfres.toJson()}");
 
-        PdfModel vModal = PdfModel(
-            categoryId: pdfModel?.categoryId,
-            pdfId: pdfModel?.pdf?.id.toString(),
-            pdfName: pdfModel?.title,
-            categoryTitle: pdfModel?.categoryTitle,
-            pdfFile: videoFile);
+        PdfModel vModal = PdfModel(categoryId: pdfModel?.categoryId, pdfId: pdfModel?.pdf?.id.toString(), pdfName: pdfModel?.title, categoryTitle: pdfModel?.categoryTitle, pdfFile: videoFile);
         int vRes = await dbHelper.savePDF(vModal);
-        if (vRes > 0){
-          Pdfcomplate=true;
+        if (vRes > 0) {
+          Pdfcomplate = true;
           _isPdfDownloading = false;
           showCustomSnackBar('PDF Save Successfully download');
           _isDownloadComplete = false;
@@ -349,30 +410,18 @@ class DownloadNotifier extends ChangeNotifier {
         }
       } else {
         print("-------366------++++${Pdfres?.toJson()}");
-        PdfModel modal = PdfModel(
-            id: pdfModel?.id,
-            categoryId: pdfModel?.categoryId,
-            pdfFile: pdfModel?.pdf?.url,
-            pdfId: pdfModel?.pdf?.id.toString(),
-            categoryTitle: pdfModel?.categoryTitle,
-            pdfName: pdfModel?.pdf?.fileName);
+        PdfModel modal = PdfModel(id: pdfModel?.id, categoryId: pdfModel?.categoryId, pdfFile: pdfModel?.pdf?.url, pdfId: pdfModel?.pdf?.id.toString(), categoryTitle: pdfModel?.categoryTitle, pdfName: pdfModel?.pdf?.fileName);
         int cRes = await dbHelper.savePdfCategory(modal);
         print("-------374------++++$cRes");
         if (cRes > 0) {
-          PdfModel? res = await dbHelper
-              .getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
-          PdfModel vModal = PdfModel(
-              categoryId: pdfModel?.categoryId,
-              pdfId: pdfModel?.pdf?.id.toString(),
-              pdfName: pdfModel?.title,
-              categoryTitle: pdfModel?.categoryTitle,
-              pdfFile: videoFile);
+          PdfModel? res = await dbHelper.getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
+          PdfModel vModal = PdfModel(categoryId: pdfModel?.categoryId, pdfId: pdfModel?.pdf?.id.toString(), pdfName: pdfModel?.title, categoryTitle: pdfModel?.categoryTitle, pdfFile: videoFile);
           print("-------383------++++$res");
           print(vModal.toJson());
           int vRes = await dbHelper.savePDF(vModal);
           print("--------386-----++++$vRes");
-          if (vRes > 0){
-            Pdfcomplate=true;
+          if (vRes > 0) {
+            Pdfcomplate = true;
             _isPdfDownloading = false;
             showCustomSnackBar('PDF Save Successfully download');
             _isDownloadComplete = false;
@@ -382,47 +431,61 @@ class DownloadNotifier extends ChangeNotifier {
           }
         }
       }
-    } else {
+    } else if (isAudio) {
       if (res != null) {
         if (model == null) return;
-        VideoModal vModal = VideoModal(
-            categoryId: model.categoryId,
-            videoId: model.video?.id.toString(),
-            videoName: model.title,
-            videoFile: videoFile,
-            videoDuration: model.duration);
-        int vRes = await dbHelper.saveVideo(vModal);
-        if (vRes > 0){
-        complate=true;
-        showCustomSnackBar('Video Save Successfully download');
+        VideoModal vModal = VideoModal(categoryId: model.categoryId, videoId: model.id.toString(), videoName: model.title, videoFile: videoFile, videoDuration: model.duration);
+        int vRes = await dbHelper.saveAudio(vModal);
+        if (vRes > 0) {
+          complate = true;
+          showCustomSnackBar('Audio Save Successfully download');
           _isDownloadComplete = false;
           res = null;
           notifyListeners();
         }
       } else {
-        CategoryModal modal = CategoryModal(
-            categoryId: model?.categoryId?.toString(),
-            categoryName: model?.categoryTitle ?? model?.category?.title,
-            categoryImage: model?.category?.imageResponse?.imageUrl);
-        int cRes = await dbHelper.saveCategory(modal);
-        CategoryModal? res = await dbHelper
-            .getSingleCategory(model?.categoryId?.toString() ?? "");
+        CategoryModal modal = CategoryModal(categoryId: model?.categoryId?.toString(), categoryName: model?.categoryTitle ?? model?.category?.title, categoryImage: model?.category?.imageResponse?.imageUrl);
+        int cRes = await dbHelper.saveAudioCategory(modal);
+        CategoryModal? res = await dbHelper.getAudioSingleCategory(model?.categoryId?.toString() ?? "");
         print("after category s--->${cRes}");
         if (cRes > 0) {
-          VideoModal vModal = VideoModal(
-              categoryId: int.parse(res?.categoryId ?? ""),
-              videoId:model?.video?.id.toString(),
-              videoName: model?.title,
-              videoFile: videoFile,
-              videoDuration: model?.duration);
-          int vRes = await dbHelper.saveVideo(vModal);
-          if (vRes > 0){
-        complate=true;
-        showCustomSnackBar('Video Save Successfully download');
+          VideoModal vModal = VideoModal(categoryId: int.parse(res?.categoryId ?? ""), videoId: model?.id.toString(), videoName: model?.title, videoFile: videoFile, videoDuration: model?.duration);
+          int vRes = await dbHelper.saveAudio(vModal);
+          if (vRes > 0) {
+            complate = true;
+            showCustomSnackBar('Audio Save Successfully download');
             _isDownloadComplete = false;
             res = null;
             notifyListeners();
-
+          }
+        }
+      }
+    } else {
+      if (res != null) {
+        if (model == null) return;
+        VideoModal vModal = VideoModal(categoryId: model.categoryId, videoId: model.video?.id.toString(), videoName: model.title, videoFile: videoFile, videoDuration: model.duration);
+        int vRes = await dbHelper.saveVideo(vModal);
+        if (vRes > 0) {
+          complate = true;
+          showCustomSnackBar('Video Save Successfully download');
+          _isDownloadComplete = false;
+          res = null;
+          notifyListeners();
+        }
+      } else {
+        CategoryModal modal = CategoryModal(categoryId: model?.categoryId?.toString(), categoryName: model?.categoryTitle ?? model?.category?.title, categoryImage: model?.category?.imageResponse?.imageUrl);
+        int cRes = await dbHelper.saveCategory(modal);
+        CategoryModal? res = await dbHelper.getSingleCategory(model?.categoryId?.toString() ?? "");
+        print("after category s--->${cRes}");
+        if (cRes > 0) {
+          VideoModal vModal = VideoModal(categoryId: int.parse(res?.categoryId ?? ""), videoId: model?.video?.id.toString(), videoName: model?.title, videoFile: videoFile, videoDuration: model?.duration);
+          int vRes = await dbHelper.saveVideo(vModal);
+          if (vRes > 0) {
+            complate = true;
+            showCustomSnackBar('Video Save Successfully download');
+            _isDownloadComplete = false;
+            res = null;
+            notifyListeners();
           }
         }
       }
@@ -435,11 +498,14 @@ class DownloadNotifier extends ChangeNotifier {
 
   bool get isAlreadyDownload => _isAlreadyDownload;
 
-  Future<bool> checkVideoIsDownload(String id, bool isPdf) async {
+  ///check video,audio or pdf download or not
+  Future<bool> checkVideoIsDownload(String id, bool isPdf, bool isAudio) async {
     final dbHelper = ref.read(databaseProvider);
     Object? res;
     if (isPdf) {
       res = await dbHelper.getSingleVideo(id);
+    } else if (isAudio) {
+      res = await dbHelper.getSingleAudio(id);
     } else {
       res = await dbHelper.getSinglePdf(id);
     }

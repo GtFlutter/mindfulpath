@@ -25,7 +25,7 @@ class FreeVideosNotifier extends AudioResourceNotifier {
   VideosResponse? _videosResponse;
   VideosResponse? get videosResponse => _videosResponse;
   int? selectedIndex;
-  List<VideoModal> downloadedVideo=[];
+  List<VideoModal> downloadedAudio=[];
 
 
 

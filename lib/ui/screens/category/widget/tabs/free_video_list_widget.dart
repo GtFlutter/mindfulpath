@@ -59,10 +59,13 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
 
   Future<void> initCall() async {
     var provider = ref.read(freeVideosProvider);
+    var audioProvider = ref.read(freeAudiosProvider);
 
     ///to get downloaded video for if already downloaded then hide button so....
     CategoryModal? res = await ref.read(databaseProvider).getSingleCategory(widget.category.id!.toString());
     provider.downloadedVideo = await ref.read(databaseProvider).getVideo(int.parse(res?.categoryId ?? "0"));
+    CategoryModal? res1 = await ref.read(databaseProvider).getAudioSingleCategory(widget.category.id!.toString());
+    audioProvider.downloadedAudio = await ref.read(databaseProvider).getAudio(int.parse(res1?.categoryId ?? "0"));
   }
 
   @override
@@ -75,7 +78,9 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
     Future.delayed(Duration.zero, () async {
       final coursePRead = ref.read(courseProvider);
       await coursePRead.getCategoryFromDatabase();
+      await coursePRead.getAudioCategoryFromDatabase();
       await coursePRead.getVideoFromDatabase(widget.category.id ?? 0);
+      await coursePRead.getAudioFromDatabase(widget.category.id ?? 0);
     });
   }
 
@@ -116,10 +121,19 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
       itemCount: widget.isAudio ? audioP.videosResponse!.list!.length : provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = widget.isAudio ? audioP.videosResponse!.list![index] : provider.videosResponse!.list![index];
-        final isDownloaded = provider.downloadedVideo.any((element) {
-          return model.id == int.parse(element.videoId ?? "0");
-        });
-        log("id in free video widget list----->${model.id}");
+        bool isDownloaded=false;
+        if(!widget.isAudio)
+        {
+           isDownloaded = provider.downloadedVideo.any((element) {
+            return model.id == int.parse(element.videoId ?? "0");
+          });
+        }else{
+          isDownloaded = audioP.downloadedAudio.any((element) {
+             log("~~~~aaaa~~~~>>>>${model.id}~~~~~${element.videoId}");
+            return model.id == int.parse(element.videoId ?? "0");
+          });
+        }
+        log("id in free video widget list----->${model.id}---$isDownloaded----${widget.isAudio}---");
         return GestureDetector(
             onTap: () {
               provider.selectedIndex = index;

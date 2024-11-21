@@ -88,6 +88,7 @@ class BookmarkNotifier extends ChangeNotifier {
     } else {
       try {
         var json = jsonDecode(response.body);
+        _bookmarkListResponse?.clear();
         _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_video_list'], false);
         _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
         print('------------>>>>>${_category!.first.id}');
@@ -110,6 +111,7 @@ class BookmarkNotifier extends ChangeNotifier {
       try {
         var json = jsonDecode(response.body);
         // _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
+        _bookmarkAudioListResponse?.clear();
         _bookmarkAudioListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
         _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
         print('------------>>>>>${_category!.first.id}');

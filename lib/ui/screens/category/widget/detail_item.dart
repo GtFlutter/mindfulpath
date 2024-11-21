@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/data/model/response/pdfs_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
+import 'package:meditation_app/provider/audio_provider.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/playlist_provider.dart';
@@ -235,6 +236,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     final coursePWatch = ref.watch(courseProvider);
     await coursePRead.getCategoryPdfFromDatabase();
     await coursePRead.getCategoryFromDatabase();
+    await coursePRead.getAudioCategoryFromDatabase();
+
 
     /*for(final category in coursePWatch.downloadPdfResponses){
     }*/
@@ -245,6 +248,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
     }*/
     await coursePRead.getVideoFromDatabase(widget.model?.categoryId ?? 0);
+    await coursePRead.getAudioFromDatabase(widget.model?.categoryId ?? 0);
   }
 
   @override
@@ -264,6 +268,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     final playlistP = ref.watch(playListProvider);
 
     final videoP = ref.watch(videoProvider);
+    final audioP = ref.watch(audioProvider);
     log("color------${videoP.isSelected}=====${int.parse(widget.index)}");
     log("color 222------${videoP.selectedItemId}=====${widget.seletedItemId})}");
     return Container(
@@ -384,13 +389,21 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                         Consumer(
                           builder: (context, ref, child) {
                             final downloadP = ref.watch(downloadProvider);
-                            final getCat = ref.watch(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model?.video?.id);
-                            print('------------------>${getCat}');
-                            ref.watch(courseProvider).downloadVideoResponse.any((e) {
-                              print('------------------292>${e.videoId}');
-                              return true;
-                            });
-                            print('------------------294>${widget.model?.video?.id}');
+                            bool getCat = false;
+                            if (widget.isAudio ?? false) {
+                              getCat = ref.watch(courseProvider).downloadAudioResponse.any((element) => int.parse(element.videoId ?? "") == widget.model?.id);
+                              print('--------audio---------->${getCat}');
+                              ref.watch(courseProvider).downloadAudioResponse.any((e) {
+                                return true;
+                              });
+                            } else {
+                              getCat = ref.watch(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model?.video?.id);
+                              print('--------video---------->${getCat}');
+                              ref.watch(courseProvider).downloadVideoResponse.any((e) {
+                                return true;
+                              });
+                            }
+
                             if (getCat) {
                               return const SizedBox.shrink();
                             } else {
@@ -411,11 +424,23 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () {
+                                    log("model--------->${widget.model?.toJson()}");
                                     print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                    debugPrint('File Path :: ${widget.model?.video?.fileName ?? ""}');
+
                                     if (downloadP.model == null) {
-                                      downloadP.download(model: widget.model);
+                                      if (widget.model?.video != null) {
+                                        downloadP.download(model: widget.model);
+                                      } else {
+                                        ///do stuff for audio download
+                                        downloadP.downloadAudio(model: widget.model);
+                                      }
                                     } else if (widget.model!.id != downloadP.model!.id) {
-                                      showCustomSnackBar('Another Video is in progress');
+                                      if (widget.model?.video != null) {
+                                        showCustomSnackBar('Another Video is in progress');
+                                      } else {
+                                        showCustomSnackBar('Another Audio is in progress');
+                                      }
                                     }
                                   },
                                 );
@@ -434,13 +459,12 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
                               if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
                                 createPlaylist(context, videoId: widget.model?.id?.toString());
-                              }else{
+                              } else {
                                 showCustomSnackBar(
                                   'Please login to create playlist.',
                                   action: SnackBarAction(
                                     label: 'Log In',
-                                    backgroundColor:
-                                    AppColors.primaryColor.withOpacity(0.8),
+                                    backgroundColor: AppColors.primaryColor.withOpacity(0.8),
                                     textColor: Colors.brown.shade800,
                                     onPressed: () => appRouter.go(RoutePath.signIn),
                                   ),

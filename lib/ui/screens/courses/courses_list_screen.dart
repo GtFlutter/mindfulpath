@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 
 import '../../../theme/styles.dart';
+import '../category/detail_category_screen.dart';
 import 'widget/course_item.dart';
 
 List<CITempModel> list = [
@@ -36,7 +39,9 @@ List<CITempModel> list = [
 
 class CoursesListScreen extends ConsumerStatefulWidget {
   final String title;
-  const CoursesListScreen({super.key, required this.title});
+  final bool isAudio;
+
+  const CoursesListScreen({super.key, required this.title, required this.isAudio});
 
   @override
   ConsumerState<CoursesListScreen> createState() => _CoursesListScreenState();
@@ -49,28 +54,36 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
   void initState() {
     final courseP = ref.read(courseProvider);
 
-    print(widget.title);
+    print("========${widget.title}");
     if (isPurchased) {
-      Future.delayed(Duration.zero,  () {
+      Future.delayed(Duration.zero, () {
         courseP.getPurchasedList();
       });
     } else if (widget.title == ScreenTitles.currentlyProgress.value) {
-      Future.delayed(Duration.zero,  () {
+      Future.delayed(Duration.zero, () {
         courseP.getCurrentlyProgressList();
       });
+    } else if (widget.isAudio) {
+      Future.delayed(
+        Duration.zero,
+        () {
+          courseP.getAudioCategoryFromDatabase();
+        },
+      );
     } else {
-      Future.delayed(Duration.zero, () {
-        courseP.getCategoryFromDatabase();
-      },);
+      Future.delayed(
+        Duration.zero,
+        () {
+          courseP.getCategoryFromDatabase();
+        },
+      );
     }
-
-
 
     super.initState();
   }
 
-
   bool get isPurchased => widget.title == ScreenTitles.purchased.value;
+
   bool get isCurrentlyProgress => widget.title == ScreenTitles.currentlyProgress.value;
 
   @override
@@ -80,15 +93,17 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
     const double ratio = 30;
     double maxWidth = _style.scaleX(16 * ratio);
     double maxHeight = _style.scaleX(8.2 * ratio);
-    print('--------------*******---${ref.read(courseProvider).downloadVideoResponse.length}');
-    if(ref.watch(courseProvider).pushData==true){
-      Future.delayed(Duration.zero, () {
-        ref.read(courseProvider.notifier).pushData=false;
-        Navigator.pop(context);
-      },);
-
+    print('--downloadVideoResponse.length---${ref.read(courseProvider).downloadVideoResponse.length}');
+    print('--downloadAudioResponse.length---${ref.read(courseProvider).downloadAudioResponse.length}');
+    if (ref.watch(courseProvider).pushData == true) {
+      Future.delayed(
+        Duration.zero,
+        () {
+          ref.read(courseProvider.notifier).pushData = false;
+          Navigator.pop(context);
+        },
+      );
     }
-
 
     final courseP = ref.watch(courseProvider);
 
@@ -102,42 +117,54 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
       body: BackgroundImage(
         child: SafeArea(
           bottom: false,
-          child: courseP.isLoading ? const Center(child: CircularProgressIndicator(),) : GridView.builder(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-              mainAxisSpacing: _style.scale * 25,
-              crossAxisSpacing: _style.scale * 25,
-              maxCrossAxisExtent: maxWidth,
-              childAspectRatio: maxWidth / maxHeight,
-            ),
-            itemCount: isPurchased ? courseP.purchasedVideoResponse.length
-                : isCurrentlyProgress ? courseP.cpVideoResponse.length
-            :courseP.downloadResponse.length,
-            padding: EdgeInsets.fromLTRB(_style.scale * 25, _style.scaleX(20), _style.scale * 25, _style.scaleX(100)),
-            itemBuilder: (context, index) {
-
-              CITempModel item;
-              if (isPurchased) {
-                item = CITempModel(courseP.purchasedVideoResponse[index].title ?? '', courseP.purchasedVideoResponse[index].categoryResponse!.imageResponse!.imageUrl ?? '');
-              } else if (isCurrentlyProgress) {
-                item = CITempModel(courseP.cpVideoResponse[index].title ?? '', courseP.cpVideoResponse[index].categoryResponse!.imageResponse!.imageUrl ?? '');
-              } else {
-                item = CITempModel(courseP.downloadResponse[index].categoryName!, courseP.downloadResponse[index].categoryImage!);
-              }
-              return CourseItem(
-                model: item,
-                style: _style,
-                onPressed: () {
-                  if (isPurchased) {
-                    context.goToDetailCategoryScreen(courseP.purchasedVideoResponse[index].categoryResponse!,isAudio: false);
-                  } else if (isCurrentlyProgress) {
-                    context.goToDetailCategoryScreen(courseP.cpVideoResponse[index].categoryResponse!,isAudio: false);
-                  }else {
-                    context.push(RoutePath.downloadDetailCategoryScreenPath, extra: courseP.downloadResponse[index]);
-                  }
-                },
-              );
-            },
-          ),
+          child: courseP.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : GridView.builder(
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    mainAxisSpacing: _style.scale * 25,
+                    crossAxisSpacing: _style.scale * 25,
+                    maxCrossAxisExtent: maxWidth,
+                    childAspectRatio: maxWidth / maxHeight,
+                  ),
+                  itemCount: isPurchased
+                      ? courseP.purchasedVideoResponse.length
+                      : isCurrentlyProgress
+                          ? courseP.cpVideoResponse.length
+                          :widget.isAudio?courseP.downloadAudioCategoryResponse.length: courseP.downloadResponse.length,
+                  padding: EdgeInsets.fromLTRB(_style.scale * 25, _style.scaleX(20), _style.scale * 25, _style.scaleX(100)),
+                  itemBuilder: (context, index) {
+                    CITempModel item;
+                    if (isPurchased) {
+                      item = CITempModel(courseP.purchasedVideoResponse[index].title ?? '', courseP.purchasedVideoResponse[index].categoryResponse!.imageResponse!.imageUrl ?? '');
+                    } else if (isCurrentlyProgress) {
+                      item = CITempModel(courseP.cpVideoResponse[index].title ?? '', courseP.cpVideoResponse[index].categoryResponse!.imageResponse!.imageUrl ?? '');
+                    } else if (widget.isAudio) {
+                      item = CITempModel(courseP.downloadAudioCategoryResponse[index].categoryName!, courseP.downloadAudioCategoryResponse[index].categoryImage!);
+                    } else {
+                      item = CITempModel(courseP.downloadResponse[index].categoryName!, courseP.downloadResponse[index].categoryImage!);
+                    }
+                    return CourseItem(
+                      model: item,
+                      style: _style,
+                      onPressed: () {
+                        if (isPurchased) {
+                          context.goToDetailCategoryScreen(courseP.purchasedVideoResponse[index].categoryResponse!, isAudio: false);
+                        } else if (isCurrentlyProgress) {
+                          context.goToDetailCategoryScreen(courseP.cpVideoResponse[index].categoryResponse!, isAudio: false);
+                        }else if(widget.isAudio){
+                          context.push(RoutePath.downloadDetailCategoryScreenPath, extra: (courseP.downloadAudioCategoryResponse[index],true));
+                          // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailCategoryScreen(categoryListResponse: , isAudio: widget.isAudio ? true : false)));
+                        }
+                        else {
+                          context.push(RoutePath.downloadDetailCategoryScreenPath, extra: (courseP.downloadResponse[index], false));
+                          // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailCategoryScreen(categoryListResponse: , isAudio: widget.isAudio ? true : false)));
+                        }
+                      },
+                    );
+                  },
+                ),
         ),
       ),
     );

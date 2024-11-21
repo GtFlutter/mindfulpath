@@ -10,7 +10,6 @@ import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/media_image_card.dart';
 import 'package:meditation_app/util/assets.dart';
 
-
 class DDIModal {
   int? id;
   String? videoId;
@@ -27,38 +26,43 @@ class DDIModal {
 class DownloadDetailItem extends ConsumerStatefulWidget {
   final AppStyle appStyle;
   final DDIModal model;
+  final bool isAudio;
   final int? index;
   final int? IsSelected;
   final void Function()? onPlay;
   final void Function()? onRemovePress;
-  const DownloadDetailItem({super.key, required this.appStyle, required this.model,this.index,this.onPlay,this.IsSelected,this.onRemovePress});
+
+  const DownloadDetailItem({super.key, required this.appStyle, required this.model, this.index, this.onPlay, this.IsSelected, this.onRemovePress, required this.isAudio});
 
   @override
   ConsumerState<DownloadDetailItem> createState() => _DetailItemState();
 }
 
 class _DetailItemState extends ConsumerState<DownloadDetailItem> {
-
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
-    var getCategory=0;
+    var getCategory = 0;
 
     var radius = widget.appStyle.scaleX(10);
     var dimension = widget.appStyle.scaleX(97);
     final coursePro = ref.watch(courseProvider);
 
-    coursePro.downloadResponse.any((element){
-      getCategory=int.parse(element.categoryId??"");
-      return true;
-    });
-
-
+    if (widget.isAudio) {
+      coursePro.downloadAudioCategoryResponse.any((element) {
+        getCategory = int.parse(element.categoryId ?? "");
+        return true;
+      });
+    } else {
+      coursePro.downloadResponse.any((element) {
+        getCategory = int.parse(element.categoryId ?? "");
+        return true;
+      });
+    }
 
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         widget.onPlay!();
-
       },
       child: Container(
         decoration: ShapeDecoration(
@@ -66,7 +70,7 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(widget.appStyle.scaleX(10)),
             side: BorderSide(
-              color: (ref.watch(videoProvider).isSelected==widget.index)?AppColors.primaryColor:AppColors.detailItemBgColor,
+              color: (ref.watch(videoProvider).isSelected == widget.index) ? AppColors.primaryColor : AppColors.detailItemBgColor,
               width: widget.appStyle.scaleX(0.5),
               strokeAlign: BorderSide.strokeAlignOutside,
             ),
@@ -120,15 +124,13 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
                             SizedBox(width: widget.appStyle.scaleX(150)),
                           ],
                         ),
-
                       ],
                     ),
-
                   ],
                 ),
               ),
               IconButton(
-                onPressed: (){
+                onPressed: () {
                   widget.onRemovePress!();
                   // setState(() async {
                   //   if(coursePro.downloadVideoResponse.length==1){
@@ -140,19 +142,14 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
                   //    await  coursePro.ref.read(courseProvider.notifier).deleteVideo(int.parse(widget.model.videoId??""),context);
                   //   }
                   // });
-
-
                 },
                 icon: SvgPicture.asset(
                   SvgPaths.remove,
                   height: 17,
                   fit: BoxFit.contain,
                 ),
-                style: IconButton.styleFrom(
-                    tapTargetSize:
-                    MaterialTapTargetSize.shrinkWrap),
+                style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
               ),
-
             ],
           ),
         ),

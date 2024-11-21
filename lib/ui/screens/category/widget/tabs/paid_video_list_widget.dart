@@ -71,7 +71,9 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
     Future.delayed(Duration.zero, () async {
       final coursePRead = ref.read(courseProvider);
       await coursePRead.getCategoryFromDatabase();
+      await coursePRead.getAudioCategoryFromDatabase();
       await coursePRead.getVideoFromDatabase(widget.category.id ?? 0);
+      await coursePRead.getAudioFromDatabase(widget.category.id ?? 0);
     });
   }
 
@@ -100,7 +102,6 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
       ref.read(downloadProvider.notifier).complate = false;
       setState(() {});
     }
-
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       controller: _controller,
@@ -112,13 +113,25 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
       itemCount: widget.isAudio ? audioP.videosResponse!.list!.length : provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = widget.isAudio ? audioP.videosResponse!.list![index] : provider.videosResponse!.list![index];
-
+        bool isDownloaded=false;
+        if(!widget.isAudio)
+        {
+          isDownloaded = provider.downloadedVideo.any((element) {
+            return model.id == int.parse(element.videoId ?? "0");
+          });
+        }else{
+          isDownloaded = audioP.downloadedAudio.any((element) {
+            return model.id == int.parse(element.videoId ?? "0");
+          });
+        }
         return GestureDetector(
-          onTap: () {
+          onTap: () async {
             if (model.category?.isPurchased??false) {
               playVideo(model);
             } else {
-              buyNow(context, categoryId: widget.category.id.toString());
+              await buyNow(context, categoryId: widget.category.id.toString());
+              provider.fetchVideos(widget.category.id ?? 0);
+              audioP.fetchAudios(widget.category.id ?? 0);
             }
           },
           child: DetailItem.video(
@@ -127,8 +140,9 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
             isAudio: widget.isAudio,
             seletedItemId: model.id,
             index: '$index',
-            isDownloaded: provider.downloadedVideo.any((element) =>
-            element.id == provider.videosResponse?.list?[index].id),
+            isDownloaded: isDownloaded,
+            // isDownloaded: provider.downloadedVideo.any((element) =>
+            // element.id == provider.videosResponse?.list?[index].id),
             onToggleBookmark: () => toggleItemBookmark(model.id,
                 isRemove: model.bookmarked ?? false),
           ),

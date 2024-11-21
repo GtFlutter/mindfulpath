@@ -16,6 +16,7 @@ import 'package:meditation_app/ui/screens/category/widget/download_pdf_screen.da
 import '../../../theme/styles.dart';
 import '../../../theme/text_style.dart';
 import '../../../util/assets.dart';
+import 'courses_list_screen.dart';
 
 class CoursesScreen extends ConsumerStatefulWidget {
   const CoursesScreen({super.key});
@@ -103,8 +104,14 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => const DownloadPdfCategoryScreen()));
-                  }else{
-                    context.go(RoutePath.coursesListScreenPath, extra: ScreenTitles.toList[index].value);
+                  }
+                  else{
+                    // context.go(RoutePath.coursesListScreenPath, extra: ScreenTitles.toList[index].value);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CoursesListScreen(
+                                title: ScreenTitles.toList[index].value, isAudio: model=="Downloaded Video"?false:true)));
                   }
 
                 },

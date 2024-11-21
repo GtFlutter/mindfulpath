@@ -44,7 +44,11 @@ class SubPlayListScreen extends ConsumerStatefulWidget {
 class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
   static AppStyle _style = AppStyle();
   Duration? _lastKnownPosition;
-
+// Variable to track the expanded tile index
+  final ExpansionTileController expansionTileController =
+  ExpansionTileController();
+  final ExpansionTileController expansionTileController1 =
+  ExpansionTileController();
   //late List<DIModel> _items;
   @override
   void initState() {
@@ -68,8 +72,12 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
       final coursePRead = ref.read(courseProvider);
       final coursePWatch = ref.watch(courseProvider);
       await coursePRead.getCategoryFromDatabase();
+      await coursePRead.getAudioCategoryFromDatabase();
       for (final category in coursePWatch.downloadResponse) {
         await coursePRead.getVideoFromDatabase(int.parse(category.categoryId ?? ""));
+      }
+      for (final category in coursePWatch.downloadAudioCategoryResponse) {
+        await coursePRead.getAudioFromDatabase(int.parse(category.categoryId ?? ""));
       }
     });
   }
@@ -98,7 +106,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
             color: draggableItemColor,
             shadowColor: draggableItemColor,
             borderRadius: BorderRadius.circular(_style.scaleX(25)),
-            child: BookmarkItem.dragable(
+            child: BookmarkItem.dragable(isAudio: false,
               appStyle: _style,
               model: BookmarkListResponse(),
               index: index,
@@ -224,15 +232,23 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                             SizedBox(height: _style.scaleX(24)),
                           ] else
                             const SizedBox.shrink(),
-                          !isLandscape
-                              ? Expanded(
+                          if (!isLandscape) Expanded(
                                   child: Column(
                                     children: [
                                       Theme(
                                         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                                         child: ExpansionTile(title: const Text("Videos"),
+                                          onExpansionChanged: (expanded) {
+                                            setState(() {
+                                              if(expanded) {
+                                                expansionTileController1.collapse();
+                                              }
+                                            });
+                                          },
+
+                                          controller: expansionTileController,
                                           children: [
-                                            if(playlistP.playlistVideoListResponse?.isNotEmpty ?? false)...[SizedBox(height:300,
+                                            if(playlistP.playlistVideoListResponse?.isNotEmpty ?? false)...[SizedBox(height:250,
                                               child: ListView.separated(
                                                 shrinkWrap: true,
                                                 scrollDirection: Axis.vertical,
@@ -250,7 +266,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                       onTap: () {
                                                         //playVideo(model);
                                                       },
-                                                      child: SubPlayListItem(
+                                                      child: SubPlayListItem(isAudio: false,
                                                         key: Key('$index'),
                                                         appStyle: _style,
                                                         model: model!,
@@ -288,6 +304,15 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                         child: Theme(
                                           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                                           child: ExpansionTile(title: const Text("Audios"),
+                                            onExpansionChanged: (expanded) {
+                                              setState(() {
+                                                if(expanded) {
+                                                  expansionTileController.collapse();
+                                                }
+
+                                              });
+                                            },
+                                            controller: expansionTileController1,
                                             children: [
                                               if(playlistP.playlistAudioListResponse?.isNotEmpty ?? false)...[ ListView.separated(
                                                 shrinkWrap: true,
@@ -306,7 +331,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                       onTap: () {
                                                         //playVideo(model);
                                                       },
-                                                      child: SubPlayListItem(
+                                                      child: SubPlayListItem(isAudio: true,
                                                         key: Key('$index'),
                                                         appStyle: _style,
                                                         model: model!,
@@ -343,8 +368,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
 
                                     ],
                                   ),
-                                )
-                              : const SizedBox.shrink(),
+                                ) else const SizedBox.shrink(),
                         ],
                       ),
                     ),

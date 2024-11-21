@@ -86,6 +86,8 @@ class PlaylistNotifier extends ChangeNotifier {
       _playlistDetailResponse = PlaylistDetailResponse.fromJson(jsonDecode(response.body));
       playlistVideoListResponse = playlistVideoListResponse ?? [];
       playlistAudioListResponse = playlistAudioListResponse ?? [];
+      playlistVideoListResponse?.clear();
+      playlistAudioListResponse?.clear();
       if (_playlistDetailResponse != null) {
         _playlistDetailResponse?.data?.playlistVideoList?.map(
           (e) {

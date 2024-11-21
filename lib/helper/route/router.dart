@@ -151,9 +151,11 @@ final appRouter = GoRouter(
               GoRoute(
                 path: RoutePath.coursesListScreen,
                 builder: (context, state) {
+
                   return CoursesListScreen(
                     key: state.pageKey,
                     title: state.extra as String? ?? 'Router Extra Not Found',
+                    isAudio: state.extra as bool? ?? false,
                   );
                 },
               ),
@@ -239,8 +241,9 @@ final appRouter = GoRouter(
                 parentNavigatorKey: rootNavigator,
                 path: RoutePath.downloadDetailCategoryScreen,
                 builder: (context, state) {
-                  if (state.extra != null && state.extra is CategoryModal) {
-                    return DownloadDetailCategoryScreen(key: state.pageKey, categoryModal: state.extra as CategoryModal,);
+                  if (state.extra != null && state.extra is (CategoryModal,bool)) {
+                    var (category, isAudio) = state.extra as (CategoryModal, bool);
+                    return DownloadDetailCategoryScreen(key: state.pageKey, categoryModal: category, isAudio: isAudio,);
                   }
                   return const WentWrongScreen();
                 },

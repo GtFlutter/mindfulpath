@@ -125,16 +125,29 @@ class CourseNotifier extends ChangeNotifier {
     }
   }
 
+//for video category
   List<CategoryModal> _downloadResponse = [];
 
   List<CategoryModal> get downloadResponse => _downloadResponse;
 
+//for audio category
+  List<CategoryModal> _downloadAudioCategoryResponse = [];
+
+  List<CategoryModal> get downloadAudioCategoryResponse => _downloadAudioCategoryResponse;
+
   Future<void> getCategoryFromDatabase() async {
     _startLoading();
-
     List<CategoryModal> list = await ref.read(databaseProvider).getCategory();
     debugPrint('downloaded VIDEO CATEGORYIES :: ${list.length}');
     _downloadResponse = list;
+    _stopLoading();
+  }
+
+  Future<void> getAudioCategoryFromDatabase() async {
+    _startLoading();
+    List<CategoryModal> list = await ref.read(databaseProvider).getAudioCategory();
+    debugPrint('downloaded AUDIO CATEGORYIES :: ${list.length}');
+    _downloadAudioCategoryResponse = list;
     _stopLoading();
   }
 
@@ -158,11 +171,23 @@ class CourseNotifier extends ChangeNotifier {
 
   List<VideoModal> get downloadVideoResponse => _downloadVideoResponse;
 
+  List<VideoModal> _downloadAudioResponse = [];
+
+  List<VideoModal> get downloadAudioResponse => _downloadAudioResponse;
+
   Future<void> getVideoFromDatabase(int categoryId) async {
     _startLoading();
     _downloadVideoResponse.clear();
     List<VideoModal> list = await ref.read(databaseProvider).getVideo(categoryId);
     _downloadVideoResponse.addAll(list);
+    _stopLoading();
+  }
+
+  Future<void> getAudioFromDatabase(int categoryId) async {
+    _startLoading();
+    _downloadAudioResponse.clear();
+    List<VideoModal> list = await ref.read(databaseProvider).getAudio(categoryId);
+    _downloadAudioResponse.addAll(list);
     _stopLoading();
   }
 
@@ -212,12 +237,24 @@ class CourseNotifier extends ChangeNotifier {
       where: 'video_id = ?',
       whereArgs: [videoId],
     );
-    if(result==1 && downloadVideoResponse.length==1){
-        //Navigator.popUntil(context, ModalRoute.withName(RoutePath.libraryScreen));
-       // Navigator.pushReplacementNamed(context,RoutePath.coursesListScreen);
-        Navigator.pop(context);
+    if (result == 1 && downloadVideoResponse.length == 1) {
+      //Navigator.popUntil(context, ModalRoute.withName(RoutePath.libraryScreen));
+      // Navigator.pushReplacementNamed(context,RoutePath.coursesListScreen);
+      Navigator.pop(context);
+    }
+  }
 
-
+  Future<void> deleteAudio(int videoId, BuildContext context) async {
+    var dbClient = await db;
+    final result = await dbClient.delete(
+      DatabaseConsts.audioTable,
+      where: 'video_id = ?',
+      whereArgs: [videoId],
+    );
+    if (result == 1 && downloadAudioResponse.length == 1) {
+      //Navigator.popUntil(context, ModalRoute.withName(RoutePath.libraryScreen));
+      // Navigator.pushReplacementNamed(context,RoutePath.coursesListScreen);
+      Navigator.pop(context);
     }
   }
 
@@ -225,6 +262,15 @@ class CourseNotifier extends ChangeNotifier {
     var dbClient = await db;
     final result = await dbClient.delete(
       DatabaseConsts.categoryTable,
+      where: 'category_id = ?',
+      whereArgs: [categoryId],
+    );
+  }
+
+  Future<void> deleteCategoryAudio(int categoryId, BuildContext context) async {
+    var dbClient = await db;
+    final result = await dbClient.delete(
+      DatabaseConsts.audioCategoryTable,
       where: 'category_id = ?',
       whereArgs: [categoryId],
     );

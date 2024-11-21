@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class PathHelper {
-  static Future<String> getDownloadDirectoryPath(bool isPdf) async {
+  static Future<String> getDownloadDirectoryPath(bool isPdf, {bool? isAudio}) async {
     Directory directory = await getApplicationSupportDirectory();
     //Directory? directory = await getExternalStorageDirectory();
     if(isPdf){
       return '${directory.path}/PDF';
+    }else if(isAudio ?? false){
+      return '${directory.path}/Audio';
     }
     return '${directory.path}/Video';
   }

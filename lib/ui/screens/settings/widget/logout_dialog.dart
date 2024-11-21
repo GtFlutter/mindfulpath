@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/payment/payment_screen.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
+import 'package:meditation_app/provider/resource_provider/paid_audios_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_videos_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
@@ -227,6 +228,7 @@ class BuyNowDialog extends ConsumerWidget {
                                        ref.read(dashboardProvider).searchVideo("", queryTime: QueryTime.qTime1, categoryId: [int.parse(categoryId)]);
                                     } else {
                                        ref.read(paidVideosProvider.notifier).fetchVideos(int.parse(categoryId),isLoading: false);
+                                       ref.read(paidAudiosProvider.notifier).fetchAudios(int.parse(categoryId),isLoading: false);
                                     }
                                   }
                                 },

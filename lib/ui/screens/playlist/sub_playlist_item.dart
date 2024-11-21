@@ -23,6 +23,7 @@ class SubPlayListItem extends ConsumerStatefulWidget {
   final PlaylistVideoList model;
   final int index;
   final bool dragable;
+  final bool isAudio;
   final String? url;
   final bool dragging;
   final GestureTapCallback? onBookmarkRemove;
@@ -33,6 +34,7 @@ class SubPlayListItem extends ConsumerStatefulWidget {
     super.key,
     required this.appStyle,
     required this.model,
+    required this.isAudio,
     required this.index,
     this.onBookmarkRemove,
     this.onPlay,
@@ -51,7 +53,6 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
 
   @override
   void initState() {
-
     model = widget.model.video!;
 
     Future.delayed(
@@ -59,6 +60,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
       () {
         // downloadP.checkVideoIsDownload(widget.model.videoId.toString(), false);
         getDownload();
+        getAudioDownload();
         getCategory();
       },
     );
@@ -69,9 +71,12 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
     final coursePRead = ref.read(courseProvider);
     final coursePWatch = ref.watch(courseProvider);
     await coursePRead.getCategoryFromDatabase();
-
+    await coursePRead.getAudioCategoryFromDatabase();
     for (final category in coursePWatch.downloadResponse) {
       await coursePRead.getVideoFromDatabase(int.parse(category.categoryId ?? ""));
+    }
+    for (final category in coursePWatch.downloadAudioCategoryResponse) {
+      await coursePRead.getAudioFromDatabase(int.parse(category.categoryId ?? ""));
     }
   }
 
@@ -79,14 +84,22 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
   void deactivate() {
     ref.read(courseProvider.notifier).downloadPdfResponses.clear();
     ref.read(courseProvider.notifier).downloadResponse.clear();
+    ref.read(courseProvider.notifier).downloadAudioCategoryResponse.clear();
   }
 
   getDownload() async {
     final downloadP = ref.read(downloadProvider);
     // log("video id in playlist----${widget.isAudio ? widget.model.audio!.id : widget.model.video!.id}");
     // result = await downloadP.checkVideoIsDownload(widget.model.video!.id.toString(), false);
-    if(model != null){
-      result = await downloadP.checkVideoIsDownload(model!.id.toString(), false);
+    if (model != null) {
+      result = await downloadP.checkVideoIsDownload(model!.id.toString(), false, false);
+    }
+  }
+
+  getAudioDownload() async {
+    final downloadP = ref.read(downloadProvider);
+    if (model != null) {
+      result = await downloadP.checkVideoIsDownload(model!.id.toString(), false, true);
     }
   }
 
@@ -122,18 +135,16 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Builder(
-                builder: (context) {
-                  debugPrint("Nothing asncajksnc ${model!.thumbnailImageUrlSrc}");
-                  return MediaImageCard(
-                    appStyle: widget.appStyle,
-                    imgUrl: model!.thumbnailImageUrlSrc!,
-                    duration: (widget.model.video?.duration ?? "").toDuration,
-                    imgRadius: widget.appStyle.scaleX(25),
-                    imgSize: widget.appStyle.scaleX(100),
-                  );
-                }
-              ),
+              Builder(builder: (context) {
+                debugPrint("Nothing asncajksnc ${model!.thumbnailImageUrlSrc}");
+                return MediaImageCard(
+                  appStyle: widget.appStyle,
+                  imgUrl: model!.thumbnailImageUrlSrc!,
+                  duration: (widget.model.video?.duration ?? "").toDuration,
+                  imgRadius: widget.appStyle.scaleX(25),
+                  imgSize: widget.appStyle.scaleX(100),
+                );
+              }),
               Flexible(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,12 +177,11 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                     ),
                                     TextSpan(
                                       text: model!.categoryTitle,
-                                      style: textStyle.copyWith(color: AppColors.categoryNameColor,fontSize: 11),
+                                      style: textStyle.copyWith(color: AppColors.categoryNameColor, fontSize: 11),
                                     ),
                                   ],
                                 ),
                               ),
-
                             ],
                           ),
                         ],
@@ -210,8 +220,17 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                               final downloadP = ref.watch(downloadProvider);
                               final coursePWatch = ref.watch(courseProvider);
                               // final getCat = ref.read(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.video?.id);
-                              final getCat = ref.read(courseProvider.notifier).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.video?.video?.id);
-                              log("getcat-----$getCat");
+                              bool getCat = false;
+                              if (widget.isAudio) {
+                                getCat = ref.read(courseProvider.notifier).downloadAudioResponse.any((element) {
+                                  log("audio playlist download--->${element.videoId}~~~~~${widget.model.toJson()}");
+                                  return int.parse(element.videoId ?? "") == widget.model.video?.id;
+                                });
+                                log("getcat in sub playlist item-----1 $getCat");
+                              } else {
+                                getCat = ref.read(courseProvider.notifier).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.video?.video?.id);
+                                log("getcat sub playlist item-----2 $getCat");
+                              }
                               if (getCat) {
                                 return const SizedBox.shrink();
                               } else {
@@ -231,10 +250,25 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                     return IconButton(
                                       onPressed: () async {
                                         if (downloadP.model == null) {
-                                          downloadP.download(model: widget.model.video);
-                                        } else if (widget.model.video!.id != downloadP.model!.id) {
-                                          showCustomSnackBar('Another Video is in progress');
+                                          if (widget.isAudio) {
+                                            downloadP.downloadAudio(model: widget.model.video);
+                                          } else {
+                                            downloadP.download(model: widget.model.video);
+                                          }
+                                        } else {
+                                          if (widget.model.video!.id != downloadP.model!.id) {
+                                            if (widget.model.video?.video != null) {
+                                              showCustomSnackBar('Another Video is in progress');
+                                            } else {
+                                              showCustomSnackBar('Another Audio is in progress');
+                                            }
+                                          }
                                         }
+                                        // if (downloadP.model == null) {
+                                        //   downloadP.download(model: widget.model.video);
+                                        // } else if (widget.model.video!.id != downloadP.model!.id) {
+                                        //   showCustomSnackBar('Another Video is in progress');
+                                        // }
                                       },
                                       icon: SvgPicture.asset(
                                         SvgPaths.download,
@@ -256,7 +290,6 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                   ],
                 ),
               ),
-
               if (widget.dragable)
                 Align(
                   alignment: Alignment.center,

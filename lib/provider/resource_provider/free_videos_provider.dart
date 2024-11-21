@@ -20,13 +20,14 @@ final freeVideosProvider = ChangeNotifierProvider<FreeVideosNotifier>((ref) {
 
 class FreeVideosNotifier extends VideoResourceNotifier {
   final DashboardRepo repo;
+
   FreeVideosNotifier(this.repo);
 
   VideosResponse? _videosResponse;
-  VideosResponse? get videosResponse => _videosResponse;
-int? selectedIndex;
-  List<VideoModal> downloadedVideo=[];
 
+  VideosResponse? get videosResponse => _videosResponse;
+  int? selectedIndex;
+  List<VideoModal> downloadedVideo = [];
 
 
   @override
@@ -41,7 +42,9 @@ int? selectedIndex;
   }
 
   bool _loading = false;
+
   bool get loading => _loading;
+
   @override
   void startLoading() {
     _loading = true;

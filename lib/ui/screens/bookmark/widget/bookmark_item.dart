@@ -23,6 +23,7 @@ class BookmarkItem extends ConsumerStatefulWidget {
   final int index;
   final bool dragable;
   final String? url;
+  final bool isAudio;
   final int? IsSelected;
   final bool dragging;
   final GestureTapCallback? onBookmarkRemove;
@@ -32,6 +33,7 @@ class BookmarkItem extends ConsumerStatefulWidget {
     super.key,
     required this.appStyle,
     required this.model,
+    required this.isAudio,
     required this.index,
     required this.onBookmarkRemove,
     this.url,
@@ -45,6 +47,7 @@ class BookmarkItem extends ConsumerStatefulWidget {
     required this.appStyle,
     required this.model,
     required this.index,
+    required this.isAudio,
     this.url,
     this.onPlay,
     this.IsSelected,
@@ -66,6 +69,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
       () {
         getDownload();
         getCategory();
+        getAudioDownload();
       },
     );
     super.initState();
@@ -75,26 +79,36 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
   void deactivate() {
     ref.read(courseProvider.notifier).downloadResponse.clear();
     ref.read(courseProvider.notifier).downloadVideoResponse.clear();
+
+    ref.read(courseProvider.notifier).downloadAudioResponse.clear();
   }
 
   getCategory() async {
     final coursePRead = ref.read(courseProvider);
     final coursePWatch = ref.watch(courseProvider);
     await coursePRead.getCategoryFromDatabase();
-
+    await coursePRead.getAudioCategoryFromDatabase();
     for (final category in coursePWatch.downloadResponse) {
       await coursePRead.getVideoFromDatabase(int.parse(category.categoryId ?? ""));
+    }
+    for (final category in coursePWatch.downloadAudioCategoryResponse) {
+      await coursePRead.getAudioFromDatabase(int.parse(category.categoryId ?? ""));
     }
   }
 
   getDownload() async {
     final downloadP = ref.read(downloadProvider);
-    result = await downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false);
+    result = await downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false, false);
+  }
+
+  getAudioDownload() async {
+    final downloadP = ref.read(downloadProvider);
+    result = await downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false, true);
   }
 
   @override
   Widget build(BuildContext context) {
-    var vp=ref.watch(videoProvider);
+    var vp = ref.watch(videoProvider);
     TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
     String timeStr = widget.model.bookmarkVideoResponse!.duration ?? "";
     List<String> timeComponents = timeStr.split(":");
@@ -171,7 +185,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                 ),
                                 TextSpan(
                                   text: widget.model.bookmarkVideoResponse?.category?.title ?? "",
-                                  style: textStyle.copyWith(color: AppColors.categoryNameColor,fontSize: 11),
+                                  style: textStyle.copyWith(color: AppColors.categoryNameColor, fontSize: 11),
                                 ),
                               ],
                             ),
@@ -210,8 +224,17 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                             builder: (context, ref, child) {
                               final downloadP = ref.watch(downloadProvider);
                               final coursePWatch = ref.watch(courseProvider);
-                              final getCat = ref.read(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.video?.id);
-                              log("getcat-----1 $getCat");
+                              bool getCat = false;
+                              if (widget.isAudio) {
+                                getCat = ref.read(courseProvider).downloadAudioResponse.any((element) {
+                                  log("audio bookmark download--->${element.videoId}~~~~~${widget.model.bookmarkVideoResponse?.id}");
+                                  return int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.id;
+                                });
+                                log("getcat-----1 $getCat");
+                              } else {
+                                getCat = ref.read(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.video?.id);
+                                log("getcat-----2 $getCat");
+                              }
 
                               if (getCat == true) {
                                 return const SizedBox.shrink();
@@ -231,9 +254,19 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                     return IconButton(
                                       onPressed: () {
                                         if (downloadP.model == null) {
-                                          downloadP.download(model: widget.model.bookmarkVideoResponse);
-                                        } else if (widget.model.bookmarkVideoResponse!.id != downloadP.model!.id) {
-                                          showCustomSnackBar('Another Video is in progress');
+                                          if (widget.isAudio) {
+                                            downloadP.downloadAudio(model: widget.model.bookmarkVideoResponse);
+                                          } else {
+                                            downloadP.download(model: widget.model.bookmarkVideoResponse);
+                                          }
+                                        } else {
+                                          if (widget.model.bookmarkVideoResponse!.id != downloadP.model!.id) {
+                                            if (widget.model.bookmarkVideoResponse?.video != null) {
+                                              showCustomSnackBar('Another Video is in progress');
+                                            } else {
+                                              showCustomSnackBar('Another Audio is in progress');
+                                            }
+                                          }
                                         }
                                       },
                                       icon: SvgPicture.asset(
