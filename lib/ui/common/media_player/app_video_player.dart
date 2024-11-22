@@ -51,6 +51,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   bool isFlickering = true;
   double _progress = 0.1;
   bool _showReload = false;
+  bool _isDragging = false;
   Timer? _watchTimer;
   Duration _currentPosition = Duration.zero;
 
@@ -138,13 +139,17 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   void listener() {
     if (_controller.value.isInitialized) {
-      if (mounted) {
+      if (mounted && !_isDragging) {
         setState(() {
           _isBuffering = _controller.value.isBuffering;
           _showReload = _controller.value.position >= _controller.value.duration;
           _progress = _controller.value.position.inSeconds.toDouble();
         });
       }
+    }
+    // Notify parent widget if needed
+    if (widget.onPositionChanged != null && !_isDragging) {
+      widget.onPositionChanged!(_controller.value.position);
     }
 
     if (_controller.value.isPlaying && !widget.isFileUrl) {
@@ -305,6 +310,22 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                             value: _progress,
                             min: 0.0,
                             max: _controller.value.duration.inSeconds.toDouble(),
+                            onChangeStart: (progress) {
+                              setState(() {
+                                _isDragging = true; // User starts dragging
+                              });
+                              // Stop listening to video updates while the user is dragging
+                              _controller.removeListener(listener);
+                            },
+                            onChangeEnd: (progress) {
+                              setState(() {
+                                _isDragging = false; // User stops dragging
+                              });
+                              // Seek to the new position after dragging is finished
+                              _controller.seekTo(Duration(seconds: progress.toInt()));
+                              // Resume listening to video updates
+                              _controller.addListener(listener);
+                            },
                             onChanged: (progress) {
                               setState(() {
                                 _progress = progress;
@@ -354,11 +375,18 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       int hours = int.parse(durationParts[0]);
       int minutes = int.parse(durationParts[1]);
       List<String> seconds = durationParts[2].split('.');
-      Duration duration = Duration(hours: hours, minutes: minutes, seconds: int.parse(seconds[0]));
-      return "${hours == 0 ? "00" : hours}:${minutes == 0 ? "00" : minutes}:${int.parse(seconds[0])}";
+      int secs = int.parse(seconds[0]);
+
+      // Format hours, minutes, and seconds with required padding
+      String formattedHours = hours.toString().padLeft(2, '0'); // 4 digits
+      String formattedMinutes = minutes.toString().padLeft(2, '0'); // 2 digits
+      String formattedSeconds = secs.toString().padLeft(2, '0'); // 2 digits
+
+      return "$formattedHours.$formattedMinutes.$formattedSeconds";
     }
-    return "00:00";
+    return "00.00.00";
   }
+
 }
 
 ///shivangi mam checked for this code

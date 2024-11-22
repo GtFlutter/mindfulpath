@@ -155,7 +155,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
 
   void toggleItemBookmark(int? itemId, {bool isRemove = false}) {
     if (itemId == null) return;
-    ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
+    ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove,isAudio: widget.isAudio);
     if(widget.isAudio){
       ref.read(paidAudiosProvider.notifier).fetchAudios(widget.category.id??0);
     }else{

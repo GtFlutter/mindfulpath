@@ -76,12 +76,13 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
       int index,
       bool isAudioFile
       ) {
-    print('------------****${bookmarkListResponse.bookmarkVideoResponse!.videoUrl}');
+    print('-----bookmarkListResponse-------****${bookmarkListResponse.bookmarkVideoResponse?.toJson()}');
+    print('-----bookmarkListResponse-------****${bookmarkListResponse.bookmarkVideoResponse?.thumbnailImageUrlSrc}');
     ref.read(videoProvider).playVideo(
         DetailedVideoModel(
           category: category,
           video: DIModel(
-            thumbnailUrl: bookmarkListResponse.bookmarkVideoResponse!.imgUrl ?? '',
+            thumbnailUrl: bookmarkListResponse.bookmarkVideoResponse!.thumbnailImageUrlSrc ?? '',
             videoUrl: bookmarkListResponse.bookmarkVideoResponse!.videoUrl!,
             duration: bookmarkListResponse.bookmarkVideoResponse?.duration ?? '',
             title: bookmarkListResponse.bookmarkVideoResponse!.title ?? '',
@@ -266,7 +267,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                     videoCtrl.isSelected = index;
                                     playVideo(model, bookmarkNotifier.category![index], index, showAudioFile);
                                   },
-                                  url: model.bookmarkVideoResponse!.videoUrlSrc,
+                                  url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
                                   onBookmarkRemove: () async {
                                     if (model.videoId == null) return;
                                     await ref.read(bookmarkProvider).toggleBookmark(model.videoId!, isRemove: true);
@@ -318,7 +319,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                   IsSelected: videoCtrl.isSelected,
                                   onPlay: () {
                                     videoCtrl.isSelected = index;
-                                    playVideo(model, bookmarkNotifier.category![index], index, showAudioFile);
+                                    playVideo(model, bookmarkNotifier.category![index], index, true);
                                   },
                                   url: model.bookmarkVideoResponse!.videoUrlSrc,
                                   onBookmarkRemove: () async {

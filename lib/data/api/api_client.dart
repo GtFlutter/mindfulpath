@@ -65,6 +65,7 @@ class ApiClient {
         headers: headers ?? _mainHeaders,
       )
           .timeout(_timeoutIn);
+      log("Base URL----->${appBaseUrl + uri}");
       return handleResponse(response, uri);
     } catch (_) {
       return _errorResponse;

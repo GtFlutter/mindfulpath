@@ -256,7 +256,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                       IsSelected: ref.read(videoProvider.notifier).isSelected,
                                       onPlay: () {
                                         ref.read(videoProvider.notifier).isSelected = index;
-                                        playVideo(model);
+                                        playVideo(model,false);
                                       },
                                       onRemovePress: () async {
                                         if (courseP.downloadVideoResponse.length == 1) {
@@ -306,7 +306,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                       IsSelected: ref.read(videoProvider.notifier).isSelected,
                                       onPlay: () {
                                         ref.read(videoProvider.notifier).isSelected = index;
-                                        playVideo(model);
+                                        playVideo(model,true);
                                       },
                                       onRemovePress: () async {
                                         if (courseP.downloadAudioResponse.length == 1) {
@@ -337,8 +337,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
     );
   }
 
-  void playVideo(DDIModal model) {
-    ref.read(offlineVideoProvider).playVideo(model);
+  void playVideo(DDIModal model,bool isAudioFile) {
+    ref.read(offlineVideoProvider).playVideo(model,isAudioFile: isAudioFile);
   }
 
   @override

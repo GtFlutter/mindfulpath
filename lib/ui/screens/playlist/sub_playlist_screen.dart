@@ -314,51 +314,53 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                             },
                                             controller: expansionTileController1,
                                             children: [
-                                              if(playlistP.playlistAudioListResponse?.isNotEmpty ?? false)...[ ListView.separated(
-                                                shrinkWrap: true,
-                                                scrollDirection: Axis.vertical,
-                                                padding: EdgeInsets.only(
-                                                  top: _style.scale * 12.5,
-                                                  right: _style.scale * 10,
-                                                  left: _style.scale * 10,
-                                                ),
-                                                itemCount: playlistP.playlistAudioListResponse?.length ?? 0,
-                                                itemBuilder: (context, index) {
-                                                  var model = playlistP.playlistAudioListResponse?[index];
+                                              if(playlistP.playlistAudioListResponse?.isNotEmpty ?? false)...[ SizedBox(height: 260,
+                                                child: ListView.separated(
+                                                  shrinkWrap: true,
+                                                  scrollDirection: Axis.vertical,
+                                                  padding: EdgeInsets.only(
+                                                    top: _style.scale * 12.5,
+                                                    right: _style.scale * 10,
+                                                    left: _style.scale * 10,
+                                                  ),
+                                                  itemCount: playlistP.playlistAudioListResponse?.length ?? 0,
+                                                  itemBuilder: (context, index) {
+                                                    var model = playlistP.playlistAudioListResponse?[index];
 
-                                                  return GestureDetector(
-                                                    //key: Key('$index'),
-                                                      onTap: () {
-                                                        //playVideo(model);
-                                                      },
-                                                      child: SubPlayListItem(isAudio: true,
-                                                        key: Key('$index'),
-                                                        appStyle: _style,
-                                                        model: model!,
-                                                        onPlay: () {
-                                                          ref.read(videoProvider.notifier).isSelected = index;
-                                                          playVideo(model,index);
-                                                          FocusManager.instance.primaryFocus?.unfocus();
+                                                    return GestureDetector(
+                                                      //key: Key('$index'),
+                                                        onTap: () {
+                                                          //playVideo(model);
                                                         },
-                                                        onRemovePress: () async {
-                                                          await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
-                                                          playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
-                                                        },
-                                                        index: index,
-                                                        url: model.video?.videoUrl ?? "",
-                                                      ));
-                                                },
-                                                separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                                                /* onReorder: (int oldIndex, int newIndex) {
-                                                                setState(() {
-                                                                  if (oldIndex < newIndex) {
-                                                                    newIndex -= 1;
-                                                                  }
-                                                                  final DIModel item = playlistP.playlistDetailResponse.removeAt(oldIndex);
-                                                                  _items.insert(newIndex, item);
-                                                                });
-                                                              },*/
-                                                // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                                        child: SubPlayListItem(isAudio: true,
+                                                          key: Key('$index'),
+                                                          appStyle: _style,
+                                                          model: model!,
+                                                          onPlay: () {
+                                                            ref.read(videoProvider.notifier).isSelected = index;
+                                                            playVideo(model,index);
+                                                            FocusManager.instance.primaryFocus?.unfocus();
+                                                          },
+                                                          onRemovePress: () async {
+                                                            await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
+                                                            playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
+                                                          },
+                                                          index: index,
+                                                          url: model.video?.videoUrl ?? "",
+                                                        ));
+                                                  },
+                                                  separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                                  /* onReorder: (int oldIndex, int newIndex) {
+                                                                  setState(() {
+                                                                    if (oldIndex < newIndex) {
+                                                                      newIndex -= 1;
+                                                                    }
+                                                                    final DIModel item = playlistP.playlistDetailResponse.removeAt(oldIndex);
+                                                                    _items.insert(newIndex, item);
+                                                                  });
+                                                                },*/
+                                                  // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                                ),
                                               ),]else...[const Text("Data Not Available")],
 
                                             ],

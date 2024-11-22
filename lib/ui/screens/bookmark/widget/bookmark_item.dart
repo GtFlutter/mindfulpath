@@ -110,10 +110,14 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
   Widget build(BuildContext context) {
     var vp = ref.watch(videoProvider);
     TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
-    String timeStr = widget.model.bookmarkVideoResponse!.duration ?? "";
+    String timeStr = widget.model.bookmarkVideoResponse?.duration ?? "";
     List<String> timeComponents = timeStr.split(":");
-    int minute = int.parse(timeComponents[1]);
-    int second = int.parse(timeComponents[2].split(".")[0]); // Extract only seconds
+    int minute = 0;
+    int second = 0;
+    if (timeComponents.isNotEmpty) {
+      minute = int.parse(timeComponents[1]);
+      second = int.parse(timeComponents[2].split(".")[0]);
+    } // Extract only seconds
     print("Minute: $minute, Second: $second");
 
 //primaryColor

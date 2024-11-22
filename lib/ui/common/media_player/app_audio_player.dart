@@ -243,7 +243,7 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
       int minutes = int.parse(durationParts[1]);
       List<String> seconds = durationParts[2].split('.');
       Duration duration = Duration(hours: hours, minutes: minutes, seconds: int.parse(seconds[0]));
-      return "${hours == 0 ? "00" : hours}:${minutes == 0 ? "00" : minutes}:${int.parse(seconds[0])}";
+      return "${hours == 0 ? "00" : hours.toString().padLeft(2, '0')}:${minutes == 0 ? "00" : minutes.toString().padLeft(2, '0')}:${int.parse(seconds[0]).toString().padLeft(2, '0')}";
     }
     return "00:00";
   }
