@@ -84,11 +84,28 @@ class NotificationServices {
     });
   }
 
-  Future<String> getDeviceToken() async {
-    String? token = await messaging.getToken();
-    return token!;
-  }
+  // Future<String> getDeviceToken() async {
+  //   String? token = await messaging.getToken();
+  //   return token!;
+  // }
+  Future<String?> getDeviceToken() async {
+    String? token;
+    int retries = 3;
 
+    for (int i = 0; i < retries; i++) {
+      try {
+        token = await FirebaseMessaging.instance.getToken();
+        if (token != null) break;
+      } catch (e) {
+        if (i == retries - 1) {
+          rethrow; // Throw after last retry
+        }
+        await Future.delayed(Duration(seconds: 2));
+      }
+    }
+
+    return token;
+  }
   void isTokenRefresh() async {
     messaging.onTokenRefresh.listen((event) {
       event.toString();

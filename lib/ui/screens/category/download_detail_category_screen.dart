@@ -213,7 +213,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         audioId: videoCtrl.video?.id ?? 0,
                         duration: videoCtrl.video!.videoDuration ?? "",
                         audioUrl: videoCtrl.video!.videoFile ?? "",
-                        audioImage: videoCtrl.video!.categoryImage ?? "",
+                        audioImage: videoCtrl.video!.videoThumbnail ?? "",
                       ),
                     ),
                     SizedBox(height: _style.scaleX(24)),
@@ -242,6 +242,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                   VideoModal item = courseP.downloadVideoResponse[index];
                                   var model = DDIModal(
                                       id: item.id,
+                                      videoThumbnail: item.videoThumbnail,
                                       videoId: item.videoId,
                                       videoName: item.videoName,
                                       videoFile: item.videoFile,
@@ -293,6 +294,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                   var model = DDIModal(
                                       id: item.id,
                                       videoId: item.videoId,
+                                      videoThumbnail: item.videoThumbnail,
                                       videoName: item.videoName,
                                       videoFile: item.videoFile,
                                       videoDuration: item.videoDuration,

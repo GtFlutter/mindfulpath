@@ -13,6 +13,7 @@ import 'package:meditation_app/util/assets.dart';
 class DDIModal {
   int? id;
   String? videoId;
+  String? videoThumbnail;
   String? videoName;
   String? videoFile;
   String? videoDuration;
@@ -20,7 +21,7 @@ class DDIModal {
   String? categoryName;
   String? categoryImage;
 
-  DDIModal({this.id, this.videoId, this.videoName, this.videoFile, this.videoDuration, this.categoryId, this.categoryName, this.categoryImage});
+  DDIModal({this.id, this.videoId,this.videoThumbnail, this.videoName, this.videoFile, this.videoDuration, this.categoryId, this.categoryName, this.categoryImage});
 }
 
 class DownloadDetailItem extends ConsumerStatefulWidget {
@@ -82,7 +83,7 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
             children: [
               MediaImageCard(
                 appStyle: widget.appStyle,
-                imgUrl: widget.model.categoryImage ?? '',
+                imgUrl: widget.model.videoThumbnail ?? '',
                 duration: widget.model.videoDuration?.toDuration ?? '',
                 imgRadius: radius,
                 imgSize: dimension,

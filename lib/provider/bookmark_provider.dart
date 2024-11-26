@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -139,6 +140,8 @@ class BookmarkNotifier extends ChangeNotifier {
       );
       return;
     }
+
+    log("-------->bookmark params---itemid-->$itemId--isAudio--->$isAudio---->isRemove--->$isRemove");
 
     showCustomSnackBar(isRemove ? 'UnBookmarking...' : 'Bookmarking...');
     startToggleLoading();

@@ -183,7 +183,7 @@ class DownloadNotifier extends ChangeNotifier {
                 _isDownloadComplete = true;
                 _isDownloading = false;
                 debugPrint('Is Downloading == $_isDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-                await _saveCategoryAndVideo('$path/${model.video!.fileName!}', //video download-download provider
+                await _saveCategoryAndVideo('$path/${model.video?.fileName}', //video download-download provider
                     model: model); //video download-download provider
                 _model = null;
                 notifyListeners();
@@ -434,7 +434,7 @@ class DownloadNotifier extends ChangeNotifier {
     } else if (isAudio) {
       if (res != null) {
         if (model == null) return;
-        VideoModal vModal = VideoModal(categoryId: model.categoryId, videoId: model.id.toString(), videoName: model.title, videoFile: videoFile, videoDuration: model.duration);
+        VideoModal vModal = VideoModal(categoryId: model.categoryId, videoId: model.id.toString(), videoThumbnail: model.thumbnailImageUrlSrc,videoName: model.title, videoFile: videoFile, videoDuration: model.duration);
         int vRes = await dbHelper.saveAudio(vModal);
         if (vRes > 0) {
           complate = true;
@@ -449,7 +449,7 @@ class DownloadNotifier extends ChangeNotifier {
         CategoryModal? res = await dbHelper.getAudioSingleCategory(model?.categoryId?.toString() ?? "");
         print("after category s--->${cRes}");
         if (cRes > 0) {
-          VideoModal vModal = VideoModal(categoryId: int.parse(res?.categoryId ?? ""), videoId: model?.id.toString(), videoName: model?.title, videoFile: videoFile, videoDuration: model?.duration);
+          VideoModal vModal = VideoModal(categoryId: int.parse(res?.categoryId ?? ""), videoId: model?.id.toString(),videoThumbnail: model?.thumbnailImageUrlSrc ?? "",videoName: model?.title, videoFile: videoFile, videoDuration: model?.duration);
           int vRes = await dbHelper.saveAudio(vModal);
           if (vRes > 0) {
             complate = true;
@@ -460,10 +460,11 @@ class DownloadNotifier extends ChangeNotifier {
           }
         }
       }
-    } else {
+    }
+    else {
       if (res != null) {
         if (model == null) return;
-        VideoModal vModal = VideoModal(categoryId: model.categoryId, videoId: model.video?.id.toString(), videoName: model.title, videoFile: videoFile, videoDuration: model.duration);
+        VideoModal vModal = VideoModal(categoryId: model.categoryId, videoId: model.video?.id.toString(),videoThumbnail: model.thumbnailImageUrlSrc,videoName: model.title, videoFile: videoFile, videoDuration: model.duration);
         int vRes = await dbHelper.saveVideo(vModal);
         if (vRes > 0) {
           complate = true;
@@ -478,7 +479,7 @@ class DownloadNotifier extends ChangeNotifier {
         CategoryModal? res = await dbHelper.getSingleCategory(model?.categoryId?.toString() ?? "");
         print("after category s--->${cRes}");
         if (cRes > 0) {
-          VideoModal vModal = VideoModal(categoryId: int.parse(res?.categoryId ?? ""), videoId: model?.video?.id.toString(), videoName: model?.title, videoFile: videoFile, videoDuration: model?.duration);
+          VideoModal vModal = VideoModal(categoryId: int.parse(res?.categoryId ?? ""), videoId: model?.video?.id.toString(), videoThumbnail: model?.thumbnailImageUrlSrc ?? "",videoName: model?.title, videoFile: videoFile, videoDuration: model?.duration);
           int vRes = await dbHelper.saveVideo(vModal);
           if (vRes > 0) {
             complate = true;

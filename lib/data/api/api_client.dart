@@ -40,6 +40,7 @@ class ApiClient {
   }) async {
     try {
       log('====> API Call: $uri \n Header: $_mainHeaders');
+      log("Base URL----->${appBaseUrl + uri}");
       http.Response response = await http
           .get(
             Uri.parse(appBaseUrl + uri),
@@ -80,8 +81,9 @@ class ApiClient {
     Map<String, String>? headers,
   }) async {
     try {
-      log('===> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+      log("Base URL----->${appBaseUrl + uri}");
       log('===> API Body: $body');
+      log('===> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
       http.Response response = await http.post(
             Uri.parse(appBaseUrl + uri),
             body: jsonEncode(body),

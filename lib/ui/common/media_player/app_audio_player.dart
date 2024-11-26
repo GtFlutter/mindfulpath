@@ -211,7 +211,7 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            if (snapshot.hasData) ...[Text('${snapshot.data?.inMinutes ?? 0}:${((snapshot.data?.inSeconds ?? 0) % 60).toString().padLeft(2, '0')}')] else ...[const CircularProgressIndicator()],
+                            if (snapshot.hasData) ...[Text('${snapshot.data?.inMinutes.toString().padLeft(2, '0') ?? 0}:${((snapshot.data?.inSeconds ?? 0) % 60).toString().padLeft(2, '0')}')] else ...[const CircularProgressIndicator()],
                             Text(stringToDuration(widget.duration ?? "")),
                           ],
                         ),

@@ -26,6 +26,7 @@ import '../../common/custom_next_button.dart';
 
 class SignInUpScreen extends ConsumerStatefulWidget {
   final bool isSignIn;
+
   const SignInUpScreen({super.key, required this.isSignIn});
 
   @override
@@ -59,6 +60,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   void setPwdErrorText([String? error]) {
     setState(() => _pwdErrorText = error);
   }
+
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -73,7 +75,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
     notificationServices.firebaseInit();
     await notificationServices.forgroundMessage();
     await notificationServices.setupInteractMessage();
-    notificationServices.getDeviceToken().then((value) {
+    await notificationServices.getDeviceToken().then((value) {
       print("device token");
       print(value);
       fcm = value;
@@ -97,9 +99,9 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
     var authP = ref.watch(authProvider);
     return GestureDetector(
       onTap: () {
-        if(_mobileFocusNode.hasFocus){
+        if (_mobileFocusNode.hasFocus) {
           _mobileFocusNode.unfocus();
-        }else if(_pwdFocusNode.hasFocus){
+        } else if (_pwdFocusNode.hasFocus) {
           _pwdFocusNode.unfocus();
         }
       },
@@ -176,9 +178,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                             child: Wrap(
                               runSpacing: _style.scale * 8,
                               children: [
-                                Text('By signing, you agree to Calm oasis',
-                                    style:
-                                    _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
+                                Text('By signing, you agree to Calm oasis', style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                                 CupertinoButton(
                                   onPressed: () {
                                     context.push(RoutePath.tCPpScreen, extra: false);
@@ -190,9 +190,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                                     style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
                                   ),
                                 ),
-                                Text('and',
-                                    style:
-                                    _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
+                                Text('and', style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.tcppTextColor)),
                                 CupertinoButton(
                                     onPressed: () {
                                       context.push(RoutePath.tCPpScreen, extra: true);
@@ -201,8 +199,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                                     minSize: 10,
                                     child: Text(
                                       ' Terms & Conditions',
-                                      style:
-                                      _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
+                                      style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppBtnColor),
                                     )),
                               ],
                             ),
@@ -216,10 +213,10 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                       children: [
                         Flexible(
                             child: Divider(
-                              color: AppColors.dividerColor,
-                              endIndent: _style.scale * 15,
-                              indent: _style.scale * 15,
-                            )),
+                          color: AppColors.dividerColor,
+                          endIndent: _style.scale * 15,
+                          indent: _style.scale * 15,
+                        )),
                         Text(
                           'OR SIGN UP WITH',
                           style: _style.text.font(
@@ -229,10 +226,10 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                         ),
                         Flexible(
                             child: Divider(
-                              color: AppColors.dividerColor,
-                              indent: _style.scale * 15,
-                              endIndent: _style.scale * 15,
-                            )),
+                          color: AppColors.dividerColor,
+                          indent: _style.scale * 15,
+                          endIndent: _style.scale * 15,
+                        )),
                       ],
                     ),
                     // SizedBox(height: _style.scale * 28),
@@ -241,7 +238,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                       children: [
                         Spacer(),
                         IconButton.outlined(
-                          onPressed: (){
+                          onPressed: () {
                             ref.read(authProvider).googleLogin();
                           },
                           icon: SvgPicture.asset(
@@ -272,10 +269,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                         text: '${widget.isSignIn ? 'Don\'t' : 'Already'} have an account?',
                         style: _style.text.font(mulishRegular400, sizePx: 13, color: AppColors.tcppTextColor),
                         children: [
-                          TextSpan(
-                              text: widget.isSignIn ? ' Sign Up' : ' Sign In ',
-                              recognizer: TapGestureRecognizer()..onTap = onSign,
-                              style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.primaryColor)),
+                          TextSpan(text: widget.isSignIn ? ' Sign Up' : ' Sign In ', recognizer: TapGestureRecognizer()..onTap = onSign, style: _style.text.font(mulishSemiBold600, sizePx: 13, color: AppColors.primaryColor)),
                         ],
                       ),
                     ),
@@ -317,8 +311,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
       }
       return;
     } else if (password.length > AppConstants.PWD_MAX_LENGTH) {
-      setPwdErrorText(
-          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
+      setPwdErrorText('Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
       return;
     } else if (!widget.isSignIn && password.contains(RegExp(r'\s'))) {
       setPwdErrorText('Password should not contain space...');
@@ -327,7 +320,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
     /// TODO IF this is sign then get error from api and show
     else if (widget.isSignIn) {
-      ref.read(authProvider).loginUser(code + number, password,fcm??"");
+      ref.read(authProvider).loginUser(code + number, password, fcm ?? "");
     } else {
       ref.read(authProvider).requestOTP(
             countryCode: code,

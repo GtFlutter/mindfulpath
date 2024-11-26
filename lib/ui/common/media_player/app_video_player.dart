@@ -155,8 +155,9 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     if (_controller.value.isPlaying && !widget.isFileUrl) {
       _watchTimer ??= Timer.periodic(_period, (timer) async {
         if (!_isBuffering && _controller.value.isInitialized) {
-          if(mounted)
-          ref.read(videoProvider).watchedDuration = _period;
+          if(mounted) {
+            ref.read(videoProvider).watchedDuration = _period;
+          }
           await ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period, false);
         }
       });
@@ -347,7 +348,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   final position = snapshot.data;
-                                  return Text('${position?.inMinutes ?? 0}:${((position?.inSeconds ?? 0) % 60).toString().padLeft(2, '0')}');
+                                  return Text('${position?.inMinutes.toString().padLeft(2, '0') ?? 0}:${((position?.inSeconds ?? 0) % 60).toString().padLeft(2, '0')}');
                                 } else {
                                   return const CircularProgressIndicator();
                                 }
@@ -382,7 +383,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       String formattedMinutes = minutes.toString().padLeft(2, '0'); // 2 digits
       String formattedSeconds = secs.toString().padLeft(2, '0'); // 2 digits
 
-      return "$formattedHours.$formattedMinutes.$formattedSeconds";
+      return "$formattedHours:$formattedMinutes:$formattedSeconds";
     }
     return "00.00.00";
   }

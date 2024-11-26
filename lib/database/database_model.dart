@@ -35,16 +35,18 @@ class VideoModal {
   int? id;
   int? categoryId;
   String? videoId;
+  String? videoThumbnail;
   String? videoName;
   String? videoFile;
   String? videoDuration;
 
-  VideoModal({this.id, this.categoryId, this.videoId, this.videoName, this.videoFile, this.videoDuration});
+  VideoModal({this.id, this.categoryId, this.videoId,this.videoThumbnail, this.videoName, this.videoFile, this.videoDuration});
 
   VideoModal.fromJson(dynamic json) {
     id = json['id'];
     categoryId = int.parse(json['category_id'].toString());
     videoId = json['video_id'];
+    videoThumbnail = json['thumbnail_image_url'];
     videoName = json['video_name'];
     videoFile = json['video_file'];
     videoDuration = json['video_duration'];
@@ -54,6 +56,7 @@ class VideoModal {
     Map<String, String> map = {};
     map['category_id'] = categoryId.toString();
     map['video_id'] = videoId!;
+    map['thumbnail_image_url'] = videoThumbnail ?? "";
     map['video_name'] = videoName!;
     map['video_file'] = videoFile!;
     map['video_duration'] = videoDuration!;
