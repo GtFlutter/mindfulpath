@@ -59,6 +59,8 @@ class SvgPaths {
 
 class ImagePaths {
   static const String bg = 'assets/image/splash_screen_bg.png';
+  static const String bg1 = 'assets/image/gradiant.png';
+  static const String bg2 = 'assets/image/black.png';
   static const String splashLogo = 'assets/image/splash_screen_logo.png';
   static const String pdfIcon = 'assets/image/pdf_icon.png';
 }

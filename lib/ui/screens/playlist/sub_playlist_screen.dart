@@ -44,11 +44,11 @@ class SubPlayListScreen extends ConsumerStatefulWidget {
 class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
   static AppStyle _style = AppStyle();
   Duration? _lastKnownPosition;
+
 // Variable to track the expanded tile index
-  final ExpansionTileController expansionTileController =
-  ExpansionTileController();
-  final ExpansionTileController expansionTileController1 =
-  ExpansionTileController();
+  final ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController1 = ExpansionTileController();
+
   //late List<DIModel> _items;
   @override
   void initState() {
@@ -106,7 +106,8 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
             color: draggableItemColor,
             shadowColor: draggableItemColor,
             borderRadius: BorderRadius.circular(_style.scaleX(25)),
-            child: BookmarkItem.dragable(isAudio: false,
+            child: BookmarkItem.dragable(
+              isAudio: false,
               appStyle: _style,
               model: BookmarkListResponse(),
               index: index,
@@ -135,22 +136,21 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
       ref.read(downloadProvider.notifier).complate = false;
       setState(() {});
     }
-    void playVideo(PlaylistVideoList model,int index) {
+    void playVideo(PlaylistVideoList model, int index) {
       print('------------****${model.video!.videoUrl}');
       ref.read(videoProvider).playVideo(
-            DetailedVideoModel(
-              video: DIModel(
-                  thumbnailUrl: model.video != null ? model.video!.thumbnailImageUrlSrc ?? '' : '',
-                  videoUrl: model.video?.videoUrl ?? "",
-                  duration: model.video?.duration ?? "",
-                  title: model.video?.title ?? '',
-                  categoryName: model.categoryTitle ?? '',
-                  videoId: model.videoId ?? 0,
-                  videoType: ResourceType.paid),
-            ),
-        index: index,
-        isAudioFile: model.video!.videoUrlSrc!.split('.').last.contains('mp3')
-          );
+          DetailedVideoModel(
+            video: DIModel(
+                thumbnailUrl: model.video != null ? model.video!.thumbnailImageUrlSrc ?? '' : '',
+                videoUrl: model.video?.videoUrl ?? "",
+                duration: model.video?.duration ?? "",
+                title: model.video?.title ?? '',
+                categoryName: model.categoryTitle ?? '',
+                videoId: model.videoId ?? 0,
+                videoType: ResourceType.paid),
+          ),
+          index: index,
+          isAudioFile: model.video!.videoUrlSrc!.split('.').last.contains('mp3'));
     }
 
     return Scaffold(
@@ -211,7 +211,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                     if (MediaQuery.orientationOf(context) == Orientation.portrait) {
                                       ref.read(bookmarkProvider.notifier).islandScap = true;
                                       final temp = ref.read(videoProvider);
-                                      temp.isVideoChanged=false;
+                                      temp.isVideoChanged = false;
                                       SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                                     } else {
                                       ref.read(bookmarkProvider.notifier).islandScap = false;
@@ -221,7 +221,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                 ),
                               ),
                             )
-                          ] else if(isAudioAvailable)...[
+                          ] else if (isAudioAvailable) ...[
                             AppAudioPlayer(
                               style: _style,
                               duration: videoCtrl.video!.duration,
@@ -232,59 +232,63 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                             SizedBox(height: _style.scaleX(24)),
                           ] else
                             const SizedBox.shrink(),
-                          if (!isLandscape) Expanded(
-                                  child: Column(
-                                    children: [
-                                      Theme(
-                                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                                        child: ExpansionTile(title: const Text("Videos"),
-                                          onExpansionChanged: (expanded) {
-                                            setState(() {
-                                              if(expanded) {
-                                                expansionTileController1.collapse();
-                                              }
-                                            });
-                                          },
+                          if (!isLandscape)
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Theme(
+                                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                    child: ExpansionTile(
+                                      title: const Text("Videos"),
+                                      onExpansionChanged: (expanded) {
+                                        setState(() {
+                                          if (expanded) {
+                                            expansionTileController1.collapse();
+                                          }
+                                        });
+                                      },
+                                      controller: expansionTileController,
+                                      children: [
+                                        if (playlistP.playlistVideoListResponse?.isNotEmpty ?? false) ...[
+                                          SizedBox(
+                                            height: 250,
+                                            child: ListView.separated(
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.vertical,
+                                              padding: EdgeInsets.only(
+                                                top: _style.scale * 12.5,
+                                                right: _style.scale * 10,
+                                                left: _style.scale * 10,
+                                              ),
+                                              itemCount: playlistP.playlistVideoListResponse?.length ?? 0,
+                                              itemBuilder: (context, index) {
+                                                var model = playlistP.playlistVideoListResponse?[index];
 
-                                          controller: expansionTileController,
-                                          children: [
-                                            if(playlistP.playlistVideoListResponse?.isNotEmpty ?? false)...[SizedBox(height:250,
-                                              child: ListView.separated(
-                                                shrinkWrap: true,
-                                                scrollDirection: Axis.vertical,
-                                                padding: EdgeInsets.only(
-                                                  top: _style.scale * 12.5,
-                                                  right: _style.scale * 10,
-                                                  left: _style.scale * 10,
-                                                ),
-                                                itemCount: playlistP.playlistVideoListResponse?.length ?? 0,
-                                                itemBuilder: (context, index) {
-                                                  var model = playlistP.playlistVideoListResponse?[index];
-
-                                                  return GestureDetector(
+                                                return GestureDetector(
                                                     //key: Key('$index'),
-                                                      onTap: () {
-                                                        //playVideo(model);
+                                                    onTap: () {
+                                                      //playVideo(model);
+                                                    },
+                                                    child: SubPlayListItem(
+                                                      isAudio: false,
+                                                      key: Key('$index'),
+                                                      appStyle: _style,
+                                                      model: model!,
+                                                      onPlay: () {
+                                                        ref.read(videoProvider.notifier).isSelected = index;
+                                                        playVideo(model, index);
+                                                        FocusManager.instance.primaryFocus?.unfocus();
                                                       },
-                                                      child: SubPlayListItem(isAudio: false,
-                                                        key: Key('$index'),
-                                                        appStyle: _style,
-                                                        model: model!,
-                                                        onPlay: () {
-                                                          ref.read(videoProvider.notifier).isSelected = index;
-                                                          playVideo(model,index);
-                                                          FocusManager.instance.primaryFocus?.unfocus();
-                                                        },
-                                                        onRemovePress: () async {
-                                                          await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
-                                                          playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
-                                                        },
-                                                        index: index,
-                                                        url: model.video?.videoUrl ?? "",
-                                                      ));
-                                                },
-                                                separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                                                /* onReorder: (int oldIndex, int newIndex) {
+                                                      onRemovePress: () async {
+                                                        await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
+                                                        playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
+                                                      },
+                                                      index: index,
+                                                      url: model.video?.videoUrl ?? "",
+                                                    ));
+                                              },
+                                              separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                              /* onReorder: (int oldIndex, int newIndex) {
                                                                 setState(() {
                                                                   if (oldIndex < newIndex) {
                                                                     newIndex -= 1;
@@ -293,64 +297,73 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                                   _items.insert(newIndex, item);
                                                                 });
                                                               },*/
-                                                // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                                              ),
-                                            ),]else...[const Text("Data Not Available")],
+                                              // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                            ),
+                                          ),
+                                        ] else ...[
+                                          const Padding(
+                                            padding: EdgeInsets.only(bottom: 20.0, top: 20),
+                                            child: Text("Data Not Available"),
+                                          )
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                      child: ExpansionTile(
+                                        title: const Text("Audios"),
+                                        onExpansionChanged: (expanded) {
+                                          setState(() {
+                                            if (expanded) {
+                                              expansionTileController.collapse();
+                                            }
+                                          });
+                                        },
+                                        controller: expansionTileController1,
+                                        children: [
+                                          if (playlistP.playlistAudioListResponse?.isNotEmpty ?? false) ...[
+                                            SizedBox(
+                                              height: 260,
+                                              child: ListView.separated(
+                                                shrinkWrap: true,
+                                                scrollDirection: Axis.vertical,
+                                                padding: EdgeInsets.only(
+                                                  top: _style.scale * 12.5,
+                                                  right: _style.scale * 10,
+                                                  left: _style.scale * 10,
+                                                ),
+                                                itemCount: playlistP.playlistAudioListResponse?.length ?? 0,
+                                                itemBuilder: (context, index) {
+                                                  var model = playlistP.playlistAudioListResponse?[index];
 
-                                          ],
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Theme(
-                                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                                          child: ExpansionTile(title: const Text("Audios"),
-                                            onExpansionChanged: (expanded) {
-                                              setState(() {
-                                                if(expanded) {
-                                                  expansionTileController.collapse();
-                                                }
-
-                                              });
-                                            },
-                                            controller: expansionTileController1,
-                                            children: [
-                                              if(playlistP.playlistAudioListResponse?.isNotEmpty ?? false)...[ SizedBox(height: 260,
-                                                child: ListView.separated(
-                                                  shrinkWrap: true,
-                                                  scrollDirection: Axis.vertical,
-                                                  padding: EdgeInsets.only(
-                                                    top: _style.scale * 12.5,
-                                                    right: _style.scale * 10,
-                                                    left: _style.scale * 10,
-                                                  ),
-                                                  itemCount: playlistP.playlistAudioListResponse?.length ?? 0,
-                                                  itemBuilder: (context, index) {
-                                                    var model = playlistP.playlistAudioListResponse?[index];
-
-                                                    return GestureDetector(
+                                                  return GestureDetector(
                                                       //key: Key('$index'),
-                                                        onTap: () {
-                                                          //playVideo(model);
+                                                      onTap: () {
+                                                        //playVideo(model);
+                                                      },
+                                                      child: SubPlayListItem(
+                                                        isAudio: true,
+                                                        key: Key('$index'),
+                                                        appStyle: _style,
+                                                        model: model!,
+                                                        onPlay: () {
+                                                          ref.read(videoProvider.notifier).isSelected = index;
+                                                          playVideo(model, index);
+                                                          FocusManager.instance.primaryFocus?.unfocus();
                                                         },
-                                                        child: SubPlayListItem(isAudio: true,
-                                                          key: Key('$index'),
-                                                          appStyle: _style,
-                                                          model: model!,
-                                                          onPlay: () {
-                                                            ref.read(videoProvider.notifier).isSelected = index;
-                                                            playVideo(model,index);
-                                                            FocusManager.instance.primaryFocus?.unfocus();
-                                                          },
-                                                          onRemovePress: () async {
-                                                            await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
-                                                            playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
-                                                          },
-                                                          index: index,
-                                                          url: model.video?.videoUrl ?? "",
-                                                        ));
-                                                  },
-                                                  separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                                                  /* onReorder: (int oldIndex, int newIndex) {
+                                                        onRemovePress: () async {
+                                                          await playlistP.removeFromPlaylist(
+                                                              (model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
+                                                          playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
+                                                        },
+                                                        index: index,
+                                                        url: model.video?.videoUrl ?? "",
+                                                      ));
+                                                },
+                                                separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                                /* onReorder: (int oldIndex, int newIndex) {
                                                                   setState(() {
                                                                     if (oldIndex < newIndex) {
                                                                       newIndex -= 1;
@@ -359,18 +372,24 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                                     _items.insert(newIndex, item);
                                                                   });
                                                                 },*/
-                                                  // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
-                                                ),
-                                              ),]else...[const Text("Data Not Available")],
-
-                                            ],
-                                          ),
-                                        ),
+                                                // separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                              ),
+                                            ),
+                                          ] else ...[
+                                            const Padding(
+                                              padding: EdgeInsets.only(bottom: 20.0, top: 20),
+                                              child: Text("Data Not Available"),
+                                            )
+                                          ],
+                                        ],
                                       ),
-
-                                    ],
+                                    ),
                                   ),
-                                ) else const SizedBox.shrink(),
+                                ],
+                              ),
+                            )
+                          else
+                            const SizedBox.shrink(),
                         ],
                       ),
                     ),

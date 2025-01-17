@@ -17,12 +17,13 @@ ThemeData darkTheme = ThemeData(
   useMaterial3: true,
   tabBarTheme: TabBarTheme(
     labelColor: Colors.black,
-    unselectedLabelColor: Colors.white,
+    unselectedLabelColor: AppColors.primaryThemeColor1,
     indicator: ShapeDecoration(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(40),
       ),
-      color: AppColors.primaryColor,
+      // color: AppColors.primaryColor,
+      color: AppColors.primaryThemeColor1, //tab color background change
     ),
     indicatorSize: TabBarIndicatorSize.label,
     overlayColor: const MaterialStatePropertyAll(Colors.transparent),

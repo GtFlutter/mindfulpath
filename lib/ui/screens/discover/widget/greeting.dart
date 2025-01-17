@@ -52,7 +52,13 @@ class _GreetingState extends State<Greeting> {
   Widget build(BuildContext context) {
     return Text(
       _greeting,
-      style: widget.style.text.font(mulishLight300, sizePx: 20, color: Colors.white),
+      style: widget.style.text
+          .font(
+            mulishLight300,
+            sizePx: 18,
+            color: Colors.white,
+          )
+          .copyWith(fontWeight: FontWeight.bold),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );

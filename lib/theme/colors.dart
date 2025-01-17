@@ -1,7 +1,9 @@
 import 'dart:ui' show Color;
 
 class AppColors {
-  static const primaryColor = Color(0xFFFFC865);
+  static const primaryColor = Color(0xFFFFC865); //yellow
+  static const primaryThemeColor1 = Color(0xFFFEF4EA);
+  static const primaryThemeColor2 = Color(0xFF8DA47B);
 
   /// Non Used Bellow Color Maybe u can optimize to use it
   static const secondaryColor = Color(0xFFD0D0D0);

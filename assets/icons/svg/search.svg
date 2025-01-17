@@ -2,10 +2,10 @@
 <g id="vuesax/linear/search-status">
 <g id="vuesax/linear/search-status_2">
 <g id="search-status">
-<path id="Vector" d="M23.3334 8.3335H33.3334" stroke="#FFC865" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Vector_2" d="M23.3334 13.3335H28.3334" stroke="#FFC865" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Vector_3" d="M35 19.1668C35 27.9168 27.9167 35.0002 19.1667 35.0002C10.4167 35.0002 3.33337 27.9168 3.33337 19.1668C3.33337 10.4168 10.4167 3.3335 19.1667 3.3335" stroke="#FFC865" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Vector_4" d="M37.663 37.663L33.333 33.333" stroke="#FFC865" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector" d="M23.3334 8.3335H33.3334" stroke="#FFC865" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_2" d="M23.3334 13.3335H28.3334" stroke="#FFC865" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M35 19.1668C35 27.9168 27.9167 35.0002 19.1667 35.0002C10.4167 35.0002 3.33337 27.9168 3.33337 19.1668C3.33337 10.4168 10.4167 3.3335 19.1667 3.3335" stroke="#FFC865" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M37.663 37.663L33.333 33.333" stroke="#FFC865" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
 </g>
 </g>

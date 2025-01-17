@@ -53,7 +53,8 @@ class BackgroundImage extends StatelessWidget {
           ),
         ],
         Image.asset(
-          ImagePaths.bg,
+          // ImagePaths.bg,
+          ImagePaths.bg2,
           fit: BoxFit.cover,
           height: double.infinity,
           width: double.infinity,

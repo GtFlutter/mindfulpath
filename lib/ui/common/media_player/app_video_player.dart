@@ -14,6 +14,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../util/dimensions.dart';
 import '../outlined_icon_button.dart';
+
 /// all working but bookmark screen and playlist screen landscape to portrait second start from zero
 class AppVideoPlayer extends ConsumerStatefulWidget {
   final String url;
@@ -73,9 +74,9 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     await initVideoPlayer();
-    if(mounted){
+    if (mounted) {
       setState(() {
-        isFlickering=false;
+        isFlickering = false;
       });
     }
   }
@@ -122,12 +123,11 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     } else {
       debugPrint('No video change, maintaining current position: ${_controller.value.position}');
       // _currentPosition = _controller.value.position;// this commented because bookmark nd playlist screen second not working when landscape to portrait
-      _currentPosition = widget.startPosition ;// this line added  because bookmark nd playlist screen second not working when landscape to portrait
+      _currentPosition = widget.startPosition; // this line added  because bookmark nd playlist screen second not working when landscape to portrait
     }
 
     super.didUpdateWidget(oldWidget);
   }
-
 
   void toggleAudio() {
     if (_controller.value.volume != 0) {
@@ -155,7 +155,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     if (_controller.value.isPlaying && !widget.isFileUrl) {
       _watchTimer ??= Timer.periodic(_period, (timer) async {
         if (!_isBuffering && _controller.value.isInitialized) {
-          if(mounted) {
+          if (mounted) {
             ref.read(videoProvider).watchedDuration = _period;
           }
           await ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period, false);
@@ -205,13 +205,10 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          if(isInitialized && !isFlickering)
+          if (isInitialized && !isFlickering)
             AspectRatio(
               aspectRatio: isInitialized ? _controller.value.aspectRatio : 16 / 9,
-              child: ClipRRect(
-                  borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)),
-                  child: VideoPlayer(_controller)
-              ),
+              child: ClipRRect(borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)), child: VideoPlayer(_controller)),
             ),
           if (!isInitialized || (_isBuffering && !_showReload)) const CircularProgressIndicator(),
           if (_showReload && isInitialized)
@@ -249,16 +246,15 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                       borderRadius: widget.isLandscape
                           ? BorderRadius.zero
                           : BorderRadius.only(
-                        bottomLeft: Radius.circular(widget.style.scaleX(25)),
-                        bottomRight: Radius.circular(widget.style.scaleX(25)),
-                      ),
+                              bottomLeft: Radius.circular(widget.style.scaleX(25)),
+                              bottomRight: Radius.circular(widget.style.scaleX(25)),
+                            ),
                     ),
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-
                         Colors.black.withOpacity(0.20),
                         Colors.black.withOpacity(0.40),
                         Colors.black.withOpacity(0.60),
@@ -302,11 +298,11 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                         padding: EdgeInsets.symmetric(horizontal: widget.style.scaleX(8)),
                         child: SliderTheme(
                           data: Theme.of(context).sliderTheme.copyWith(
-                            trackHeight: widget.style.scaleX(4),
-                            overlayShape: SliderComponentShape.noOverlay,
-                            thumbShape: RoundSliderThumbShape(enabledThumbRadius: widget.style.scaleX(6)),
-                            trackShape: CustomTrackShape(),
-                          ),
+                                trackHeight: widget.style.scaleX(4),
+                                overlayShape: SliderComponentShape.noOverlay,
+                                thumbShape: RoundSliderThumbShape(enabledThumbRadius: widget.style.scaleX(6)),
+                                trackShape: CustomTrackShape(),
+                              ),
                           child: Slider(
                             value: _progress,
                             min: 0.0,
@@ -382,12 +378,14 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       String formattedHours = hours.toString().padLeft(2, '0'); // 4 digits
       String formattedMinutes = minutes.toString().padLeft(2, '0'); // 2 digits
       String formattedSeconds = secs.toString().padLeft(2, '0'); // 2 digits
-
-      return "$formattedHours:$formattedMinutes:$formattedSeconds";
+      if (formattedHours == "00") {
+        return "$formattedMinutes:$formattedSeconds";
+      } else {
+        return "$formattedHours:$formattedMinutes:$formattedSeconds";
+      }
     }
     return "00.00.00";
   }
-
 }
 
 ///shivangi mam checked for this code

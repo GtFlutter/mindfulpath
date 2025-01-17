@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/provider/dashboard_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
@@ -14,7 +13,6 @@ import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../outlined_icon_button.dart';
-
 
 class AppAudioPlayer extends ConsumerStatefulWidget {
   final AppStyle style;
@@ -55,9 +53,11 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
 
   void _initializeAudio() {
     // Start playing from the beginning
+    _audioPlayer.audioCache.clearAll();
+    _audioPlayer.setSourceDeviceFile(widget.audioUrl, mimeType: 'audio/mp3');
     lastSecond = 0;
     _audioPlayer.seek(Duration.zero);
-    _audioPlayer.play(UrlSource(widget.audioUrl));
+    _audioPlayer.play(UrlSource(widget.audioUrl, mimeType: "audio/mp3"));
   }
 
   @override
@@ -83,7 +83,14 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
     super.dispose();
   }
 
-  void togglePlayPause() {
+  Future<void> togglePlayPause() async {
+    print("===_audioPlayer.state~~${_audioPlayer.state}----${widget.audioUrl}");
+    // if (await File(widget.audioUrl).exists()) {
+    //   print('File exists at: ${widget.audioUrl}');
+    // } else {
+    //   print('File does NOT exist at: ${widget.audioUrl}');
+    //   return; // Stop execution if the file doesn't exist
+    // }
     setState(() {
       if (_audioPlayer.state == PlayerState.playing) {
         _audioPlayer.pause();
@@ -130,6 +137,7 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
                   log("back called");
                   log("dsfdsdsfdsfdsf======>${ref.read(videoProvider).isAudioFileAvailable}");
                   ref.read(videoProvider.notifier).deactivateAudioPlayer();
+                  ref.read(offlineVideoProvider.notifier).deactivateAudioPlayer();
                   log("dsfdsdsfdsfdsf======>${ref.read(videoProvider).isAudioFileAvailable}");
                   // ref.read(dashboardProvider).storeVideoWatchedTime(widget.audioId, Duration(seconds: lastSecond), true);
                   setState(() {});
@@ -137,8 +145,10 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
               ),
             ),
           ),
-          Align(alignment: Alignment.bottomCenter,
-            child: SizedBox(height: 70,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              height: 70,
               child: StreamBuilder(
                 stream: _audioPlayer.onPositionChanged,
                 builder: (context, snapshot) {
@@ -243,7 +253,11 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
       int minutes = int.parse(durationParts[1]);
       List<String> seconds = durationParts[2].split('.');
       Duration duration = Duration(hours: hours, minutes: minutes, seconds: int.parse(seconds[0]));
-      return "${hours == 0 ? "00" : hours.toString().padLeft(2, '0')}:${minutes == 0 ? "00" : minutes.toString().padLeft(2, '0')}:${int.parse(seconds[0]).toString().padLeft(2, '0')}";
+      if (hours == 0) {
+        return "${minutes == 0 ? "00" : minutes.toString().padLeft(2, '0')}:${int.parse(seconds[0]).toString().padLeft(2, '0')}";
+      } else {
+        return "${hours == 0 ? "00" : hours.toString().padLeft(2, '0')}:${minutes == 0 ? "00" : minutes.toString().padLeft(2, '0')}:${int.parse(seconds[0]).toString().padLeft(2, '0')}";
+      }
     }
     return "00:00";
   }

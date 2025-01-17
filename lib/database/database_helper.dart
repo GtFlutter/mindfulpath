@@ -6,11 +6,9 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_migration/sqflite_migration.dart';
 
-
 final databaseProvider = Provider<DatabaseHelper>((ref) => DatabaseHelper());
 
 class DatabaseHelper {
-
   static late Database _db;
   List<PdfModel> _downloadPdfResponses = [];
   List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
@@ -32,7 +30,7 @@ class DatabaseHelper {
       "category_id" TEXT
     );
     '''
-    '''
+        '''
     CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioCategoryTable} (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "category_id" TEXT,
@@ -40,7 +38,6 @@ class DatabaseHelper {
       "category_image" TEXT
     );
     ''',
-
   ]);
 
   Future<Database> openDB() async {
@@ -176,8 +173,6 @@ class DatabaseHelper {
     }
   }
 
-
-
   Future<List<PdfModel>> getPdfCategory() async {
     List<PdfModel> tempList = [];
     var dbClient = await db;
@@ -186,7 +181,7 @@ class DatabaseHelper {
 
     if (res.isNotEmpty) {
       tempList = PdfModel.listFromJson(res);
-      _downloadPdfResponses=PdfModel.listFromJson(res);
+      _downloadPdfResponses = PdfModel.listFromJson(res);
       return tempList;
     } else {
       return tempList;
@@ -206,9 +201,7 @@ class DatabaseHelper {
     }
   }
 
-
   ///for audio.......
-
 
   Future<int> saveAudioCategory(CategoryModal modal) async {
     var dbClient = await db;
@@ -266,7 +259,7 @@ class DatabaseHelper {
     List<VideoModal> tempList = [];
     var dbClient = await db;
     List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.audioTable, where: 'category_id = ?', whereArgs: [categoryId]);
-    debugPrint("Res getAudio:: $res");
+    print("Res getAudio:: $res");
     if (res.isNotEmpty) {
       tempList = VideoModal.listFromJson(res);
       return tempList;

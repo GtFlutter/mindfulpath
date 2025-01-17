@@ -35,7 +35,7 @@ class BookmarkNotifier extends ChangeNotifier {
 
   int? isSelected;
 
-  bool islandScap=false;
+  bool islandScap = false;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -52,6 +52,8 @@ class BookmarkNotifier extends ChangeNotifier {
   List<CategoryListResponse>? _category;
   List<CategoryListResponse>? get category => _category;
 
+  List<CategoryListResponse>? _audioCategory;
+  List<CategoryListResponse>? get audioCategory => _audioCategory;
 
   void startLoading() {
     if (!_isLoading) {
@@ -93,8 +95,18 @@ class BookmarkNotifier extends ChangeNotifier {
         var json = jsonDecode(response.body);
         _bookmarkListResponse?.clear();
         _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_video_list'], false);
+        log("video list---->-----${_bookmarkListResponse?.length}");
+        for (int i = 0; i <= (_bookmarkListResponse?.length ?? 0); i++) {
+          if (_bookmarkListResponse?[i].bookmarkVideoResponse == null) {
+            log("vedio deleted");
+            _bookmarkListResponse?.removeAt(i);
+          } else {
+            log("else part");
+          }
+        }
+        notifyListeners();
         _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
-        print('------------>>>>>${_category!.first.id}');
+        print('-----video category in bookmark------->>>>>${_category!.first.id}');
         stopLoading();
       } catch (e) {
         //showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
@@ -116,8 +128,17 @@ class BookmarkNotifier extends ChangeNotifier {
         // _bookmarkListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
         _bookmarkAudioListResponse?.clear();
         _bookmarkAudioListResponse = BookmarkListResponse.listFromJson(json['data']['bookmark_audio_list'], false);
-        _category = CategoryListResponse.listFromJson(json['data']['bookmark_video_list']);
-        print('------------>>>>>${_category!.first.id}');
+        for (int i = 0; i <= (bookmarkAudioListResponse?.length ?? 0); i++) {
+          if (bookmarkAudioListResponse?[i].bookmarkVideoResponse == null) {
+            log("audio deleted");
+            bookmarkAudioListResponse?.removeAt(i);
+          } else {
+            log("-else");
+          }
+        }
+        notifyListeners();
+        _audioCategory = CategoryListResponse.listFromJson(json['data']['bookmark_audio_list']["audio"]["category"]);
+        print('--------audio category in bookmark---->>>>>${_audioCategory!.first.id}');
         stopLoading();
       } catch (e) {
         //showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
@@ -153,15 +174,16 @@ class BookmarkNotifier extends ChangeNotifier {
     } else {
       try {
         stopToggleLoading();
-        if(isAudio){
+        if (isAudio) {
           ref.read(freeAudiosProvider).toggleBookmark(itemId);
           ref.read(paidAudiosProvider).toggleBookmark(itemId);
-        }else{
-        ref.read(freeVideosProvider).toggleBookmark(itemId);
-        ref.read(paidVideosProvider).toggleBookmark(itemId);
-        ref.read(featuredVideosProvider).toggleBookmark(itemId);}
+        } else {
+          ref.read(freeVideosProvider).toggleBookmark(itemId);
+          ref.read(paidVideosProvider).toggleBookmark(itemId);
+          ref.read(featuredVideosProvider).toggleBookmark(itemId);
+        }
         // showCustomSnackBar('${isRemove ? 'UnBookmarked' : 'Bookmarked'} Successful', type: true);
-        final json=jsonDecode(response.body);
+        final json = jsonDecode(response.body);
         showCustomSnackBar(json["message"], type: true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);

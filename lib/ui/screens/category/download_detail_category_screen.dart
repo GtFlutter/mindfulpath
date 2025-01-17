@@ -83,16 +83,23 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
     var isVideoAvailable = videoCtrl.isAudioFileAvailable ? false : videoCtrl.video != null;
     var isAudioAvailable = videoCtrl.isAudioFileAvailable && videoCtrl.video != null;
     return PopScope(
-      canPop: !isVideoAvailable,
+      canPop: !isVideoAvailable || !isAudioAvailable,
       onPopInvoked: (didPop) {
         if (didPop) {
           return;
         }
         if (isVideoAvailable) {
+          log("video disposed called");
           if (MediaQuery.orientationOf(context) == Orientation.landscape) {
             SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
           }
           videoCtrl.clearVideo();
+
+          return;
+        }
+        if (isAudioAvailable) {
+          log("audio disposed called");
+          videoCtrl.deactivateAudioPlayer();
           return;
         }
         if (context.canPop()) {
@@ -212,7 +219,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         style: _style,
                         audioId: videoCtrl.video?.id ?? 0,
                         duration: videoCtrl.video!.videoDuration ?? "",
-                        audioUrl: videoCtrl.video!.videoFile ?? "",
+                        audioUrl: "file://${videoCtrl.video!.videoFile ?? " "}",
                         audioImage: videoCtrl.video!.videoThumbnail ?? "",
                       ),
                     ),
@@ -257,7 +264,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                       IsSelected: ref.read(videoProvider.notifier).isSelected,
                                       onPlay: () {
                                         ref.read(videoProvider.notifier).isSelected = index;
-                                        playVideo(model,false);
+                                        playVideo(model, false);
                                       },
                                       onRemovePress: () async {
                                         if (courseP.downloadVideoResponse.length == 1) {
@@ -308,7 +315,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                       IsSelected: ref.read(videoProvider.notifier).isSelected,
                                       onPlay: () {
                                         ref.read(videoProvider.notifier).isSelected = index;
-                                        playVideo(model,true);
+                                        playVideo(model, true);
                                       },
                                       onRemovePress: () async {
                                         if (courseP.downloadAudioResponse.length == 1) {
@@ -339,8 +346,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
     );
   }
 
-  void playVideo(DDIModal model,bool isAudioFile) {
-    ref.read(offlineVideoProvider).playVideo(model,isAudioFile: isAudioFile);
+  void playVideo(DDIModal model, bool isAudioFile) {
+    ref.read(offlineVideoProvider).playVideo(model, isAudioFile: isAudioFile);
   }
 
   @override

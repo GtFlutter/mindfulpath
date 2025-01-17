@@ -259,6 +259,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                                 IsSelected: videoCtrl.isSelected,
                                                 onPlay: () {
                                                   videoCtrl.isSelected = index;
+                                                  log("~~~~~~${bookmarkNotifier.category?.length}");
                                                   playVideo(model, bookmarkNotifier.category![index], index, showAudioFile);
                                                 },
                                                 url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
@@ -274,12 +275,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                         ),
                                       ),
                                     ] else ...[
-                                      const Column(mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(height: 50),
-                                          Text("Data Not Available"),
-                                          SizedBox(height: 50),
-                                        ],
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 20.0,top: 20),
+                                        child: Text("Data Not Available"),
                                       )
                                     ],
                                   ],
@@ -311,6 +309,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                           ),
                                           itemCount: bookmarkNotifier.bookmarkAudioListResponse!.length,
                                           itemBuilder: (context, index) {
+                                            log("index------$index------${bookmarkNotifier.audioCategory?.length}");
                                             var model = bookmarkNotifier.bookmarkAudioListResponse![index];
 
                                             return GestureDetector(
@@ -323,9 +322,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                                 IsSelected: videoCtrl.isSelected,
                                                 onPlay: () {
                                                   videoCtrl.isSelected = index;
-                                                  playVideo(model, bookmarkNotifier.category![index], index, true);
+                                                  playVideo(model, bookmarkNotifier.audioCategory?[index] ?? CategoryListResponse(), index, true);
                                                 },
-                                                url: model.bookmarkVideoResponse!.videoUrlSrc,
+                                                url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
                                                 onBookmarkRemove: () async {
                                                   if (model.videoId == null) return;
                                                   await ref.read(bookmarkProvider).toggleBookmark(model.videoId!, isRemove: true, isAudio: true);
@@ -337,12 +336,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                           separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
                                         ),
                                       ] else ...[
-                                        const Column(mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            SizedBox(height: 50),
-                                            Text("Data Not Available"),
-                                            SizedBox(height: 50),
-                                          ],
+                                        const Padding(
+                                          padding: EdgeInsets.only(bottom: 20.0,top: 20),
+                                          child: Text("Data Not Available"),
                                         )
                                       ],
                                     ],

@@ -80,6 +80,8 @@ class DiscoverItem extends StatelessWidget {
                   FilledButton(
                     onPressed: onPressed,
                     style: FilledButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                      backgroundColor: AppColors.primaryThemeColor1,
                       textStyle: style.text.font(
                         mulishSemiBold600,
                         sizePx: 12.5,
@@ -88,7 +90,12 @@ class DiscoverItem extends StatelessWidget {
                       ),
                       visualDensity: const VisualDensity(vertical: -1),
                     ),
-                    child: Text(item.buttonTitle ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
+                    child: Text(
+                      item.buttonTitle ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.black, fontSize: 14),
+                    ),
                   ),
                   const Spacer(),
                 ],

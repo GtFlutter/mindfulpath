@@ -53,7 +53,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
 
   @override
   void initState() {
-    model = widget.model.video!;
+    model = widget.model.video;
 
     Future.delayed(
       Duration.zero,
@@ -136,10 +136,10 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Builder(builder: (context) {
-                debugPrint("Nothing asncajksnc ${model!.thumbnailImageUrlSrc}");
+                debugPrint("Nothing asncajksnc ${model?.thumbnailImageUrlSrc ?? ""}");
                 return MediaImageCard(
                   appStyle: widget.appStyle,
-                  imgUrl: model!.thumbnailImageUrlSrc!,
+                  imgUrl: model?.thumbnailImageUrlSrc ?? "",
                   duration: (widget.model.video?.duration ?? "").toDuration,
                   imgRadius: widget.appStyle.scaleX(25),
                   imgSize: widget.appStyle.scaleX(100),
@@ -156,7 +156,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '${model!.title}',
+                            '${model?.title ?? ""}',
                             style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -176,7 +176,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                       style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                     ),
                                     TextSpan(
-                                      text: model!.categoryTitle,
+                                      text: model?.categoryTitle ?? "",
                                       style: textStyle.copyWith(color: AppColors.categoryNameColor, fontSize: 11),
                                     ),
                                   ],

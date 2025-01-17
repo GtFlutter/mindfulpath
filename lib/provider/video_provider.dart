@@ -92,6 +92,13 @@ class OfflineVideoNotifier extends ChangeNotifier {
     playVideo(ddiModal, forceToPlay: true);
   }
 
+  void deactivateAudioPlayer(){
+    isAudioFileAvailable=false;
+    _video=null;
+    // selectedItemId=null;
+    notifyListeners();
+  }
+
   void playVideo(DDIModal ddiModal, {bool notify = true, bool forceToPlay = false,bool isAudioFile = false}) {
 
     DDIModal? model = _video;
@@ -107,12 +114,6 @@ class OfflineVideoNotifier extends ChangeNotifier {
     if (notify) notifyListeners();
   }
 
-  void deactivateAudioPlayer(){
-    isAudioFileAvailable=false;
-    _video=null;
-    // selectedItemId=null;
-    notifyListeners();
-  }
 
 
 }

@@ -39,7 +39,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     notificationServices.firebaseInit();
     await notificationServices.forgroundMessage();
     await notificationServices.setupInteractMessage();
-
   }
 
   @override
@@ -48,8 +47,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     _style = AppStyle(screenSize: size);
 
     /// This is For Featured Card Image Clipper
-    final DashboardCustomImageClipper clipper =
-        DashboardCustomImageClipper(_style.scaleX(15));
+    final DashboardCustomImageClipper clipper = DashboardCustomImageClipper(_style.scaleX(15));
 
     return Scaffold(
       extendBody: true,
@@ -73,8 +71,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 width: _style.scale * 20,
                 fit: BoxFit.contain,
               ),
-              style:
-                  IconButton.styleFrom(splashFactory: InkSplash.splashFactory),
+              style: IconButton.styleFrom(splashFactory: InkSplash.splashFactory),
             );
           },
         ),
@@ -98,10 +95,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Padding(
-              padding: EdgeInsets.only(
-                  left: _style.scale * 20,
-                  right: _style.scale * 22,
-                  bottom: _style.scale * 10),
+              padding: EdgeInsets.only(left: _style.scale * 20, right: _style.scale * 22, bottom: _style.scale * 10),
               child: Greeting(key: const ValueKey('Greeting'), style: _style),
             ),
           ),
@@ -112,8 +106,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           bottom: false,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.only(
-                bottom: _style.scale * 100, top: _style.scale * 10),
+            padding: EdgeInsets.only(bottom: _style.scale * 100, top: _style.scale * 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

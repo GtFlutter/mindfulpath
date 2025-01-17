@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meditation_app/theme/colors.dart';
 
-import '../../theme/colors.dart';
 import '../../theme/styles.dart';
 
 class CustomTab extends StatelessWidget {
@@ -14,17 +14,19 @@ class CustomTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 30,
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(style.scaleX(40)),
-          side: const BorderSide(color: AppColors.primaryColor),
+          side: const BorderSide(color: AppColors.primaryThemeColor1),
+          // side: const BorderSide(color: Colors.black54),
         ),
       ),
       width: smallTab ? null : style.scaleX(100),
       padding: smallTab
           ? EdgeInsets.symmetric(
               horizontal: style.scaleX(12.5),
-              vertical: style.scaleX(5),
+              vertical: style.scaleX(8),
             )
           : EdgeInsets.symmetric(
               horizontal: style.scaleX(5),
@@ -35,6 +37,7 @@ class CustomTab extends StatelessWidget {
         textAlign: TextAlign.center,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
+        // style: TextStyle(color: AppColors.primaryThemeColor1, fontSize: 12),
       ),
     );
   }

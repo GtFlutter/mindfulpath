@@ -98,12 +98,12 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
 
   getDownload() async {
     final downloadP = ref.read(downloadProvider);
-    result = await downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false, false);
+    result = await downloadP.checkVideoIsDownload((widget.model.bookmarkVideoResponse?.id ?? 0).toString(), false, false);
   }
 
   getAudioDownload() async {
     final downloadP = ref.read(downloadProvider);
-    result = await downloadP.checkVideoIsDownload(widget.model.bookmarkVideoResponse!.id.toString(), false, true);
+    result = await downloadP.checkVideoIsDownload((widget.model.bookmarkVideoResponse?.id ?? 0).toString(), false, true);
   }
 
   @override
@@ -114,7 +114,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
     List<String> timeComponents = timeStr.split(":");
     int minute = 0;
     int second = 0;
-    if (timeComponents.isNotEmpty) {
+    if (timeComponents.isNotEmpty && timeComponents.length > 1) {
       minute = int.parse(timeComponents[1]);
       second = int.parse(timeComponents[2].split(".")[0]);
     } // Extract only seconds
