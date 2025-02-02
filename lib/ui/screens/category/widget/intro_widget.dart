@@ -23,7 +23,7 @@ class IntroWidget extends StatelessWidget {
             style: style.text.font(
               brandonMedium500,
               sizePx: 30,
-              color: AppColors.primaryColor,
+              color: AppColors.primaryThemeColor1,
             ),
             textAlign: TextAlign.center,
           ),

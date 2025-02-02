@@ -166,7 +166,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
               decoration: ShapeDecoration(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(_style.scaleX(40)),
-                  side: const BorderSide(color: AppColors.primaryColor),
+                  side: const BorderSide(color: AppColors.primaryThemeColor1),
                 ),
               ),
               padding: EdgeInsets.symmetric(

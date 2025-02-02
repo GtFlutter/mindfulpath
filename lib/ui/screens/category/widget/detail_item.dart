@@ -271,7 +271,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     final audioP = ref.watch(audioProvider);
     log("color------${videoP.isSelected}=====${int.parse(widget.index)}");
     log("color 222------${videoP.selectedItemId}=====${widget.seletedItemId})}");
-    log("bookmark in detail item------${widget.model!.bookmarked} ${widget.model!.bookmarked!} ");
+    log("bookmark in detail item------${widget.model?.bookmarked} ${widget.model?.bookmarked!} ");
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),

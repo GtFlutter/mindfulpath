@@ -140,7 +140,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                 return MediaImageCard(
                   appStyle: widget.appStyle,
                   imgUrl: model?.thumbnailImageUrlSrc ?? "",
-                  duration: (widget.model.video?.duration ?? "").toDuration,
+                  duration:widget.model.video?.duration?.isEmpty ?? false? (widget.model.video?.duration ?? "00:00:00").toDuration:"",
                   imgRadius: widget.appStyle.scaleX(25),
                   imgSize: widget.appStyle.scaleX(100),
                 );

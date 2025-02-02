@@ -18,8 +18,8 @@ class CustomSelecteableButton extends StatelessWidget {
         constraints: const BoxConstraints(minWidth: 85),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Dimensions.PADDING_SIZE_EXTRA_LARGE),
-          border: Border.all(color: AppColors.primaryColor),
-          color: selected ? AppColors.primaryColor : null,
+          border: Border.all(color: AppColors.primaryThemeColor1),
+          color: selected ? AppColors.primaryThemeColor1 : null,
         ),
         alignment: Alignment.center,
         padding: const EdgeInsets.all(Dimensions.PADDING_SIZE_EXTRA_SMALL),

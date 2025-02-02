@@ -280,7 +280,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                         FocusManager.instance.primaryFocus?.unfocus();
                                                       },
                                                       onRemovePress: () async {
-                                                        await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
+                                                        await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), (model.video?.videoUrlSrc ?? "").split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
                                                         playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
                                                       },
                                                       index: index,
