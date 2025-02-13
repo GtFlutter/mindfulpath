@@ -53,6 +53,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TabBar(
+                    labelPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                     controller: _tabController,
                     isScrollable: true,
                     indicatorPadding: EdgeInsets.symmetric(vertical: _style.scaleX(9)),
@@ -61,7 +62,8 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
                     // labelColor: AppColors.primaryThemeColor2,
                     labelStyle: _style.text.font(
                       mulishRegular400,
-                      sizePx: 12.5,
+                      sizePx: 13.5,
+                      // sizePx: 15.5,
                       color: AppColors.primaryThemeColor2,
                     ),
                     tabs: [

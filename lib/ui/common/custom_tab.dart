@@ -14,7 +14,7 @@ class CustomTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 30,
+      height: 34,
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(style.scaleX(40)),
@@ -37,6 +37,7 @@ class CustomTab extends StatelessWidget {
         textAlign: TextAlign.center,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 14),
         // style: TextStyle(color: AppColors.primaryThemeColor1, fontSize: 12),
       ),
     );
