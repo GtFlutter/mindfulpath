@@ -25,8 +25,9 @@ class CustomTab extends StatelessWidget {
       width: smallTab ? null : style.scaleX(100),
       padding: smallTab
           ? EdgeInsets.symmetric(
-              horizontal: style.scaleX(12.5),
-              vertical: style.scaleX(8),
+              // horizontal: style.scaleX(12.5),
+              horizontal: style.scaleX(8.5),
+              vertical: style.scaleX(10),
             )
           : EdgeInsets.symmetric(
               horizontal: style.scaleX(5),
@@ -37,8 +38,8 @@ class CustomTab extends StatelessWidget {
         textAlign: TextAlign.center,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontSize: 14),
-        // style: TextStyle(color: AppColors.primaryThemeColor1, fontSize: 12),
+        // style: TextStyle(fontSize: 14),
+        style: TextStyle(fontSize: 11),
       ),
     );
   }

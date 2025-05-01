@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/bookmark/bookmark_screen.dart';
+import 'package:meditation_app/ui/screens/courses/courses_list_screen.dart';
 import 'package:meditation_app/ui/screens/courses/courses_screen.dart';
 import 'package:meditation_app/ui/screens/playlist/playlist_screen.dart';
 
@@ -27,7 +28,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -53,6 +54,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TabBar(
+                    padding: EdgeInsets.symmetric(horizontal: 2.0),
                     labelPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                     controller: _tabController,
                     isScrollable: true,
@@ -62,14 +64,15 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
                     // labelColor: AppColors.primaryThemeColor2,
                     labelStyle: _style.text.font(
                       mulishRegular400,
-                      sizePx: 13.5,
-                      // sizePx: 15.5,
+                      // sizePx: 13.5,
+                      sizePx: 11.5,
                       color: AppColors.primaryThemeColor2,
                     ),
                     tabs: [
-                      Tab(child: CustomTab.small(text: 'Bookmark', style: _style)),
+                      Tab(child: CustomTab.small(text: 'Bookmarked', style: _style)),
                       Tab(child: CustomTab.small(text: 'Playlist', style: _style)),
-                      Tab(child: CustomTab.small(text: 'Courses', style: _style)),
+                      Tab(child: CustomTab.small(text: 'Downloaded', style: _style)),
+                      Tab(child: CustomTab.small(text: 'Plus', style: _style)),
                     ],
                   ),
                 ],
@@ -79,11 +82,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
         child: TabBarView(
           physics: BouncingScrollPhysics(),
           controller: _tabController,
-          children: const [
-            BookmarkScreen(),
-            PlaylistScreen(),
-            CoursesScreen(),
-          ],
+          children: const [BookmarkScreen(), PlaylistScreen(), CoursesScreen(), CoursesListScreen(title: "Purchased", isAudio: false)],
         ),
       ),
     );

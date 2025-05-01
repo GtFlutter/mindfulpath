@@ -94,7 +94,7 @@ class PdfResponse {
   /// No Use of below variable
   // int can_view_free_user;
 
-  const PdfResponse({
+  PdfResponse({
     required this.category,
     required this.id,
     required this.title,

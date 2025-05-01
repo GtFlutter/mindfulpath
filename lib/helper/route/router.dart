@@ -23,7 +23,6 @@ import 'package:meditation_app/ui/screens/search/search_screen.dart';
 import 'package:meditation_app/ui/screens/settings/settings_screen.dart';
 import 'package:meditation_app/ui/screens/settings/tc_pp_screen.dart';
 import 'package:meditation_app/ui/screens/shellnav/shell_route.dart';
-import 'package:meditation_app/ui/screens/splash_screen.dart';
 import 'package:meditation_app/ui/screens/support/support_screen.dart';
 import 'package:meditation_app/ui/screens/support/support_section_screen.dart';
 import 'package:meditation_app/ui/screens/update_profile/update_profile_screen.dart';
@@ -38,13 +37,13 @@ final appRouter = GoRouter(
   initialLocation: RoutePath.discoverScreen,
   debugLogDiagnostics: true,
   routes: [
-    GoRoute(
-      parentNavigatorKey: rootNavigator,
-      path: RoutePath.splash,
-      builder: (context, state) {
-        return SplashScreen(key: state.pageKey);
-      },
-    ),
+    // GoRoute(
+    //   parentNavigatorKey: rootNavigator,
+    //   path: RoutePath.splash,
+    //   builder: (context, state) {
+    //     return SplashScreen(key: state.pageKey);
+    //   },
+    // ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
       path: RoutePath.signIn,
@@ -151,7 +150,6 @@ final appRouter = GoRouter(
               GoRoute(
                 path: RoutePath.coursesListScreen,
                 builder: (context, state) {
-
                   return CoursesListScreen(
                     key: state.pageKey,
                     title: state.extra as String? ?? 'Router Extra Not Found',
@@ -241,9 +239,13 @@ final appRouter = GoRouter(
                 parentNavigatorKey: rootNavigator,
                 path: RoutePath.downloadDetailCategoryScreen,
                 builder: (context, state) {
-                  if (state.extra != null && state.extra is (CategoryModal,bool)) {
+                  if (state.extra != null && state.extra is (CategoryModal, bool)) {
                     var (category, isAudio) = state.extra as (CategoryModal, bool);
-                    return DownloadDetailCategoryScreen(key: state.pageKey, categoryModal: category, isAudio: isAudio,);
+                    return DownloadDetailCategoryScreen(
+                      key: state.pageKey,
+                      categoryModal: category,
+                      isAudio: isAudio,
+                    );
                   }
                   return const WentWrongScreen();
                 },

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,10 +6,8 @@ import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
-import 'package:meditation_app/ui/screens/analytics/helper/analytics_enums.dart';
 
 import '../../../theme/styles.dart';
-import '../category/detail_category_screen.dart';
 import 'widget/course_item.dart';
 
 List<CITempModel> list = [
@@ -59,7 +55,8 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
       Future.delayed(Duration.zero, () {
         courseP.getPurchasedList();
       });
-    } else if (widget.title == ScreenTitles.currentlyProgress.value) {
+      // } else if (widget.title == ScreenTitles.currentlyProgress.value) {
+    } else if (widget.title == "Currently Progress") {
       Future.delayed(Duration.zero, () {
         courseP.getCurrentlyProgressList();
       });
@@ -82,9 +79,11 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
     super.initState();
   }
 
-  bool get isPurchased => widget.title == ScreenTitles.purchased.value;
+  // bool get isPurchased => widget.title == ScreenTitles.purchased.value;
+  bool get isPurchased => widget.title == "Purchased";
 
-  bool get isCurrentlyProgress => widget.title == ScreenTitles.currentlyProgress.value;
+  // bool get isCurrentlyProgress => widget.title == ScreenTitles.currentlyProgress.value;
+  bool get isCurrentlyProgress => widget.title == "Currently Progress";
 
   @override
   Widget build(BuildContext context) {
@@ -108,11 +107,13 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
     final courseP = ref.watch(courseProvider);
 
     return Scaffold(
-      appBar: CustomAppBar(
-        screenSize: size,
-        style: _style,
-        title: widget.title,
-      ),
+      appBar: isPurchased
+          ? null
+          : CustomAppBar(
+              screenSize: size,
+              style: _style,
+              title: widget.title,
+            ),
       extendBodyBehindAppBar: true,
       body: BackgroundImage(
         child: SafeArea(
@@ -132,7 +133,9 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
                       ? courseP.purchasedVideoResponse.length
                       : isCurrentlyProgress
                           ? courseP.cpVideoResponse.length
-                          :widget.isAudio?courseP.downloadAudioCategoryResponse.length: courseP.downloadResponse.length,
+                          : widget.isAudio
+                              ? courseP.downloadAudioCategoryResponse.length
+                              : courseP.downloadResponse.length,
                   padding: EdgeInsets.fromLTRB(_style.scale * 25, _style.scaleX(20), _style.scale * 25, _style.scaleX(100)),
                   itemBuilder: (context, index) {
                     CITempModel item;
@@ -153,11 +156,10 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
                           context.goToDetailCategoryScreen(courseP.purchasedVideoResponse[index].categoryResponse!, isAudio: false);
                         } else if (isCurrentlyProgress) {
                           context.goToDetailCategoryScreen(courseP.cpVideoResponse[index].categoryResponse!, isAudio: false);
-                        }else if(widget.isAudio){
-                          context.push(RoutePath.downloadDetailCategoryScreenPath, extra: (courseP.downloadAudioCategoryResponse[index],true));
+                        } else if (widget.isAudio) {
+                          context.push(RoutePath.downloadDetailCategoryScreenPath, extra: (courseP.downloadAudioCategoryResponse[index], true));
                           // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailCategoryScreen(categoryListResponse: , isAudio: widget.isAudio ? true : false)));
-                        }
-                        else {
+                        } else {
                           context.push(RoutePath.downloadDetailCategoryScreenPath, extra: (courseP.downloadResponse[index], false));
                           // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailCategoryScreen(categoryListResponse: , isAudio: widget.isAudio ? true : false)));
                         }

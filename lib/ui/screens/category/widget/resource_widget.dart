@@ -11,6 +11,7 @@ import 'package:meditation_app/provider/resource_provider/paid_videos_provider.d
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
+import 'package:meditation_app/ui/screens/category/widget/tabs/all_item_list_widget.dart';
 import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_widget.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
@@ -37,7 +38,7 @@ class ResourceDetailCategory extends ConsumerStatefulWidget {
 
 class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
-  final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF'), ItemName(id: 2, title: 'Audio')];
+  final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF'), ItemName(id: 2, title: 'Audio'), ItemName(id: 3, title: 'All')];
   static AppStyle _style = AppStyle();
 
   /// Either 0(Video) or 1(PDF)
@@ -49,7 +50,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(initialIndex: courseIndex, length: 6, vsync: this);
+    _tabController = TabController(initialIndex: courseIndex, length: 8, vsync: this);
     (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
 
     Future.delayed(Duration(seconds: 0), () {
@@ -98,6 +99,10 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       goTo = 4;
     } else if (filterIndex == 2 && courseTypeIndex == 1) {
       goTo = 5;
+    } else if (filterIndex == 3 && courseTypeIndex == 0) {
+      goTo = 6;
+    } else if (filterIndex == 3 && courseTypeIndex == 1) {
+      goTo = 7;
     } else {
       goTo = throw ArgumentError();
     }
@@ -105,7 +110,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     _tabController.animateTo(goTo);
   }
 
-  void _changeFilter(ItemName? value,) {
+  void _changeFilter(
+    ItemName? value,
+  ) {
     if (value == null || value.id == filterIndex) return;
     setState(() {
       filterIndex = value.id;
@@ -178,8 +185,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 appStyle: _style,
                 items: _filters,
                 width: _style.scaleX(120),
-                maxHeight: _style.scaleX(150),
+                maxHeight: _style.scaleX(250),
                 onChanged: (value) {
+                  log("filters------>${_filters.length}");
                   _changeCourseType(0);
                   _changeFilter(ItemName(id: value?.id ?? 0, title: value!.title));
 
@@ -196,7 +204,10 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
             children: [
-              FreeVideoListWidget(category: widget.category, isAudio: false,),
+              FreeVideoListWidget(
+                category: widget.category,
+                isAudio: false,
+              ),
               PaidVideoListWidget(
                 category: widget.category,
                 isAudio: false,
@@ -207,12 +218,18 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 category: widget.category,
                 isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
               ),
-              FreeVideoListWidget(category: widget.category,isAudio: true,),
+              FreeVideoListWidget(
+                category: widget.category,
+                isAudio: true,
+              ),
               PaidVideoListWidget(
                 category: widget.category,
                 isAudio: true,
                 isPurchased: audioProvider.videosResponse?.category?.isPurchased ?? false,
               ),
+              AllItemListWidget(category: widget.category),
+              //All Paid Content
+              AllItemListWidget(category: widget.category),
             ],
           ),
         ),

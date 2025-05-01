@@ -11,6 +11,7 @@ final databaseProvider = Provider<DatabaseHelper>((ref) => DatabaseHelper());
 class DatabaseHelper {
   static late Database _db;
   List<PdfModel> _downloadPdfResponses = [];
+
   List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
 
   Future<Database> get db async {
@@ -19,8 +20,7 @@ class DatabaseHelper {
   }
 
   final _configs = MigrationConfig(initializationScript: DatabaseConsts.initialScript, migrationScripts: [
-    '''
-    CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioTable} (
+    '''CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioTable} (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "video_id" TEXT,
       "thumbnail_image_url" TEXT,
@@ -28,16 +28,13 @@ class DatabaseHelper {
       "video_file" TEXT,
       "video_duration" TEXT,
       "category_id" TEXT
-    );
-    '''
-        '''
-    CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioCategoryTable} (
+    );''',
+    '''CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioCategoryTable} (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "category_id" TEXT,
       "category_name" TEXT,
       "category_image" TEXT
-    );
-    ''',
+    );''',
   ]);
 
   Future<Database> openDB() async {

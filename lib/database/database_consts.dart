@@ -6,23 +6,13 @@ class DatabaseConsts {
   static const String audioTable = 'AudioTable';
   static const String pdfTable = 'PdfTable';
 
-
   static final initialScript = [
-
     '''CREATE TABLE $categoryTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "category_id" TEXT,
       "category_name" TEXT,
       "category_image" TEXT
     );''',
-
-    '''CREATE TABLE $audioCategoryTable (
-      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "category_id" TEXT,
-      "category_name" TEXT,
-      "category_image" TEXT
-    );''',
-
     '''CREATE TABLE $categoryPdfTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "pdf_id" TEXT,
@@ -31,7 +21,6 @@ class DatabaseConsts {
       "category_id" TEXT,
       "category_title" TEXT
     );''',
-
     '''CREATE TABLE $videoTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "video_id" TEXT,
@@ -41,7 +30,6 @@ class DatabaseConsts {
       "video_duration" TEXT,
       "category_id" TEXT
     );''',
-
     '''CREATE TABLE $pdfTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "pdf_id" TEXT,
@@ -49,10 +37,14 @@ class DatabaseConsts {
       "pdf_file" TEXT,
       "category_id" TEXT,
       "category_title" TEXT
-
-    );'''
-
-    '''CREATE TABLE $audioTable (
+    );''',
+    '''CREATE TABLE IF NOT EXISTS $audioCategoryTable (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "category_id" TEXT,
+      "category_name" TEXT,
+      "category_image" TEXT
+    );''',
+    '''CREATE TABLE IF NOT EXISTS $audioTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "video_id" TEXT,
       "video_name" TEXT,

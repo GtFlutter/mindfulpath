@@ -43,7 +43,23 @@ class CourseNotifier extends ChangeNotifier {
   List<PurchasedVideoResponse> get purchasedVideoResponse => _purchasedVideoResponse;
 
   static late Database _db;
-  final _configs = MigrationConfig(initializationScript: DatabaseConsts.initialScript, migrationScripts: []);
+  final _configs = MigrationConfig(initializationScript: DatabaseConsts.initialScript, migrationScripts: [
+    '''CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioTable} (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "video_id" TEXT,
+      "thumbnail_image_url" TEXT,
+      "video_name" TEXT,
+      "video_file" TEXT,
+      "video_duration" TEXT,
+      "category_id" TEXT
+    );''',
+    '''CREATE TABLE IF NOT EXISTS ${DatabaseConsts.audioCategoryTable} (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "category_id" TEXT,
+      "category_name" TEXT,
+      "category_image" TEXT
+    );''',
+  ]);
 
   Future<Database> get db async {
     _db = await openDB();
@@ -146,7 +162,7 @@ class CourseNotifier extends ChangeNotifier {
   Future<void> getAudioCategoryFromDatabase() async {
     _startLoading();
     List<CategoryModal> list = await ref.read(databaseProvider).getAudioCategory();
-    debugPrint('downloaded AUDIO CATEGORYIES :: ${list.length}');
+    // debugPrint('downloaded AUDIO CATEGORYIES :: ${list.length}');
     _downloadAudioCategoryResponse = list;
     _stopLoading();
   }

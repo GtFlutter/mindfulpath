@@ -121,15 +121,14 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
       itemCount: widget.isAudio ? audioP.videosResponse!.list!.length : provider.videosResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = widget.isAudio ? audioP.videosResponse!.list![index] : provider.videosResponse!.list![index];
-        bool isDownloaded=false;
-        if(!widget.isAudio)
-        {
-           isDownloaded = provider.downloadedVideo.any((element) {
+        bool isDownloaded = false;
+        if (!widget.isAudio) {
+          isDownloaded = provider.downloadedVideo.any((element) {
             return model.id == int.parse(element.videoId ?? "0");
           });
-        }else{
+        } else {
           isDownloaded = audioP.downloadedAudio.any((element) {
-             log("~~~~aaaa~~~~>>>>${model.id}~~~~~${element.videoId}");
+            log("~~~~aaaa~~~~>>>>${model.id}~~~~~${element.videoId}");
             return model.id == int.parse(element.videoId ?? "0");
           });
         }

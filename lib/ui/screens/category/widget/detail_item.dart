@@ -238,7 +238,6 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     await coursePRead.getCategoryFromDatabase();
     await coursePRead.getAudioCategoryFromDatabase();
 
-
     /*for(final category in coursePWatch.downloadPdfResponses){
     }*/
     await coursePRead.getPdfFromDatabase(widget.pdfModel?.categoryId ?? 0);
@@ -271,7 +270,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     final audioP = ref.watch(audioProvider);
     log("color------${videoP.isSelected}=====${int.parse(widget.index)}");
     log("color 222------${videoP.selectedItemId}=====${widget.seletedItemId})}");
-    log("bookmark in detail item------${widget.model?.bookmarked} ${widget.model?.bookmarked!} ");
+    log("bookmark in detail item------${widget.model?.bookmarked} ${widget.model?.bookmarked} ");
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
@@ -293,8 +292,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
             if (isVideo)
               MediaImageCard(
                 appStyle: widget.appStyle,
-                imgUrl: widget.model!.imgUrl ?? '',
-                duration: widget.model!.duration!.toDuration,
+                imgUrl: widget.model?.imgUrl ?? '',
+                duration: widget.model?.duration?.toDuration ?? "",
                 imgRadius: radius,
                 imgSize: dimension,
               )

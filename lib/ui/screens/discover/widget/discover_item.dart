@@ -34,7 +34,8 @@ class DiscoverItem extends StatelessWidget {
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           gradient: const LinearGradient(
-            colors: [AppColors.primaryGradientColor, AppColors.secondaryGradientColor],
+            // colors: [AppColors.primaryGradientColor, AppColors.secondaryGradientColor],
+            colors: [Colors.black, Colors.black],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
