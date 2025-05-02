@@ -111,7 +111,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       minHeight: 200 * _style.scale,
                       style: _style,
                       children: [
-                        Spacer(flex: 1),
+                        SizedBox(height: _style.scale * 100),
+                        // Spacer(flex: 1),
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -123,11 +124,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               onChanged: (_) {
                                 setNumberErrorText();
                               },
+                              onTap: () {},
                               style: _style,
                             ),
                           ],
                         ),
-                        Spacer(flex: 3),
+                        // Spacer(flex: 3),
+                        SizedBox(height: _style.scale * 30),
                         CustomNextButton(
                           text: 'Next',
                           onPressed: !authP.isLoading ? onNext : null,

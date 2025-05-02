@@ -15,6 +15,7 @@ class MobileNumberTextField extends StatelessWidget {
 
   final String? errorText;
   final ValueChanged<String>? onChanged;
+  final Function()? onTap;
 
   final TextInputAction? textInputAction;
   final AppStyle style;
@@ -27,6 +28,7 @@ class MobileNumberTextField extends StatelessWidget {
     this.labelText,
     this.errorText,
     this.onChanged,
+    this.onTap,
     this.textInputAction,
     required this.style,
   });
@@ -37,6 +39,7 @@ class MobileNumberTextField extends StatelessWidget {
       controller: controller,
       cursorColor: CustomeTextFieldStyle.cursorColor,
       onChanged: onChanged,
+      onTap: onTap,
       textInputAction: textInputAction,
       decoration: CustomeTextFieldStyle.inputDecoration(style: style).copyWith(
         labelText: labelText ?? 'Number',
