@@ -28,22 +28,23 @@ import 'package:meditation_app/ui/screens/support/support_section_screen.dart';
 import 'package:meditation_app/ui/screens/update_profile/update_profile_screen.dart';
 
 import '../../ui/screens/category/widget/detail_item.dart';
+import '../../ui/screens/splash_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigator = GlobalKey(debugLabel: 'root');
 final GlobalKey<NavigatorState> shellNavigator = GlobalKey(debugLabel: 'shell');
 
 final appRouter = GoRouter(
   navigatorKey: rootNavigator,
-  initialLocation: RoutePath.discoverScreen,
+  initialLocation: RoutePath.splash,
   debugLogDiagnostics: true,
   routes: [
-    // GoRoute(
-    //   parentNavigatorKey: rootNavigator,
-    //   path: RoutePath.splash,
-    //   builder: (context, state) {
-    //     return SplashScreen(key: state.pageKey);
-    //   },
-    // ),
+    GoRoute(
+      parentNavigatorKey: rootNavigator,
+      path: RoutePath.splash,
+      builder: (context, state) {
+        return SplashScreen(key: state.pageKey);
+      },
+    ),
     GoRoute(
       parentNavigatorKey: rootNavigator,
       path: RoutePath.signIn,

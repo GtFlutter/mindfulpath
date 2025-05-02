@@ -117,6 +117,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             MobileNumberTextField(
+                              textInputAction: TextInputAction.done,
                               onCountryCodeChanged: setCountryCode,
                               controller: _numberCtrl,
                               initialCountryCodeSelection: _initCountryCode,

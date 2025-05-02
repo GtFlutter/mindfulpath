@@ -249,7 +249,6 @@ class AuthNotifier extends ChangeNotifier {
         } else if (context != null && context.mounted) {
           context.go(RoutePath.signIn);
         }
-
       } catch (_) {
         stopProgress();
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
@@ -276,8 +275,8 @@ class AuthNotifier extends ChangeNotifier {
     startProgress();
     await repo.logoutUser();
     await repo.clearUserData();
-    socialUserData=null;
-    mobileOrEmail=null;
+    socialUserData = null;
+    mobileOrEmail = null;
     stopProgress();
     BuildContext? context = rootNavigator.currentContext;
     if (context != null && context.mounted) {
