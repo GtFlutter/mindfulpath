@@ -41,6 +41,13 @@ class DashboardRepo {
   }) async {
     return await apiClient.postData(AppConfigs.getPdfs, _toBody(categoryId, resourceType, offset));
   }
+  Future<Response> getAllItem({
+    required int categoryId,
+    required int offset,
+    required ResourceType resourceType,
+  }) async {
+    return await apiClient.postData(AppConfigs.getAllItem, _toBody(categoryId, resourceType, offset));
+  }
 
   Map<String, int> _toBody(int categoryId, ResourceType resourceType, int offset) => {
         'category_id': categoryId,

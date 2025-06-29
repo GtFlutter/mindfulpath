@@ -19,8 +19,7 @@ import '../../../theme/styles.dart';
 import '../../../util/constants.dart';
 
 class OTPModel {
-  final String countryCode;
-  final String phoneNo;
+  final String email;
   final SendOTP type;
   final String? password;
   final int otp;
@@ -28,8 +27,7 @@ class OTPModel {
   OTPModel({
     required this.otp,
     required this.type,
-    required this.countryCode,
-    required this.phoneNo,
+    required this.email,
     this.password,
   });
 }
@@ -80,7 +78,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                 children: [
                   CustomHeader(
                     title: 'OTP has been sent to ${widget.model.otp}',
-                    subTitle: '${widget.model.countryCode} ${widget.model.phoneNo.mask()}',
+                    subTitle: widget.model.email,
                     style: _style,
                   ),
                   Expanded(
@@ -140,8 +138,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                                   CupertinoButton(
                                     onPressed: () {
                                       ref.read(authProvider).requestOTP(
-                                            countryCode: widget.model.countryCode,
-                                            phoneNo: widget.model.phoneNo,
+                                            email: widget.model.email,
                                             type: widget.model.type,
                                             password: widget.model.password,
                                             shouldReplace: true,
@@ -188,8 +185,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       return;
     } else {
       ref.read(authProvider).verifyOTP(
-            countryCode: widget.model.countryCode,
-            phoneNo: widget.model.phoneNo,
+            email: widget.model.email,
             type: widget.model.type,
             otp: int.parse(otp),
             password: widget.model.password,

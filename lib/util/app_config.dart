@@ -39,6 +39,7 @@ class AppConfigs {
   static const String searchVideos = '/search-video';
   static const String purchaseSubscription = '/purchase-subscription';
   static const String getAudios = '/get-audio-list';
+  static const String getAllItem = '/get-all-list';
 
 
   static const String getBookmarks = '/get-bookmark-list';

@@ -320,11 +320,11 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
     /// TODO IF this is sign then get error from api and show
     else if (widget.isSignIn) {
-      ref.read(authProvider).loginUser(code + number, password, fcm ?? "");
+      ref.read(authProvider).loginUser(email, password, fcm ?? "");
     } else {
       ref.read(authProvider).requestOTP(
             countryCode: code,
-            phoneNo: number,
+            email: email,
             type: SendOTP.register,
             password: password,
           );

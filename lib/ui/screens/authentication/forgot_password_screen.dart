@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
+import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
@@ -14,6 +15,7 @@ import 'package:meditation_app/ui/screens/authentication/widget/custom_header.da
 
 import '../../../theme/colors.dart';
 import '../../../theme/styles.dart';
+import '../../../theme/text_field_style.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -25,7 +27,7 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   static AppStyle _style = AppStyle();
 
-  final TextEditingController _numberCtrl = TextEditingController();
+  final TextEditingController _emailCtrl = TextEditingController();
 
   final String _initCountryCode = '+91';
   String _countryCode = '+91';
@@ -116,17 +118,32 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            MobileNumberTextField(
-                              textInputAction: TextInputAction.done,
-                              onCountryCodeChanged: setCountryCode,
-                              controller: _numberCtrl,
-                              initialCountryCodeSelection: _initCountryCode,
-                              errorText: _numberErrorText,
+                            // MobileNumberTextField(
+                            //   textInputAction: TextInputAction.done,
+                            //   onCountryCodeChanged: setCountryCode,
+                            //   controller: _numberCtrl,
+                            //   initialCountryCodeSelection: _initCountryCode,
+                            //   errorText: _numberErrorText,
+                            //   onChanged: (_) {
+                            //     setNumberErrorText();
+                            //   },
+                            //   onTap: () {},
+                            //   style: _style,
+                            // ),
+                            TextField(
+                              controller: _emailCtrl,
+                              readOnly: ref.read(authProvider).socialUserData?.socialId?.isNotEmpty ?? false,
+                              cursorColor: CustomeTextFieldStyle.cursorColor,
                               onChanged: (_) {
-                                setNumberErrorText();
+                                userP.setEmailError();
                               },
-                              onTap: () {},
-                              style: _style,
+                              textInputAction: TextInputAction.done,
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                                labelText: 'Email',
+                                errorText: userP.emailErrorText,
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
                             ),
                           ],
                         ),
@@ -150,18 +167,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   void onNext() {
-    String number = _numberCtrl.text.trim();
+    String email = _emailCtrl.text.trim();
     String code = _countryCode;
-    if (number.isEmpty) {
-      setNumberErrorText('Please enter a number');
+    if (email.isEmpty) {
+      setNumberErrorText('Please enter a email');
       return;
-    } else if (code.isEmpty) {
-      setNumberErrorText('Please select country code');
+    } else if (email.isEmail) {
+      setNumberErrorText('Please enter valid email');
       return;
     } else {
       ref.read(authProvider).requestOTP(
-            countryCode: code,
-            phoneNo: number,
+           email: _emailCtrl.text.trim(),
             type: SendOTP.forgotPwd,
           );
     }

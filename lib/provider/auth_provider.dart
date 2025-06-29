@@ -53,14 +53,14 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   /// Password is required for type == SendOTP.register, If You Want To Replace Screen Then add shouldReplace = true
-  Future<void> requestOTP({required String countryCode, required String phoneNo, required SendOTP type, String? password, bool shouldReplace = false}) async {
+  Future<void> requestOTP({required String email, required SendOTP type, String? password, bool shouldReplace = false}) async {
     assert(!(type == SendOTP.register && password == null));
     if (!shouldReplace) {
       startProgress();
     } else {
       showCustomSnackBar('Resending OTP');
     }
-    Response response = await repo.requestOTP(countryCode + phoneNo, type);
+    Response response = await repo.requestOTP(email, type);
     if (response.statusCode != 200) {
       if (!shouldReplace) stopProgress();
       ApiChecker.checkApi(response);
@@ -85,8 +85,7 @@ class AuthNotifier extends ChangeNotifier {
             extra: OTPModel(
               otp: otp,
               type: type,
-              countryCode: countryCode,
-              phoneNo: phoneNo,
+              email: email,
               password: password,
             ),
           );
@@ -96,8 +95,7 @@ class AuthNotifier extends ChangeNotifier {
             extra: OTPModel(
               otp: otp,
               type: type,
-              countryCode: countryCode,
-              phoneNo: phoneNo,
+              email: email,
               password: password,
             ),
           );
@@ -157,7 +155,8 @@ class AuthNotifier extends ChangeNotifier {
   ///google login
   Future googleLogin() async {
     try {
-      final gLogin = GoogleSignIn(scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']);
+      final gLogin =
+          GoogleSignIn(scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']);
       await gLogin.signOut();
       GoogleSignInAccount? account = await gLogin.signIn();
       if (account == null) {
@@ -175,7 +174,13 @@ class AuthNotifier extends ChangeNotifier {
       //   throw Exception(unKnownError);
       // }
       if (response) {
-        socialUserData = SocialUserData(userName: account.displayName, mobileOrEmail: account.email, socialId: account.id, isSocialLogin: true, fcmToken: fcmToken, isGoogleLogin: true);
+        socialUserData = SocialUserData(
+            userName: account.displayName,
+            mobileOrEmail: account.email,
+            socialId: account.id,
+            isSocialLogin: true,
+            fcmToken: fcmToken,
+            isGoogleLogin: true);
 
         mobileOrEmail = account.email;
       }
@@ -201,8 +206,7 @@ class AuthNotifier extends ChangeNotifier {
 
   /// Password is required for type == SendOTP.register
   Future<void> verifyOTP({
-    required String countryCode,
-    required String phoneNo,
+    required email,
     required SendOTP type,
     required int otp,
     String? password,
@@ -210,7 +214,7 @@ class AuthNotifier extends ChangeNotifier {
     assert(!(type == SendOTP.register && password == null));
 
     startProgress();
-    Response response = await repo.verifyOTP(countryCode + phoneNo, otp);
+    Response response = await repo.verifyOTP(email, otp);
     stopProgress();
     if (response.statusCode != 200) {
       ApiChecker.checkApi(response);
@@ -219,9 +223,9 @@ class AuthNotifier extends ChangeNotifier {
     BuildContext? context = rootNavigator.currentContext;
     if (context != null && context.mounted) {
       if (type == SendOTP.register) {
-        context.pushReplacement(RoutePath.createNewProfileScreen, extra: (countryCode + phoneNo, password));
+        context.pushReplacement(RoutePath.createNewProfileScreen, extra: (email, password));
       } else if (type == SendOTP.forgotPwd) {
-        context.pushReplacement(RoutePath.createNewPasswordScreen, extra: countryCode + phoneNo);
+        context.pushReplacement(RoutePath.createNewPasswordScreen, extra: email);
       }
     }
   }
