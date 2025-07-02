@@ -6,16 +6,19 @@ import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/helper/route/router.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
+import 'package:meditation_app/provider/resource_provider/free_all_item_list_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_audios_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_videos_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
-import 'package:meditation_app/ui/screens/category/widget/tabs/all_item_list_widget.dart';
+import 'package:meditation_app/ui/screens/category/widget/tabs/free_all_item_list_widget.dart';
+import 'package:meditation_app/ui/screens/category/widget/tabs/paid_free_all_list_widget.dart';
 import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_widget.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../../provider/dashboard_provider.dart';
+import '../../../../provider/resource_provider/paid_all_item_list_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../common/custom_dropdown_button.dart';
 import 'custom_selecteable_button.dart';
@@ -38,7 +41,9 @@ class ResourceDetailCategory extends ConsumerStatefulWidget {
 
 class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory> with TickerProviderStateMixin {
   late TabController _tabController;
-  final List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF'), ItemName(id: 2, title: 'Audio'), ItemName(id: 3, title: 'All')];
+  List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF'), ItemName(id: 2, title: 'Audio'), ItemName(id: 3, title: 'All')];
+  List<ItemName> _freeFilters = [];
+  List<ItemName> _paidFilters = [];
   static AppStyle _style = AppStyle();
 
   /// Either 0(Video) or 1(PDF)
@@ -53,7 +58,20 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     _tabController = TabController(initialIndex: courseIndex, length: 8, vsync: this);
     (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
 
-    Future.delayed(Duration(seconds: 0), () {
+    Future.delayed(Duration(seconds: 0), () async {
+      log("------>cst id for all item--${widget.category.id}");
+     await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
+      // ✅ Build _freeFilters after fetching free items
+      final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
+      final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
+      final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+
+      _freeFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
+
+      setState(() {
+        _filters = _freeFilters;
+        filterIndex = _filters.first.id;
+      });
       ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
     }).then((value) async {
       if (widget.isFromPdfNotification ?? false) {
@@ -82,6 +100,32 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  List<ItemName> buildFilterOptions({
+    required bool isVideo,
+    required bool isAudio,
+    required bool isPdf,
+  }) {
+    final List<ItemName> filters = [];
+
+    if (isVideo) {
+      filters.add(ItemName(id: 0, title: 'Video'));
+    }
+    if (isPdf) {
+      filters.add(ItemName(id: 1, title: 'PDF'));
+    }
+    if (isAudio) {
+      filters.add(ItemName(id: 2, title: 'Audio'));
+    }
+
+    if (filters.isEmpty) {
+      filters.add(ItemName(id: 3, title: 'All'));
+    } else {
+      filters.add(ItemName(id: 3, title: 'All'));
+    }
+
+    return filters;
   }
 
   void _changeTab(int filterIndex, int courseTypeIndex) {
@@ -114,20 +158,79 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     ItemName? value,
   ) {
     if (value == null || value.id == filterIndex) return;
+    // Map title to index used in _changeTab
+    final title = value.title.toLowerCase();
+    int mappedIndex;
+
+    if (title == 'video') {
+      mappedIndex = 0;
+    } else if (title == 'audio') {
+      mappedIndex = 2;
+    } else if (title == 'pdf') {
+      mappedIndex = 1;
+    } else if (title == 'all') {
+      mappedIndex = 3;
+    } else {
+      // Unknown filter title, do nothing
+      return;
+    }
+
+    if (mappedIndex == filterIndex) return;
+
     setState(() {
-      filterIndex = value.id;
-      // _changeTab(filterIndex, courseIndex);
+      filterIndex = mappedIndex;
+
       _changeTab(filterIndex, courseIndex);
     });
   }
 
-  void _changeCourseType(int index) {
+  // void _changeCourseType(int index) {
+  //   if (index == courseIndex) return;
+  //   setState(() {
+  //     courseIndex = index;
+  //     _changeTab(filterIndex, courseIndex);
+  //   });
+  // }
+  void _changeCourseType(int index) async {
     if (index == courseIndex) return;
+
     setState(() {
       courseIndex = index;
-      _changeTab(filterIndex, courseIndex);
     });
+
+    if (courseIndex == 1) {
+      // Switching to PAID
+      await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
+      final isVideo = (ref.read(paidAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
+      final isAudio = (ref.read(paidAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
+      final isPdf = (ref.read(paidAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+
+      _paidFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
+
+      setState(() {
+        _filters = _paidFilters;
+        filterIndex = _filters.first.id;
+      });
+    } else {
+      // Switching to FREE
+      if (_freeFilters.isEmpty) {
+        // fallback: rebuild filters from existing data if needed
+        await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
+        final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
+        final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
+        final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+        _freeFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
+      }
+
+      setState(() {
+        _filters = _freeFilters;
+        filterIndex = _filters.first.id;
+      });
+    }
+
+    _changeTab(filterIndex, courseIndex); // Reloads content for selected tab and filter
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +246,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         Row(
           children: [
             CustomSelecteableButton(
-              text: 'Free',
+              text: 'Core',
               selected: courseIndex == 0,
               onTap: () => _changeCourseType(0),
             ),
@@ -181,7 +284,8 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 vertical: _style.scaleX(3.5),
               ),
               child: CustomDropDownButton<ItemName>(
-                value: _filters[filterIndex],
+                // value: _filters[filterIndex],
+                value: _filters.firstWhere((e) => e.id == filterIndex, orElse: () => _filters.first),
                 appStyle: _style,
                 items: _filters,
                 width: _style.scaleX(120),
@@ -229,7 +333,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
               ),
               AllItemListWidget(category: widget.category),
               //All Paid Content
-              AllItemListWidget(category: widget.category),
+              PaidAllItemListWidget(category: widget.category),
             ],
           ),
         ),

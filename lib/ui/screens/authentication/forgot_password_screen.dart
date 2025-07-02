@@ -13,6 +13,7 @@ import 'package:meditation_app/ui/screens/authentication/widget/contact_number_t
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 
+import '../../../provider/user_provider.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
@@ -48,7 +49,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   void dispose() {
-    _numberCtrl.dispose();
+    _emailCtrl.dispose();
     super.dispose();
   }
 
@@ -56,7 +57,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
-
+    var userP = ref.watch(userProvider);
     var authP = ref.watch(authProvider);
 
     return AbsorbPointer(
@@ -169,13 +170,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   void onNext() {
     String email = _emailCtrl.text.trim();
     String code = _countryCode;
-    if (email.isEmpty) {
-      setNumberErrorText('Please enter a email');
-      return;
-    } else if (email.isEmail) {
-      setNumberErrorText('Please enter valid email');
-      return;
-    } else {
+     if (email.isEmpty) {
+    ref.read(userProvider).setEmailError(error: 'Please enter an email');
+    return;
+    } else if (!email.isEmail) {
+    ref.read(userProvider).setEmailError(error: 'Invalid email');
+    return;
+    }  else {
       ref.read(authProvider).requestOTP(
            email: _emailCtrl.text.trim(),
             type: SendOTP.forgotPwd,

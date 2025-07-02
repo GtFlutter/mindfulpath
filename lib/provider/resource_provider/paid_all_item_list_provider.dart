@@ -17,14 +17,14 @@ import '../../util/constants.dart';
 import '../repo_provider/dashboard_repo_provider.dart';
 import 'audio_resource_notifier_model.dart';
 
-final freeAllItemProvider = ChangeNotifierProvider<FreeAllItemNotifier>((ref) {
+final paidAllItemProvider = ChangeNotifierProvider<PaidAllItemNotifier>((ref) {
   final repo = ref.watch(dashboardRepoProvider);
-  return FreeAllItemNotifier(repo);
+  return PaidAllItemNotifier(repo);
 });
 
-class FreeAllItemNotifier extends ChangeNotifier {
+class PaidAllItemNotifier extends ChangeNotifier {
   final DashboardRepo repo;
-  FreeAllItemNotifier(this.repo);
+  PaidAllItemNotifier(this.repo);
 
   AllItemWidgetListResponse? _allItemResponse;
   AllItemWidgetListResponse? get allItemResponse => _allItemResponse;
@@ -55,9 +55,9 @@ class FreeAllItemNotifier extends ChangeNotifier {
   }
 
   @override
-  Future<void> fetchAllFreeItem(int categoryId) async {
+  Future<void> fetchAllPaidItem(int categoryId) async {
     startLoading();
-    Response response = await repo.getAllItem(categoryId: categoryId, offset: 1, resourceType: ResourceType.free);
+    Response response = await repo.getAllItem(categoryId: categoryId, offset: 1, resourceType: ResourceType.paid);
     if (response.statusCode != 200) {
       stopLoading();
       ApiChecker.checkApi(response);
@@ -65,7 +65,7 @@ class FreeAllItemNotifier extends ChangeNotifier {
       try {
         final jsonResponse = json.decode(response.body);
         _allItemResponse = AllItemWidgetListResponse.fromJson(jsonResponse);
-        log("all item list=======>${_allItemResponse?.toJson()}");
+        log("all item list paid=======>${_allItemResponse?.toJson()}");
         stopLoading();
         notifyListeners();
       } catch (e) {

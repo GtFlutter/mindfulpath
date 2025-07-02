@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart' show CupertinoButton;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../helper/route/route_paths.dart';
 import '../../../theme/styles.dart';
+import '../../../theme/text_field_style.dart';
 import '../../common/custom_next_button.dart';
 
 class SignInUpScreen extends ConsumerStatefulWidget {
@@ -37,8 +40,11 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   static AppStyle _style = AppStyle();
   final TextEditingController _numberCtrl = TextEditingController();
   final TextEditingController _passwordCtrl = TextEditingController();
+  final TextEditingController _emailCtrl = TextEditingController();
+
   final FocusNode _pwdFocusNode = FocusNode();
   final FocusNode _mobileFocusNode = FocusNode();
+  final FocusNode _emailFocusNode = FocusNode();
 
   final String initCountryCode = '+91';
   String _countryCode = '+91';
@@ -46,6 +52,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
   String? _numberErrorText;
   String? _pwdErrorText;
+  String? _emailErrorText;
 
   void setCountryCode(String code) {
     if (code != _countryCode) {
@@ -59,6 +66,9 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
   void setPwdErrorText([String? error]) {
     setState(() => _pwdErrorText = error);
+  }
+  void setEmailErrorText([String? error]) {
+    setState(() => _emailErrorText = error);
   }
 
   @override
@@ -129,20 +139,38 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Focus(
-                          focusNode: _mobileFocusNode,
-                          child: MobileNumberTextField(
-                            onCountryCodeChanged: setCountryCode,
-                            controller: _numberCtrl,
-                            initialCountryCodeSelection: initCountryCode,
-                            errorText: _numberErrorText,
-                            textInputAction: TextInputAction.next,
-                            onChanged: (_) {
-                              setNumberErrorText();
-                            },
-                            style: _style,
+                        if (!widget.isSignIn) ...[
+                          Focus(
+                            focusNode: _mobileFocusNode,
+                            child: MobileNumberTextField(
+                              onCountryCodeChanged: setCountryCode,
+                              controller: _numberCtrl,
+                              initialCountryCodeSelection: initCountryCode,
+                              errorText: _numberErrorText,
+                              textInputAction: TextInputAction.next,
+                              onChanged: (_) {
+                                setNumberErrorText();
+                              },
+                              style: _style,
+                            ),
                           ),
-                        ),
+                        ],
+                        if (widget.isSignIn) ...[
+                          TextField(
+                            controller: _emailCtrl,
+                            cursorColor: CustomeTextFieldStyle.cursorColor,
+                            onChanged: (_) {
+                              setEmailErrorText();
+                            },
+                            textInputAction: TextInputAction.done,
+                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                              labelText: 'Email',
+                              errorText: _emailErrorText,
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            style: CustomeTextFieldStyle.valueStyle(style: _style),
+                          ),
+                        ],
                         SizedBox(height: size.height * 0.05),
                         PasswordTextField(
                           key: ValueKey('siusp1'),
@@ -277,6 +305,10 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                     CustomNextButton(
                       text: widget.isSignIn ? 'Sign In' : 'Next',
                       onPressed: !authP.isLoading ? onNext : null,
+                      // onPressed: (){
+                      //   log("login screen------->${!authP.isLoading}");
+                      //   !authP.isLoading ? onNext() : null;
+                      // },
                       style: _style,
                       inProgress: authP.isLoading,
                     ),
@@ -291,13 +323,15 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   }
 
   void onNext() {
+    log("djfrejerjgerjggjmkergmklmg---${widget.isSignIn}");
     String number = _numberCtrl.text.trim();
     String code = _countryCode.trim();
     String password = _passwordCtrl.text.trim();
-    if (number.isEmpty) {
+    String email = _emailCtrl.text.trim();
+    if (!widget.isSignIn && number.isEmpty) {
       setNumberErrorText('Please Enter Your Number');
       return;
-    } else if (code.isEmpty) {
+    } else if (!widget.isSignIn && code.isEmpty) {
       setNumberErrorText('Please Select Your Country Code');
       return;
     } else if (password.isEmpty) {
@@ -320,11 +354,12 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
     /// TODO IF this is sign then get error from api and show
     else if (widget.isSignIn) {
+      print("djfrejerjgerjggjmkergmklmg33333---${widget.isSignIn}");
+
       ref.read(authProvider).loginUser(email, password, fcm ?? "");
     } else {
       ref.read(authProvider).requestOTP(
-            countryCode: code,
-            email: email,
+        email: email,
             type: SendOTP.register,
             password: password,
           );

@@ -15,22 +15,36 @@ ThemeData darkTheme = ThemeData(
     // error: const Color(0xFFE84D4F),
   ),
   useMaterial3: true,
-  tabBarTheme: TabBarTheme(
+  tabBarTheme: TabBarThemeData(
     labelColor: Colors.black,
     unselectedLabelColor: AppColors.primaryThemeColor1,
     indicator: ShapeDecoration(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(40),
       ),
-      // color: AppColors.primaryColor,
-      color: AppColors.primaryThemeColor1, //tab color background change
+      color: AppColors.primaryThemeColor1,
     ),
     indicatorSize: TabBarIndicatorSize.label,
-    overlayColor: const MaterialStatePropertyAll(Colors.transparent),
-    //
+    overlayColor: MaterialStateProperty.all(Colors.transparent),
     dividerColor: Colors.transparent,
     dividerHeight: 0,
   ),
+  // tabBarTheme: TabBarTheme(
+  //   labelColor: Colors.black,
+  //   unselectedLabelColor: AppColors.primaryThemeColor1,
+  //   indicator: ShapeDecoration(
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.circular(40),
+  //     ),
+  //     // color: AppColors.primaryColor,
+  //     color: AppColors.primaryThemeColor1, //tab color background change
+  //   ),
+  //   indicatorSize: TabBarIndicatorSize.label,
+  //   overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+  //   //
+  //   dividerColor: Colors.transparent,
+  //   dividerHeight: 0,
+  // ),
 
   // disabledColor: const Color(0xFFA0A4A8),
   // hintColor: const Color(0xFF9F9F9F),

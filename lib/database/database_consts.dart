@@ -47,6 +47,7 @@ class DatabaseConsts {
     '''CREATE TABLE IF NOT EXISTS $audioTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
       "video_id" TEXT,
+      "thumbnail_image_url" TEXT,
       "video_name" TEXT,
       "video_file" TEXT,
       "video_duration" TEXT,
