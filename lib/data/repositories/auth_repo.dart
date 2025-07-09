@@ -27,17 +27,17 @@ class AuthRepo {
     return await apiClient.postData(AppConfigs.checkSocialUser, body);
   }
 
-  Future<Response> requestOTP(String phoneNo, SendOTP type) async {
+  Future<Response> requestOTP(String email, SendOTP type) async {
     return await apiClient.postData(
       AppConfigs.sendOTP,
-      {'phone_no': phoneNo, 'type': type.value},
+      {'email': email, 'type': type.value},
     );
   }
 
-  Future<Response> verifyOTP(String phoneNo, int otp) async {
+  Future<Response> verifyOTP(String email, int otp) async {
     return await apiClient.postData(
       AppConfigs.verifyOTP,
-      {'phone_no': phoneNo, 'otp': otp},
+      {'email': email, 'otp': otp},
     );
   }
 

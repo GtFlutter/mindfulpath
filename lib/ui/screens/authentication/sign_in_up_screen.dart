@@ -139,23 +139,22 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (!widget.isSignIn) ...[
-                          Focus(
-                            focusNode: _mobileFocusNode,
-                            child: MobileNumberTextField(
-                              onCountryCodeChanged: setCountryCode,
-                              controller: _numberCtrl,
-                              initialCountryCodeSelection: initCountryCode,
-                              errorText: _numberErrorText,
-                              textInputAction: TextInputAction.next,
-                              onChanged: (_) {
-                                setNumberErrorText();
-                              },
-                              style: _style,
-                            ),
-                          ),
-                        ],
-                        if (widget.isSignIn) ...[
+                        // if (!widget.isSignIn) ...[
+                        //   Focus(
+                        //     focusNode: _mobileFocusNode,
+                        //     child: MobileNumberTextField(
+                        //       onCountryCodeChanged: setCountryCode,
+                        //       controller: _numberCtrl,
+                        //       initialCountryCodeSelection: initCountryCode,
+                        //       errorText: _numberErrorText,
+                        //       textInputAction: TextInputAction.next,
+                        //       onChanged: (_) {
+                        //         setNumberErrorText();
+                        //       },
+                        //       style: _style,
+                        //     ),
+                        //   ),
+                        // ],
                           TextField(
                             controller: _emailCtrl,
                             cursorColor: CustomeTextFieldStyle.cursorColor,
@@ -170,7 +169,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                             keyboardType: TextInputType.emailAddress,
                             style: CustomeTextFieldStyle.valueStyle(style: _style),
                           ),
-                        ],
+
                         SizedBox(height: size.height * 0.05),
                         PasswordTextField(
                           key: ValueKey('siusp1'),
@@ -328,13 +327,14 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
     String code = _countryCode.trim();
     String password = _passwordCtrl.text.trim();
     String email = _emailCtrl.text.trim();
-    if (!widget.isSignIn && number.isEmpty) {
-      setNumberErrorText('Please Enter Your Number');
-      return;
-    } else if (!widget.isSignIn && code.isEmpty) {
-      setNumberErrorText('Please Select Your Country Code');
-      return;
-    } else if (password.isEmpty) {
+    // if (!widget.isSignIn && number.isEmpty) {
+    //   setNumberErrorText('Please Enter Your Number');
+    //   return;
+    // } else if (!widget.isSignIn && code.isEmpty) {
+    //   setNumberErrorText('Please Select Your Country Code');
+    //   return;
+    // } else if
+    if(password.isEmpty) {
       setPwdErrorText('Please Enter Your Password');
       return;
     } else if (password.length < AppConstants.PWD_MIN_LENGTH) {

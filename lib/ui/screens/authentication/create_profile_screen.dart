@@ -15,6 +15,7 @@ import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/common/custom_next_button.dart';
 import 'package:meditation_app/ui/common/custom_scrollable_column_layout.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
+import 'package:meditation_app/ui/screens/authentication/widget/contact_number_text_field.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_auth_app_bar.dart';
 import 'package:meditation_app/ui/screens/authentication/widget/custom_header.dart';
 import 'package:meditation_app/util/assets.dart';
@@ -24,14 +25,14 @@ import '../../../theme/text_field_style.dart';
 import '../../../util/constants.dart';
 
 class CreateProfileScreen extends ConsumerStatefulWidget {
-   String? phoneNo;
+   String? email;
    String? password;
 
-  /// First Variable [PhoneNo] and Second Variable [Password]
+  /// First Variable [Email] and Second Variable [Password]
   CreateProfileScreen({
     super.key,
      (String, String)? value,
-  })  : phoneNo = value?.$1 ?? "",
+  })  : email = value?.$1 ?? "",
         password = value?.$2 ?? "";
 
   @override
@@ -43,15 +44,21 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   static AppStyle _style = AppStyle();
 
   final TextEditingController _nameCtrl = TextEditingController();
-  final TextEditingController _emailCtrl = TextEditingController();
+  final TextEditingController _phoneCtrl = TextEditingController();
   final TextEditingController _dateCtrl = TextEditingController();
   DateTime? _dateOfBirth;
   String? _gender;
   String? fcm;
+  final String initCountryCode = '+91';
+  String _countryCode = '+91';
 
   final List<String> _genderList =
       List.unmodifiable(['Male', 'Female', 'Other']);
-
+  void setCountryCode(String code) {
+    if (code != _countryCode) {
+      setState(() => _countryCode = code);
+    }
+  }
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -60,7 +67,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
       if(socialUserData!=null){
         print("callleeddddd social data");
         _nameCtrl.text=socialUserData.userName ?? "";
-        _emailCtrl.text=socialUserData.mobileOrEmail ?? "";
+        widget.email=socialUserData.mobileOrEmail ?? "";
       }
       getFirebaseNotification();
     });
@@ -83,7 +90,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
     _dateCtrl.dispose();
 
     super.dispose();
@@ -157,23 +164,34 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                   style: _style),
                             ),
                             SizedBox(height: _style.scale * 27.5),
-                            TextField(
-                              controller: _emailCtrl,
-                              cursorColor: CustomeTextFieldStyle.cursorColor,
+                             MobileNumberTextField(
+                              onCountryCodeChanged: setCountryCode,
+                              controller: _phoneCtrl,
+                              initialCountryCodeSelection: initCountryCode,
+                              errorText: userP.emailErrorText,
+                              textInputAction: TextInputAction.next,
                               onChanged: (_) {
-                                userP.setEmailError();
+                                userP.setPhoneError();
                               },
-                              textInputAction: TextInputAction.done,
-                              decoration: CustomeTextFieldStyle.inputDecoration(
-                                      style: _style)
-                                  .copyWith(
-                                labelText: 'Email',
-                                errorText: userP.emailErrorText,
-                              ),
-                              keyboardType: TextInputType.emailAddress,
-                              style: CustomeTextFieldStyle.valueStyle(
-                                  style: _style),
+                              style: _style,
                             ),
+                            // TextField(
+                            //   controller: _emailCtrl,
+                            //   cursorColor: CustomeTextFieldStyle.cursorColor,
+                            //   onChanged: (_) {
+                            //     userP.setEmailError();
+                            //   },
+                            //   textInputAction: TextInputAction.done,
+                            //   decoration: CustomeTextFieldStyle.inputDecoration(
+                            //           style: _style)
+                            //       .copyWith(
+                            //     labelText: 'Email',
+                            //     errorText: userP.emailErrorText,
+                            //   ),
+                            //   keyboardType: TextInputType.emailAddress,
+                            //   style: CustomeTextFieldStyle.valueStyle(
+                            //       style: _style),
+                            // ),
                             SizedBox(height: _style.scale * 27.5),
                             TextField(
                               controller: _dateCtrl,
@@ -250,7 +268,8 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
 
   void onNext() {
     String name = _nameCtrl.text.trim();
-    String email = _emailCtrl.text.trim();
+    String phone = _phoneCtrl.text.trim();
+    String code = _countryCode.trim();
     DateTime? dateOfBirth = _dateOfBirth;
     String? gender;
     if (_gender == null) {
@@ -258,7 +277,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
     } else {
       gender = _gender!.trim();
     }
-    String phoneNo = widget.phoneNo?.trim() ?? "";
+    String email = widget.email?.trim() ?? "";
     String password = widget.password?.trim() ?? "";
 
     // if (phoneNo.isEmpty ||
@@ -272,7 +291,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
     //   }
     //   return;
     // }
-    if ((ref.read(authProvider).socialUserData?.socialId?.isEmpty ?? false) &&(phoneNo.isEmpty ||
+    if ((ref.read(authProvider).socialUserData?.socialId?.isEmpty ?? true) &&(phone.isEmpty ||
         password.isEmpty ||
         password.contains(RegExp(r'\s')) ||
         password.length < AppConstants.PWD_MIN_LENGTH ||
@@ -286,15 +305,17 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
     else if (name.isEmpty) {
       ref.read(userProvider).setNameError(error: 'Please Enter Your Full Name');
       return;
-    } else if (email.isEmpty) {
-      ref.read(userProvider).setEmailError(error: 'Please Enter Your Email');
+    } else if (phone.isEmpty) {
+      ref.read(userProvider).setPhoneError(error: 'Please Enter Your Phone');
       return;
-    } else if (!email.isEmail) {
-      ref
-          .read(userProvider)
-          .setEmailError(error: 'Please Enter Your Valid Email');
-      return;
-    } else if (dateOfBirth == null) {
+    }
+    // else if (!email.isEmail) {
+    //   ref
+    //       .read(userProvider)
+    //       .setEmailError(error: 'Please Enter Your Valid Email');
+    //   return;
+    // }
+    else if (dateOfBirth == null) {
       ref
           .read(userProvider)
           .setDateError(error: 'Please Select Your Date of Birth');
@@ -307,7 +328,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
       final authPro= ref.read(authProvider);
       ref.read(userProvider).createUserProfile(
             UserBody.register(
-                name, email, phoneNo, dateOfBirth, gender, password, fcm ?? "",googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "":"",facebookId:  !(authPro.socialUserData?.isGoogleLogin ??
+                name, email, code+phone, dateOfBirth, gender, password, fcm ?? "",googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "":"",facebookId:  !(authPro.socialUserData?.isGoogleLogin ??
                 false) ? authPro.socialUserData?.socialId ?? "":""),
           );
     }

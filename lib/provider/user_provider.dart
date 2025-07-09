@@ -33,11 +33,13 @@ class UserNotifier extends ChangeNotifier {
 
   String? _nameErrorText;
   String? _emailErrorText;
+  String? _phoneErrorText;
   String? _dateErrorText;
   String? _genderErrorText;
 
   String? get nameErrorText => _nameErrorText;
   String? get emailErrorText => _emailErrorText;
+  String? get phoneErrorText => _phoneErrorText;
   String? get dateErrorText => _dateErrorText;
   String? get genderErrorText => _genderErrorText;
 
@@ -76,6 +78,14 @@ class UserNotifier extends ChangeNotifier {
       return;
     }
     _emailErrorText = error;
+    if (notifie) notifyListeners();
+  }
+
+  void setPhoneError({String? error, bool notifie = true}) {
+    if (error == null && _phoneErrorText == null) {
+      return;
+    }
+    _phoneErrorText = error;
     if (notifie) notifyListeners();
   }
 
