@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/data/repositories/auth_repo.dart';
+import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/notification_services.dart';
 import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
@@ -23,6 +24,7 @@ import 'package:meditation_app/util/constants.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../helper/route/route_paths.dart';
+import '../../../provider/user_provider.dart';
 import '../../../theme/styles.dart';
 import '../../../theme/text_field_style.dart';
 import '../../common/custom_next_button.dart';
@@ -333,7 +335,18 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
     // } else if (!widget.isSignIn && code.isEmpty) {
     //   setNumberErrorText('Please Select Your Country Code');
     //   return;
-    // } else if
+    // }
+    // else if
+    if(email.isEmpty){
+      setEmailErrorText('Please Enter Your Email');
+      return;
+    }
+    else if (!email.isEmail) {
+    ref
+        .read(userProvider)
+        .setEmailError(error: 'Please Enter Your Valid Email');
+    return;
+    }
     if(password.isEmpty) {
       setPwdErrorText('Please Enter Your Password');
       return;
