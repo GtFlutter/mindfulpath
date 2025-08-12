@@ -251,6 +251,7 @@ class _UpdateProfileFormState extends ConsumerState<UpdateProfileForm> {
                       style: CustomeTextFieldStyle.valueStyle(style: _style),
                       borderRadius: BorderRadius.circular(_style.scale * 10),
                       dropdownColor: Color.fromARGB(255, 93, 53, 20),
+                      alignment: Alignment.bottomCenter,
                       decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                         errorText: userP.genderErrorText,
                         labelText: 'Gender',

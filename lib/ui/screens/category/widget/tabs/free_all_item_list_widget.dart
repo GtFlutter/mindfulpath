@@ -80,6 +80,10 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
       final coursePRead = ref.read(courseProvider);
       await coursePRead.getCategoryFromDatabase();
       await coursePRead.getAudioCategoryFromDatabase();
+      await coursePRead.getCategoryPdfFromDatabase();
+      await coursePRead.getVideoFromDatabase(widget.category.id ?? 0);
+      await coursePRead.getAudioFromDatabase(widget.category.id ?? 0);
+      await coursePRead.getPdfFromDatabase(widget.category.id??0);
       await initCall();
     });
   }
@@ -246,6 +250,7 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
   Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false, required bool isAudio}) async {
     if (itemId == null) return;
     await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: isAudio);
+    ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
   }
 
   @override

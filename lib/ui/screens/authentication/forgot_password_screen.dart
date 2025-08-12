@@ -168,6 +168,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   void onNext() {
+    FocusManager.instance.primaryFocus?.unfocus();
     String email = _emailCtrl.text.trim();
     String code = _countryCode;
      if (email.isEmpty) {

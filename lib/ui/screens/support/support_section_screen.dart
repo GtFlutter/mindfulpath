@@ -38,14 +38,29 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
 
     AsyncValue<List<SupportTicket>> list =
         ref.watch(supportTicketsListProvider);
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: CustomAppBar(
         screenSize: size,
         style: _style,
-        title: 'Support Section',
+        title: 'Support History',
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: 'New Ticket',
+              onPressed: () async {
+                context.push(RoutePath.supportScreenPath).then((value) {
+
+                },); // navigate to the support form
+
+
+              },
+            ),
+          ),
+        ],
       ),
       body: BackgroundImage(
         alignment: Alignment.topCenter,

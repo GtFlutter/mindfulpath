@@ -50,12 +50,16 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // debugPrint('screenSize=$screenSize, scale=$scale');
-    return MaterialApp.router(
-      title: AppConfigs.APP_NAME,
-      debugShowCheckedModeBanner: false,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.dark,
-      routerConfig: appRouter,
+    final scale = MediaQuery.of(context).textScaleFactor.clamp(1.0, 1.2);
+    return MediaQuery(
+      data:  MediaQuery.of(context).copyWith(textScaleFactor: scale),
+      child: MaterialApp.router(
+        title: AppConfigs.APP_NAME,
+        debugShowCheckedModeBanner: false,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.dark,
+        routerConfig: appRouter,
+      ),
     );
   }
 }

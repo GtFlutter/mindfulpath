@@ -79,7 +79,7 @@ final appRouter = GoRouter(
       builder: (context, state) {
         return CreateNewPasswordScreen(
           key: state.pageKey,
-          phoneNo: state.extra as String? ?? '',
+          email: state.extra as String? ?? '',
         );
       },
     ),
@@ -191,20 +191,22 @@ final appRouter = GoRouter(
                     ),
                     GoRoute(
                       parentNavigatorKey: rootNavigator,
-                      path: RoutePath.supportScreen,
+                      path: RoutePath.supportSectionScreen,
                       builder: (context, state) {
-                        return SupportScreen(key: state.pageKey);
+                        return SupportSectionScreen(key: state.pageKey);
                       },
                       routes: [
                         GoRoute(
                           parentNavigatorKey: rootNavigator,
-                          path: RoutePath.supportSectionScreen,
+                          path: RoutePath.supportScreen,
                           builder: (context, state) {
-                            return SupportSectionScreen(key: state.pageKey);
+                            return SupportScreen(key: state.pageKey);
                           },
+
                         ),
                       ],
                     ),
+
                     GoRoute(
                       parentNavigatorKey: rootNavigator,
                       path: RoutePath.settingsScreen,

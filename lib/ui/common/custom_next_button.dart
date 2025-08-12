@@ -9,13 +9,14 @@ class CustomNextButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final AppStyle style;
   final bool inProgress;
+  final BoxConstraints? boxConstraints;
 
-  const CustomNextButton({super.key, required this.text, this.onPressed, required this.style, this.inProgress = false});
+  const CustomNextButton({super.key, required this.text, this.onPressed, required this.style, this.inProgress = false, this.boxConstraints});
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 500 * style.scaleX(0.5)),
+      constraints:boxConstraints ?? BoxConstraints(maxWidth: 500 * style.scaleX(0.5)),
       child: Stack(
         alignment: AlignmentDirectional.centerStart,
         children: [

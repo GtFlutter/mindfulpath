@@ -113,7 +113,7 @@ class UserNotifier extends ChangeNotifier {
     if (response.statusCode == 200) {
       try {
         String? token = jsonDecode(response.body)['data']['token'];
-        await repo.clearUserData();
+        // await repo.clearUserData();
         if (token != null) {
           await repo.saveUserToken(token);
         }

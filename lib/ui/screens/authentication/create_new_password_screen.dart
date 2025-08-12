@@ -18,8 +18,9 @@ import '../../../theme/styles.dart';
 import '../../../util/constants.dart';
 
 class CreateNewPasswordScreen extends ConsumerStatefulWidget {
-  final String phoneNo;
-  const CreateNewPasswordScreen({super.key, required this.phoneNo});
+  final String email;
+
+  const CreateNewPasswordScreen({super.key, required this.email});
 
   @override
   ConsumerState<CreateNewPasswordScreen> createState() => _CreateNewPasswordScreenState();
@@ -153,38 +154,29 @@ class _CreateNewPasswordScreenState extends ConsumerState<CreateNewPasswordScree
     String confirmPassword = _confirmPasswordCtrl.text.trim();
     if (password.isEmpty) {
       setPwdError('Please enter a Password');
-      return;
     } else if (confirmPassword.isEmpty) {
       setCnfPwdError('Please enter a Confirm Password');
-      return;
     } else if (password.length < AppConstants.PWD_MIN_LENGTH) {
       setPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
-      return;
     } else if (password.length > AppConstants.PWD_MAX_LENGTH) {
-      setPwdError(
-          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
-      return;
+      setPwdError('Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
     } else if (password.contains(RegExp(r'\s'))) {
       setPwdError('Password should not contain space...');
-      return;
-    } else if (confirmPassword.length < AppConstants.PWD_MIN_LENGTH) {
-      setCnfPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
-      return;
-    } else if (confirmPassword.length > AppConstants.PWD_MAX_LENGTH) {
-      setCnfPwdError(
-          'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
-      return;
-    } else if (confirmPassword.contains(RegExp(r'\s'))) {
-      setCnfPwdError('Password should not contain space...');
-      return;
-    } else if (password != confirmPassword) {
+    }
+    // else if (confirmPassword.length < AppConstants.PWD_MIN_LENGTH) {
+    //   setCnfPwdError('Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
+    // } else if (confirmPassword.length > AppConstants.PWD_MAX_LENGTH) {
+    //   setCnfPwdError('Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
+    // } else if (confirmPassword.contains(RegExp(r'\s'))) {
+    //   setCnfPwdError('Password should not contain space...');
+    // }
+    else if (password != confirmPassword) {
       setCnfPwdError('Both password must match');
-      return;
-    } else if (widget.phoneNo.isEmpty) {
+    } else if (widget.email.isEmpty) {
       showCustomSnackBar(AppConstants.WENT_WRONG);
       context.go(RoutePath.signIn);
     } else {
-      ref.read(authProvider).resetPassword(widget.phoneNo, password);
+      ref.read(authProvider).resetPassword(widget.email, password);
     }
   }
 }

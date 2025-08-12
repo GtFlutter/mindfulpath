@@ -35,10 +35,16 @@ class FreeAllItemNotifier extends ChangeNotifier {
   List<VideoModal> downloadedVideo = [];
   List<PdfModel> downloadedPDF = [];
 
-  @override
-  void toggleBookmark(int itemId, {bool notifier = true}) {
-    // TODO: implement toggleBookmark
-  }
+   @override
+   void toggleBookmark(int itemId, {bool notifier = true}) {
+     // if (_allItemResponse == null || _allItemResponse!.data == null) {
+     //   return;
+     // }
+     // var itemIndex = _videosResponse!.list!.indexWhere((element) => element.id == itemId);
+     // if (itemIndex == -1) return;
+     // _videosResponse!.list![itemIndex].bookmarked = !(_videosResponse!.list![itemIndex].bookmarked ?? true);
+     // if (notifier) notifyListeners();
+   }
 
   bool _loading = false;
   bool get loading => _loading;

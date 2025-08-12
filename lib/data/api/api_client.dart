@@ -11,7 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiClient {
   final String appBaseUrl;
   final SharedPreferences sharedPreferences;
-  static const String _noInternetMessage = 'Connection to API server failed due to internet connection';
+  // static const String _noInternetMessage = 'Connection to API server failed due to internet connection';
+  static const String _noInternetMessage = 'No Internet Connection';
   final Duration _timeoutIn = const Duration(seconds: 60);
   final http.Response _errorResponse = http.Response(
     jsonEncode(ErrorResponse(status: false, message: _noInternetMessage).toJson()),

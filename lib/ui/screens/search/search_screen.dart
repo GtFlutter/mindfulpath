@@ -2,6 +2,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -45,7 +46,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   bool isFirstTime = true;
   bool showSearchResult = false;
   Duration? _lastKnownPosition;
-
 
   @override
   void initState() {
@@ -141,8 +141,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: Column(
             children: [
               if (!isLandscape) ...[
+
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: _style.scaleX(15), vertical: _style.scaleX(2)),
+                  height: _style.scaleX(45),
+                  // padding: EdgeInsets.symmetric(horizontal: _style.scaleX(15), vertical: _style.scaleX(2)),
+                  padding: EdgeInsets.symmetric(horizontal: _style.scaleX(15)),
                   margin: EdgeInsets.symmetric(vertical: _style.scaleX(10), horizontal: _style.scaleX(20)),
                   alignment: Alignment.center,
                   decoration: ShapeDecoration(
@@ -151,6 +154,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     shadows: [BoxShadow(blurRadius: 1, offset: Offset(0.5, 1), color: Colors.black12)],
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SvgPicture.asset(
                         SvgPaths.search,
@@ -162,7 +166,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       Flexible(
                         child: TextField(
                           focusNode: _focusNode,
-                          autofocus: true,
+                          // autofocus: true,
+                          maxLines: 1,
                           controller: _controller,
                           textInputAction: TextInputAction.search,
                           keyboardType: TextInputType.text,
@@ -179,8 +184,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
                             // setState(() {
                             // dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
-                            dashboardNotifier.searchVideo(text,
-                                queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+                            dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
                             if (text.isEmpty) {
                               setState(() {
                                 showSearchResult = true;
@@ -190,15 +194,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             // });
                           },
                           style: _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white, spacingPc: 10),
-                          textAlignVertical: TextAlignVertical.top,
+                          strutStyle: const StrutStyle(
+                            height: 1, // tweak until it visually matches
+                            fontSize: 14,
+                            forceStrutHeight: true,
+                          ),
+                          textAlignVertical: TextAlignVertical.center,
                           decoration: InputDecoration(
+                            isCollapsed: true,
                             border: InputBorder.none,
                             hintText: 'Hinted search text',
-                            hintStyle:
-                                _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white.withOpacity(0.5)),
-                            contentPadding: EdgeInsets.only(bottom: _style.scaleX(16)),
+                            hintStyle: _style.text.font(mulishMedium500, sizePx:14, color: Colors.white.withOpacity(0.5), spacingPc: 10),
+                              contentPadding: EdgeInsets.zero,
+                            // contentPadding: EdgeInsets.symmetric(vertical: _style.scaleX(12)), // keeps it centered
                             constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
-                            alignLabelWithHint: true,
+                            // alignLabelWithHint: true,
                           ),
                         ),
                       ),
@@ -289,7 +299,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         if (MediaQuery.orientationOf(context) == Orientation.portrait) {
                           ref.read(dashboardProvider.notifier).islandScap = true;
                           final temp = ref.read(videoProvider);
-                          temp.isVideoChanged=false;
+                          temp.isVideoChanged = false;
                           SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
                         } else {
                           ref.read(dashboardProvider.notifier).islandScap = false;
@@ -365,8 +375,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 }).toList();
               }
 
-              await dashboardNotifier.searchVideo(_controller.text,
-                  queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+              await dashboardNotifier.searchVideo(_controller.text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
               setState(() {
                 showSearchResult = true;
               });
@@ -411,8 +420,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               }).toList();
             }
 
-            await dashboardNotifier.searchVideo(_controller.text,
-                queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+            await dashboardNotifier.searchVideo(_controller.text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
             // setState(() {
             if (dashboardNotifier.data?.list?.isNotEmpty ?? false) {
               showSearchResult = true;

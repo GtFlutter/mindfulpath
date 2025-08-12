@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/helper/date_converter.dart';
@@ -48,6 +50,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     _style = AppStyle(screenSize: size);
 
     var prov = ref.watch(analyticsProvider);
+    log("---------->watch time----->${prov.reslut?.totalWatchTimeHr}");
 
     TextStyle textStyle = _style.text.font(mulishMedium500, sizePx: 12.5);
     TextStyle subTextStyle = _style.text.font(mulishRegular400, sizePx: 10);
@@ -62,7 +65,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         automaticallyImplyLeading: false,
         actions: [
           TextButton(
-            onPressed: prov.loading ? null : () => prov.reset(selectedItem == ItemName(id: 1,title: 'Audios')),
+            onPressed: prov.loading ? null : () {
+              setState(() {
+                selectedItem = listVideoAudio.first; // Reset to 'Videos'
+              });
+              // prov.reset(false);
+              prov.reset(selectedItem == ItemName(id: 1,title: 'Audios'));
+            },
             child: const Text('Reset'),
           ),
         ],
@@ -91,7 +100,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     categories: prov.categories,
                     videos: listVideoAudio,
                     durationtypes: FilterDuration.toList(),
-                    onCategoryChanged: (value) => prov.onCategoryChanged(value, isAudio: selectedItem == ItemName(id: 1,title: 'Audios')),
+                    onCategoryChanged: (value) => prov.onCategoryChanged(value, isAudio: selectedItem?.id == 1),
                     onVideoChanged: (value) {
                       selectedItem = value;
                       if(value == listVideoAudio.first){
@@ -101,7 +110,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                       }
                       setState(() {});
                     },
-                    onDurationTypeChanged: (value) => prov.onDurationTypeChanged(value, selectedItem == ItemName(id: 1,title: 'Audios')),
+                    onDurationTypeChanged: (value) => prov.onDurationTypeChanged(value, selectedItem?.id == 1),
                   ),
                 ),
                 if (prov.loading)

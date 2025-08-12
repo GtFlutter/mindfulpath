@@ -73,6 +73,8 @@ class CourseNotifier extends ChangeNotifier {
     return await openDatabaseWithMigration(path, _configs);
   }
 
+
+
   void _startLoading() {
     if (!_isLoading) {
       _isLoading = true;

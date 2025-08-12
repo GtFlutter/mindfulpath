@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -25,19 +27,18 @@ import '../../../theme/text_field_style.dart';
 import '../../../util/constants.dart';
 
 class CreateProfileScreen extends ConsumerStatefulWidget {
-   String? email;
-   String? password;
+  String? email;
+  String? password;
 
   /// First Variable [Email] and Second Variable [Password]
   CreateProfileScreen({
     super.key,
-     (String, String)? value,
+    (String, String)? value,
   })  : email = value?.$1 ?? "",
         password = value?.$2 ?? "";
 
   @override
-  ConsumerState<CreateProfileScreen> createState() =>
-      _CreateNewProfileScreenState();
+  ConsumerState<CreateProfileScreen> createState() => _CreateNewProfileScreenState();
 }
 
 class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
@@ -52,22 +53,23 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   final String initCountryCode = '+91';
   String _countryCode = '+91';
 
-  final List<String> _genderList =
-      List.unmodifiable(['Male', 'Female', 'Other']);
+  final List<String> _genderList = List.unmodifiable(['Male', 'Female', 'Other']);
+
   void setCountryCode(String code) {
     if (code != _countryCode) {
       setState(() => _countryCode = code);
     }
   }
+
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
       ref.read(userProvider).clearAllErrorText(notifie: false);
       final socialUserData = ref.read(authProvider).socialUserData;
-      if(socialUserData!=null){
+      if (socialUserData != null) {
         print("callleeddddd social data");
-        _nameCtrl.text=socialUserData.userName ?? "";
-        widget.email=socialUserData.mobileOrEmail ?? "";
+        _nameCtrl.text = socialUserData.userName ?? "";
+        widget.email = socialUserData.mobileOrEmail ?? "";
       }
       getFirebaseNotification();
     });
@@ -152,23 +154,20 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
                                 userP.setNameError();
                               },
                               textInputAction: TextInputAction.next,
-                              decoration: CustomeTextFieldStyle.inputDecoration(
-                                      style: _style)
-                                  .copyWith(
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                                 labelText: 'Full name',
                                 errorText: userP.nameErrorText,
                               ),
                               keyboardType: TextInputType.text,
                               textCapitalization: TextCapitalization.words,
-                              style: CustomeTextFieldStyle.valueStyle(
-                                  style: _style),
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
                             ),
                             SizedBox(height: _style.scale * 27.5),
-                             MobileNumberTextField(
+                            MobileNumberTextField(
                               onCountryCodeChanged: setCountryCode,
                               controller: _phoneCtrl,
                               initialCountryCodeSelection: initCountryCode,
-                              errorText: userP.emailErrorText,
+                              errorText: userP.phoneErrorText,
                               textInputAction: TextInputAction.next,
                               onChanged: (_) {
                                 userP.setPhoneError();
@@ -198,36 +197,27 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
                               readOnly: true,
                               canRequestFocus: false,
                               onTap: selectDate,
-                              decoration: CustomeTextFieldStyle.inputDecoration(
-                                      style: _style)
-                                  .copyWith(
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                                 labelText: 'Date of birth',
                                 errorText: userP.dateErrorText,
                                 suffixIcon: Padding(
-                                  padding:
-                                      EdgeInsets.only(right: _style.scale * 25),
+                                  padding: EdgeInsets.only(right: _style.scale * 25),
                                   child: SvgPicture.asset(SvgPaths.calendar),
                                 ),
                                 suffixIconConstraints: BoxConstraints(
-                                  maxWidth:
-                                      (_style.scale * 20) + (_style.scale * 25),
+                                  maxWidth: (_style.scale * 20) + (_style.scale * 25),
                                   maxHeight: _style.scale * 20,
                                 ),
                               ),
-                              style: CustomeTextFieldStyle.valueStyle(
-                                  style: _style),
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
                             ),
                             SizedBox(height: _style.scale * 27.5),
                             DropdownButtonFormField(
                               value: _gender,
-                              style: CustomeTextFieldStyle.valueStyle(
-                                  style: _style),
-                              borderRadius:
-                                  BorderRadius.circular(_style.scale * 10),
+                              style: CustomeTextFieldStyle.valueStyle(style: _style),
+                              borderRadius: BorderRadius.circular(_style.scale * 10),
                               dropdownColor: Color.fromARGB(255, 93, 53, 20),
-                              decoration: CustomeTextFieldStyle.inputDecoration(
-                                      style: _style)
-                                  .copyWith(
+                              decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
                                 errorText: userP.genderErrorText,
                                 labelText: 'Gender',
                               ),
@@ -279,57 +269,28 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
     }
     String email = widget.email?.trim() ?? "";
     String password = widget.password?.trim() ?? "";
-
-    // if (phoneNo.isEmpty ||
-    //     password.isEmpty ||
-    //     password.contains(RegExp(r'\s')) ||
-    //     password.length < AppConstants.PWD_MIN_LENGTH ||
-    //     password.length > AppConstants.PWD_MAX_LENGTH) {
-    //   showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
-    //   if (context.canPop()) {
-    //     context.pop();
-    //   }
-    //   return;
-    // }
-    if ((ref.read(authProvider).socialUserData?.socialId?.isEmpty ?? true) &&(phone.isEmpty ||
-        password.isEmpty ||
-        password.contains(RegExp(r'\s')) ||
-        password.length < AppConstants.PWD_MIN_LENGTH ||
-        password.length > AppConstants.PWD_MAX_LENGTH)) {
+    log("create profile data----->${ref.read(authProvider).socialUserData?.socialId?.isEmpty}------${email.isEmpty}------${password.isEmpty}");
+    if ((ref.read(authProvider).socialUserData?.socialId?.isEmpty ?? true) && (email.isEmpty && password.isEmpty)) {
       showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
       if (context.canPop()) {
         context.pop();
       }
       return;
-    }
-    else if (name.isEmpty) {
+    }  if (name.isEmpty) {
       ref.read(userProvider).setNameError(error: 'Please Enter Your Full Name');
-      return;
-    } else if (phone.isEmpty) {
+    }  if (phone.isEmpty) {
       ref.read(userProvider).setPhoneError(error: 'Please Enter Your Phone');
-      return;
     }
-    // else if (!email.isEmail) {
-    //   ref
-    //       .read(userProvider)
-    //       .setEmailError(error: 'Please Enter Your Valid Email');
-    //   return;
-    // }
-    else if (dateOfBirth == null) {
-      ref
-          .read(userProvider)
-          .setDateError(error: 'Please Select Your Date of Birth');
-      return;
-    } else if (gender == null || gender.isEmpty) {
+     if (dateOfBirth == null) {
+      ref.read(userProvider).setDateError(error: 'Please Select Your Date of Birth');
+    }  if (gender == null || gender.isEmpty) {
       ref.read(userProvider).setGenderError(error: 'Please Select Your Gender');
-      return;
     } else {
       print('------------>${fcm}');
-      final authPro= ref.read(authProvider);
+      final authPro = ref.read(authProvider);
       ref.read(userProvider).createUserProfile(
-            UserBody.register(
-                name, email, code+phone, dateOfBirth, gender, password, fcm ?? "",googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "":"",facebookId:  !(authPro.socialUserData?.isGoogleLogin ??
-                false) ? authPro.socialUserData?.socialId ?? "":""),
+            UserBody.register(name, email, code + phone, dateOfBirth!, gender, password, fcm ?? "",
+                googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : "", facebookId: !(authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : ""),
           );
     }
   }

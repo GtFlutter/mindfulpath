@@ -267,15 +267,20 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                         playVideo(model, false);
                                       },
                                       onRemovePress: () async {
-                                        if (courseP.downloadVideoResponse.length == 1) {
-                                          courseP.pushData = true;
-                                          await courseP.deleteCategoryVideo(int.parse(widget.categoryModal.categoryId ?? "0"), context);
-                                          await courseP.deleteVideo(int.parse(item.videoId ?? ""), context);
-                                        } else {
-                                          await courseP.deleteVideo(int.parse(item.videoId ?? ""), context);
+                                        bool shouldDelete = await showDeleteConfirmationDialog(context);
+                                        if (!shouldDelete) return;
+                                        if (shouldDelete) {
+                                          if (courseP.downloadVideoResponse.length == 1) {
+                                            courseP.pushData = true;
+                                            await courseP.deleteCategoryVideo(int.parse(widget.categoryModal.categoryId ?? "0"), context);
+                                            await courseP.deleteVideo(int.parse(item.videoId ?? ""), context);
+                                          } else {
+                                            await courseP.deleteVideo(int.parse(item.videoId ?? ""), context);
+                                          }
+                                          courseP.downloadVideoResponse.removeAt(index);
+                                          setState(() {});
                                         }
-                                        courseP.downloadVideoResponse.removeAt(index);
-                                        setState(() {});
+
                                       },
                                       appStyle: _style,
                                       index: index,
@@ -318,15 +323,19 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                                         playVideo(model, true);
                                       },
                                       onRemovePress: () async {
-                                        if (courseP.downloadAudioResponse.length == 1) {
-                                          courseP.pushData = true;
-                                          await courseP.deleteCategoryAudio(int.parse(widget.categoryModal.categoryId ?? "0"), context);
-                                          await courseP.deleteAudio(int.parse(item.videoId ?? ""), context);
-                                        } else {
-                                          await courseP.deleteAudio(int.parse(item.videoId ?? ""), context);
+                                        bool shouldDelete = await showDeleteConfirmationDialog(context);
+                                        if (!shouldDelete) return;
+                                        if (shouldDelete) {
+                                          if (courseP.downloadAudioResponse.length == 1) {
+                                            courseP.pushData = true;
+                                            await courseP.deleteCategoryAudio(int.parse(widget.categoryModal.categoryId ?? "0"), context);
+                                            await courseP.deleteAudio(int.parse(item.videoId ?? ""), context);
+                                          } else {
+                                            await courseP.deleteAudio(int.parse(item.videoId ?? ""), context);
+                                          }
+                                          courseP.downloadAudioResponse.removeAt(index);
+                                          setState(() {});
                                         }
-                                        courseP.downloadAudioResponse.removeAt(index);
-                                        setState(() {});
                                       },
                                       appStyle: _style,
                                       index: index,
@@ -344,6 +353,91 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
         ),
       ),
     );
+  }
+
+  Future<bool> showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Are you sure you want to delete this?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Buttons: Cancel and Delete
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Cancel Button
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+
+                      // Delete Button in red box
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(true),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // 🗑️ Red circular icon at top center
+            Positioned(
+              top: -30,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.delete, color: Colors.white, size: 28),
+                ),
+              ),
+            ),
+
+            // ❌ Close icon at top-right
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ) ?? false;
   }
 
   void playVideo(DDIModal model, bool isAudioFile) {

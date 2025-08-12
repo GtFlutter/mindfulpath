@@ -13,7 +13,7 @@ import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/analytics/data/model/response/category_and_video_name_model.dart';
 import 'package:meditation_app/ui/screens/category/widget/tabs/free_all_item_list_widget.dart';
-import 'package:meditation_app/ui/screens/category/widget/tabs/paid_free_all_list_widget.dart';
+import 'package:meditation_app/ui/screens/category/widget/tabs/paid_all_list_widget.dart';
 import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_widget.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
@@ -44,7 +44,15 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   List<ItemName> _filters = [ItemName(id: 0, title: 'Video'), ItemName(id: 1, title: 'PDF'), ItemName(id: 2, title: 'Audio'), ItemName(id: 3, title: 'All')];
   List<ItemName> _freeFilters = [];
   List<ItemName> _paidFilters = [];
+  int? _lastCategoryId;
   static AppStyle _style = AppStyle();
+
+  // bool isFreeVideo = true;
+  // bool isPaidVideo = true;
+  // bool isFreePdf = true;
+  // bool isPaidPdf = true;
+  // bool isFreeAudio = true;
+  // bool isPaidAudio = true;
 
   /// Either 0(Video) or 1(PDF)
   int filterIndex = 0;
@@ -57,10 +65,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     super.initState();
     _tabController = TabController(initialIndex: courseIndex, length: 8, vsync: this);
     (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
-
     Future.delayed(Duration(seconds: 0), () async {
       log("------>cst id for all item--${widget.category.id}");
-     await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
+      await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
       // ✅ Build _freeFilters after fetching free items
       final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
       final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
@@ -176,10 +183,10 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     }
 
     if (mappedIndex == filterIndex) return;
+    log("course index during filter change --->$courseIndex");
 
     setState(() {
       filterIndex = mappedIndex;
-
       _changeTab(filterIndex, courseIndex);
     });
   }
@@ -200,13 +207,15 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
 
     if (courseIndex == 1) {
       // Switching to PAID
-      await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
-      final isVideo = (ref.read(paidAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
-      final isAudio = (ref.read(paidAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
-      final isPdf = (ref.read(paidAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
 
-      _paidFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
-
+      // fallback: rebuild filters from existing data if needed
+      if (_paidFilters.isEmpty) {
+        await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
+        final isVideo = (ref.read(paidAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
+        final isAudio = (ref.read(paidAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
+        final isPdf = (ref.read(paidAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+        _paidFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
+      }
       setState(() {
         _filters = _paidFilters;
         filterIndex = _filters.first.id;
@@ -227,10 +236,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         filterIndex = _filters.first.id;
       });
     }
-
+    log("course index during course type change --->$courseIndex");
     _changeTab(filterIndex, courseIndex); // Reloads content for selected tab and filter
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -292,7 +300,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
                 maxHeight: _style.scaleX(250),
                 onChanged: (value) {
                   log("filters------>${_filters.length}");
-                  _changeCourseType(0);
+                  // _changeCourseType(0);because at filter change time no need to tab change so this code comment
                   _changeFilter(ItemName(id: value?.id ?? 0, title: value!.title));
 
                   // _changeCourseType(0);

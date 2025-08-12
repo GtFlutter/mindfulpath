@@ -74,8 +74,8 @@ class AuthRepo {
   }
 
   /// Forgot Password : Only OTP Verification Require, No Auth Require
-  Future<Response> resetPassword(String phoneNo, String password) async {
-    return await apiClient.postData(AppConfigs.resetPassword, {'phone_no': phoneNo, 'password': password});
+  Future<Response> resetPassword(String email, String password) async {
+    return await apiClient.postData(AppConfigs.resetPassword, {'email': email, 'password': password});
   }
 
   Future<Response> changePassword(String oldPassword, String password) async {
@@ -93,7 +93,6 @@ class AuthRepo {
     debugPrint(' Clearing User Token');
     apiClient.token = null;
     apiClient.updateHeader(null);
-
     return sharedPreferences.clear();
   }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -14,6 +15,8 @@ import 'package:meditation_app/provider/repo_provider/auth_repo_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/util/constants.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../data/model/response/check_social_user_response.dart';
 import '../notification_services.dart';
@@ -123,7 +126,7 @@ class AuthNotifier extends ChangeNotifier {
         if (data.data != null) {
           if (data.data?.token != null) {
             showCustomSnackBar('Sign In Successfully', type: true);
-            await repo.clearUserData();
+            // await repo.clearUserData();
             await repo.saveUserToken(data.data?.token ?? "");
             BuildContext? context = rootNavigator.currentContext;
             if (context != null && context.mounted && data.data?.token != null) {
@@ -151,51 +154,115 @@ class AuthNotifier extends ChangeNotifier {
     }
     return false;
   }
-
-  ///google login
-  Future googleLogin() async {
+  Future<void> googleLogin() async {
     try {
-      final gLogin =
-          GoogleSignIn(scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']);
-      await gLogin.signOut();
+      final gLogin = GoogleSignIn(
+        scopes: [
+          'https://www.googleapis.com/auth/userinfo.email',
+          'https://www.googleapis.com/auth/userinfo.profile',
+          'openid',
+        ],
+      );
+
+      await gLogin.signOut(); // Optional: Clear any previous session
+
       GoogleSignInAccount? account = await gLogin.signIn();
+
       if (account == null) {
-        stopProgress();
-        throw Exception('User account not found');
+        // 🔙 User cancelled the login (pressed back or closed dialog)
+        // showCustomSnackBar('Login cancelled by user.', type: false);
+        return;
       }
-      await gLogin.signOut();
+
       startProgress();
+
+      // ✅ Login succeeded – get FCM token and check user
       String? fcmToken = await notificationServices.getDeviceToken();
-      CheckSocialUserRequest request = CheckSocialUserRequest(socialId: account.id, email: account.email, fcmToken: fcmToken);
+
+      CheckSocialUserRequest request = CheckSocialUserRequest(
+        socialId: account.id,
+        email: account.email,
+        fcmToken: fcmToken,
+      );
+
       log('Account :: $account', name: 'GoogleAccount');
 
       bool? response = await checkSocialUser(request);
-      // if (response == null) {
-      //   throw Exception(unKnownError);
-      // }
-      if (response) {
+
+      if (response == true) {
         socialUserData = SocialUserData(
-            userName: account.displayName,
-            mobileOrEmail: account.email,
-            socialId: account.id,
-            isSocialLogin: true,
-            fcmToken: fcmToken,
-            isGoogleLogin: true);
+          userName: account.displayName,
+          mobileOrEmail: account.email,
+          socialId: account.id,
+          isSocialLogin: true,
+          fcmToken: fcmToken,
+          isGoogleLogin: true,
+        );
 
         mobileOrEmail = account.email;
+      } else {
+        showCustomSnackBar('Login failed: Invalid response from server.', type: false);
       }
-      stopProgress();
+    } on PlatformException catch (e) {
+      // ⚠️ Specific Google sign-in issues (like Play Services not available)
+      showCustomSnackBar('Google Sign-In error: ${e.message}', type: false);
     } on Exception catch (e) {
-      stopProgress();
-      showCustomSnackBar(e.toString().replaceAll('Exception:', ''), type: false);
+      // ❗ Other known exceptions
+      showCustomSnackBar(e.toString().replaceAll('Exception:', '').trim(), type: false);
     } catch (e) {
-      stopProgress();
+      // ❗ Unexpected or unknown errors
       log('Google Login Error :: $e', name: 'LoginError');
+      showCustomSnackBar('Something went wrong. Please try again.', type: false);
     } finally {
       stopProgress();
+      notifyListeners();
     }
-    notifyListeners();
   }
+
+  // ///google login
+  // Future googleLogin() async {
+  //   try {
+  //     final gLogin =
+  //         GoogleSignIn(scopes: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']);
+  //     await gLogin.signOut();
+  //     GoogleSignInAccount? account = await gLogin.signIn();
+  //     if (account == null) {
+  //       stopProgress();
+  //       throw Exception('User account not found');
+  //     }
+  //     await gLogin.signOut();
+  //     startProgress();
+  //     String? fcmToken = await notificationServices.getDeviceToken();
+  //     CheckSocialUserRequest request = CheckSocialUserRequest(socialId: account.id, email: account.email, fcmToken: fcmToken);
+  //     log('Account :: $account', name: 'GoogleAccount');
+  //
+  //     bool? response = await checkSocialUser(request);
+  //     // if (response == null) {
+  //     //   throw Exception(unKnownError);
+  //     // }
+  //     if (response) {
+  //       socialUserData = SocialUserData(
+  //           userName: account.displayName,
+  //           mobileOrEmail: account.email,
+  //           socialId: account.id,
+  //           isSocialLogin: true,
+  //           fcmToken: fcmToken,
+  //           isGoogleLogin: true);
+  //
+  //       mobileOrEmail = account.email;
+  //     }
+  //     stopProgress();
+  //   } on Exception catch (e) {
+  //     stopProgress();
+  //     showCustomSnackBar(e.toString().replaceAll('Exception:', ''), type: false);
+  //   } catch (e) {
+  //     stopProgress();
+  //     log('Google Login Error :: $e', name: 'LoginError');
+  //   } finally {
+  //     stopProgress();
+  //   }
+  //   notifyListeners();
+  // }
 
   // Future<void> facebookAuth() async{
   //   final LoginResult loginResult = await FacebookAuth.instance.login();
@@ -241,7 +308,7 @@ class AuthNotifier extends ChangeNotifier {
     if (response.statusCode == 200) {
       try {
         String? token = jsonDecode(response.body)['data']['token'];
-        await repo.clearUserData();
+        // await repo.clearUserData();
         if (token != null) {
           await repo.saveUserToken(token);
         }
@@ -260,9 +327,9 @@ class AuthNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> resetPassword(String phoneNo, String password) async {
+  Future<void> resetPassword(String email, String password) async {
     startProgress();
-    Response response = await repo.resetPassword(phoneNo, password);
+    Response response = await repo.resetPassword(email, password);
     stopProgress();
     if (response.statusCode == 200) {
       showCustomSnackBar('Password Changed Successfully', type: true);
@@ -274,11 +341,22 @@ class AuthNotifier extends ChangeNotifier {
       context.go(RoutePath.signIn);
     }
   }
+  Future<void> deleteLocalDatabase() async {
+    try {
+      final databasePath = await getDatabasesPath();
+      final path = join(databasePath, 'meditation_DB.db');
 
+      await deleteDatabase(path);
+      print('Database deleted successfully');
+    } catch (e) {
+      print('Error deleting database: $e');
+    }
+  }
   Future<void> logoutUser() async {
     startProgress();
     await repo.logoutUser();
     await repo.clearUserData();
+    await deleteLocalDatabase();
     socialUserData = null;
     mobileOrEmail = null;
     stopProgress();

@@ -41,12 +41,12 @@ class LogoutDialog extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Log out',
+                    'Sign out',
                     style: style.text.font(mulishSemiBold600, sizePx: 20),
                   ),
                   SizedBox(height: style.scaleX(10)),
                   Text(
-                    'Are you sure, you want to Logout?',
+                    'Are you sure, you want to Sign out?',
                     style: style.text.font(mulishRegular400, sizePx: 13),
                   ),
                   SizedBox(height: style.scaleX(37.5)),
@@ -75,7 +75,7 @@ class LogoutDialog extends ConsumerWidget {
                             textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
                             padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
                           ),
-                          child: Text(authP.isLoading ? 'Logging out..' : 'Log out'),
+                          child: Text(authP.isLoading ? 'Signing out..' : 'Sign out'),
                         ),
                       ),
                     ],

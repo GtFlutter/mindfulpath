@@ -125,31 +125,73 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   staticData.when(
                     data: (data) {
                       int index = data.indexWhere(
-                        (element) => element.key == (Platform.isAndroid ? 'share_android' : 'share_ios'),
+                            (element) => element.key == (Platform.isAndroid ? 'share_android' : 'share_ios'),
                       );
                       return index != -1 && data[index].value != null
                           ? Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SettingsListTile(
-                                  style: _style,
-                                  onPressed: () {
-                                    Share.share(
-                                      'Download The ${AppConfigs.APP_NAME} App Now. \n ${data[index].value}',
-                                      subject: 'Download the ${AppConfigs.APP_NAME} app now.',
-                                    );
-                                  },
-                                  title: 'Share App',
-                                ),
-                                SizedBox(height: _style.scaleX(25)),
-                              ],
-                            )
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SettingsListTile(
+                            style: _style,
+                            onPressed: () {
+                              Share.share(
+                                'Download The ${AppConfigs.APP_NAME} App Now. \n ${data[index].value}',
+                                subject: 'Download the ${AppConfigs.APP_NAME} app now.',
+                              );
+                            },
+                            title: 'Share App',
+                          ),
+                          SizedBox(height: _style.scaleX(25)),
+                        ],
+                      )
                           : const SizedBox.shrink();
                     },
-                    error: (Object _, StackTrace __) => const SizedBox.shrink(),
-                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                    loading: () => Column(
+                      children: [
+                        SettingsListTile(
+                          style: _style,
+                          onPressed: null,
+                          title: 'Share App',
+                          tralling: const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        SizedBox(height: _style.scaleX(25)),
+                      ],
+                    ),
                   ),
-                  SettingsListTile(style: _style, onPressed: logout, title: 'Logout'),
+
+                  // staticData.when(
+                  //   data: (data) {
+                  //     int index = data.indexWhere(
+                  //       (element) => element.key == (Platform.isAndroid ? 'share_android' : 'share_ios'),
+                  //     );
+                  //     return index != -1 && data[index].value != null
+                  //         ? Column(
+                  //             mainAxisSize: MainAxisSize.min,
+                  //             children: [
+                  //               SettingsListTile(
+                  //                 style: _style,
+                  //                 onPressed: () {
+                  //                   Share.share(
+                  //                     'Download The ${AppConfigs.APP_NAME} App Now. \n ${data[index].value}',
+                  //                     subject: 'Download the ${AppConfigs.APP_NAME} app now.',
+                  //                   );
+                  //                 },
+                  //                 title: 'Share App',
+                  //               ),
+                  //               SizedBox(height: _style.scaleX(25)),
+                  //             ],
+                  //           )
+                  //         : const SizedBox.shrink();
+                  //   },
+                  //   error: (Object _, StackTrace __) => const SizedBox.shrink(),
+                  //   loading: () => const SizedBox.shrink(),
+                  // ),
+                  SettingsListTile(style: _style, onPressed: logout, title: 'Sign out'),
                   SizedBox(height: _style.scaleX(25)),
                 ],
               ),

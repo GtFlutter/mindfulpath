@@ -162,39 +162,39 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
                       style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
                     ),
                     SizedBox(height: _style.scale * 27.5),
-                    supportP.name == null || supportP.name == ""
-                        ? TextField(
-                            readOnly: !_disableField,
-                            canRequestFocus: _disableField,
-                            showCursor: _disableField,
-                            magnifierConfiguration: TextMagnifierConfiguration.disabled,
-                            onTap: () {
-                              context.go(RoutePath.supportSectionScreenPath);
-                            },
-                            keyboardType: TextInputType.none,
-                            decoration: CustomeTextFieldStyle.inputDecoration(
-                              style: _style,
-                              labelSize: 15,
-                              floatingLabelSize: 15,
-                            ).copyWith(
-                              labelText: 'Support Section',
-                              labelStyle: _style.text.font(
-                                mulishSemiBold600,
-                                sizePx: 15,
-                                color: Colors.white,
-                              ),
-                              suffixIcon: UnconstrainedBox(
-                                child: SvgPicture.asset(
-                                  SvgPaths.arrowRight,
-                                  height: _style.scaleX(20),
-                                  width: _style.scaleX(20),
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                            style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
-                          )
-                        : const SizedBox.shrink(),
+                    // supportP.name == null || supportP.name == ""
+                    //     ? TextField(
+                    //         readOnly: !_disableField,
+                    //         canRequestFocus: _disableField,
+                    //         showCursor: _disableField,
+                    //         magnifierConfiguration: TextMagnifierConfiguration.disabled,
+                    //         onTap: () {
+                    //           context.go(RoutePath.supportSectionScreenPath);
+                    //         },
+                    //         keyboardType: TextInputType.none,
+                    //         decoration: CustomeTextFieldStyle.inputDecoration(
+                    //           style: _style,
+                    //           labelSize: 15,
+                    //           floatingLabelSize: 15,
+                    //         ).copyWith(
+                    //           labelText: 'Support Section',
+                    //           labelStyle: _style.text.font(
+                    //             mulishSemiBold600,
+                    //             sizePx: 15,
+                    //             color: Colors.white,
+                    //           ),
+                    //           suffixIcon: UnconstrainedBox(
+                    //             child: SvgPicture.asset(
+                    //               SvgPaths.arrowRight,
+                    //               height: _style.scaleX(20),
+                    //               width: _style.scaleX(20),
+                    //               fit: BoxFit.contain,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //         style: CustomeTextFieldStyle.valueStyle(style: _style, valueSize: 12.5),
+                    //       )
+                    //     : const SizedBox.shrink(),
                   ],
                 ),
                 const Spacer(),
@@ -215,26 +215,26 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
     );
   }
 
-  void onNext() {
+  Future<void> onNext() async {
     String name = _nameCtrl.text.trim();
     String email = _emailCtrl.text.trim().toLowerCase();
     String description = _descriptionCtrl.text.trim();
 
     if (name.isEmpty) {
       ref.read(supportProvider).setNameError(error: 'Please Enter Your Name');
-      return;
-    } else if (email.isEmpty) {
+    }
+    if (email.isEmpty) {
       ref.read(supportProvider).setEmailError(error: 'Please Enter Your Email');
-      return;
     } else if (!email.isEmail) {
       ref.read(supportProvider).setEmailError(error: 'Please Enter Your Valid Email');
-      return;
-    } else if (description.isEmpty) {
+    }
+    if (description.isEmpty) {
       ref.read(supportProvider).setDescriptionError(error: 'Please Enter Your Description');
       return;
-    } else {
+    }
+    else {
       FocusManager.instance.primaryFocus?.unfocus();
-      ref.read(supportProvider).raiseSupportTicket(
+     await ref.read(supportProvider).raiseSupportTicket(
             SupportTicket.body(
               name: name,
               email: email,
@@ -244,6 +244,7 @@ class _SupportScreenState extends ConsumerState<SupportScreen> {
             emailCtrl: _emailCtrl,
             descriptionCtrl: _descriptionCtrl,
           );
+
     }
   }
 }

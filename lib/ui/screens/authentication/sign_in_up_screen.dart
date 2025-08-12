@@ -69,6 +69,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   void setPwdErrorText([String? error]) {
     setState(() => _pwdErrorText = error);
   }
+
   void setEmailErrorText([String? error]) {
     setState(() => _emailErrorText = error);
   }
@@ -157,20 +158,20 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                         //     ),
                         //   ),
                         // ],
-                          TextField(
-                            controller: _emailCtrl,
-                            cursorColor: CustomeTextFieldStyle.cursorColor,
-                            onChanged: (_) {
-                              setEmailErrorText();
-                            },
-                            textInputAction: TextInputAction.done,
-                            decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
-                              labelText: 'Email',
-                              errorText: _emailErrorText,
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                            style: CustomeTextFieldStyle.valueStyle(style: _style),
+                        TextField(
+                          controller: _emailCtrl,
+                          cursorColor: CustomeTextFieldStyle.cursorColor,
+                          onChanged: (_) {
+                            setEmailErrorText();
+                          },
+                          textInputAction: TextInputAction.done,
+                          decoration: CustomeTextFieldStyle.inputDecoration(style: _style).copyWith(
+                            labelText: 'Email',
+                            errorText: _emailErrorText,
                           ),
+                          keyboardType: TextInputType.emailAddress,
+                          style: CustomeTextFieldStyle.valueStyle(style: _style),
+                        ),
 
                         SizedBox(height: size.height * 0.05),
                         PasswordTextField(
@@ -199,6 +200,8 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                               ),
                             ),
                           ),
+                          SizedBox(height: _style.scale * 40),
+
                           SizedBox(height: _style.scale * 20),
                         ] else ...[
                           SizedBox(height: size.height * 0.05),
@@ -235,6 +238,17 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                           ),
                           SizedBox(height: _style.scale * 10),
                         ],
+                        CustomNextButton(
+                          boxConstraints: BoxConstraints(maxWidth: 800 * _style.scaleX(0.5)),
+                          text: widget.isSignIn ? 'Sign In' : 'Next',
+                          onPressed: !authP.isLoading ? onNext : null,
+                          // onPressed: (){
+                          //   log("login screen------->${!authP.isLoading}");
+                          //   !authP.isLoading ? onNext() : null;
+                          // },
+                          style: _style,
+                          inProgress: authP.isLoading,
+                        ),
                       ],
                     ),
                     Spacer(flex: 2),
@@ -247,7 +261,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                           indent: _style.scale * 15,
                         )),
                         Text(
-                          'OR SIGN UP WITH',
+                          widget.isSignIn ? 'OR SIGN IN WITH' : 'OR SIGN UP WITH',
                           style: _style.text.font(
                             mulishSemiBold600,
                             sizePx: 13,
@@ -266,16 +280,34 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                     Row(
                       children: [
                         Spacer(),
-                        IconButton.outlined(
-                          onPressed: () {
-                            ref.read(authProvider).googleLogin();
-                          },
-                          icon: SvgPicture.asset(
-                            SvgPaths.googleLogo,
-                            width: _style.scale * 36,
-                            height: _style.scale * 36,
+                        SizedBox(
+                          width: _style.scale * 48,
+                          height: _style.scale * 48,
+                          child: IconButton.outlined(
+                            padding: EdgeInsets.only(left: 3),
+                            alignment: Alignment.center,
+                            onPressed: () {
+                              ref.read(authProvider).googleLogin();
+                            },
+                            icon: SvgPicture.asset(
+                              SvgPaths.googleLogo,
+                              width: _style.scale * 36,
+                              height: _style.scale * 36,
+                            ),
                           ),
                         ),
+                        // IconButton.outlined(
+                        //   onPressed: () {
+                        //     ref.read(authProvider).googleLogin();
+                        //   },
+                        //   padding: EdgeInsets.zero,
+                        //   alignment: Alignment.center,
+                        //   icon: SvgPicture.asset(
+                        //     SvgPaths.googleLogo,
+                        //     width: _style.scale * 36,
+                        //     height: _style.scale * 36,
+                        //   ),
+                        // ),
                         // SizedBox(width: _style.scale * 40),
                         // IconButton.outlined(
                         //   onPressed: () {
@@ -303,16 +335,16 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                       ),
                     ),
                     SizedBox(height: _style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
-                    CustomNextButton(
-                      text: widget.isSignIn ? 'Sign In' : 'Next',
-                      onPressed: !authP.isLoading ? onNext : null,
-                      // onPressed: (){
-                      //   log("login screen------->${!authP.isLoading}");
-                      //   !authP.isLoading ? onNext() : null;
-                      // },
-                      style: _style,
-                      inProgress: authP.isLoading,
-                    ),
+                    // CustomNextButton(
+                    //   text: widget.isSignIn ? 'Sign In' : 'Next',
+                    //   onPressed: !authP.isLoading ? onNext : null,
+                    //   // onPressed: (){
+                    //   //   log("login screen------->${!authP.isLoading}");
+                    //   //   !authP.isLoading ? onNext() : null;
+                    //   // },
+                    //   style: _style,
+                    //   inProgress: authP.isLoading,
+                    // ),
 
                     SizedBox(height: _style.scale * 20),
                   ],
@@ -324,45 +356,29 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   }
 
   void onNext() {
+    FocusManager.instance.primaryFocus?.unfocus();
     log("djfrejerjgerjggjmkergmklmg---${widget.isSignIn}");
-    String number = _numberCtrl.text.trim();
-    String code = _countryCode.trim();
     String password = _passwordCtrl.text.trim();
     String email = _emailCtrl.text.trim();
-    // if (!widget.isSignIn && number.isEmpty) {
-    //   setNumberErrorText('Please Enter Your Number');
-    //   return;
-    // } else if (!widget.isSignIn && code.isEmpty) {
-    //   setNumberErrorText('Please Select Your Country Code');
-    //   return;
-    // }
-    // else if
-    if(email.isEmpty){
+    log("email.is email---->${email.isEmail}");
+    if (email.isEmpty) {
       setEmailErrorText('Please Enter Your Email');
-      return;
+    } else if (!email.isEmail && !widget.isSignIn) {
+      setEmailErrorText('Please Enter Your Valid Email');
+      // ref.read(userProvider).setEmailError(error: 'Please Enter Your Valid Email');
     }
-    else if (!email.isEmail) {
-    ref
-        .read(userProvider)
-        .setEmailError(error: 'Please Enter Your Valid Email');
-    return;
-    }
-    if(password.isEmpty) {
+    if (password.isEmpty) {
       setPwdErrorText('Please Enter Your Password');
-      return;
-    } else if (password.length < AppConstants.PWD_MIN_LENGTH) {
+    } else if (password.length < AppConstants.PWD_MIN_LENGTH && !widget.isSignIn) {
       if (widget.isSignIn) {
         setPwdErrorText('Invalid Password');
       } else {
         setPwdErrorText('Password must be at least ${AppConstants.PWD_MIN_LENGTH} character');
       }
-      return;
     } else if (password.length > AppConstants.PWD_MAX_LENGTH) {
       setPwdErrorText('Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
-      return;
     } else if (!widget.isSignIn && password.contains(RegExp(r'\s'))) {
       setPwdErrorText('Password should not contain space...');
-      return;
     }
 
     /// TODO IF this is sign then get error from api and show
@@ -372,7 +388,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
       ref.read(authProvider).loginUser(email, password, fcm ?? "");
     } else {
       ref.read(authProvider).requestOTP(
-        email: email,
+            email: email,
             type: SendOTP.register,
             password: password,
           );
@@ -380,6 +396,8 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   }
 
   void onSign() {
+    _emailCtrl.clear();
+    _passwordCtrl.clear();
     context.go(widget.isSignIn ? RoutePath.signUp : RoutePath.signIn);
   }
 

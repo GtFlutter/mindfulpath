@@ -345,7 +345,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                           Flexible(
                             child: Text(
                               isVideo ? widget.model?.category?.title ?? "" : widget.subTitle ?? '',
-                              style: textStyle.copyWith(color: AppColors.categoryNameColor),
+                              style: textStyle.copyWith(color: AppColors.categoryNameColor,fontSize: 9,fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),

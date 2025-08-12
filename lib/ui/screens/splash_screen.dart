@@ -1,23 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
+import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 
+import '../../provider/shared_pref_provider.dart';
 import '../../util/assets.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends ConsumerStatefulWidget {
+
   const SplashScreen({super.key});
+
+
+  @override
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   static AppStyle _style = AppStyle();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (!mounted) return; // ensure widget is still active
+      final auth = ref.read(authProvider);
+      if (auth.isUserLoggedIn) {
+        context.go(RoutePath.discoverScreen);
+      } else {
+        context.go(RoutePath.signIn);
+      }
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
-    Future.delayed(const Duration(seconds: 3), () {
-      context.go(RoutePath.signIn);
-    });
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: BackgroundImage(

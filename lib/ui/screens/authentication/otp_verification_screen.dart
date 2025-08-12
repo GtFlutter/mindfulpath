@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart' show CupertinoButton;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -176,6 +178,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   }
 
   void onNext() {
+    log("otp verification screen --on next button ----${widget.model.email}---${widget.model.password}");
     String otp = _pinController.text.trim();
     if (otp.isEmpty) {
       setPinErrorText('Please Enter Your OTP');

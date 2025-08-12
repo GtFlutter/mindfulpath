@@ -263,7 +263,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                               itemCount: playlistP.playlistVideoListResponse?.length ?? 0,
                                               itemBuilder: (context, index) {
                                                 var model = playlistP.playlistVideoListResponse?[index];
-
+log("modellllllllllll-----${model?.video?.id}");
                                                 return GestureDetector(
                                                     //key: Key('$index'),
                                                     onTap: () {

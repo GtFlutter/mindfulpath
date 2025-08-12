@@ -140,7 +140,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                 return MediaImageCard(
                   appStyle: widget.appStyle,
                   imgUrl: model?.thumbnailImageUrlSrc ?? "",
-                  duration:widget.model.video?.duration?.isEmpty ?? false? (widget.model.video?.duration ?? "00:00:00").toDuration:"",
+                  duration:(widget.model.video?.duration?.isNotEmpty ?? false)? (widget.model.video?.duration ?? "00:00:00").toDuration:"",
                   imgRadius: widget.appStyle.scaleX(25),
                   imgSize: widget.appStyle.scaleX(100),
                 );
@@ -176,7 +176,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                       style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: AppColors.primaryColor),
                                     ),
                                     TextSpan(
-                                      text: model?.categoryTitle ?? "",
+                                      text: model?.category?.title ?? "",
                                       style: textStyle.copyWith(color: AppColors.categoryNameColor, fontSize: 11),
                                     ),
                                   ],

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +14,11 @@ import 'package:meditation_app/provider/repo_provider/dashboard_repo_provider.da
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/search/util/query_time.dart';
 import 'package:meditation_app/util/constants.dart';
+import 'package:path/path.dart';
+
+import '../data/model/response/response_error.dart';
+import '../helper/route/route_paths.dart';
+import 'auth_provider.dart';
 
 final dashboardProvider = ChangeNotifierProvider<DashboardNotifier>((ref) {
   final repo = ref.watch(dashboardRepoProvider);
@@ -64,10 +70,12 @@ class DashboardNotifier extends ChangeNotifier {
   Future<void> getCategoryList() async {
     startLoading();
     Response response = await repo.getCategories(1);
+    log("==========status code---${response.statusCode}");
     if (response.statusCode != 200) {
       stopLoading();
-      ApiChecker.checkApi(response);
-    } else {
+      ApiChecker.checkApi(response, authNotifier: ref.read(authProvider));
+    }
+    else {
       try {
         var json = jsonDecode(response.body);
         _categoryListResponse = CategoryListResponse.listFromJson(json['data']['category_list']);

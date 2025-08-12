@@ -65,7 +65,7 @@ class AnalyticsNotifier extends ChangeNotifier {
     if (value != null) {
       getVideoNamesList(value.id, isAudio: isAudio);
     } else {
-      getAnalytics(isAudio!);
+      getAnalytics(isAudio);
     }
   }
 

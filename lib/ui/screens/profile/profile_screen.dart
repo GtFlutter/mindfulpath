@@ -89,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   } else if (index == 1) {
                     context.go(RoutePath.notificationsPath);
                   } else if (index == 2) {
-                    context.go(RoutePath.supportScreenPath);
+                    context.go(RoutePath.supportSectionScreenPath);
                   } else if (index == 3) {
                     context.go(RoutePath.settingsScreenPath);
                   }

@@ -26,29 +26,27 @@ class RoutePath {
   /// [Discover]
   static const String discoverScreen = '/discover';
   //  [detail-category]
-  /*  */ static const String detailCategoryScreen = 'detail-category';
-  /*  */ static const String downloadDetailCategoryScreen = 'download-detail-category';
-  /*  */ static const String detailCategoryScreenPath = '$discoverScreen/$detailCategoryScreen';
-  /*  */ static const String downloadDetailCategoryScreenPath = '$discoverScreen/$downloadDetailCategoryScreen';
-  //  [Profile]
-  /*  */ static const String profileScreen = 'profile';
-  /*  */ static const String profileScreenPath = '$discoverScreen/$profileScreen';
-  //         [Edit Profile]
-  /*         */ static const String editProfileScreen = 'edit-profile';
-  /*         */ static const String editProfileScreenPath = '$discoverScreen/$profileScreen/$editProfileScreen';
-  //         [Support]
-  /*         */ static const String supportScreen = 'support';
-  /*         */ static const String supportScreenPath = '$discoverScreen/$profileScreen/$supportScreen';
-  //                [Support-Section]
-  /*                */ static const String supportSectionScreen = 'support-section';
-  /*                */ static const String supportSectionScreenPath =
-      '$discoverScreen/$profileScreen/$supportScreen/$supportSectionScreen';
-  //         [Settings]
-  /*         */ static const String settingsScreen = 'settings';
-  /*         */ static const String settingsScreenPath = '$discoverScreen/$profileScreen/$settingsScreen';
-  //         [Notifications]
-  /*         */ static const String notifications = 'notifications';
-  /*         */ static const String notificationsPath = '$discoverScreen/$profileScreen/$notifications';
+  static const String detailCategoryScreen = 'detail-category';
+  static const String downloadDetailCategoryScreen = 'download-detail-category';
+  static const String detailCategoryScreenPath = '$discoverScreen/$detailCategoryScreen';
+  static const String downloadDetailCategoryScreenPath = '$discoverScreen/$downloadDetailCategoryScreen';
+  //[Profile]
+  static const String profileScreen = 'profile';
+  static const String profileScreenPath = '$discoverScreen/$profileScreen';
+  //[Edit Profile]
+  static const String editProfileScreen = 'edit-profile';
+  static const String editProfileScreenPath = '$discoverScreen/$profileScreen/$editProfileScreen';
+  //[Support]
+  static const String supportScreen = 'support';
+  static const String supportSectionScreen = 'support-section';
+  static const String supportScreenPath = '$discoverScreen/$profileScreen/$supportSectionScreen/$supportScreen';
+  static const String supportSectionScreenPath = '$discoverScreen/$profileScreen/$supportSectionScreen';
+  //[Settings]
+  static const String settingsScreen = 'settings';
+  static const String settingsScreenPath = '$discoverScreen/$profileScreen/$settingsScreen';
+  //[Notifications]
+  static const String notifications = 'notifications';
+  static const String notificationsPath = '$discoverScreen/$profileScreen/$notifications';
 
   ///
   static const String analyticsScreen = '/analytics';

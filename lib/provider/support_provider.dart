@@ -28,6 +28,7 @@ class SupportNotifier extends ChangeNotifier {
   SupportNotifier(this.repo);
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   String? name;
@@ -53,7 +54,9 @@ class SupportNotifier extends ChangeNotifier {
   String? _descriptionErrorText;
 
   String? get nameErrorText => _nameErrorText;
+
   String? get emailErrorText => _emailErrorText;
+
   String? get descriptionErrorText => _descriptionErrorText;
 
   void clearAllErrorText({bool notifie = true}) {
@@ -87,8 +90,7 @@ class SupportNotifier extends ChangeNotifier {
     if (notifie) notifyListeners();
   }
 
-  Future<void> raiseSupportTicket(SupportTicket ticket,
-      {required TextEditingController nameCtrl, emailCtrl, descriptionCtrl}) async {
+  Future<void> raiseSupportTicket(SupportTicket ticket, {required TextEditingController nameCtrl, emailCtrl, descriptionCtrl}) async {
     startLoading();
 
     Response response = await repo.raiseSupportTicket(ticket);
@@ -102,7 +104,8 @@ class SupportNotifier extends ChangeNotifier {
       } catch (_) {}
       BuildContext? context = rootNavigator.currentContext;
       if (context != null && context.mounted) {
-        context.go(RoutePath.supportSectionScreenPath);
+        // context.go(RoutePath.supportSectionScreenPath);
+        context.pop(true);
       }
       return;
     }
