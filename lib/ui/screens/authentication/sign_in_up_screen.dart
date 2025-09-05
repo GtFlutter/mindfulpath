@@ -201,7 +201,6 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                             ),
                           ),
                           SizedBox(height: _style.scale * 40),
-
                           SizedBox(height: _style.scale * 20),
                         ] else ...[
                           SizedBox(height: size.height * 0.05),
@@ -363,7 +362,7 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
     log("email.is email---->${email.isEmail}");
     if (email.isEmpty) {
       setEmailErrorText('Please Enter Your Email');
-    } else if (!email.isEmail && !widget.isSignIn) {
+    } else if (!email.isEmail) {
       setEmailErrorText('Please Enter Your Valid Email');
       // ref.read(userProvider).setEmailError(error: 'Please Enter Your Valid Email');
     }
@@ -383,9 +382,10 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
 
     /// TODO IF this is sign then get error from api and show
     else if (widget.isSignIn) {
-      print("djfrejerjgerjggjmkergmklmg33333---${widget.isSignIn}");
-
-      ref.read(authProvider).loginUser(email, password, fcm ?? "");
+      if (email.isEmail && password.isNotEmpty) {
+        print("djfrejerjgerjggjmkergmklmg33333---${widget.isSignIn}");
+        ref.read(authProvider).loginUser(email, password, fcm ?? "");
+      }
     } else {
       ref.read(authProvider).requestOTP(
             email: email,

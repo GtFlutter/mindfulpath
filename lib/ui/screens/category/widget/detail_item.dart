@@ -19,12 +19,15 @@ import '../../../../data/model/response/videos_response.dart';
 import '../../../../helper/route/route_paths.dart';
 import '../../../../helper/route/router.dart';
 import '../../../../provider/auth_provider.dart';
+import '../../../../provider/resource_provider/paid_videos_provider.dart';
+import '../../../../provider/resource_provider/paid_audios_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
 import '../../../common/outlined_icon_button.dart';
+import '../../settings/widget/logout_dialog.dart';
 
 class DIModel {
   final int videoId;
@@ -268,6 +271,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
     final videoP = ref.watch(videoProvider);
     final audioP = ref.watch(audioProvider);
+    var paidVideo = ref.watch(paidVideosProvider);
+    var paidAudio = ref.watch(paidAudiosProvider);
     log("color------${videoP.isSelected}=====${int.parse(widget.index)}");
     log("color 222------${videoP.selectedItemId}=====${widget.seletedItemId})}");
     log("bookmark in detail item------${widget.model?.bookmarked} ${widget.model?.bookmarked} ");
@@ -345,7 +350,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                           Flexible(
                             child: Text(
                               isVideo ? widget.model?.category?.title ?? "" : widget.subTitle ?? '',
-                              style: textStyle.copyWith(color: AppColors.categoryNameColor,fontSize: 9,fontWeight: FontWeight.bold),
+                              style: textStyle.copyWith(color: AppColors.categoryNameColor, fontSize: 9, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -423,24 +428,30 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   SvgPaths.download,
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
-                                  onTap: () {
-                                    log("model--------->${widget.model?.toJson()}");
-                                    print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
-                                    debugPrint('File Path :: ${widget.model?.video?.fileName ?? ""}');
+                                  onTap: () async {
+                                    if (widget.model?.category?.isPurchased ?? false) {
+                                      log("model--------->${widget.model?.toJson()}");
+                                      print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
+                                      debugPrint('File Path :: ${widget.model?.video?.fileName ?? ""}');
 
-                                    if (downloadP.model == null) {
-                                      if (widget.model?.video != null) {
-                                        downloadP.download(model: widget.model);
-                                      } else {
-                                        ///do stuff for audio download
-                                        downloadP.downloadAudio(model: widget.model);
+                                      if (downloadP.model == null) {
+                                        if (widget.model?.video != null) {
+                                          downloadP.download(model: widget.model);
+                                        } else {
+                                          ///do stuff for audio download
+                                          downloadP.downloadAudio(model: widget.model);
+                                        }
+                                      } else if (widget.model!.id != downloadP.model!.id) {
+                                        if (widget.model?.video != null) {
+                                          showCustomSnackBar('Another Video is in progress');
+                                        } else {
+                                          showCustomSnackBar('Another Audio is in progress');
+                                        }
                                       }
-                                    } else if (widget.model!.id != downloadP.model!.id) {
-                                      if (widget.model?.video != null) {
-                                        showCustomSnackBar('Another Video is in progress');
-                                      } else {
-                                        showCustomSnackBar('Another Audio is in progress');
-                                      }
+                                    } else {
+                                      await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
+                                      paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
+                                      paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                                     }
                                   },
                                 );
@@ -454,22 +465,28 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                       MenuAnchor(
                         menuChildren: [
                           MenuItemButton(
-                            onPressed: () {
-                              log("create playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
-                              bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                              if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
-                                createPlaylist(context, videoId: widget.model?.id?.toString());
+                            onPressed: () async {
+                              if (widget.model?.category?.isPurchased ?? false) {
+                                log("create playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
+                                bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                                if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
+                                  createPlaylist(context, videoId: widget.model?.id?.toString());
+                                } else {
+                                  showCustomSnackBar(
+                                    'Please login to create playlist.',
+                                    action: SnackBarAction(
+                                      label: 'Log In',
+                                      backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                                      textColor: Colors.brown.shade800,
+                                      onPressed: () => appRouter.go(RoutePath.signIn),
+                                    ),
+                                    duration: const Duration(seconds: 5),
+                                  );
+                                }
                               } else {
-                                showCustomSnackBar(
-                                  'Please login to create playlist.',
-                                  action: SnackBarAction(
-                                    label: 'Log In',
-                                    backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                    textColor: Colors.brown.shade800,
-                                    onPressed: () => appRouter.go(RoutePath.signIn),
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                );
+                                await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
+                                paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
+                                paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                               }
                             },
                             child: Text(

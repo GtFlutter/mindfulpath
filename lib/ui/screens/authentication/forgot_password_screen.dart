@@ -102,7 +102,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     children: [
                       CustomHeader(
                         title: 'Forgot password',
-                        subTitle: 'Please enter your number to request a password reset.',
+                        subTitle: 'Please enter your Email to request a password reset.',
                         subTitleColor: AppColors.textFieldValueColor,
                         padding: EdgeInsets.symmetric(horizontal: _style.scale * 25),
                         style: _style,

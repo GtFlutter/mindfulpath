@@ -142,47 +142,39 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
     String oldPassword = _oldPasswordCtrl.text.trim();
     String newPassword = _newPasswordCtrl.text.trim();
 
-
     ///old password validation
     if (oldPassword.isEmpty) {
       _oldPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setOldPwdError(error: 'Please enter an Old Password');
-    }
-   else if (oldPassword.length < AppConstants.PWD_MIN_LENGTH) {
+    }  else if (oldPassword.length < AppConstants.PWD_MIN_LENGTH) {
       _oldPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setOldPwdError(error: 'Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
-
     } else if (oldPassword.length > AppConstants.PWD_MAX_LENGTH) {
       _oldPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setOldPwdError(error: 'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
-
     } else if (oldPassword.contains(RegExp(r'\s'))) {
       _oldPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setOldPwdError(error: 'Password should not contain space...');
-
     }
+
     ///new password validation
     if (newPassword.isEmpty) {
       _newPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setNewPwdError(error: 'Please enter a new Password');
-    }
-    else if (newPassword.length < AppConstants.PWD_MIN_LENGTH) {
+    } else if (newPassword.length < AppConstants.PWD_MIN_LENGTH) {
       _newPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setNewPwdError(error: 'Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
-
     } else if (newPassword.length > AppConstants.PWD_MAX_LENGTH) {
       _newPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setNewPwdError(error: 'Password length must be between ${AppConstants.PWD_MIN_LENGTH}-${AppConstants.PWD_MAX_LENGTH} character...');
-
     } else if (newPassword.contains(RegExp(r'\s'))) {
       _newPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setNewPwdError(error: 'Password should not contain space...');
-
     }
-    if(newPassword == oldPassword){
+    if (newPassword == oldPassword && oldPassword.isNotEmpty && newPassword.isNotEmpty) {
       ref.read(changePasswordProvider).setNewPwdError(error: 'New password should not be same as old password');
     }
-    else {
+    if (newPassword.isNotEmpty && oldPassword.isNotEmpty) {
       ref.read(changePasswordProvider).changePassword(oldPassword, newPassword);
     }
   }

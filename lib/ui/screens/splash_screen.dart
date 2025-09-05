@@ -27,11 +27,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     Future.delayed(Duration(milliseconds: 100), () {
       if (!mounted) return; // ensure widget is still active
       final auth = ref.read(authProvider);
-      if (auth.isUserLoggedIn) {
-        context.go(RoutePath.discoverScreen);
-      } else {
-        context.go(RoutePath.signIn);
-      }
+      context.go(RoutePath.discoverScreen);
+      // if (auth.isUserLoggedIn) {
+      //   context.go(RoutePath.discoverScreen);
+      // } else {
+      //   context.go(RoutePath.signIn);
+      // }
     });
 
   }
