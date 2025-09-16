@@ -81,5 +81,6 @@ class FreeAllItemNotifier extends ChangeNotifier {
     }
   }
 
+
 }
 

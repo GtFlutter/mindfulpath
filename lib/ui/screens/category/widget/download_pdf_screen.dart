@@ -9,6 +9,8 @@ import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
+import '../../../../data/model/response/pdfs_response.dart';
+
 class DownloadPdfCategoryScreen extends ConsumerStatefulWidget {
   const DownloadPdfCategoryScreen({super.key});
 
@@ -44,7 +46,7 @@ class _DownloadPdfCategoryScreenState extends ConsumerState<DownloadPdfCategoryS
     await coursePro.getCategoryPdfFromDatabase();
     if (coursePro.downloadPdfResponses.isEmpty) return;
     for (final category in coursePro.downloadPdfResponses) {
-      await ref.read(courseProvider.notifier).getPdfFromDatabase(category.categoryId ?? 0);
+      await ref.read(courseProvider.notifier).getPdfFromDatabase(int.parse(category.categoryId ?? ""));
     }
     coursePro.stopPDFLoading();
   }
@@ -102,11 +104,13 @@ class _DownloadPdfCategoryScreenState extends ConsumerState<DownloadPdfCategoryS
                       },
                       child: DetailItem.pdf(
                         appStyle: _style,
+                        // pdfModel: PdfResponse(),
                         title: model.pdfName ?? '',
                         subTitle: model.categoryTitle ?? "",
                         index: '$index',
                         isShow: false,
                         isRemove: true,
+                        onToggleBookmark: (){},
                         isDownloaded: false,
                         pressRemove: () async {
                           print('courseP.downloadPdfResponse.length ${courseP.downloadPdfResponse.length}');

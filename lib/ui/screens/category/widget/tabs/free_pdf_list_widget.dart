@@ -7,6 +7,7 @@ import 'package:meditation_app/provider/resource_provider/free_pdfs_provider.dar
 
 import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../database/database_helper.dart';
+import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../theme/styles.dart';
 import '../detail_item.dart';
 
@@ -24,12 +25,12 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
   static AppStyle _style = AppStyle();
 
   @override
-  void initState()  {
-
+  void initState() {
     Future.delayed(Duration.zero, () async {
       ref.read(freePdfsProvider).fetchPdfs(widget.category.id!);
       await initCall();
     });
+
     ///to get downloaded pdf for if already downloaded then hide button so....
     super.initState();
   }
@@ -49,9 +50,9 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
       final coursePRead = ref.read(courseProvider);
       final coursePWatch = ref.watch(courseProvider);
       await coursePRead.getCategoryPdfFromDatabase();
-     // for(final category in coursePWatch.downloadPdfResponses){
+      // for(final category in coursePWatch.downloadPdfResponses){
       print('+++++++++_________----------+++++++${widget.category.id}');
-        await coursePRead.getPdfFromDatabase(widget.category.id??0);
+      await coursePRead.getPdfFromDatabase(widget.category.id ?? 0);
 
       //}
     });
@@ -65,15 +66,13 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
 
     print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 
-    provider.downloadedPDF.map((e){
+    provider.downloadedPDF.map((e) {
       print('First Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
     });
 
-    provider.pdfsResponse?.list?.map((e){
+    provider.pdfsResponse?.list?.map((e) {
       print('Second Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
-
     });
-
 
     if (provider.loading) {
       return const Center(child: CircularProgressIndicator());
@@ -85,8 +84,6 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
     if (provider.pdfsResponse!.list!.isEmpty) {
       return const Center(child: Text('Free PDF\'s Is Empty'));
     }
-
-
 
     final downloadP = ref.watch(downloadProvider);
 
@@ -109,10 +106,11 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
       itemBuilder: (context, index) {
         var model = provider.pdfsResponse!.list![index];
         print('-------456------->${model.categoryId}');
-       final data= provider.downloadedPDF.any((element) => model.categoryId==element.categoryId);
-       final datas= provider.downloadedPDF.any((element) => element.id == provider.pdfsResponse?.list?[index].id);
+        final data = provider.downloadedPDF.any((element) => model.categoryId == element.categoryId);
+        final datas = provider.downloadedPDF.any((element) => element.id == provider.pdfsResponse?.list?[index].id);
         print('-------123------->$data');
-        print('-------789------->$datas');
+        print('--------789------>$datas');
+        print('-------model.pdf!.id------->${model.id}');
 
         return GestureDetector(
           onTap: () => viewPdf(model.pdfUrl),
@@ -124,7 +122,10 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
             index: '$index',
             seletedItemId: model.id,
             isShow: true,
-            isDownloaded:provider.downloadedPDF.any((element) => model.pdf!.id.toString()==element.pdfId),
+            isDownloaded: provider.downloadedPDF.any((element) => model.id.toString() == element.pdfId),
+            onToggleBookmark: () {
+              toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false,);
+            },
           ),
         );
       },
@@ -132,10 +133,18 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
     );
   }
 
+  Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false}) async {
+    if (itemId == null) return;
+    await ref.read(bookmarkProvider.notifier).toggleBookmark(itemId, isRemove: isRemove,isPDF: true);
+    ref.read(freePdfsProvider.notifier).fetchPdfs(widget.category.id ?? 0);
+  }
+
   void viewPdf(String? pdfUrl) {
     if (pdfUrl == null) return;
     context.pushViewPDFScreen(pdfUrl);
   }
+
+
 
   @override
   bool get wantKeepAlive => true;

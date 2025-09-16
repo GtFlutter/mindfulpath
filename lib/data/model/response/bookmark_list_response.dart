@@ -14,6 +14,7 @@
 /// }
 library;
 
+import 'package:meditation_app/data/model/response/pdfs_response.dart';
 import 'package:meditation_app/data/model/response/videos_response.dart';
 
 
@@ -66,5 +67,38 @@ class BookmarkVideoResponse {
     title = json['title'];
     thumbnailImageUrl = json['thumbnail_image_url'];
     videoUrl = json['video_url'];
+  }
+}
+
+
+class BookmarkPDFListResponse {
+  int? id;
+  int? userId;
+  int? pdfId;
+  String? pdfTitle;
+  String? createdAt;
+  String? updatedAt;
+  PdfResponse? bookmarkPdfResponse;
+
+  BookmarkPDFListResponse({this.id, this.userId, this.pdfId, this.pdfTitle, this.createdAt, this.updatedAt, this.bookmarkPdfResponse});
+
+  BookmarkPDFListResponse.fromJson(dynamic json) {
+    id = json['id'];
+    userId = json['user_id'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+    if (json['pdf'] != null) {
+      pdfTitle = json['pdf_title'];
+      pdfId = json['pdf_id'];
+      bookmarkPdfResponse = PdfResponse.fromJson(json['pdf']);
+    }
+  }
+
+  static List<BookmarkPDFListResponse> listFromJson(dynamic jsonList, bool isFromAudio) {
+    List<BookmarkPDFListResponse> list = [];
+    for (var json in jsonList) {
+      list.add(BookmarkPDFListResponse.fromJson(json));
+    }
+    return list;
   }
 }

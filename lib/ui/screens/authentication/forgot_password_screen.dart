@@ -30,8 +30,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   final TextEditingController _emailCtrl = TextEditingController();
 
-  final String _initCountryCode = '+91';
-  String _countryCode = '+91';
+  final String _initCountryCode = '+1';
+  String _countryCode = '+1';
 
   String? _numberErrorText;
 

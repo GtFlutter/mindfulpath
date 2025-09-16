@@ -147,7 +147,7 @@ class BuyNowDialog extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Upgrade for Full Access',
+                    'Upgrade For Full Access',
                     style: style.text.font(mulishSemiBold600, sizePx: 20),
                   ),
                   SizedBox(height: style.scaleX(10)),

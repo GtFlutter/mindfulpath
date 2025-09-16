@@ -136,6 +136,11 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
       ref.read(downloadProvider.notifier).complate = false;
       setState(() {});
     }
+    if (downloadP.Pdfcomplate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).Pdfcomplate = false;
+      setState(() {});
+    }
     void playVideo(PlaylistVideoList model, int index) {
       print('------------****${model.video!.videoUrl}');
       ref.read(videoProvider).playVideo(

@@ -7,16 +7,12 @@ import '../../theme/styles.dart';
 import 'cutom_media_card.dart';
 
 class MediaImageCard extends StatelessWidget {
-  const MediaImageCard(
-      {super.key,
-      required this.appStyle,
-      required this.imgUrl,
-      required this.duration,
-      required this.imgSize,
-      required this.imgRadius});
+  const MediaImageCard({super.key, required this.appStyle, required this.imgUrl, required this.duration, required this.imgSize, this.isPDF, this.isAudio, required this.imgRadius});
 
   final AppStyle appStyle;
   final String imgUrl;
+  final bool? isAudio;
+  final bool? isPDF;
   final String duration;
   final double imgSize;
   final double imgRadius;
@@ -24,16 +20,21 @@ class MediaImageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imgUrl.isEmpty) {
-      return SizedBox(
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(imgRadius),
+          border: Border.all(color: Colors.grey),
+        ),
         width: imgSize,
         height: imgSize,
-        child: Center(
-          child: Text(
-            'Video No Longer Available',
-            textAlign: TextAlign.center,
-            style: appStyle.text.font(mulishSemiBold600, sizePx: 8, color: Colors.white),
-          ),
-        ),
+        child:Icon(isAudio ?? false ? Icons.audiotrack : isPDF ?? false ? Icons.picture_as_pdf : Icons.video_collection,color: Colors.white,)
+        // Center(
+        //   child: Text(
+        //     'Video No Longer Available',
+        //     textAlign: TextAlign.center,
+        //     style: appStyle.text.font(mulishSemiBold600, sizePx: 8, color: Colors.white),
+        //   ),
+        // ),
       );
     }
     return Stack(

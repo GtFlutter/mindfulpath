@@ -48,8 +48,8 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
   final FocusNode _mobileFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
 
-  final String initCountryCode = '+91';
-  String _countryCode = '+91';
+  final String initCountryCode = '+1';
+  String _countryCode = '+1';
   String? fcm;
 
   String? _numberErrorText;

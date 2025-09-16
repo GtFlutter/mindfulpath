@@ -48,9 +48,9 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 10.0),
-            child: IconButton(
-              icon: const Icon(Icons.add),
-              tooltip: 'New Ticket',
+            child: TextButton(
+              child: const Text("Get Help"),
+
               onPressed: () async {
                 context.push(RoutePath.supportScreenPath).then((value) {
 
@@ -84,7 +84,8 @@ class _SupportSectionScreenState extends ConsumerState<SupportSectionScreen> {
                         supportP.name = data[index].name;
                         supportP.email = data[index].email;
                         supportP.descr = data[index].description;
-                        Navigator.pop(context);
+                        context.go(RoutePath.supportScreenPath);
+                        // Navigator.pop(context);
 
                       },
                     );

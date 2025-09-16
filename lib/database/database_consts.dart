@@ -13,13 +13,11 @@ class DatabaseConsts {
       "category_name" TEXT,
       "category_image" TEXT
     );''',
-    '''CREATE TABLE $categoryPdfTable (
+    '''CREATE TABLE IF NOT EXISTS $categoryPdfTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-      "pdf_id" TEXT,
-      "pdf_name" TEXT,
-      "pdf_file" TEXT,
       "category_id" TEXT,
-      "category_title" TEXT
+      "category_name" TEXT,
+      "category_image" TEXT
     );''',
     '''CREATE TABLE $videoTable (
       "id" INTEGER PRIMARY KEY AUTOINCREMENT,

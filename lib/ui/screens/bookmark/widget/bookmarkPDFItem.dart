@@ -4,25 +4,25 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:meditation_app/data/model/body/resource_type.dart';
 import 'package:meditation_app/data/model/response/bookmark_list_response.dart';
-import 'package:meditation_app/provider/bookmark_provider.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
-import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../data/model/body/resource_type.dart';
+import '../../../../provider/bookmark_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
 import '../../../common/media_image_card.dart';
+import '../../settings/widget/logout_dialog.dart';
 
-class BookmarkItem extends ConsumerStatefulWidget {
+class BookmarkPDFItem extends ConsumerStatefulWidget {
   final AppStyle appStyle;
-  final BookmarkListResponse model;
+  final BookmarkPDFListResponse? model;
   final int index;
   final bool dragable;
   final String? url;
@@ -32,10 +32,10 @@ class BookmarkItem extends ConsumerStatefulWidget {
   final GestureTapCallback? onBookmarkRemove;
   final void Function()? onPlay;
 
-  const BookmarkItem({
+  const BookmarkPDFItem({
     super.key,
     required this.appStyle,
-    required this.model,
+    this.model,
     required this.isAudio,
     required this.index,
     required this.onBookmarkRemove,
@@ -45,10 +45,10 @@ class BookmarkItem extends ConsumerStatefulWidget {
   })  : dragable = false,
         dragging = false;
 
-  const BookmarkItem.dragable({
+  const BookmarkPDFItem.dragable({
     super.key,
     required this.appStyle,
-    required this.model,
+    this.model,
     required this.index,
     required this.isAudio,
     this.url,
@@ -59,20 +59,19 @@ class BookmarkItem extends ConsumerStatefulWidget {
   }) : dragable = true;
 
   @override
-  ConsumerState<BookmarkItem> createState() => _BookmarkItemState();
+  ConsumerState<BookmarkPDFItem> createState() => _BookmarkItemState();
 }
 
-class _BookmarkItemState extends ConsumerState<BookmarkItem> {
+class _BookmarkItemState extends ConsumerState<BookmarkPDFItem> {
   bool result = true;
 
   @override
   void initState() {
     Future.delayed(
       Duration.zero,
-      () {
-        getDownload();
+          () {
         getCategory();
-        getAudioDownload();
+        getPDFDownload();
 
       },
     );
@@ -81,50 +80,29 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
 
   @override
   void deactivate() {
-    ref.read(courseProvider.notifier).downloadResponse.clear();
-    ref.read(courseProvider.notifier).downloadVideoResponse.clear();
-
-    ref.read(courseProvider.notifier).downloadAudioResponse.clear();
+    // ref.read(courseProvider.notifier).downloadPdfResponse.clear();
+    // ref.read(courseProvider.notifier).downloadPdfResponses.clear();
   }
-
-  getCategory() async {
-    final coursePRead = ref.read(courseProvider);
-    final coursePWatch = ref.watch(courseProvider);
-    await coursePRead.getCategoryFromDatabase();
-    await coursePRead.getAudioCategoryFromDatabase();
-    for (final category in coursePWatch.downloadResponse) {
-      await coursePRead.getVideoFromDatabase(int.parse(category.categoryId ?? ""));
-    }
-    for (final category in coursePWatch.downloadAudioCategoryResponse) {
-      await coursePRead.getAudioFromDatabase(int.parse(category.categoryId ?? ""));
-    }
+getCategory() async {
+  final coursePRead = ref.read(courseProvider);
+  final coursePWatch = ref.watch(courseProvider);
+  for (final category in coursePWatch.downloadPdfResponse){
+    await coursePRead.getPdfFromDatabase(category.categoryId ?? 0);
   }
+}
 
-  getDownload() async {
+  getPDFDownload() async {
     final downloadP = ref.read(downloadProvider);
-    result = await downloadP.checkVideoIsDownload((widget.model.bookmarkVideoResponse?.id ?? 0).toString(), false, false);
-  }
-
-  getAudioDownload() async {
-    final downloadP = ref.read(downloadProvider);
-    result = await downloadP.checkVideoIsDownload((widget.model.bookmarkVideoResponse?.id ?? 0).toString(), false, true);
+    result = await downloadP.checkVideoIsDownload((widget.model?.bookmarkPdfResponse?.pdf ?? 0).toString(), true, false);
+    log("result---->$result--->${widget.model?.bookmarkPdfResponse?.id}");
   }
 
   @override
   Widget build(BuildContext context) {
+    final downloadP = ref.watch(downloadProvider);
+    log("${widget.model?.bookmarkPdfResponse?.id} == ${downloadP.pdfModel?.id}");
     var vp = ref.watch(videoProvider);
     TextStyle textStyle = widget.appStyle.text.font(mulishRegular400, sizePx: 9);
-    String timeStr = widget.model.bookmarkVideoResponse?.duration ?? "";
-    List<String> timeComponents = timeStr.split(":");
-    int minute = 0;
-    int second = 0;
-    if (timeComponents.isNotEmpty && timeComponents.length > 1) {
-      minute = int.parse(timeComponents[1]);
-      second = int.parse(timeComponents[2].split(".")[0]);
-    } // Extract only seconds
-    print("Minute: $minute, Second: $second");
-
-//primaryColor
     return GestureDetector(
       onTap: () {
         widget.onPlay!();
@@ -158,9 +136,10 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               MediaImageCard(
+                isPDF: true,
                 appStyle: widget.appStyle,
-                imgUrl: widget.model.bookmarkVideoResponse != null ? widget.model.bookmarkVideoResponse!.thumbnailImageUrlSrc ?? '' : '',
-                duration: minute == 0 ? '${second} Sec' : '${minute} Min',
+                imgUrl: widget.model?.bookmarkPdfResponse != null ? widget.model?.bookmarkPdfResponse!.thumbnailImageUrlSrc ?? '' : '',
+                duration: "",
                 imgRadius: widget.appStyle.scaleX(25),
                 imgSize: widget.appStyle.scaleX(90),
               ),
@@ -175,7 +154,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '${widget.model.videoTitle}',
+                            '${widget.model?.pdfTitle ?? "Empty..."}',
                             style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 14, color: Colors.white),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -192,7 +171,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                   style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 16, color: AppColors.primaryColor),
                                 ),
                                 TextSpan(
-                                  text: widget.model.bookmarkVideoResponse?.category?.title ?? "",
+                                  text: widget.model?.bookmarkPdfResponse?.category?.title ?? "",
                                   style: textStyle.copyWith(color: AppColors.categoryNameColor, fontSize: 11),
                                 ),
                               ],
@@ -230,24 +209,19 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                           ),
                           Consumer(
                             builder: (context, ref, child) {
-                              final downloadP = ref.watch(downloadProvider);
-                              final coursePWatch = ref.watch(courseProvider);
-                              bool getCat = false;
-                              if (widget.isAudio) {
-                                getCat = ref.read(courseProvider).downloadAudioResponse.any((element) {
-                                  log("audio bookmark download--->${element.videoId}~~~~~${widget.model.bookmarkVideoResponse?.id}");
-                                  return int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.id;
-                                });
-                                log("getcat-----1 $getCat");
-                              } else {
-                                getCat = ref.read(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.video?.id);
-                                log("getcat-----2 $getCat");
-                              }
+                              // final downloadP = ref.watch(downloadProvider);
+                              final getCat = ref.read(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.model?.bookmarkPdfResponse?.id);
+
+                              ref.watch(courseProvider).downloadPdfResponse.any((e) {
+                                print('________))))))))))((((((((((4355(((${e.pdfId}');
+
+                                return true;
+                              });
 
                               if (getCat == true) {
                                 return const SizedBox.shrink();
                               } else {
-                                if (downloadP.isDownloading && widget.model.bookmarkVideoResponse!.id == downloadP.model!.id) {
+                                if (downloadP.isPdfDownloading && widget.model?.bookmarkPdfResponse!.id == downloadP.pdfModel!.id) {
                                   return SizedBox(
                                     height: 15,
                                     width: 15,
@@ -261,26 +235,18 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                                   if (!result) {
                                     return IconButton(
                                       onPressed: () async {
-                                        if((widget.model.bookmarkVideoResponse?.category?.isPurchased ?? false) || widget.model.bookmarkVideoResponse?.videoType==ResourceType.free){
-                                          if (downloadP.model == null) {
-                                            if (widget.isAudio) {
-                                              downloadP.downloadAudio(model: widget.model.bookmarkVideoResponse);
-                                            } else {
-                                              downloadP.download(model: widget.model.bookmarkVideoResponse);
-                                            }
-                                          } else {
-                                            if (widget.model.bookmarkVideoResponse!.id != downloadP.model!.id) {
-                                              if (widget.model.bookmarkVideoResponse?.video != null) {
-                                                showCustomSnackBar('Another Video is in progress');
-                                              } else {
-                                                showCustomSnackBar('Another Audio is in progress');
-                                              }
-                                            }
+                                        print('---------------------?${downloadP.pdfModel?.categoryId ?? 0}');
+                                        print('------------widget.model?.bookmarkPdfResponse---------?${widget.model?.bookmarkPdfResponse?.toJson()}');
+                                        if((widget.model?.bookmarkPdfResponse?.category?.isPurchased ?? false) || widget.model?.bookmarkPdfResponse?.pdfType==ResourceType.free){
+                                          if (downloadP.pdfModel == null) {
+                                            print(widget.model?.bookmarkPdfResponse?.categoryId ?? "");
+                                            downloadP.pdfDownload(model: widget.model?.bookmarkPdfResponse);
+                                          } else if (widget.model?.bookmarkPdfResponse?.id != downloadP.pdfModel!.id) {
+                                            showCustomSnackBar('Another PDF is in progress');
                                           }
                                         }else{
-                                          await buyNow(context, categoryId: widget.model.bookmarkVideoResponse!.categoryId.toString());
-                                          ref.read(bookmarkProvider.notifier).getBookmarkList();
-                                          ref.read(bookmarkProvider.notifier).getAudioBookmarks();
+                                          await buyNow(context, categoryId: (widget.model?.bookmarkPdfResponse?.categoryId ?? 0).toString());
+                                          ref.read(bookmarkProvider.notifier).getPDFBookmarks();
 
                                         }
 

@@ -58,7 +58,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> with TickerProvid
                     labelPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                     controller: _tabController,
                     isScrollable: true,
-                    indicatorPadding: EdgeInsets.symmetric(vertical: _style.scaleX(9)),
+                    indicatorPadding: EdgeInsets.symmetric(vertical: _style.scaleX(12)),
                     tabAlignment: TabAlignment.center,
                     indicatorWeight: 1,
                     // labelColor: AppColors.primaryThemeColor2,

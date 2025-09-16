@@ -60,4 +60,14 @@ class PaidPdfsNotifier extends PdfResourceNotifier {
       }
     }
   }
+  void toggleBookmark(int itemId, {bool notifier = true}) {
+
+    if (pdfsResponse == null || pdfsResponse!.list == null) {
+      return;
+    }
+    var itemIndex = pdfsResponse!.list!.indexWhere((element) => element.id == itemId);
+    if (itemIndex == -1) return;
+    pdfsResponse?.list![itemIndex].bookmarked = !(pdfsResponse!.list![itemIndex].bookmarked ?? true);
+    if (notifier) notifyListeners();
+  }
 }

@@ -6,10 +6,12 @@ import 'package:meditation_app/helper/navigation.dart';
 
 import '../../data/model/body/resource_type.dart';
 import '../../provider/bookmark_provider.dart';
+import '../../provider/featured_videos_provider.dart';
 import '../../theme/styles.dart';
 import '../screens/category/widget/detail_item.dart';
 import '../screens/discover/widget/featured_item.dart';
 import '../screens/discover/widget/featured_item_painter.dart';
+import '../screens/settings/widget/logout_dialog.dart';
 
 class FeatureVideoList extends ConsumerWidget {
   final AppStyle style;
@@ -20,26 +22,24 @@ class FeatureVideoList extends ConsumerWidget {
   final bool shrinkWrap;
   final ScrollController? controller;
 
-  const FeatureVideoList.horizontal(
-     {
+  const FeatureVideoList.horizontal({
     super.key,
     required this.style,
-       required this.list,
+    required this.list,
     required this.clipper,
     this.physics,
     this.shrinkWrap = false,
     this.controller,
   }) : scrollDirection = Axis.horizontal;
 
-  const FeatureVideoList.vertical(
-    {
+  const FeatureVideoList.vertical({
     super.key,
-      required this.list,
-      required this.style,
+    required this.list,
+    required this.style,
     this.physics,
     this.shrinkWrap = false,
     this.controller,
-    })  : scrollDirection = Axis.vertical,
+  })  : scrollDirection = Axis.vertical,
         clipper = null;
 
   @override
@@ -54,28 +54,32 @@ class FeatureVideoList extends ConsumerWidget {
         padding: EdgeInsets.symmetric(horizontal: style.scale * 22),
         itemCount: list.length,
         itemBuilder: (context, index) {
-
           var dataModel = list[index];
-          print('-------------------------->${dataModel.category?.title}');
+          print('------------dataModel-------------->${dataModel.toJson()}');
           return GestureDetector(
-            onTap: () {
-              if (dataModel.category != null) {
-                if (context.canPop()) {
-                  context.pop();
+            onTap: () async {
+              if (dataModel.category?.isPurchased == true) {
+                if (dataModel.category != null) {
+                  if (context.canPop()) {
+                    context.pop();
+                  }
+                  context.goToDetailCategoryScreen(
+                    dataModel.category!,
+                    isAudio: false,
+                    video: DIModel(
+                      thumbnailUrl: dataModel.imgUrl ?? '',
+                      videoType: dataModel.category?.isPurchased ?? false ? ResourceType.paid : ResourceType.free,
+                      videoId: dataModel.video!.id!,
+                      videoUrl: dataModel.videoUrl ?? '',
+                      duration: dataModel.duration ?? '',
+                      title: dataModel.title ?? 'Title Not Found',
+                      categoryName: dataModel.category!.title ?? '',
+                    ),
+                  );
                 }
-                context.goToDetailCategoryScreen(
-                  dataModel.category!,
-                  isAudio: false,
-                  video: DIModel(
-                    thumbnailUrl: dataModel.imgUrl ?? '',
-                    videoType: ResourceType.free,
-                    videoId: dataModel.video!.id!,
-                    videoUrl: dataModel.videoUrl ?? '',
-                    duration: dataModel.duration ?? '',
-                    title: dataModel.title ?? 'Title Not Found',
-                    categoryName: dataModel.category!.title ?? '',
-                  ),
-                );
+              } else {
+                await buyNow(context, categoryId: (dataModel.category!.id ?? 0).toString());
+                ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
               }
             },
             child: scrollDirection == Axis.horizontal
@@ -90,9 +94,14 @@ class FeatureVideoList extends ConsumerWidget {
                     model: dataModel,
                     index: '$index',
                     isDownloaded: false,
-                    onToggleBookmark: () {
-                      if (dataModel.id == null) return;
-                      ref.read(bookmarkProvider).toggleBookmark(dataModel.video?.id??0, isRemove: dataModel.bookmarked ?? false);
+                    onToggleBookmark: () async {
+                      if (dataModel.category?.isPurchased ?? false) {
+                        if (dataModel.id == null) return;
+                        ref.read(bookmarkProvider).toggleBookmark(dataModel.video?.id ?? 0, isRemove: dataModel.bookmarked ?? false);
+                      } else {
+                        await buyNow(context, categoryId: (dataModel.category!.id ?? 0).toString());
+                        ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
+                      }
                     },
                   ),
           );

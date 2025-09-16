@@ -146,7 +146,7 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
     if (oldPassword.isEmpty) {
       _oldPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setOldPwdError(error: 'Please enter an Old Password');
-    }  else if (oldPassword.length < AppConstants.PWD_MIN_LENGTH) {
+    } else if (oldPassword.length < AppConstants.PWD_MIN_LENGTH) {
       _oldPwdFocusNode.requestFocus();
       ref.read(changePasswordProvider).setOldPwdError(error: 'Password must be atleast ${AppConstants.PWD_MIN_LENGTH} character');
     } else if (oldPassword.length > AppConstants.PWD_MAX_LENGTH) {
@@ -173,9 +173,11 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
     }
     if (newPassword == oldPassword && oldPassword.isNotEmpty && newPassword.isNotEmpty) {
       ref.read(changePasswordProvider).setNewPwdError(error: 'New password should not be same as old password');
-    }
-    if (newPassword.isNotEmpty && oldPassword.isNotEmpty) {
+    } else if (newPassword != oldPassword && oldPassword.isNotEmpty && newPassword.isNotEmpty) {
       ref.read(changePasswordProvider).changePassword(oldPassword, newPassword);
     }
+    // if (newPassword.isNotEmpty && oldPassword.isNotEmpty) {
+    //   ref.read(changePasswordProvider).changePassword(oldPassword, newPassword);
+    // }
   }
 }

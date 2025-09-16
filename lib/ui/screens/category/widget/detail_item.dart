@@ -19,6 +19,9 @@ import '../../../../data/model/response/videos_response.dart';
 import '../../../../helper/route/route_paths.dart';
 import '../../../../helper/route/router.dart';
 import '../../../../provider/auth_provider.dart';
+import '../../../../provider/featured_videos_provider.dart';
+import '../../../../provider/resource_provider/free_pdfs_provider.dart';
+import '../../../../provider/resource_provider/paid_all_item_list_provider.dart';
 import '../../../../provider/resource_provider/paid_videos_provider.dart';
 import '../../../../provider/resource_provider/paid_audios_provider.dart';
 import '../../../../theme/colors.dart';
@@ -198,11 +201,11 @@ class DetailItem extends ConsumerStatefulWidget {
     required String this.title,
     required String this.subTitle,
     required this.isDownloaded,
+    required this.onToggleBookmark,
     this.isRemove,
     this.pressRemove,
     this.isShow,
-  })  : model = null,
-        onToggleBookmark = null;
+  }) : model = null;
 
   @override
   ConsumerState<DetailItem> createState() => _DetailItemState();
@@ -241,22 +244,15 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     await coursePRead.getCategoryFromDatabase();
     await coursePRead.getAudioCategoryFromDatabase();
 
-    /*for(final category in coursePWatch.downloadPdfResponses){
-    }*/
-    await coursePRead.getPdfFromDatabase(widget.pdfModel?.categoryId ?? 0);
-
-    /* for(final category in coursePWatch.downloadResponse){
-      print('-------------149${category.categoryId}');
-
-    }*/
     await coursePRead.getVideoFromDatabase(widget.model?.categoryId ?? 0);
     await coursePRead.getAudioFromDatabase(widget.model?.categoryId ?? 0);
+    await coursePRead.getPdfFromDatabase(widget.pdfModel?.categoryId ?? 0);
   }
 
   @override
   void deactivate() {
-    ref.read(courseProvider.notifier).downloadPdfResponses.clear();
-    ref.read(courseProvider.notifier).downloadResponse.clear();
+    // ref.read(courseProvider.notifier).downloadPdfResponses.clear();
+    // ref.read(courseProvider.notifier).downloadResponse.clear();
   }
 
   @override
@@ -265,6 +261,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     var radius = widget.appStyle.scaleX(10);
     var dimension = widget.appStyle.scaleX(97);
     bool isVideo = widget.model != null;
+    bool isPdf=widget.pdfModel!=null;
     var pdfIconSize = isVideo ? 0.0 : widget.appStyle.scaleX(30);
 
     final playlistP = ref.watch(playListProvider);
@@ -273,9 +270,14 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     final audioP = ref.watch(audioProvider);
     var paidVideo = ref.watch(paidVideosProvider);
     var paidAudio = ref.watch(paidAudiosProvider);
+    var freePdf = ref.watch(freePdfsProvider);
+    var paidPdf = ref.watch(freePdfsProvider);
+    var paidAllItem = ref.watch(paidAllItemProvider);
+    var freeallItem = ref.watch(freePdfsProvider);
     log("color------${videoP.isSelected}=====${int.parse(widget.index)}");
     log("color 222------${videoP.selectedItemId}=====${widget.seletedItemId})}");
-    log("bookmark in detail item------${widget.model?.bookmarked} ${widget.model?.bookmarked} ");
+    log("bookmark in detail item------${widget.model?.bookmarked} ${widget.pdfModel?.bookmarked} ");
+    log("bookmark pdf in detail item------${widget.pdfModel?.bookmarked} ${!widget.isDownloaded} ${widget.isShow} ");
     return Container(
       decoration: ShapeDecoration(
         color: const Color(0xFF1B1B1B),
@@ -347,7 +349,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           SizedBox(width: widget.appStyle.scaleX(5)),
-                          Flexible(
+                          Expanded(
                             child: Text(
                               isVideo ? widget.model?.category?.title ?? "" : widget.subTitle ?? '',
                               style: textStyle.copyWith(color: AppColors.categoryNameColor, fontSize: 9, fontWeight: FontWeight.bold),
@@ -355,7 +357,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          SizedBox(width: widget.appStyle.scaleX(120)),
+                          SizedBox(width: widget.appStyle.scaleX(60)),
                         ],
                       ),
                     ],
@@ -429,7 +431,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () async {
-                                    if (widget.model?.category?.isPurchased ?? false) {
+                                    if (widget.model?.category?.isPurchased ?? false || widget.model?.videoType == ResourceType.free) {
                                       log("model--------->${widget.model?.toJson()}");
                                       print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
                                       debugPrint('File Path :: ${widget.model?.video?.fileName ?? ""}');
@@ -452,6 +454,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
                                       paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
                                       paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
+                                      paidAllItem.fetchAllPaidItem(widget.model?.category?.id ?? 0);
+                                      ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
                                     }
                                   },
                                 );
@@ -549,55 +553,81 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   const Spacer(),
                 ],
               )
-            else if (!widget.isDownloaded)
-              widget.isShow == true
-                  ? Consumer(
-                      builder: (context, ref, child) {
-                        final downloadP = ref.watch(downloadProvider);
-                        final getCat = ref.read(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.pdf?.id);
+            // else if (!widget.isDownloaded)
+            else if (isPdf)
+              (widget.isShow ?? false)
+                  ? Row(
+                      children: [
+                        if (!widget.isDownloaded)
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final downloadP = ref.watch(downloadProvider);
+                            bool getCat = false;
+                            for (final e in ref.watch(courseProvider).downloadPdfResponse) {
+                              print("Comparing e.pdfId=${e.pdfId} with widget.pdfModel.id=${widget.pdfModel?.id}");
+                            }
+                              getCat = ref.watch(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.id);
+                              print('-----gat cat---pdf---------->${getCat}');
+                              // ref.watch(courseProvider).downloadPdfResponse.any((e) {
+                              //   print('-----gat cat---pdf--1-------->${e.pdfId}-----${widget.pdfModel?.id}');
+                              //   return true;
+                              // });
 
-                        ref.watch(courseProvider).downloadPdfResponse.any((e) {
-                          print('________))))))))))((((((((((4355(((${e.pdfId}');
-
-                          return true;
-                        });
-                        // print('________))))))))))((((((((((4399(((${widget.pdfModel?.pdf?.id}');
-
-                        // print('________*****************________442(((${widget.pdfModel?.categoryId}');
-                        // print('________*****************________443(((${downloadP.pdfModel?.categoryId}');
-                        // print('________*****************________444(((${downloadP.isPdfDownloading}');
-
-                        if (getCat) {
-                          return const SizedBox.shrink();
-                        } else {
-                          if (downloadP.isPdfDownloading && widget.pdfModel!.id == downloadP.pdfModel!.id) {
-                            return SizedBox(
-                              height: 15,
-                              width: 15,
-                              child: CircularProgressIndicator(
-                                strokeCap: StrokeCap.butt,
-                                strokeWidth: 2,
-                                value: downloadP.progress,
-                              ),
-                            );
-                          } else {
-                            return OutlinedIconButton.svg(
-                              SvgPaths.download,
-                              appStyle: widget.appStyle,
-                              // svgIconSrc: SvgPaths.bookmarkSelected,
-                              onTap: () {
-                                print('---------------------?${downloadP.pdfModel?.categoryId ?? 0}');
-                                if (downloadP.pdfModel == null) {
-                                  print(widget.pdfModel?.categoryId ?? "");
-                                  downloadP.pdfDownload(model: widget.pdfModel);
-                                } else if (widget.pdfModel!.id != downloadP.pdfModel!.id) {
-                                  showCustomSnackBar('Another PDF is in progress');
-                                }
-                              },
-                            );
-                          }
-                        }
-                      },
+                            // final downloadP = ref.watch(downloadProvider);
+                            // final getCat = ref.watch(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.id);
+                            //
+                            // ref.watch(courseProvider).downloadPdfResponse.any((e) {
+                            //   print('________))))))))))((((((((((4355(((${e.pdfId}');
+                            //
+                            //   return true;
+                            // });
+                            if (getCat) {
+                              return const SizedBox.shrink();
+                            } else {
+                              if (downloadP.isPdfDownloading && widget.pdfModel?.id == downloadP.pdfModel?.id) {
+                                return SizedBox(
+                                  height: 15,
+                                  width: 15,
+                                  child: CircularProgressIndicator(
+                                    strokeCap: StrokeCap.butt,
+                                    strokeWidth: 2,
+                                    value: downloadP.progress,
+                                  ),
+                                );
+                              } else {
+                                return OutlinedIconButton.svg(
+                                  SvgPaths.download,
+                                  appStyle: widget.appStyle,
+                                  // svgIconSrc: SvgPaths.bookmarkSelected,
+                                  onTap: () async {
+                                    print('------------pdf download-------->${widget.pdfModel?.toJson()}');
+                                    print('------------pdf download11-------->${downloadP.pdfModel?.toJson()}');
+                                    print('------------pdf download22-------->${widget.pdfModel?.pdfType == ResourceType.free}');
+                                    if ((widget.pdfModel?.category?.isPurchased ?? false) || widget.pdfModel?.pdfType == ResourceType.free) {
+                                      if (downloadP.pdfModel == null) {
+                                        print(widget.pdfModel?.categoryId ?? "");
+                                        downloadP.pdfDownload(model: widget.pdfModel);
+                                      } else if (widget.pdfModel?.id != downloadP.pdfModel?.id) {
+                                        showCustomSnackBar('Another PDF is in progress');
+                                      }
+                                    } else {
+                                      await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString());
+                                      paidPdf.fetchPdfs(widget.pdfModel?.category?.id ?? 0);
+                                      paidAllItem.fetchAllPaidItem(widget.pdfModel?.category?.id ?? 0);
+                                    }
+                                  },
+                                );
+                              }
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 8), // spacing between buttons
+                        OutlinedIconButton.svg(
+                          widget.pdfModel?.bookmarked != null && (widget.pdfModel?.bookmarked ?? false) ? SvgPaths.bookmarkSelected : SvgPaths.bookmarkUnselected,
+                          appStyle: widget.appStyle,
+                          onTap: widget.onToggleBookmark,
+                        ),
+                      ],
                     )
                   : const SizedBox.shrink(),
             SizedBox(width: widget.appStyle.scaleX(10)),

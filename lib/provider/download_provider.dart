@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -57,8 +58,7 @@ class DownloadNotifier extends ChangeNotifier {
   }
 
   void pdfDownload({PdfResponse? model}) async {
-    //sdf;
-    //bool? currantResult;
+  log("----->model for pdf download--->$model");
     BuildContext? context = await rootNavigator.currentContext;
     if (context == null) return;
     if (model == null) return;
@@ -76,10 +76,7 @@ class DownloadNotifier extends ChangeNotifier {
         ),
         duration: const Duration(seconds: 5),
       );
-      return;
-    }
-    if (false) {
-      buyNow(context, categoryId: model.category!.id.toString());
+      _pdfModel = null;
       return;
     }
     await _checkDirectory(true);
@@ -96,10 +93,10 @@ class DownloadNotifier extends ChangeNotifier {
     //  _pdfModel = null;
     //  notifyListeners();
     //} else {
-    await DownloadHelper.instance.download(
+    final res=await DownloadHelper.instance.download(
       model.pdfUrl!,
       '$path/${model.pdf!.fileName!}',
-      onReceiveProgress: (count, total) {
+      onReceiveProgress: (count, total) async {
         print("model category id-->${model.categoryId}");
         debugPrint('Count :: $count --*-- Total :: $total');
         if (total != -1) {
@@ -113,7 +110,8 @@ class DownloadNotifier extends ChangeNotifier {
               _isDownloadComplete = true;
               _isPdfDownloading = false;
               debugPrint('Is Downloading == $_isPdfDownloading --*-*-- Is Download Complete == $_isDownloadComplete');
-              _saveCategoryAndVideo(model.pdf?.url ?? "", pdfModel: model, isPdf: true); //pdf download- download provider
+             // await _saveCategoryAndVideo(model.pdf?.url ?? "", pdfModel: model, isPdf: true); //pdf download- download provider
+             await _saveCategoryAndVideo(model.pdfUrl ?? "", pdfModel: model, isPdf: true); //pdf download- download provider
               _pdfModel = null;
               notifyListeners();
             }
@@ -377,13 +375,13 @@ class DownloadNotifier extends ChangeNotifier {
 
   ///save category vedio ,pdf,audio
   Future<void> _saveCategoryAndVideo(String videoFile, {VideoResponse? model, PdfResponse? pdfModel, bool isPdf = false, bool isAudio = false}) async {
-    print('-------333------++++${model}');
-    print('-------334------++++${pdfModel}');
-    print('-------335------++++${videoFile}');
+    print('-------audio or video model------++++${model}');
+    print('-------pdf download model------++++${pdfModel?.toJson()}');
+    print('-------file url------++++${videoFile}');
     CategoryModal? res;
-    PdfModel? Pdfres;
+    CategoryModal? Pdfres;
     final dbHelper = ref.read(databaseProvider);
-    print("-------340------++++${pdfModel?.categoryId}");
+    print("-------pdfModel?.categoryId------++++${pdfModel?.categoryId}");
     if (isPdf) {
       Pdfres = await dbHelper.getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
     } else if (isAudio) {
@@ -395,27 +393,27 @@ class DownloadNotifier extends ChangeNotifier {
 
     if (isPdf) {
       if (Pdfres != null) {
-        print("-------352------++++${Pdfres.toJson()}");
+        print("-------pdf response when download------++++${Pdfres.toJson()}");
 
-        PdfModel vModal = PdfModel(categoryId: pdfModel?.categoryId, pdfId: pdfModel?.pdf?.id.toString(), pdfName: pdfModel?.title, categoryTitle: pdfModel?.categoryTitle, pdfFile: videoFile);
+        PdfModel vModal = PdfModel(categoryId: pdfModel?.categoryId, pdfId: pdfModel?.id.toString(), pdfName: pdfModel?.title, categoryTitle: pdfModel?.categoryTitle, pdfFile: videoFile);
         int vRes = await dbHelper.savePDF(vModal);
         if (vRes > 0) {
           Pdfcomplate = true;
           _isPdfDownloading = false;
-          showCustomSnackBar('PDF Save Successfully download');
+          showCustomSnackBar('PDF downloaded Successfully');
           _isDownloadComplete = false;
           _pdfModel = null;
           Pdfres = null;
           notifyListeners();
         }
       } else {
-        print("-------366------++++${Pdfres?.toJson()}");
-        PdfModel modal = PdfModel(id: pdfModel?.id, categoryId: pdfModel?.categoryId, pdfFile: pdfModel?.pdf?.url, pdfId: pdfModel?.pdf?.id.toString(), categoryTitle: pdfModel?.categoryTitle, pdfName: pdfModel?.pdf?.fileName);
+        print("-------pdf response when download when category not avail------++++${Pdfres?.toJson()}");
+        CategoryModal modal = CategoryModal(categoryId: pdfModel?.categoryId?.toString(), categoryName: pdfModel?.categoryTitle ?? pdfModel?.category?.title, categoryImage: pdfModel?.category?.imageResponse?.imageUrl);
         int cRes = await dbHelper.savePdfCategory(modal);
         print("-------374------++++$cRes");
         if (cRes > 0) {
-          PdfModel? res = await dbHelper.getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
-          PdfModel vModal = PdfModel(categoryId: pdfModel?.categoryId, pdfId: pdfModel?.pdf?.id.toString(), pdfName: pdfModel?.title, categoryTitle: pdfModel?.categoryTitle, pdfFile: videoFile);
+          CategoryModal? res = await dbHelper.getSinglePdfCategory(pdfModel?.categoryId?.toString() ?? "");
+          PdfModel vModal = PdfModel(categoryId: pdfModel?.categoryId, pdfId: pdfModel?.id.toString(), pdfName: pdfModel?.title, categoryTitle: pdfModel?.categoryTitle, pdfFile: videoFile);
           print("-------383------++++$res");
           print(vModal.toJson());
           int vRes = await dbHelper.savePDF(vModal);
@@ -504,11 +502,11 @@ class DownloadNotifier extends ChangeNotifier {
     final dbHelper = ref.read(databaseProvider);
     Object? res;
     if (isPdf) {
-      res = await dbHelper.getSingleVideo(id);
+      res = await dbHelper.getSinglePdf(id);
     } else if (isAudio) {
       res = await dbHelper.getSingleAudio(id);
     } else {
-      res = await dbHelper.getSinglePdf(id);
+      res = await dbHelper.getSingleVideo(id);
     }
     if (res == null) {
       _isAlreadyDownload = false;

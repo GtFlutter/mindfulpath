@@ -14,8 +14,10 @@ import 'package:meditation_app/provider/featured_videos_provider.dart';
 import 'package:meditation_app/provider/repo_provider/bookmark_repo_provider.dart';
 import 'package:meditation_app/provider/resource_provider/free_all_item_list_provider.dart';
 import 'package:meditation_app/provider/resource_provider/free_audios_provider.dart';
+import 'package:meditation_app/provider/resource_provider/free_pdfs_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_all_item_list_provider.dart';
 import 'package:meditation_app/provider/resource_provider/paid_audios_provider.dart';
+import 'package:meditation_app/provider/resource_provider/paid_pdfs_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/util/constants.dart';
@@ -40,21 +42,31 @@ class BookmarkNotifier extends ChangeNotifier {
   bool islandScap = false;
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   bool _isToggleLoading = false;
+
   bool get isToggleLoading => _isToggleLoading;
 
   List<BookmarkListResponse>? _bookmarkListResponse;
+
   List<BookmarkListResponse>? get bookmarkListResponse => _bookmarkListResponse;
 
   List<BookmarkListResponse>? _bookmarkAudioListResponse;
+
   List<BookmarkListResponse>? get bookmarkAudioListResponse => _bookmarkAudioListResponse;
 
+  List<BookmarkPDFListResponse>? _bookmarkPDFListResponse;
+
+  List<BookmarkPDFListResponse>? get bookmarkPDFListResponse => _bookmarkPDFListResponse;
+
   List<CategoryListResponse>? _category;
+
   List<CategoryListResponse>? get category => _category;
 
   List<CategoryListResponse>? _audioCategory;
+
   List<CategoryListResponse>? get audioCategory => _audioCategory;
 
   void startLoading() {
@@ -149,7 +161,36 @@ class BookmarkNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleBookmark(int itemId, {bool isRemove = false, bool isAudio = false}) async {
+  Future<void> getPDFBookmarks() async {
+    startLoading();
+    Response response = await repo.getPDFBookmarks();
+    debugPrint('RESPONSE CODE :: ${response.statusCode}');
+    if (response.statusCode != 200) {
+      stopLoading();
+      ApiChecker.checkApi(response);
+    } else {
+      try {
+        var json = jsonDecode(response.body);
+        _bookmarkPDFListResponse?.clear();
+        _bookmarkPDFListResponse = BookmarkPDFListResponse.listFromJson(json['data']['bookmark_pdf_list'], false);
+        for (int i = 0; i <= (_bookmarkPDFListResponse?.length ?? 0); i++) {
+          if (_bookmarkPDFListResponse?[i].bookmarkPdfResponse == null) {
+            log("audio deleted");
+            _bookmarkPDFListResponse?.removeAt(i);
+          } else {
+            log("-else");
+          }
+        }
+        notifyListeners();
+        stopLoading();
+      } catch (e) {
+        //showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
+        stopLoading();
+      }
+    }
+  }
+
+  Future<void> toggleBookmark(int itemId, {bool isRemove = false, bool isAudio = false, bool isPDF = false}) async {
     if (!ref.read(authProvider).isUserLoggedIn) {
       showCustomSnackBar(
         'Please login to bookmark.',
@@ -169,7 +210,7 @@ class BookmarkNotifier extends ChangeNotifier {
     showCustomSnackBar(isRemove ? 'UnBookmarking...' : 'Bookmarking...');
     startToggleLoading();
 
-    Response response = await repo.toggleBookmark(itemId, isAudio);
+    Response response = await repo.toggleBookmark(itemId, isAudio, isPDF);
     if (response.statusCode != 200) {
       stopToggleLoading();
       ApiChecker.checkApi(response);
@@ -179,6 +220,9 @@ class BookmarkNotifier extends ChangeNotifier {
         if (isAudio) {
           ref.read(freeAudiosProvider).toggleBookmark(itemId);
           ref.read(paidAudiosProvider).toggleBookmark(itemId);
+        } else if (isPDF) {
+          ref.read(freePdfsProvider).toggleBookmark(itemId);
+          ref.read(paidPdfsProvider).toggleBookmark(itemId);
         } else {
           ref.read(freeVideosProvider).toggleBookmark(itemId);
           ref.read(paidVideosProvider).toggleBookmark(itemId);

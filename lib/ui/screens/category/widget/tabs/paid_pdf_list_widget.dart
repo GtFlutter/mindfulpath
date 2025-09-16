@@ -8,6 +8,7 @@ import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../database/database_helper.dart';
+import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../theme/styles.dart';
 import '../detail_item.dart';
 
@@ -15,7 +16,7 @@ class PaidPdfListWidget extends ConsumerStatefulWidget {
   final CategoryListResponse category;
   final bool isPurchased;
 
-  const PaidPdfListWidget({super.key, required this.category,required this.isPurchased});
+  const PaidPdfListWidget({super.key, required this.category, required this.isPurchased});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _PaidPdfListWidgetState();
@@ -27,7 +28,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
 
   @override
   void initState() {
-    Future.delayed(Duration.zero, ()  {
+    Future.delayed(Duration.zero, () {
       print('______________________________________30__${widget.category.isPurchased}');
       // if (!(widget.isPurchased)) {
       //   buyNow(context, categoryId: widget.category.id.toString());
@@ -37,7 +38,8 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
     });
     super.initState();
   }
-  Future<void> initCall()async {
+
+  Future<void> initCall() async {
     ///to get downloaded pdf for if already downloaded then hide button so....
     ref.read(paidPdfsProvider).downloadedPDF = await ref.read(databaseProvider).getPdf(widget.category.id!);
   }
@@ -52,7 +54,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
     Future.delayed(Duration.zero, () async {
       final coursePRead = ref.read(courseProvider);
       await coursePRead.getCategoryPdfFromDatabase();
-      await coursePRead.getPdfFromDatabase(widget.category.id??0);
+      await coursePRead.getPdfFromDatabase(widget.category.id ?? 0);
     });
   }
 
@@ -62,13 +64,12 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
     var provider = ref.watch(paidPdfsProvider);
 
-    provider.downloadedPDF.map((e){
+    provider.downloadedPDF.map((e) {
       print('First Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
     });
 
-    provider.pdfsResponse?.list?.map((e){
+    provider.pdfsResponse?.list?.map((e) {
       print('Second Id%%%%%%%%%%%%%%%%%%%%${e.categoryId}');
-
     });
 
     if (provider.loading) {
@@ -101,11 +102,11 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
       itemCount: provider.pdfsResponse!.list!.length,
       itemBuilder: (context, index) {
         var model = provider.pdfsResponse!.list![index];
-
+        print("provider.pdfsResponse?.list?[index].id----->${provider.pdfsResponse?.list?[index].id}");
         return GestureDetector(
           onTap: () {
             print('______________________________________106__${widget.category.isPurchased}');
-            if (widget.category.isPurchased??false) {
+            if (widget.category.isPurchased ?? false) {
               viewPdf(model.pdfUrl);
             } else {
               buyNow(context, categoryId: widget.category.id.toString());
@@ -119,12 +120,21 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
             index: '$index',
             seletedItemId: model.id,
             isShow: true,
-            isDownloaded: provider.downloadedPDF.any((element) => element.id==provider.pdfsResponse?.list?[index].id),
+            onToggleBookmark: () {
+              toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false);
+            },
+            isDownloaded: provider.downloadedPDF.any((element) => element.id == provider.pdfsResponse?.list?[index].id),
           ),
         );
       },
       separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
     );
+  }
+
+  Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false}) async {
+    if (itemId == null) return;
+    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isPDF: true);
+    ref.read(paidPdfsProvider.notifier).fetchPdfs(widget.category.id ?? 0);
   }
 
   void viewPdf(String? pdfUrl) {

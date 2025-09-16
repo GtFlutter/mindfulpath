@@ -32,6 +32,7 @@ class CourseNotifier extends ChangeNotifier {
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
+
   bool _isPDFLoading = false;
 
   bool get isPDFLoading => _isPDFLoading;
@@ -59,6 +60,12 @@ class CourseNotifier extends ChangeNotifier {
       "category_name" TEXT,
       "category_image" TEXT
     );''',
+    '''CREATE TABLE IF NOT EXISTS ${DatabaseConsts.categoryPdfTable} (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "category_id" TEXT,
+      "category_name" TEXT,
+      "category_image" TEXT
+    );''',
   ]);
 
   Future<Database> get db async {
@@ -66,14 +73,47 @@ class CourseNotifier extends ChangeNotifier {
     return _db;
   }
 
+  List<PurchasedVideoResponse> _cpVideoResponse = [];
+
+  List<PurchasedVideoResponse> get cpVideoResponse => _cpVideoResponse;
+
+//for video category
+  List<CategoryModal> _downloadResponse = [];
+
+  List<CategoryModal> get downloadResponse => _downloadResponse;
+
+//for audio category
+  List<CategoryModal> _downloadAudioCategoryResponse = [];
+
+  List<CategoryModal> get downloadAudioCategoryResponse => _downloadAudioCategoryResponse;
+
+  List<CategoryModal> _downloadPdfResponses = [];
+
+  List<CategoryModal> get downloadPdfResponses => _downloadPdfResponses;
+  int index = 0;
+
+  List<VideoModal> _downloadVideoResponse = [];
+
+  List<VideoModal> get downloadVideoResponse => _downloadVideoResponse;
+
+  List<VideoModal> _downloadAudioResponse = [];
+
+  List<VideoModal> get downloadAudioResponse => _downloadAudioResponse;
+
+  final List<PdfModel> _downloadPdfResponse = [];
+
+  List<PdfModel> get downloadPdfResponse => _downloadPdfResponse;
+
+  final List<PdfModel> _downloadPdfResponseTemp = [];
+
+  List<PdfModel> get downloadPdfResponseTemp => _downloadPdfResponseTemp;
+
   Future<Database> openDB() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'meditation_DB.db');
 
     return await openDatabaseWithMigration(path, _configs);
   }
-
-
 
   void _startLoading() {
     if (!_isLoading) {
@@ -120,10 +160,6 @@ class CourseNotifier extends ChangeNotifier {
     }
   }
 
-  List<PurchasedVideoResponse> _cpVideoResponse = [];
-
-  List<PurchasedVideoResponse> get cpVideoResponse => _cpVideoResponse;
-
   Future<void> getCurrentlyProgressList() async {
     _startLoading();
     Response response = await repo.getPurchasedList();
@@ -142,17 +178,7 @@ class CourseNotifier extends ChangeNotifier {
       }
     }
   }
-
-//for video category
-  List<CategoryModal> _downloadResponse = [];
-
-  List<CategoryModal> get downloadResponse => _downloadResponse;
-
-//for audio category
-  List<CategoryModal> _downloadAudioCategoryResponse = [];
-
-  List<CategoryModal> get downloadAudioCategoryResponse => _downloadAudioCategoryResponse;
-
+///get video category
   Future<void> getCategoryFromDatabase() async {
     _startLoading();
     List<CategoryModal> list = await ref.read(databaseProvider).getCategory();
@@ -160,7 +186,7 @@ class CourseNotifier extends ChangeNotifier {
     _downloadResponse = list;
     _stopLoading();
   }
-
+///get audio category
   Future<void> getAudioCategoryFromDatabase() async {
     _startLoading();
     List<CategoryModal> list = await ref.read(databaseProvider).getAudioCategory();
@@ -168,15 +194,10 @@ class CourseNotifier extends ChangeNotifier {
     _downloadAudioCategoryResponse = list;
     _stopLoading();
   }
-
-  List<PdfModel> _downloadPdfResponses = [];
-
-  List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
-  int index = 0;
-
+///get pdf category
   Future<void> getCategoryPdfFromDatabase() async {
     _startLoading();
-    List<PdfModel> list = await ref.read(databaseProvider).getPdfCategory();
+    List<CategoryModal> list = await ref.read(databaseProvider).getPdfCategory();
     print(list.length);
     index = list.length;
     print("getCategoryPdfFromDatabase====>$list");
@@ -185,14 +206,7 @@ class CourseNotifier extends ChangeNotifier {
     _stopLoading();
   }
 
-  List<VideoModal> _downloadVideoResponse = [];
-
-  List<VideoModal> get downloadVideoResponse => _downloadVideoResponse;
-
-  List<VideoModal> _downloadAudioResponse = [];
-
-  List<VideoModal> get downloadAudioResponse => _downloadAudioResponse;
-
+  ///Get video from database
   Future<void> getVideoFromDatabase(int categoryId) async {
     _startLoading();
     _downloadVideoResponse.clear();
@@ -200,7 +214,7 @@ class CourseNotifier extends ChangeNotifier {
     _downloadVideoResponse.addAll(list);
     _stopLoading();
   }
-
+///Get audio from database
   Future<void> getAudioFromDatabase(int categoryId) async {
     _startLoading();
     _downloadAudioResponse.clear();
@@ -208,15 +222,7 @@ class CourseNotifier extends ChangeNotifier {
     _downloadAudioResponse.addAll(list);
     _stopLoading();
   }
-
-  final List<PdfModel> _downloadPdfResponse = [];
-
-  List<PdfModel> get downloadPdfResponse => _downloadPdfResponse;
-
-  final List<PdfModel> _downloadPdfResponseTemp = [];
-
-  List<PdfModel> get downloadPdfResponseTemp => _downloadPdfResponseTemp;
-
+///Get pdf from database for particular category
   Future<void> getPdfFromDatabase(int id) async {
     _startLoading();
     List<PdfModel> list = [];
@@ -227,7 +233,7 @@ class CourseNotifier extends ChangeNotifier {
     log("Length Of PDF : ${_downloadPdfResponse.length}");
     _stopLoading();
   }
-
+///Get pdf from database for all category
   Future<void> getPdfFromDatabaseTemp() async {
     log("1st time called......");
     _downloadPdfResponse.clear();
@@ -238,7 +244,7 @@ class CourseNotifier extends ChangeNotifier {
     await getCategoryPdfFromDatabase();
     for (final category in _downloadPdfResponses) {
       List<PdfModel> list = [];
-      list = await ref.read(databaseProvider).getPdf(category.categoryId ?? 0);
+      list = await ref.read(databaseProvider).getPdf(int.parse(category.categoryId ?? ""));
       _downloadPdfResponseTemp.addAll(list);
       log("Length ${list.length}---");
     }
@@ -247,7 +253,7 @@ class CourseNotifier extends ChangeNotifier {
     notifyListeners();
     log("Length Of PDF : ${_downloadPdfResponse.length}");
   }
-
+///Delete particular video from database
   Future<void> deleteVideo(int videoId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
@@ -261,7 +267,7 @@ class CourseNotifier extends ChangeNotifier {
       Navigator.pop(context);
     }
   }
-
+///Delete particular audio from database
   Future<void> deleteAudio(int videoId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
@@ -275,7 +281,7 @@ class CourseNotifier extends ChangeNotifier {
       Navigator.pop(context);
     }
   }
-
+///Delete particular video category from database
   Future<void> deleteCategoryVideo(int categoryId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
@@ -284,7 +290,7 @@ class CourseNotifier extends ChangeNotifier {
       whereArgs: [categoryId],
     );
   }
-
+///Delete particular audio category from database
   Future<void> deleteCategoryAudio(int categoryId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
@@ -293,7 +299,7 @@ class CourseNotifier extends ChangeNotifier {
       whereArgs: [categoryId],
     );
   }
-
+///Delete particular pdf category from database
   Future<void> deleteCategoryPdf(int categoryId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(
@@ -302,7 +308,7 @@ class CourseNotifier extends ChangeNotifier {
       whereArgs: [categoryId],
     );
   }
-
+///Delete particular pdf from database
   Future<void> deletePdf(int pdfId, BuildContext context) async {
     var dbClient = await db;
     final result = await dbClient.delete(

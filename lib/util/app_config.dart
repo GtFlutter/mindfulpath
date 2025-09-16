@@ -44,6 +44,7 @@ class AppConfigs {
 
   static const String getBookmarks = '/get-bookmark-list';
   static const String getAudioBookmarks = '/get-audio-bookmark-list';
+  static const String getPDFBookmarks = '/get-pdf-bookmark-list';
   static const String toggleBookmark = '/add-to-bookmark';
 
   static const String getPlaylist = '/get-playlist';

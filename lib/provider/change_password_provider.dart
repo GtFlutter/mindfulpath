@@ -138,9 +138,9 @@ class ChangePwdResponseErrorModel {
   factory ChangePwdResponseErrorModel.fromJson(Map<String, dynamic> json) {
     return ChangePwdResponseErrorModel(
       // oldPassword: json['new_password'] == null ? [] : json['new_password'].cast<String>(),
-      oldPassword: json['new_password'] == null ? [] : List<String>.from(json['old_password']),
+      oldPassword: json['old_password'] == null ? [] : List<String>.from(json['old_password']),
       // newPassword: json['old_password'] == null ? [] : json['old_password'].cast<String>(),
-      newPassword: json['old_password'] == null ? [] : List<String>.from(json['old_password']),
+      newPassword: json['new_password'] == null ? [] : List<String>.from(json['new_password']),
     );
   }
 }

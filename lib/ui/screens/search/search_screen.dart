@@ -141,79 +141,88 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: Column(
             children: [
               if (!isLandscape) ...[
-
-                Container(
-                  height: _style.scaleX(45),
-                  // padding: EdgeInsets.symmetric(horizontal: _style.scaleX(15), vertical: _style.scaleX(2)),
-                  padding: EdgeInsets.symmetric(horizontal: _style.scaleX(15)),
-                  margin: EdgeInsets.symmetric(vertical: _style.scaleX(10), horizontal: _style.scaleX(20)),
-                  alignment: Alignment.center,
-                  decoration: ShapeDecoration(
-                    color: Color(0xFF2D251F),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_style.scaleX(22.5))),
-                    shadows: [BoxShadow(blurRadius: 1, offset: Offset(0.5, 1), color: Colors.black12)],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        SvgPaths.search,
-                        height: _style.scale * 20,
-                        fit: BoxFit.contain,
-                        colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                      ),
-                      SizedBox(width: _style.scaleX(14)),
-                      Flexible(
-                        child: TextField(
-                          focusNode: _focusNode,
-                          // autofocus: true,
-                          maxLines: 1,
-                          controller: _controller,
-                          textInputAction: TextInputAction.search,
-                          keyboardType: TextInputType.text,
-                          onChanged: (text) {
-                            // if (text.isEmpty) {
-                            //   return;
-                            // }
-                            List<int>? ids = [];
-                            if (_selectedCategories.isNotEmpty) {
-                              _selectedCategories.map((e) {
-                                ids.add(e.id ?? 0);
-                              }).toList();
-                            }
-
-                            // setState(() {
-                            // dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
-                            dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
-                            if (text.isEmpty) {
-                              setState(() {
-                                showSearchResult = true;
-                              });
-                            }
-
-                            // });
-                          },
-                          style: _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white, spacingPc: 10),
-                          strutStyle: const StrutStyle(
-                            height: 1, // tweak until it visually matches
-                            fontSize: 14,
-                            forceStrutHeight: true,
-                          ),
-                          textAlignVertical: TextAlignVertical.center,
-                          decoration: InputDecoration(
-                            isCollapsed: true,
-                            border: InputBorder.none,
-                            hintText: 'Hinted search text',
-                            hintStyle: _style.text.font(mulishMedium500, sizePx:14, color: Colors.white.withOpacity(0.5), spacingPc: 10),
-                              contentPadding: EdgeInsets.zero,
-                            // contentPadding: EdgeInsets.symmetric(vertical: _style.scaleX(12)), // keeps it centered
-                            constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
-                            // alignLabelWithHint: true,
-                          ),
+                Row(
+                  children: [
+                    IconButton( iconSize: 25,
+                      icon: const Icon(Icons.arrow_back, color: Colors.white,),
+                      onPressed: () => Navigator.of(context).maybePop(),
+                    ),
+                    Expanded(
+                      child: Container(
+                        height: _style.scaleX(45),
+                        // padding: EdgeInsets.symmetric(horizontal: _style.scaleX(15), vertical: _style.scaleX(2)),
+                        padding: EdgeInsets.symmetric(horizontal: _style.scaleX(15)),
+                        margin: EdgeInsets.symmetric(vertical: _style.scaleX(10), horizontal: _style.scaleX(20)),
+                        alignment: Alignment.center,
+                        decoration: ShapeDecoration(
+                          color: Color(0xFF2D251F),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_style.scaleX(22.5))),
+                          shadows: [BoxShadow(blurRadius: 1, offset: Offset(0.5, 1), color: Colors.black12)],
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              SvgPaths.search,
+                              height: _style.scale * 20,
+                              fit: BoxFit.contain,
+                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            ),
+                            SizedBox(width: _style.scaleX(14)),
+                            Flexible(
+                              child: TextField(
+                                focusNode: _focusNode,
+                                // autofocus: true,
+                                maxLines: 1,
+                                controller: _controller,
+                                textInputAction: TextInputAction.search,
+                                keyboardType: TextInputType.text,
+                                onChanged: (text) {
+                                  // if (text.isEmpty) {
+                                  //   return;
+                                  // }
+                                  List<int>? ids = [];
+                                  if (_selectedCategories.isNotEmpty) {
+                                    _selectedCategories.map((e) {
+                                      ids.add(e.id ?? 0);
+                                    }).toList();
+                                  }
+                      
+                                  // setState(() {
+                                  // dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
+                                  dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+                                  if (text.isEmpty) {
+                                    setState(() {
+                                      showSearchResult = true;
+                                    });
+                                  }
+                      
+                                  // });
+                                },
+                                style: _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white, spacingPc: 10),
+                                strutStyle: const StrutStyle(
+                                  height: 1, // tweak until it visually matches
+                                  fontSize: 14,
+                                  forceStrutHeight: true,
+                                ),
+                                textAlignVertical: TextAlignVertical.center,
+                                decoration: InputDecoration(
+                                  isCollapsed: true,
+                                  border: InputBorder.none,
+                                  hintText: 'Hinted search text',
+                                  hintStyle: _style.text.font(mulishMedium500, sizePx:14, color: Colors.white.withOpacity(0.5), spacingPc: 10),
+                                    contentPadding: EdgeInsets.zero,
+                                  // contentPadding: EdgeInsets.symmetric(vertical: _style.scaleX(12)), // keeps it centered
+                                  constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
+                                  // alignLabelWithHint: true,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: _style.scaleX(20)),

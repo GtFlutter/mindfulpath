@@ -8,19 +8,35 @@ import 'package:meditation_app/theme/text_field_style.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 
-class CreatePlaylistDialog extends ConsumerWidget {
+class CreatePlaylistDialog extends ConsumerStatefulWidget {
   CreatePlaylistDialog(this.style, {super.key, this.videoId});
 
   final AppStyle style;
   final String? videoId;
+  @override
+  ConsumerState<CreatePlaylistDialog> createState() => _CreatePlaylistDialogState();
+}
+class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
 
-  final TextEditingController _playlistCtrl = TextEditingController();
+  late final TextEditingController _playlistCtrl;
 
   final _formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    super.initState();
+    _playlistCtrl = TextEditingController();
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void dispose() {
+    _playlistCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final playlistP = ref.watch(playListProvider);
+    final style = widget.style;
     final outlineBorder = OutlineInputBorder(
       borderSide: BorderSide(
         color: AppColors.textFieldEnableBorderColor,
@@ -113,7 +129,7 @@ class CreatePlaylistDialog extends ConsumerWidget {
                       ) : FilledButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await playlistP.createPlaylist(_playlistCtrl.text.trim(), videoId: videoId);
+                            await playlistP.createPlaylist(_playlistCtrl.text.trim(), videoId: widget.videoId);
                             if (context.mounted && context.canPop()) context.pop();
                           }
                         },
@@ -134,3 +150,4 @@ class CreatePlaylistDialog extends ConsumerWidget {
     );
   }
 }
+

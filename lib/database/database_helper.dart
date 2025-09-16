@@ -10,9 +10,9 @@ final databaseProvider = Provider<DatabaseHelper>((ref) => DatabaseHelper());
 
 class DatabaseHelper {
   static late Database _db;
-  List<PdfModel> _downloadPdfResponses = [];
+  List<CategoryModal> _downloadPdfResponses = [];
 
-  List<PdfModel> get downloadPdfResponses => _downloadPdfResponses;
+  List<CategoryModal> get downloadPdfResponses => _downloadPdfResponses;
 
   Future<Database> get db async {
     _db = await openDB();
@@ -35,6 +35,12 @@ class DatabaseHelper {
       "category_name" TEXT,
       "category_image" TEXT
     );''',
+    '''CREATE TABLE IF NOT EXISTS ${DatabaseConsts.categoryPdfTable} (
+      "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+      "category_id" TEXT,
+      "category_name" TEXT,
+      "category_image" TEXT
+    );''',
   ]);
 
   Future<Database> openDB() async {
@@ -46,6 +52,8 @@ class DatabaseHelper {
 
   Future close() async => _db.close();
 
+  ///==========================================================for video===================================================///
+  ///save Video category
   Future<int> saveCategory(CategoryModal modal) async {
     var dbClient = await db;
     int res;
@@ -60,61 +68,7 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<CategoryModal?> getSingleCategory(String categoryId) async {
-    var dbClient = await db;
-    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.categoryTable, where: 'category_id = ?', whereArgs: [categoryId]);
-    if (res.isNotEmpty) {
-      return CategoryModal.fromJson(res.first);
-    } else {
-      return null;
-    }
-  }
-
-  Future<int> savePdfCategory(PdfModel modal) async {
-    var dbClient = await db;
-    int res;
-    try {
-      print('|||||||||||||||||||||||||||${modal.toJson()}');
-      res = await dbClient.insert(DatabaseConsts.categoryPdfTable, modal.toJson());
-      debugPrint("DATABASE:- ${DatabaseConsts.categoryPdfTable} saved to db");
-    } catch (e) {
-      await dbClient.delete(DatabaseConsts.categoryPdfTable);
-      res = await dbClient.insert('CategoryPdfTable', modal.toJson());
-      debugPrint("DATABASE:- ${DatabaseConsts.categoryPdfTable} saved to db with Error");
-    }
-    return res;
-  }
-
-  Future<PdfModel?> getSinglePdfCategory(String categoryId) async {
-    var dbClient = await db;
-    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.categoryPdfTable, where: 'category_id = ?', whereArgs: [categoryId]);
-    if (res.isNotEmpty) {
-      return PdfModel.fromJson(res.first);
-    } else {
-      return null;
-    }
-  }
-
-  Future<VideoModal?> getSingleVideo(String videoId) async {
-    var dbClient = await db;
-    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.videoTable, where: 'video_id = ?', whereArgs: [videoId]);
-    if (res.isNotEmpty) {
-      return VideoModal.fromJson(res.first);
-    } else {
-      return null;
-    }
-  }
-
-  Future<PdfModel?> getSinglePdf(String pdfId) async {
-    var dbClient = await db;
-    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.pdfTable, where: 'pdf_id = ?', whereArgs: [pdfId]);
-    if (res.isNotEmpty) {
-      return PdfModel.fromJson(res.first);
-    } else {
-      return null;
-    }
-  }
-
+  ///save video
   Future<int> saveVideo(VideoModal modal) async {
     var dbClient = await db;
     int res;
@@ -129,20 +83,29 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> savePDF(PdfModel modal) async {
+  ///Get single category of Video
+  Future<CategoryModal?> getSingleCategory(String categoryId) async {
     var dbClient = await db;
-    int res;
-    try {
-      res = await dbClient.insert(DatabaseConsts.pdfTable, modal.toJson());
-      debugPrint("DATABASE:- ${DatabaseConsts.pdfTable} saved to db");
-    } catch (e) {
-      await dbClient.delete(DatabaseConsts.pdfTable);
-      res = await dbClient.insert(DatabaseConsts.pdfTable, modal.toJson());
-      debugPrint("DATABASE:- ${DatabaseConsts.pdfTable} saved to db with Error");
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.categoryTable, where: 'category_id = ?', whereArgs: [categoryId]);
+    if (res.isNotEmpty) {
+      return CategoryModal.fromJson(res.first);
+    } else {
+      return null;
     }
-    return res;
   }
 
+  ///Get single video
+  Future<VideoModal?> getSingleVideo(String videoId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.videoTable, where: 'video_id = ?', whereArgs: [videoId]);
+    if (res.isNotEmpty) {
+      return VideoModal.fromJson(res.first);
+    } else {
+      return null;
+    }
+  }
+
+  ///Get all video category
   Future<List<CategoryModal>> getCategory() async {
     List<CategoryModal> tempList = [];
     var dbClient = await db;
@@ -156,6 +119,7 @@ class DatabaseHelper {
     }
   }
 
+  ///get all video of particular category
   Future<List<VideoModal>> getVideo(int categoryId) async {
     print("category id in database helper---$categoryId");
     List<VideoModal> tempList = [];
@@ -170,21 +134,78 @@ class DatabaseHelper {
     }
   }
 
-  Future<List<PdfModel>> getPdfCategory() async {
-    List<PdfModel> tempList = [];
+  /// ==========================================================for pdf===================================================///
+  ///save pdf category
+  Future<int> savePdfCategory(CategoryModal modal) async {
+    var dbClient = await db;
+    int res;
+    try {
+      print('|||||||||||||||||||||||||||${modal.toJson()}');
+      res = await dbClient.insert(DatabaseConsts.categoryPdfTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.categoryPdfTable} saved to db");
+    } catch (e) {
+      await dbClient.delete(DatabaseConsts.categoryPdfTable);
+      res = await dbClient.insert('CategoryPdfTable', modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.categoryPdfTable} saved to db with Error");
+    }
+    return res;
+  }
+
+  ///save pdf
+  Future<int> savePDF(PdfModel modal) async {
+    var dbClient = await db;
+    int res;
+    try {
+      res = await dbClient.insert(DatabaseConsts.pdfTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.pdfTable} saved to db");
+    } catch (e) {
+      await dbClient.delete(DatabaseConsts.pdfTable);
+      res = await dbClient.insert(DatabaseConsts.pdfTable, modal.toJson());
+      debugPrint("DATABASE:- ${DatabaseConsts.pdfTable} saved to db with Error");
+    }
+    return res;
+  }
+
+  ///Get single pdf category
+  Future<CategoryModal?> getSinglePdfCategory(String categoryId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.categoryPdfTable, where: 'category_id = ?', whereArgs: [categoryId]);
+    if (res.isNotEmpty) {
+      return CategoryModal.fromJson(res.first);
+    } else {
+      return null;
+    }
+  }
+
+  ///Get single pdf
+  Future<PdfModel?> getSinglePdf(String pdfId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.pdfTable, where: 'pdf_id = ?', whereArgs: [pdfId]);
+    if (res.isNotEmpty) {
+      debugPrint("Res get single pdf::: $res");
+      return PdfModel.fromJson(res.first);
+    } else {
+      return null;
+    }
+  }
+
+  ///Get all pdf category
+  Future<List<CategoryModal>> getPdfCategory() async {
+    List<CategoryModal> tempList = [];
     var dbClient = await db;
     List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.categoryPdfTable);
     debugPrint("Res getCategory::: $res");
 
     if (res.isNotEmpty) {
-      tempList = PdfModel.listFromJson(res);
-      _downloadPdfResponses = PdfModel.listFromJson(res);
+      tempList = CategoryModal.listFromJson(res);
+      _downloadPdfResponses = CategoryModal.listFromJson(res);
       return tempList;
     } else {
       return tempList;
     }
   }
 
+  ///Get all pdf of particular category
   Future<List<PdfModel>> getPdf(int categoryId) async {
     List<PdfModel> tempList = [];
     var dbClient = await db;
@@ -198,8 +219,8 @@ class DatabaseHelper {
     }
   }
 
-  ///for audio.......
-
+  ///==========================================================for audio===================================================///
+  ///save audio category
   Future<int> saveAudioCategory(CategoryModal modal) async {
     var dbClient = await db;
     int res;
@@ -214,29 +235,7 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<CategoryModal?> getAudioSingleCategory(String categoryId) async {
-    var dbClient = await db;
-    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.audioCategoryTable, where: 'category_id = ?', whereArgs: [categoryId]);
-    if (res.isNotEmpty) {
-      return CategoryModal.fromJson(res.first);
-    } else {
-      return null;
-    }
-  }
-
-  Future<List<CategoryModal>> getAudioCategory() async {
-    List<CategoryModal> tempList = [];
-    var dbClient = await db;
-    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.audioCategoryTable);
-    debugPrint("Res getCategory:: $res");
-    if (res.isNotEmpty) {
-      tempList = CategoryModal.listFromJson(res);
-      return tempList;
-    } else {
-      return tempList;
-    }
-  }
-
+  ///save audio
   Future<int> saveAudio(VideoModal modal) async {
     var dbClient = await db;
     int res;
@@ -251,6 +250,32 @@ class DatabaseHelper {
     return res;
   }
 
+  ///get particular audio category
+  Future<CategoryModal?> getAudioSingleCategory(String categoryId) async {
+    var dbClient = await db;
+    List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.audioCategoryTable, where: 'category_id = ?', whereArgs: [categoryId]);
+    if (res.isNotEmpty) {
+      return CategoryModal.fromJson(res.first);
+    } else {
+      return null;
+    }
+  }
+
+  ///get all audio category
+  Future<List<CategoryModal>> getAudioCategory() async {
+    List<CategoryModal> tempList = [];
+    var dbClient = await db;
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.audioCategoryTable);
+    debugPrint("Res getCategory:: $res");
+    if (res.isNotEmpty) {
+      tempList = CategoryModal.listFromJson(res);
+      return tempList;
+    } else {
+      return tempList;
+    }
+  }
+
+  ///get all audio of particular category
   Future<List<VideoModal>> getAudio(int categoryId) async {
     print("category id in database helper---$categoryId");
     List<VideoModal> tempList = [];
@@ -265,6 +290,7 @@ class DatabaseHelper {
     }
   }
 
+  ///get particular audio
   Future<VideoModal?> getSingleAudio(String videoId) async {
     var dbClient = await db;
     List<Map<String, Object?>> res = await dbClient.query(DatabaseConsts.audioTable, where: 'video_id = ?', whereArgs: [videoId]);

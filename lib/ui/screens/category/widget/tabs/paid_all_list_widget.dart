@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/category_list_reponse.dart';
 import 'package:meditation_app/helper/navigation.dart';
 import 'package:meditation_app/provider/resource_provider/paid_all_item_list_provider.dart';
+import 'package:meditation_app/provider/resource_provider/paid_pdfs_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 
 import '../../../../../data/model/all_item_data_model.dart';
@@ -18,6 +19,7 @@ import '../../../../../provider/course_provider.dart';
 import '../../../../../provider/download_provider.dart';
 import '../../../../../provider/recent_videos_provider.dart';
 import '../../../../../provider/video_provider.dart';
+import '../../../settings/widget/logout_dialog.dart';
 import '../detail_item.dart';
 
 class PaidAllItemListWidget extends ConsumerStatefulWidget {
@@ -83,7 +85,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
       await coursePRead.getCategoryPdfFromDatabase();
       await coursePRead.getVideoFromDatabase(widget.category.id ?? 0);
       await coursePRead.getAudioFromDatabase(widget.category.id ?? 0);
-      await coursePRead.getPdfFromDatabase(widget.category.id??0);
+      await coursePRead.getPdfFromDatabase(widget.category.id ?? 0);
       await initCall();
     });
   }
@@ -122,6 +124,12 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
       refreshh();
       ref.read(downloadProvider.notifier).complate = false;
     }
+    print('++++++++++===========++++++++++${downloadP.Pdfcomplate}');
+    if (downloadP.Pdfcomplate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).Pdfcomplate = false;
+      setState(() {});
+    }
 
     if (allItemProvider.loading) {
       return const Center(child: CircularProgressIndicator());
@@ -129,6 +137,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
 
     final items = flatItems;
     log("flat item--->${flatItems.length}");
+
 
     if (items.isEmpty && !allItemProvider.loading) {
       return const Center(child: Text('No data available.'));
@@ -149,8 +158,17 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
         log("v or a respose---${item is VideoResponse}");
         if (item is PdfResponse) {
           final isDownloaded = allItemProvider.downloadedPDF.any((element) => element.pdfId == item.id.toString());
+          log("pdf ------item.id--->${item.id}");
           return GestureDetector(
-            onTap: () => viewPdf(item.pdfUrl),
+            onTap: () async {
+              if (item.category?.isPurchased ?? false) {
+                viewPdf(item.pdfUrl);
+              } else {
+                await buyNow(context, categoryId: widget.category.id.toString());
+                allItemProvider.fetchAllPaidItem(widget.category.id ?? 0);
+              }
+
+            },
             child: DetailItem.pdf(
               appStyle: _style,
               title: item.title ?? '',
@@ -160,6 +178,9 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
               seletedItemId: item.id,
               isShow: true,
               isDownloaded: isDownloaded,
+              onToggleBookmark: () {
+                toggleItemBookmark(item.id, isRemove: item.bookmarked ?? false, isAudio: false, isPDF: true);
+              },
             ),
           );
         } else if (item is VideoResponse) {
@@ -168,20 +189,25 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
 
           if (!isAudio) {
             isDownloaded = allItemProvider.downloadedVideo.any(
-                  (element) => item.id == int.parse(element.videoId ?? "0"),
+              (element) => item.id == int.parse(element.videoId ?? "0"),
             );
           } else {
             isDownloaded = allItemProvider.downloadedAudio.any(
-                  (element) => item.id == int.parse(element.videoId ?? "0"),
+              (element) => item.id == int.parse(element.videoId ?? "0"),
             );
           }
 
           return GestureDetector(
-            onTap: () {
-              if (!isAudio) {
-                playVideo(item, index);
+            onTap: () async {
+              if (item.category?.isPurchased ?? false) {
+                if (!isAudio) {
+                  playVideo(item, index);
+                } else {
+                  playAudio(item, index);
+                }
               } else {
-                playAudio(item, index);
+                await buyNow(context, categoryId: widget.category.id.toString());
+                allItemProvider.fetchAllPaidItem(widget.category.id ?? 0);
               }
             },
             child: DetailItem.video(
@@ -211,45 +237,45 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
 
   void playVideo(VideoResponse model, int index) {
     ref.read(videoProvider).playVideo(
-      DetailedVideoModel(
-        category: widget.category,
-        video: DIModel(
-          thumbnailUrl: model.imgUrl ?? '',
-          videoUrl: model.videoUrl!,
-          duration: model.duration ?? '',
-          title: model.title ?? '',
-          categoryName: widget.category.title ?? '',
-          videoId: model.id!,
-          videoType: model.videoType ?? ResourceType.paid,
-        ),
-      ),
-      index: index,
-      isAudioFile: false,
-    );
+          DetailedVideoModel(
+            category: widget.category,
+            video: DIModel(
+              thumbnailUrl: model.imgUrl ?? '',
+              videoUrl: model.videoUrl!,
+              duration: model.duration ?? '',
+              title: model.title ?? '',
+              categoryName: widget.category.title ?? '',
+              videoId: model.id!,
+              videoType: model.videoType ?? ResourceType.paid,
+            ),
+          ),
+          index: index,
+          isAudioFile: false,
+        );
   }
 
   void playAudio(VideoResponse model, int index) {
     ref.read(videoProvider).playVideo(
-      DetailedVideoModel(
-        category: widget.category,
-        video: DIModel(
-          thumbnailUrl: model.imgUrl ?? '',
-          videoUrl: model.videoUrl!,
-          duration: model.duration ?? '',
-          title: model.title ?? '',
-          categoryName: widget.category.title ?? '',
-          videoId: model.id!,
-          videoType: model.videoType ?? ResourceType.paid,
-        ),
-      ),
-      index: index,
-      isAudioFile: true,
-    );
+          DetailedVideoModel(
+            category: widget.category,
+            video: DIModel(
+              thumbnailUrl: model.imgUrl ?? '',
+              videoUrl: model.videoUrl!,
+              duration: model.duration ?? '',
+              title: model.title ?? '',
+              categoryName: widget.category.title ?? '',
+              videoId: model.id!,
+              videoType: model.videoType ?? ResourceType.paid,
+            ),
+          ),
+          index: index,
+          isAudioFile: true,
+        );
   }
 
-  Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false, required bool isAudio}) async {
+  Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false, required bool isAudio, bool isPDF = false}) async {
     if (itemId == null) return;
-    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: isAudio);
+    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: isAudio, isPDF: isPDF);
     ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
   }
 

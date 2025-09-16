@@ -83,7 +83,7 @@ class _CreateNewPasswordScreenState extends ConsumerState<CreateNewPasswordScree
               child: Column(
                 children: [
                   CustomHeader(
-                    title: 'Create a new password',
+                    title: 'Reset password',
                     subTitle: 'Your new password must be different from the previous password',
                     subTitleColor: AppColors.textFieldValueColor,
                     padding: EdgeInsets.symmetric(horizontal: _style.scale * 25),
@@ -133,7 +133,7 @@ class _CreateNewPasswordScreenState extends ConsumerState<CreateNewPasswordScree
                         ),
                         Spacer(flex: 3),
                         CustomNextButton(
-                          text: 'Next',
+                          text: 'Save',
                           onPressed: !authP.isLoading ? onNext : null,
                           style: _style,
                           inProgress: authP.isLoading,

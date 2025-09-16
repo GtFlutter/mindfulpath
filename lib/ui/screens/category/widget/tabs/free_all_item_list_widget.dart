@@ -53,8 +53,9 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
 
     CategoryModal? res1 = await database.getAudioSingleCategory(widget.category.id!.toString());
     provider.downloadedAudio = await database.getAudio(int.parse(res1?.categoryId ?? "0"));
-
-    provider.downloadedPDF = await database.getPdf(widget.category.id!);
+    CategoryModal? res2 = await database.getSinglePdfCategory(widget.category.id!.toString());
+    provider.downloadedPDF = await database.getPdf(int.parse(res2?.categoryId ?? "0"));
+    log("download pdf -----${provider.downloadedPDF.length}");
   }
 
   @override
@@ -123,6 +124,12 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
       ref.read(downloadProvider.notifier).complate = false;
     }
 
+    print('++++++++++===========++++++++++${downloadP.Pdfcomplate}');
+    if (downloadP.Pdfcomplate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).Pdfcomplate = false;
+      setState(() {});
+    }
     if (allItemProvider.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -157,7 +164,11 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
               pdfModel: item,
               subTitle: item.categoryTitle ?? '',
               index: '$index',
-              seletedItemId: item.id,
+              onToggleBookmark: () {
+                log("===>pdf id====>${item.id}");
+                toggleItemBookmark(item.id, isRemove: item.bookmarked ?? false, isAudio: false,isPDF: true);
+              },
+              seletedItemId: item.id ?? 0,
               isShow: true,
               isDownloaded: isDownloaded,
             ),
@@ -191,7 +202,7 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
               index: '$index',
               seletedItemId: item.id,
               onToggleBookmark: () {
-                toggleItemBookmark(item.id, isRemove: item.bookmarked ?? false, isAudio: isAudio);
+                toggleItemBookmark(item.id, isRemove: item.bookmarked ?? false, isAudio: isAudio,isPDF: false);
               },
               isDownloaded: isDownloaded,
             ),
@@ -247,9 +258,9 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
         );
   }
 
-  Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false, required bool isAudio}) async {
+  Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false, required bool isAudio,bool isPDF=false}) async {
     if (itemId == null) return;
-    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: isAudio);
+    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: isAudio,isPDF: isPDF);
     ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
   }
 

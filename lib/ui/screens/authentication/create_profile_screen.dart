@@ -50,8 +50,8 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   DateTime? _dateOfBirth;
   String? _gender;
   String? fcm;
-  final String initCountryCode = '+91';
-  String _countryCode = '+91';
+  final String initCountryCode = '+1';
+  String _countryCode = '+1';
 
   final List<String> _genderList = List.unmodifiable(['Male', 'Female', 'Other']);
 

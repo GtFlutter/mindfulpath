@@ -94,10 +94,10 @@ class PdfModel {
   Map<String, String> toJson() {
     Map<String, String> map = {};
     map['category_id'] = categoryId.toString();
-    map['pdf_id'] = pdfId!;
-    map['pdf_name'] = pdfName!;
-    map['pdf_file'] = pdfFile!;
-    map['category_title'] = categoryTitle!;
+    map['pdf_id'] = pdfId ?? "";
+    map['pdf_name'] = pdfName ?? "";
+    map['pdf_file'] = pdfFile ?? "";
+    map['category_title'] = categoryTitle ?? "";
     return map;
   }
 

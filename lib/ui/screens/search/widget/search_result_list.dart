@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/data/model/response/videos_response.dart';
@@ -88,6 +90,7 @@ class SearchResultsList extends ConsumerWidget {
       ),
     );
     bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+    log("featureed vedio free or not --->${detailedVideoModel.video.videoType}");
     if (detailedVideoModel.video.videoType == ResourceType.paid && !isLoggedIn) {
       showCustomSnackBar('Login to access video', type: false);
       // appRouter.push(RoutePath.signIn);

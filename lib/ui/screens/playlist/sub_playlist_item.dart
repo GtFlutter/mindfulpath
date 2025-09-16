@@ -82,8 +82,8 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
 
   @override
   void deactivate() {
-    ref.read(courseProvider.notifier).downloadPdfResponses.clear();
-    ref.read(courseProvider.notifier).downloadResponse.clear();
+    // ref.read(courseProvider.notifier).downloadPdfResponses.clear();
+    // ref.read(courseProvider.notifier).downloadResponse.clear();
     ref.read(courseProvider.notifier).downloadAudioCategoryResponse.clear();
   }
 

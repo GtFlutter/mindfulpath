@@ -105,7 +105,14 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
     }
 
     final courseP = ref.watch(courseProvider);
-
+    final itemCount = isPurchased
+        ? courseP.purchasedVideoResponse.length
+        : isCurrentlyProgress
+        ? courseP.cpVideoResponse.length
+        : widget.isAudio
+        ? courseP.downloadAudioCategoryResponse.length
+        : courseP.downloadResponse.length;
+print("item count-------->$itemCount");
     return Scaffold(
       appBar: isPurchased
           ? null
@@ -122,6 +129,13 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
+              :(itemCount==0)?
+          const Center(
+            child: Text(
+              "No downloads found",
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          )
               : GridView.builder(
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                     mainAxisSpacing: _style.scale * 25,
@@ -129,13 +143,7 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
                     maxCrossAxisExtent: maxWidth,
                     childAspectRatio: maxWidth / maxHeight,
                   ),
-                  itemCount: isPurchased
-                      ? courseP.purchasedVideoResponse.length
-                      : isCurrentlyProgress
-                          ? courseP.cpVideoResponse.length
-                          : widget.isAudio
-                              ? courseP.downloadAudioCategoryResponse.length
-                              : courseP.downloadResponse.length,
+                  itemCount: itemCount,
                   padding: EdgeInsets.fromLTRB(_style.scale * 25, _style.scaleX(20), _style.scale * 25, _style.scaleX(100)),
                   itemBuilder: (context, index) {
                     CITempModel item;

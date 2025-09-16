@@ -44,14 +44,14 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
 
   @override
   void deactivate() {
-    ref.read(courseProvider.notifier).downloadPdfResponses.clear();
-    ref.read(courseProvider.notifier).downloadPdfResponse.clear();
+    // ref.read(courseProvider.notifier).downloadPdfResponses.clear();
+    // ref.read(courseProvider.notifier).downloadPdfResponse.clear();
   }
 
   getCategory()async{
     await ref.read(courseProvider).getCategoryPdfFromDatabase();
     for(final category in ref.watch(courseProvider).downloadPdfResponses){
-      await ref.read(courseProvider).getPdfFromDatabase(category.categoryId??0);
+      await ref.read(courseProvider).getPdfFromDatabase(int.parse(category.categoryId??""));
     }
 
   }

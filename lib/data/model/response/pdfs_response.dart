@@ -156,8 +156,10 @@ class PdfResponse {
   final String? categoryTitle;
   final String? uniqueId;
   final ResourceType? pdfType;
+   bool? bookmarked;
   final String? pdfUrlSrc;
   final MediaResponse? pdf;
+  final String? thumbnailImageUrlSrc;
   final CategoryListResponse? category;
 
   PdfResponse({
@@ -165,10 +167,12 @@ class PdfResponse {
     this.title,
     this.categoryId,
     this.categoryTitle,
+    this.bookmarked,
     this.uniqueId,
     this.pdfType,
     this.pdfUrlSrc,
     this.pdf,
+    this.thumbnailImageUrlSrc,
     this.category,
   });
 
@@ -181,9 +185,11 @@ class PdfResponse {
       categoryId: json['category_id'],
       categoryTitle: json['category_title'],
       uniqueId: json['unique_id'],
+      bookmarked:json['is_bookmark'] ?? null,
       pdfType: ResourceType.fromJson(json['pdf_type']),
       pdfUrlSrc: json['pdf_url'],
       pdf: json['pdf'] != null ? MediaResponse.fromJson(json['pdf']) : null,
+      thumbnailImageUrlSrc: json['thumbnail_image_url'],
       category: json['category'] != null
           ? CategoryListResponse.fromJson(json['category'])
           : null,
@@ -199,7 +205,9 @@ class PdfResponse {
       'unique_id': uniqueId,
       'pdf_type': pdfType,
       'pdf_url': pdfUrlSrc,
+      'is_bookmark': bookmarked ?? false,
       'pdf': pdf?.toJson(),
+      'thumbnail_image_url': thumbnailImageUrlSrc,
       'category': category?.toJson(),
     };
   }

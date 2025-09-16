@@ -47,15 +47,8 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   int? _lastCategoryId;
   static AppStyle _style = AppStyle();
 
-  // bool isFreeVideo = true;
-  // bool isPaidVideo = true;
-  // bool isFreePdf = true;
-  // bool isPaidPdf = true;
-  // bool isFreeAudio = true;
-  // bool isPaidAudio = true;
-
   /// Either 0(Video) or 1(PDF)
-  int filterIndex = 0;
+  int filterIndex = 3;
 
   /// Either 0(Free) or 1(Paid)
   int courseIndex = 0;
@@ -63,21 +56,53 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(initialIndex: courseIndex, length: 8, vsync: this);
-    (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
+    _tabController = TabController(initialIndex: 6, length: 8, vsync: this);
+    // (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
+    // if(widget.isFromPdfNotification ?? false)  _changeFilter(ItemName(id: 1, title: 'PDF'));
     Future.delayed(Duration(seconds: 0), () async {
       log("------>cst id for all item--${widget.category.id}");
       await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
-      // ✅ Build _freeFilters after fetching free items
-      final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
-      final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
-      final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+      // // ✅ Build _freeFilters after fetching free items
+      // final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
+      // final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
+      // final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+      //
+      // _freeFilters = buildFilterOptions(hasVideo: isVideo, hasAudio: isAudio, hasPdf: isPdf);
+      final data = ref.read(freeAllItemProvider).allItemResponse?.data;
 
-      _freeFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
-
+      final hasVideo = (data?.video?.isNotEmpty ?? false);
+      final hasAudio = (data?.audio?.isNotEmpty ?? false);
+      final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+      log("------>hasVideo=$hasVideo-------->hasAudio=$hasAudio------->hasPdf=$hasPdf");
+      _freeFilters = buildFilterOptions(
+        hasVideo: hasVideo,
+        hasAudio: hasAudio,
+        hasPdf: hasPdf,
+      );
       setState(() {
         _filters = _freeFilters;
-        filterIndex = _filters.first.id;
+        // filterIndex = _filters.first.id;
+        final availableCount = [hasVideo, hasAudio, hasPdf].where((e) => e).length;
+        log("available count---->$availableCount");
+        if (availableCount == 0) {
+          // no data → All only
+          filterIndex = 3;
+        } else if (availableCount == 1) {
+          // exactly one category → that one
+          filterIndex = _filters.first.id;
+        } else {
+          // multiple categories → default to All
+          filterIndex = 3;
+        }
+        // ✅ run after first frame
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if(filterIndex!=3) {
+            _changeTab(filterIndex, courseIndex);
+          }
+          log("👉 Default filterIndex applied AFTER build: $filterIndex");
+        });
+
+        log("👉 Default filterIndex set to $filterIndex");
       });
       ref.read(paidVideosProvider.notifier).fetchVideos(widget.category.id ?? 0, isLoading: false);
     }).then((value) async {
@@ -96,11 +121,13 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         } else {
           _changeCourseType(0);
         }
-      } else {
-        _changeCourseType(0);
-        _changeFilter(ItemName(id: 0, title: 'Video'));
       }
+      // else {
+      //   _changeCourseType(0);
+      //   _changeFilter(ItemName(id: 0, title: 'Video'));
+      // }
     });
+
   }
 
   @override
@@ -110,30 +137,57 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   }
 
   List<ItemName> buildFilterOptions({
-    required bool isVideo,
-    required bool isAudio,
-    required bool isPdf,
+    required bool hasVideo,
+    required bool hasAudio,
+    required bool hasPdf,
   }) {
     final List<ItemName> filters = [];
-
-    if (isVideo) {
-      filters.add(ItemName(id: 0, title: 'Video'));
-    }
-    if (isPdf) {
-      filters.add(ItemName(id: 1, title: 'PDF'));
-    }
-    if (isAudio) {
-      filters.add(ItemName(id: 2, title: 'Audio'));
-    }
-
-    if (filters.isEmpty) {
+    final availableTypes = [hasVideo, hasAudio, hasPdf].where((e) => e).length;
+    log("=======>available types=====>$availableTypes");
+    if (availableTypes == 0) {
+      // No data at all → only All
       filters.add(ItemName(id: 3, title: 'All'));
+    } else if (availableTypes == 1) {
+      // Only one category → show only that one
+      if (hasVideo) filters.add(ItemName(id: 0, title: 'Video'));
+      if (hasPdf) filters.add(ItemName(id: 1, title: 'PDF'));
+      if (hasAudio) filters.add(ItemName(id: 2, title: 'Audio'));
     } else {
+      // More than one category → show all available + All
       filters.add(ItemName(id: 3, title: 'All'));
+      if (hasVideo) filters.add(ItemName(id: 0, title: 'Video'));
+      if (hasPdf) filters.add(ItemName(id: 1, title: 'PDF'));
+      if (hasAudio) filters.add(ItemName(id: 2, title: 'Audio'));
     }
 
     return filters;
   }
+
+  // List<ItemName> buildFilterOptions({
+  //   required bool isVideo,
+  //   required bool isAudio,
+  //   required bool isPdf,
+  // }) {
+  //   final List<ItemName> filters = [];
+  //
+  //   if (isVideo) {
+  //     filters.add(ItemName(id: 0, title: 'Video'));
+  //   }
+  //   if (isPdf) {
+  //     filters.add(ItemName(id: 1, title: 'PDF'));
+  //   }
+  //   if (isAudio) {
+  //     filters.add(ItemName(id: 2, title: 'Audio'));
+  //   }
+  //
+  //   if (filters.isEmpty) {
+  //     filters.add(ItemName(id: 3, title: 'All'));
+  //   } else {
+  //     filters.add(ItemName(id: 3, title: 'All'));
+  //   }
+  //
+  //   return filters;
+  // }
 
   void _changeTab(int filterIndex, int courseTypeIndex) {
     int currentTabIndex = _tabController.index;
@@ -206,34 +260,84 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     });
 
     if (courseIndex == 1) {
-      // Switching to PAID
-
-      // fallback: rebuild filters from existing data if needed
-      if (_paidFilters.isEmpty) {
+     log("paid filter is empty----->${_paidFilters.isEmpty}");
+      // if (_paidFilters.isEmpty) {
+      if (true) {
         await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
-        final isVideo = (ref.read(paidAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
-        final isAudio = (ref.read(paidAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
-        final isPdf = (ref.read(paidAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
-        _paidFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
+        // final isVideo = (ref.read(paidAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
+        // final isAudio = (ref.read(paidAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
+        // final isPdf = (ref.read(paidAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+        // _paidFilters = buildFilterOptions(hasVideo: isVideo, hasAudio: isAudio, hasPdf: isPdf);
+        final data = ref.read(paidAllItemProvider).allItemResponse?.data;
+
+        final hasVideo = (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+
+        _paidFilters = buildFilterOptions(
+          hasVideo: hasVideo,
+          hasAudio: hasAudio,
+          hasPdf: hasPdf,
+        );
       }
       setState(() {
         _filters = _paidFilters;
-        filterIndex = _filters.first.id;
+        // filterIndex = _filters.first.id;
+        final data = ref.read(paidAllItemProvider).allItemResponse?.data;
+
+        final hasVideo = (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+        final availableCount = [hasVideo, hasAudio, hasPdf].where((e) => e).length;
+
+        if (availableCount == 0) {
+          filterIndex = 3; // no data → All
+        } else if (availableCount == 1) {
+          filterIndex = _filters.first.id; // single category → that one
+        } else {
+          filterIndex = 3; // multiple categories → All
+        }
       });
     } else {
-      // Switching to FREE
-      if (_freeFilters.isEmpty) {
+      log("free filter is empty----->${_freeFilters.isEmpty}");
+      // if (_freeFilters.isEmpty) {
+      if (true) {
         // fallback: rebuild filters from existing data if needed
         await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
-        final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
-        final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
-        final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
-        _freeFilters = buildFilterOptions(isVideo: isVideo, isAudio: isAudio, isPdf: isPdf);
+        // final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
+        // final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
+        // final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
+        // _freeFilters = buildFilterOptions(hasVideo: isVideo, hasAudio: isAudio, hasPdf: isPdf);
+        final data = ref.read(freeAllItemProvider).allItemResponse?.data;
+
+        final hasVideo = (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+
+        _freeFilters = buildFilterOptions(
+          hasVideo: hasVideo,
+          hasAudio: hasAudio,
+          hasPdf: hasPdf,
+        );
       }
 
       setState(() {
         _filters = _freeFilters;
-        filterIndex = _filters.first.id;
+        // filterIndex = _filters.first.id;
+        final data = ref.read(freeAllItemProvider).allItemResponse?.data;
+
+        final hasVideo = (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+        final availableCount = [hasVideo, hasAudio, hasPdf].where((e) => e).length;
+
+        if (availableCount == 0) {
+          filterIndex = 3; // no data → All
+        } else if (availableCount == 1) {
+          filterIndex = _filters.first.id; // single category → that one
+        } else {
+          filterIndex = 3; // multiple categories → All
+        }
       });
     }
     log("course index during course type change --->$courseIndex");
@@ -260,7 +364,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
             ),
             const SizedBox(width: Dimensions.PADDING_SIZE_DEFAULT),
             CustomSelecteableButton(
-              text: 'Paid',
+              text: 'Plus',
               selected: courseIndex == 1,
               onTap: () async {
                 if (!ref.read(authProvider).isUserLoggedIn) {
@@ -293,7 +397,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
               ),
               child: CustomDropDownButton<ItemName>(
                 // value: _filters[filterIndex],
-                value: _filters.firstWhere((e) => e.id == filterIndex, orElse: () => _filters.first),
+                value: _filters.firstWhere((e) => e.id == filterIndex, orElse: () => _filters.last),
                 appStyle: _style,
                 items: _filters,
                 width: _style.scaleX(120),

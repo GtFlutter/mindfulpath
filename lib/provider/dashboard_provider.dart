@@ -71,6 +71,7 @@ class DashboardNotifier extends ChangeNotifier {
     startLoading();
     Response response = await repo.getCategories(1);
     log("==========status code---${response.statusCode}");
+    log("==========msg---${response.body}");
     if (response.statusCode != 200) {
       stopLoading();
       ApiChecker.checkApi(response, authNotifier: ref.read(authProvider));
