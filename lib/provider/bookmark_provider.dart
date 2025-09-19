@@ -193,9 +193,9 @@ class BookmarkNotifier extends ChangeNotifier {
   Future<void> toggleBookmark(int itemId, {bool isRemove = false, bool isAudio = false, bool isPDF = false}) async {
     if (!ref.read(authProvider).isUserLoggedIn) {
       showCustomSnackBar(
-        'Please login to bookmark.',
+        'Please Sign in to bookmark.',
         action: SnackBarAction(
-          label: 'Log In',
+          label: 'Sign in',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
           textColor: Colors.brown.shade800,
           onPressed: () => appRouter.go(RoutePath.signIn),

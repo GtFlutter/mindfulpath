@@ -5,13 +5,18 @@ import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/helper/navigation.dart';
 
 import '../../data/model/body/resource_type.dart';
+import '../../helper/route/route_paths.dart';
+import '../../helper/route/router.dart';
+import '../../provider/auth_provider.dart';
 import '../../provider/bookmark_provider.dart';
 import '../../provider/featured_videos_provider.dart';
+import '../../theme/colors.dart';
 import '../../theme/styles.dart';
 import '../screens/category/widget/detail_item.dart';
 import '../screens/discover/widget/featured_item.dart';
 import '../screens/discover/widget/featured_item_painter.dart';
 import '../screens/settings/widget/logout_dialog.dart';
+import 'custom_snackbar.dart';
 
 class FeatureVideoList extends ConsumerWidget {
   final AppStyle style;
@@ -95,13 +100,23 @@ class FeatureVideoList extends ConsumerWidget {
                     index: '$index',
                     isDownloaded: false,
                     onToggleBookmark: () async {
-                      if (dataModel.category?.isPurchased ?? false) {
+                      bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                      if(!isLoggedIn){
+                        showCustomSnackBar(
+                          'Please Sign in to Bookmark',
+                          action: SnackBarAction(
+                            label: 'Sign in',
+                            backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                            textColor: Colors.brown.shade800,
+                            onPressed: () => appRouter.go(RoutePath.signIn),
+                          ),
+                          duration: const Duration(seconds: 5),
+                        );
+                        return;
+                      }
                         if (dataModel.id == null) return;
                         ref.read(bookmarkProvider).toggleBookmark(dataModel.video?.id ?? 0, isRemove: dataModel.bookmarked ?? false);
-                      } else {
-                        await buyNow(context, categoryId: (dataModel.category!.id ?? 0).toString());
-                        ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
-                      }
+
                     },
                   ),
           );

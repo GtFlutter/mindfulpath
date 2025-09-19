@@ -19,7 +19,7 @@ class SignInRequire extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Login to access your analytics',
+              'Sign in to access your analytics',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),

@@ -12,12 +12,17 @@ import '../../../../../data/model/response/pdfs_response.dart';
 import '../../../../../data/model/response/videos_response.dart';
 import '../../../../../database/database_helper.dart';
 import '../../../../../database/database_model.dart';
+import '../../../../../helper/route/route_paths.dart';
+import '../../../../../helper/route/router.dart';
+import '../../../../../provider/auth_provider.dart';
 import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../provider/course_provider.dart';
 import '../../../../../provider/download_provider.dart';
 import '../../../../../provider/recent_videos_provider.dart';
 import '../../../../../provider/resource_provider/free_all_item_list_provider.dart';
 import '../../../../../provider/video_provider.dart';
+import '../../../../../theme/colors.dart';
+import '../../../../common/custom_snackbar.dart';
 import '../detail_item.dart';
 
 class AllItemListWidget extends ConsumerStatefulWidget {
@@ -259,6 +264,20 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
   }
 
   Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false, required bool isAudio,bool isPDF=false}) async {
+    bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+    if(!isLoggedIn){
+      showCustomSnackBar(
+        'Please Sign in to Bookmark',
+        action: SnackBarAction(
+          label: 'Sign in',
+          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+          textColor: Colors.brown.shade800,
+          onPressed: () => appRouter.go(RoutePath.signIn),
+        ),
+        duration: const Duration(seconds: 5),
+      );
+      return;
+    }
     if (itemId == null) return;
     await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: isAudio,isPDF: isPDF);
     ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);

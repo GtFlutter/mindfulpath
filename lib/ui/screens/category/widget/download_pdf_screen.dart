@@ -154,7 +154,7 @@ class _DownloadPdfCategoryScreenState extends ConsumerState<DownloadPdfCategoryS
                 ),
               )
             : Center(
-                child:courseP.isPDFLoading? const CircularProgressIndicator():SizedBox.shrink(),
+                child:courseP.isPDFLoading? const CircularProgressIndicator():Center(child: Text("No Plus content yet",style: TextStyle(fontSize: 16, color: Colors.white)),),
               ));
   }
 

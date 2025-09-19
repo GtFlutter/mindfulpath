@@ -18,6 +18,7 @@ import 'package:meditation_app/ui/common/media_player/app_audio_player.dart';
 import 'package:meditation_app/ui/common/media_player/app_video_player.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 import 'package:meditation_app/ui/screens/playlist/sub_playlist_item.dart';
+import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 
 import '../../../provider/course_provider.dart';
 import '../../../provider/download_provider.dart';
@@ -134,11 +135,6 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
     if (downloadP.complate == true) {
       refreshh();
       ref.read(downloadProvider.notifier).complate = false;
-      setState(() {});
-    }
-    if (downloadP.Pdfcomplate == true) {
-      refreshh();
-      ref.read(downloadProvider.notifier).Pdfcomplate = false;
       setState(() {});
     }
     void playVideo(PlaylistVideoList model, int index) {
@@ -268,7 +264,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                               itemCount: playlistP.playlistVideoListResponse?.length ?? 0,
                                               itemBuilder: (context, index) {
                                                 var model = playlistP.playlistVideoListResponse?[index];
-log("modellllllllllll-----${model?.video?.id}");
+                                                log("modellllllllllll-----${model?.video?.id}");
                                                 return GestureDetector(
                                                     //key: Key('$index'),
                                                     onTap: () {
@@ -279,13 +275,19 @@ log("modellllllllllll-----${model?.video?.id}");
                                                       key: Key('$index'),
                                                       appStyle: _style,
                                                       model: model!,
-                                                      onPlay: () {
-                                                        ref.read(videoProvider.notifier).isSelected = index;
-                                                        playVideo(model, index);
-                                                        FocusManager.instance.primaryFocus?.unfocus();
+                                                      onPlay: () async {
+                                                        if (model.video?.category?.isPurchased ?? false || model.video?.videoType == ResourceType.free) {
+                                                          ref.read(videoProvider.notifier).isSelected = index;
+                                                          playVideo(model, index);
+                                                          FocusManager.instance.primaryFocus?.unfocus();
+                                                        } else {
+                                                          await buyNow(context, categoryId: (model.video?.categoryId ?? 0).toString());
+                                                          playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
+                                                        }
                                                       },
                                                       onRemovePress: () async {
-                                                        await playlistP.removeFromPlaylist((model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), (model.video?.videoUrlSrc ?? "").split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
+                                                        await playlistP.removeFromPlaylist(
+                                                            (model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), (model.video?.videoUrlSrc ?? "").split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
                                                         playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
                                                       },
                                                       index: index,
@@ -353,10 +355,15 @@ log("modellllllllllll-----${model?.video?.id}");
                                                         key: Key('$index'),
                                                         appStyle: _style,
                                                         model: model!,
-                                                        onPlay: () {
-                                                          ref.read(videoProvider.notifier).isSelected = index;
-                                                          playVideo(model, index);
-                                                          FocusManager.instance.primaryFocus?.unfocus();
+                                                        onPlay: () async {
+                                                          if (model.video?.category?.isPurchased ?? false || model.video?.videoType == ResourceType.free) {
+                                                            ref.read(videoProvider.notifier).isSelected = index;
+                                                            playVideo(model, index);
+                                                            FocusManager.instance.primaryFocus?.unfocus();
+                                                          } else {
+                                                            await buyNow(context, categoryId: (model.video?.categoryId ?? 0).toString());
+                                                            playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
+                                                          }
                                                         },
                                                         onRemovePress: () async {
                                                           await playlistP.removeFromPlaylist(

@@ -87,9 +87,9 @@ class _CoursesScreenState extends ConsumerState<CoursesScreen> {
                       'Is User Logged In :: ${ref.read(authProvider).isUserLoggedIn}');
                   if (!ref.read(authProvider).isUserLoggedIn) {
                     showCustomSnackBar(
-                      'Please login to review course.',
+                      'Please Sign in to access Downloaded Content',
                       action: SnackBarAction(
-                        label: 'Log In',
+                        label: 'Sign in',
                         backgroundColor:
                             AppColors.primaryColor.withOpacity(0.8),
                         textColor: Colors.brown.shade800,

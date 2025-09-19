@@ -369,9 +369,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
               onTap: () async {
                 if (!ref.read(authProvider).isUserLoggedIn) {
                   showCustomSnackBar(
-                    'Please login to view paid video.',
+                    'Please Sign in to view paid video.',
                     action: SnackBarAction(
-                      label: 'Log In',
+                      label: 'Sign in',
                       backgroundColor: AppColors.primaryColor.withOpacity(0.8),
                       textColor: Colors.brown.shade800,
                       onPressed: () => appRouter.go(RoutePath.signIn),

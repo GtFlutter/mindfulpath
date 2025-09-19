@@ -68,9 +68,9 @@ class _PlaylistScreenState extends ConsumerState<PlaylistScreen> {
                       onTap: () {
                         if (!ref.read(authProvider).isUserLoggedIn) {
                           showCustomSnackBar(
-                            'Please login to create playlist.',
+                            'Please Sign in to create playlist.',
                             action: SnackBarAction(
-                              label: 'Log In',
+                              label: 'Sign in',
                               backgroundColor:
                               AppColors.primaryColor.withOpacity(0.8),
                               textColor: Colors.brown.shade800,
@@ -131,6 +131,11 @@ class _PlaylistScreenState extends ConsumerState<PlaylistScreen> {
             ),
     );
   }
+  @override
+  void deactivate() {
+    ref.read(playListProvider).playlistListResponse?.clear();
+  }
+
 
   void createPlaylist() {
     showDialog(

@@ -202,7 +202,7 @@ class AuthNotifier extends ChangeNotifier {
 
         mobileOrEmail = account.email;
       } else {
-        showCustomSnackBar('Login failed: Invalid response from server.', type: false);
+        showCustomSnackBar('Sign in failed: Invalid response from server.', type: false);
       }
     } on PlatformException catch (e) {
       // ⚠️ Specific Google sign-in issues (like Play Services not available)
@@ -212,7 +212,7 @@ class AuthNotifier extends ChangeNotifier {
       showCustomSnackBar(e.toString().replaceAll('Exception:', '').trim(), type: false);
     } catch (e) {
       // ❗ Unexpected or unknown errors
-      log('Google Login Error :: $e', name: 'LoginError');
+      log('Google Sign in Error :: $e', name: 'LoginError');
       showCustomSnackBar('Something went wrong. Please try again.', type: false);
     } finally {
       stopProgress();

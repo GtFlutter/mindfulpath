@@ -8,6 +8,7 @@ import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/helper/string_converter.dart';
 import 'package:meditation_app/provider/course_provider.dart';
 import 'package:meditation_app/provider/download_provider.dart';
+import 'package:meditation_app/provider/playlist_provider.dart';
 import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/common/media_image_card.dart';
@@ -17,6 +18,8 @@ import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 import '../../../../util/assets.dart';
+import '../../../data/model/body/resource_type.dart';
+import '../settings/widget/logout_dialog.dart';
 
 class SubPlayListItem extends ConsumerStatefulWidget {
   final AppStyle appStyle;
@@ -249,26 +252,26 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                   if (!result) {
                                     return IconButton(
                                       onPressed: () async {
-                                        if (downloadP.model == null) {
-                                          if (widget.isAudio) {
-                                            downloadP.downloadAudio(model: widget.model.video);
-                                          } else {
-                                            downloadP.download(model: widget.model.video);
-                                          }
-                                        } else {
-                                          if (widget.model.video!.id != downloadP.model!.id) {
-                                            if (widget.model.video?.video != null) {
-                                              showCustomSnackBar('Another Video is in progress');
+                                        if (widget.model.video?.category?.isPurchased ?? false || widget.model.video?.videoType == ResourceType.free) {
+                                          if (downloadP.model == null) {
+                                            if (widget.isAudio) {
+                                              downloadP.downloadAudio(model: widget.model.video);
                                             } else {
-                                              showCustomSnackBar('Another Audio is in progress');
+                                              downloadP.download(model: widget.model.video);
+                                            }
+                                          } else {
+                                            if (widget.model.video!.id != downloadP.model!.id) {
+                                              if (widget.model.video?.video != null) {
+                                                showCustomSnackBar('Another Video is in progress');
+                                              } else {
+                                                showCustomSnackBar('Another Audio is in progress');
+                                              }
                                             }
                                           }
+                                        } else {
+                                          await buyNow(context, categoryId: (widget.model.video?.categoryId ?? 0).toString());
+                                          ref.read(playListProvider).getPlaylistDetails(widget.model.playlistId ?? 0, showProgress: true);
                                         }
-                                        // if (downloadP.model == null) {
-                                        //   downloadP.download(model: widget.model.video);
-                                        // } else if (widget.model.video!.id != downloadP.model!.id) {
-                                        //   showCustomSnackBar('Another Video is in progress');
-                                        // }
                                       },
                                       icon: SvgPicture.asset(
                                         SvgPaths.download,

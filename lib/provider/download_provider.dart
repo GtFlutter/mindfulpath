@@ -67,7 +67,7 @@ class DownloadNotifier extends ChangeNotifier {
     double tempProgress = 0.0;
     if (!ref.read(authProvider).isUserLoggedIn) {
       showCustomSnackBar(
-        'Please login to download a Pdf.',
+        'Please Sign in to download a Pdf.',
         action: SnackBarAction(
           label: 'Log In',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
@@ -139,9 +139,9 @@ class DownloadNotifier extends ChangeNotifier {
     if (!ref.read(authProvider).isUserLoggedIn) {
       _model = null;
       showCustomSnackBar(
-        'Please login to download a video.',
+        'Please Sign in to download a video.',
         action: SnackBarAction(
-          label: 'Log In',
+          label: 'Sign in',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
           textColor: Colors.brown.shade800,
           onPressed: () => appRouter.go(RoutePath.signIn),
@@ -212,9 +212,9 @@ class DownloadNotifier extends ChangeNotifier {
     if (!ref.read(authProvider).isUserLoggedIn) {
       _model = null;
       showCustomSnackBar(
-        'Please login to download a Audio.',
+        'Please Sign in to download a Audio.',
         action: SnackBarAction(
-          label: 'Log In',
+          label: 'Sign in',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
           textColor: Colors.brown.shade800,
           onPressed: () => appRouter.go(RoutePath.signIn),
@@ -281,9 +281,9 @@ class DownloadNotifier extends ChangeNotifier {
     if (!ref.read(authProvider).isUserLoggedIn) {
       _model = null;
       showCustomSnackBar(
-        'Please login to bookmark.',
+        'Please Sign in to bookmark.',
         action: SnackBarAction(
-          label: 'Log In',
+          label: 'Sign in',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
           textColor: Colors.brown.shade800,
           onPressed: () => appRouter.go(RoutePath.signIn),
@@ -421,7 +421,7 @@ class DownloadNotifier extends ChangeNotifier {
           if (vRes > 0) {
             Pdfcomplate = true;
             _isPdfDownloading = false;
-            showCustomSnackBar('PDF Save Successfully download');
+            showCustomSnackBar('PDF downloaded Successfully');
             _isDownloadComplete = false;
             _pdfModel = null;
             Pdfres = null;
@@ -436,7 +436,7 @@ class DownloadNotifier extends ChangeNotifier {
         int vRes = await dbHelper.saveAudio(vModal);
         if (vRes > 0) {
           complate = true;
-          showCustomSnackBar('Audio Save Successfully download');
+          showCustomSnackBar('Audio downloaded Successfully');
           _isDownloadComplete = false;
           res = null;
           notifyListeners();
@@ -451,7 +451,7 @@ class DownloadNotifier extends ChangeNotifier {
           int vRes = await dbHelper.saveAudio(vModal);
           if (vRes > 0) {
             complate = true;
-            showCustomSnackBar('Audio Save Successfully download');
+            showCustomSnackBar('Audio downloaded Successfully');
             _isDownloadComplete = false;
             res = null;
             notifyListeners();
@@ -465,7 +465,7 @@ class DownloadNotifier extends ChangeNotifier {
         int vRes = await dbHelper.saveVideo(vModal);
         if (vRes > 0) {
           complate = true;
-          showCustomSnackBar('Video Save Successfully download');
+          showCustomSnackBar('Video downloaded Successfully');
           _isDownloadComplete = false;
           res = null;
           notifyListeners();
@@ -481,7 +481,7 @@ class DownloadNotifier extends ChangeNotifier {
           int vRes = await dbHelper.saveVideo(vModal);
           if (vRes > 0) {
             complate = true;
-            showCustomSnackBar('Video Save Successfully download');
+            showCustomSnackBar('Video downloaded Successfully');
             _isDownloadComplete = false;
             res = null;
             notifyListeners();

@@ -9,9 +9,12 @@ import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
 import '../../../../data/model/body/resource_type.dart';
 import '../../../../data/model/response/category_list_reponse.dart';
+import '../../../../helper/route/route_paths.dart';
+import '../../../../helper/route/router.dart';
 import '../../../../provider/auth_provider.dart';
 import '../../../../provider/recent_videos_provider.dart';
 import '../../../../provider/video_provider.dart';
+import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../common/custom_snackbar.dart';
 import '../../settings/widget/logout_dialog.dart';
@@ -92,7 +95,7 @@ class SearchResultsList extends ConsumerWidget {
     bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
     log("featureed vedio free or not --->${detailedVideoModel.video.videoType}");
     if (detailedVideoModel.video.videoType == ResourceType.paid && !isLoggedIn) {
-      showCustomSnackBar('Login to access video', type: false);
+      showCustomSnackBar('Sign In to access Plus Content', type: false);
       // appRouter.push(RoutePath.signIn);
       return;
     } else if (!(category.isPurchased ?? false) && videoResponse.videoType==ResourceType.paid) {
@@ -104,6 +107,20 @@ class SearchResultsList extends ConsumerWidget {
   }
 
   void toggleItemBookmark(WidgetRef ref, int? itemId, {bool isRemove = false}) {
+    bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+    if(!isLoggedIn){
+      showCustomSnackBar(
+        'Please Sign in to Bookmark',
+        action: SnackBarAction(
+          label: 'Sign in',
+          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+          textColor: Colors.brown.shade800,
+          onPressed: () => appRouter.go(RoutePath.signIn),
+        ),
+        duration: const Duration(seconds: 5),
+      );
+      return;
+    }
     if (itemId == null) return;
     ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
   }

@@ -14,6 +14,9 @@ import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/settings/widget/logout_dialog.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../helper/route/route_paths.dart';
+import '../../../../helper/route/router.dart';
+import '../../../../provider/auth_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';

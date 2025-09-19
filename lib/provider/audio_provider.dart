@@ -37,7 +37,7 @@ class AudioNotifier extends ChangeNotifier {
     /// Auth User
     bool isLoggedIn = _ref.read(authProvider).isUserLoggedIn;
     if (detailedVideoModel.video.videoType == ResourceType.paid && !isLoggedIn) {
-      showCustomSnackBar('Login to access video', type: false);
+      showCustomSnackBar('Sign in to access Plus Content', type: false);
       appRouter.push(RoutePath.signIn);
       return;
     }
