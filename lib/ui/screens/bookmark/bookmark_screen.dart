@@ -53,6 +53,10 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   @override
   void deactivate() {
     ref.read(videoProvider.notifier).isSelected = null;
+    final pro=ref.read(bookmarkProvider);
+    pro.bookmarkListResponse?.clear();
+    pro.bookmarkAudioListResponse?.clear();
+    pro.bookmarkPDFListResponse?.clear();
     super.deactivate();
   }
 
@@ -70,10 +74,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
       for (final category in coursePWatch.downloadAudioCategoryResponse) {
         await coursePRead.getAudioFromDatabase(int.parse(category.categoryId ?? ""));
       }
-      for (final category in coursePWatch.downloadPdfResponses){
+      for (final category in coursePWatch.downloadPdfResponses) {
         await coursePRead.getPdfFromDatabase(int.parse(category.categoryId ?? ""));
-    }
-
+      }
     });
   }
 
@@ -256,10 +259,10 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                             right: _style.scale * 10,
                                             left: _style.scale * 10,
                                           ),
-                                          itemCount: bookmarkNotifier.bookmarkListResponse!.length,
+                                          itemCount: bookmarkNotifier.bookmarkListResponse?.length ?? 0,
                                           itemBuilder: (context, index) {
-                                            var model = bookmarkNotifier.bookmarkListResponse![index];
-
+                                            var model = bookmarkNotifier.bookmarkListResponse?[index] ?? BookmarkListResponse();
+                                            log("bookmark model-->${model.bookmarkVideoResponse?.category?.toJson()}");
                                             return BookmarkItem(
                                               isAudio: false,
                                               appStyle: _style,
@@ -268,8 +271,9 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                               IsSelected: videoCtrl.isSelected,
                                               onPlay: () {
                                                 videoCtrl.isSelected = index;
-                                                log("~~~~~~${bookmarkNotifier.category?.length}");
-                                                playVideo(model, bookmarkNotifier.category![index], index, showAudioFile);
+                                                log("~~~~~121212~${model.bookmarkVideoResponse?.category}");
+                                                log("~~~333333344444~~~${bookmarkNotifier.category?.length}");
+                                                playVideo(model, model.bookmarkVideoResponse?.category ?? CategoryListResponse(), index, showAudioFile);
                                               },
                                               url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
                                               onBookmarkRemove: () async {
@@ -284,71 +288,71 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                       ),
                                     ] else ...[
                                       const Padding(
-                                        padding: EdgeInsets.only(bottom: 20.0,top: 20),
+                                        padding: EdgeInsets.only(bottom: 20.0, top: 20),
                                         child: Text("Data Not Available"),
                                       )
                                     ],
                                   ],
                                 ),
                               ),
-                               Theme(
-                                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                                  child: ExpansionTile(
-                                    title: Text("Bookmarked Audios"),
-                                    onExpansionChanged: (expanded) {
-                                      setState(() {
-                                        if (expanded) {
-                                          expansionTileController.collapse();
-                                          expansionTileController2.collapse();
-                                        }
-                                      });
-                                    },
-                                    controller: expansionTileController1,
-                                    children: [
-                                      if (bookmarkNotifier.bookmarkAudioListResponse?.isNotEmpty ?? false) ...[
-                                        ListView.separated(
-                                          shrinkWrap: true,
-                                          scrollDirection: Axis.vertical,
-                                          padding: EdgeInsets.only(
-                                            //bottom: _style.scale * 100,
-                                            top: _style.scale * 12.5,
-                                            right: _style.scale * 10,
-                                            left: _style.scale * 10,
-                                          ),
-                                          itemCount: bookmarkNotifier.bookmarkAudioListResponse!.length,
-                                          itemBuilder: (context, index) {
-                                            log("index------$index------${bookmarkNotifier.audioCategory?.length}");
-                                            var model = bookmarkNotifier.bookmarkAudioListResponse![index];
-
-                                            return BookmarkItem(
-                                              isAudio: true,
-                                              appStyle: _style,
-                                              model: model,
-                                              index: index,
-                                              IsSelected: videoCtrl.isSelected,
-                                              onPlay: () {
-                                                videoCtrl.isSelected = index;
-                                                playVideo(model, bookmarkNotifier.audioCategory?[index] ?? CategoryListResponse(), index, true);
-                                              },
-                                              url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
-                                              onBookmarkRemove: () async {
-                                                if (model.videoId == null) return;
-                                                await ref.read(bookmarkProvider).toggleBookmark(model.videoId!, isRemove: true, isAudio: true);
-                                                bookmarkNotifier.bookmarkAudioListResponse!.removeAt(index);
-                                              },
-                                            );
-                                          },
-                                          separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                              Theme(
+                                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                child: ExpansionTile(
+                                  title: Text("Bookmarked Audios"),
+                                  onExpansionChanged: (expanded) {
+                                    setState(() {
+                                      if (expanded) {
+                                        expansionTileController.collapse();
+                                        expansionTileController2.collapse();
+                                      }
+                                    });
+                                  },
+                                  controller: expansionTileController1,
+                                  children: [
+                                    if (bookmarkNotifier.bookmarkAudioListResponse?.isNotEmpty ?? false) ...[
+                                      ListView.separated(
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.vertical,
+                                        padding: EdgeInsets.only(
+                                          //bottom: _style.scale * 100,
+                                          top: _style.scale * 12.5,
+                                          right: _style.scale * 10,
+                                          left: _style.scale * 10,
                                         ),
-                                      ] else ...[
-                                        const Padding(
-                                          padding: EdgeInsets.only(bottom: 20.0,top: 20),
-                                          child: Text("Data Not Available"),
-                                        )
-                                      ],
+                                        itemCount: bookmarkNotifier.bookmarkAudioListResponse!.length,
+                                        itemBuilder: (context, index) {
+                                          log("index------$index------${bookmarkNotifier.audioCategory?.length}");
+                                          var model = bookmarkNotifier.bookmarkAudioListResponse![index];
+
+                                          return BookmarkItem(
+                                            isAudio: true,
+                                            appStyle: _style,
+                                            model: model,
+                                            index: index,
+                                            IsSelected: videoCtrl.isSelected,
+                                            onPlay: () {
+                                              videoCtrl.isSelected = index;
+                                              playVideo(model, bookmarkNotifier.audioCategory?[index] ?? CategoryListResponse(), index, true);
+                                            },
+                                            url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
+                                            onBookmarkRemove: () async {
+                                              if (model.videoId == null) return;
+                                              await ref.read(bookmarkProvider).toggleBookmark(model.videoId!, isRemove: true, isAudio: true);
+                                              bookmarkNotifier.bookmarkAudioListResponse!.removeAt(index);
+                                            },
+                                          );
+                                        },
+                                        separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                      ),
+                                    ] else ...[
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 20.0, top: 20),
+                                        child: Text("Data Not Available"),
+                                      )
                                     ],
-                                  ),
+                                  ],
                                 ),
+                              ),
                               Expanded(
                                 child: Theme(
                                   data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -389,7 +393,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                               url: model?.bookmarkPdfResponse?.pdfUrl ?? "",
                                               onBookmarkRemove: () async {
                                                 if (model?.pdfId == null) return;
-                                                await ref.read(bookmarkProvider).toggleBookmark(model?.bookmarkPdfResponse?.id ??0, isRemove: true, isAudio: false,isPDF: true);
+                                                await ref.read(bookmarkProvider).toggleBookmark(model?.bookmarkPdfResponse?.id ?? 0, isRemove: true, isAudio: false, isPDF: true);
                                                 bookmarkNotifier.bookmarkPDFListResponse!.removeAt(index);
                                               },
                                             );
@@ -398,7 +402,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                         ),
                                       ] else ...[
                                         const Padding(
-                                          padding: EdgeInsets.only(bottom: 20.0,top: 20),
+                                          padding: EdgeInsets.only(bottom: 20.0, top: 20),
                                           child: Text("Data Not Available"),
                                         )
                                       ],
@@ -415,6 +419,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
             ),
     );
   }
+
   void viewPdf(String? pdfUrl) {
     if (pdfUrl == null) return;
     context.pushViewPDFScreen(pdfUrl);

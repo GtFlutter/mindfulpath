@@ -69,7 +69,7 @@ class DownloadNotifier extends ChangeNotifier {
       showCustomSnackBar(
         'Please Sign in to download a Pdf.',
         action: SnackBarAction(
-          label: 'Log In',
+          label: 'Sign In',
           backgroundColor: AppColors.primaryColor.withOpacity(0.8),
           textColor: Colors.brown.shade800,
           onPressed: () => appRouter.go(RoutePath.signIn),

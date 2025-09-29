@@ -261,7 +261,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     var radius = widget.appStyle.scaleX(10);
     var dimension = widget.appStyle.scaleX(97);
     bool isVideo = widget.model != null;
-    bool isPdf=widget.pdfModel!=null;
+    bool isPdf = widget.pdfModel != null;
     var pdfIconSize = isVideo ? 0.0 : widget.appStyle.scaleX(30);
 
     final playlistP = ref.watch(playListProvider);
@@ -436,7 +436,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
                                       debugPrint('File Path :: ${widget.model?.video?.fileName ?? ""}');
                                       bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                      if(!isLoggedIn){
+                                      if (!isLoggedIn) {
                                         showCustomSnackBar(
                                           'Please Sign in to Download',
                                           action: SnackBarAction(
@@ -516,24 +516,32 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             menuChildren: [
                               if (playlistP.playlistListResponse != null) ...[
                                 ...List.generate(playlistP.playlistListResponse!.length, (index) {
-                                  return PopupMenuItem(
-                                    height: widget.appStyle.scaleX(24),
-                                    onTap: () async {
-                                      bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                      if(!isLoggedIn){
-                                        showCustomSnackBar(
-                                          'Please Sign in to Add to Playlist',
-                                          action: SnackBarAction(
-                                            label: 'Sign in',
-                                            backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                            textColor: Colors.brown.shade800,
-                                            onPressed: () => appRouter.go(RoutePath.signIn),
-                                          ),
-                                          duration: const Duration(seconds: 5),
-                                        );
-                                        return;
+                                  return MenuItemButton(
+                                    // height: widget.appStyle.scaleX(24),
+                                    onPressed: () async {
+                                      log("Add to  playlist-->${widget.model?.videoType == ResourceType.free}");
+                                      if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
+                                        log("Add to  playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
+                                        bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                                        if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
+                                          await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio!);
+                                        } else {
+                                          showCustomSnackBar(
+                                            'Please Sign in to Add to Playlist',
+                                            action: SnackBarAction(
+                                              label: 'Sign in',
+                                              backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                                              textColor: Colors.brown.shade800,
+                                              onPressed: () => appRouter.go(RoutePath.signIn),
+                                            ),
+                                            duration: const Duration(seconds: 5),
+                                          );
+                                        }
+                                      } else {
+                                        await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
+                                        paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
+                                        paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                                       }
-                                      await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio!);
                                     },
                                     child: Text(
                                       playlistP.playlistListResponse![index].title ?? '',
@@ -585,69 +593,69 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                   ? Row(
                       children: [
                         if (!widget.isDownloaded)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final downloadP = ref.watch(downloadProvider);
-                            bool getCat = false;
-                            for (final e in ref.watch(courseProvider).downloadPdfResponse) {
-                              print("Comparing e.pdfId=${e.pdfId} with widget.pdfModel.id=${widget.pdfModel?.id}");
-                            }
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final downloadP = ref.watch(downloadProvider);
+                              bool getCat = false;
+                              for (final e in ref.watch(courseProvider).downloadPdfResponse) {
+                                print("Comparing e.pdfId=${e.pdfId} with widget.pdfModel.id=${widget.pdfModel?.id}");
+                              }
                               getCat = ref.watch(courseProvider).downloadPdfResponse.any((element) => int.parse(element.pdfId ?? "") == widget.pdfModel?.id);
                               print('-----gat cat---pdf---------->${getCat}');
-                            if (getCat) {
-                              return const SizedBox.shrink();
-                            } else {
-                              if (downloadP.isPdfDownloading && widget.pdfModel?.id == downloadP.pdfModel?.id) {
-                                return SizedBox(
-                                  height: 15,
-                                  width: 15,
-                                  child: CircularProgressIndicator(
-                                    strokeCap: StrokeCap.butt,
-                                    strokeWidth: 2,
-                                    value: downloadP.progress,
-                                  ),
-                                );
+                              if (getCat) {
+                                return const SizedBox.shrink();
                               } else {
-                                return OutlinedIconButton.svg(
-                                  SvgPaths.download,
-                                  appStyle: widget.appStyle,
-                                  // svgIconSrc: SvgPaths.bookmarkSelected,
-                                  onTap: () async {
-                                    print('------------pdf download-------->${widget.pdfModel?.toJson()}');
-                                    print('------------pdf download11-------->${downloadP.pdfModel?.toJson()}');
-                                    print('------------pdf download22-------->${widget.pdfModel?.pdfType == ResourceType.free}');
-                                    if ((widget.pdfModel?.category?.isPurchased ?? false) || widget.pdfModel?.pdfType == ResourceType.free) {
-                                      bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                      if(!isLoggedIn){
-                                        showCustomSnackBar(
-                                          'Please Sign in to Download',
-                                          action: SnackBarAction(
-                                            label: 'Sign in',
-                                            backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                            textColor: Colors.brown.shade800,
-                                            onPressed: () => appRouter.go(RoutePath.signIn),
-                                          ),
-                                          duration: const Duration(seconds: 5),
-                                        );
-                                        return;
+                                if (downloadP.isPdfDownloading && widget.pdfModel?.id == downloadP.pdfModel?.id) {
+                                  return SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: CircularProgressIndicator(
+                                      strokeCap: StrokeCap.butt,
+                                      strokeWidth: 2,
+                                      value: downloadP.progress,
+                                    ),
+                                  );
+                                } else {
+                                  return OutlinedIconButton.svg(
+                                    SvgPaths.download,
+                                    appStyle: widget.appStyle,
+                                    // svgIconSrc: SvgPaths.bookmarkSelected,
+                                    onTap: () async {
+                                      print('------------pdf download-------->${widget.pdfModel?.toJson()}');
+                                      print('------------pdf download11-------->${downloadP.pdfModel?.toJson()}');
+                                      print('------------pdf download22-------->${widget.pdfModel?.pdfType == ResourceType.free}');
+                                      if ((widget.pdfModel?.category?.isPurchased ?? false) || widget.pdfModel?.pdfType == ResourceType.free) {
+                                        bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                                        if (!isLoggedIn) {
+                                          showCustomSnackBar(
+                                            'Please Sign in to Download',
+                                            action: SnackBarAction(
+                                              label: 'Sign in',
+                                              backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                                              textColor: Colors.brown.shade800,
+                                              onPressed: () => appRouter.go(RoutePath.signIn),
+                                            ),
+                                            duration: const Duration(seconds: 5),
+                                          );
+                                          return;
+                                        }
+                                        if (downloadP.pdfModel == null) {
+                                          print(widget.pdfModel?.categoryId ?? "");
+                                          downloadP.pdfDownload(model: widget.pdfModel);
+                                        } else if (widget.pdfModel?.id != downloadP.pdfModel?.id) {
+                                          showCustomSnackBar('Another PDF is in progress');
+                                        }
+                                      } else {
+                                        await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString());
+                                        paidPdf.fetchPdfs(widget.pdfModel?.category?.id ?? 0);
+                                        paidAllItem.fetchAllPaidItem(widget.pdfModel?.category?.id ?? 0);
                                       }
-                                      if (downloadP.pdfModel == null) {
-                                        print(widget.pdfModel?.categoryId ?? "");
-                                        downloadP.pdfDownload(model: widget.pdfModel);
-                                      } else if (widget.pdfModel?.id != downloadP.pdfModel?.id) {
-                                        showCustomSnackBar('Another PDF is in progress');
-                                      }
-                                    } else {
-                                      await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString());
-                                      paidPdf.fetchPdfs(widget.pdfModel?.category?.id ?? 0);
-                                      paidAllItem.fetchAllPaidItem(widget.pdfModel?.category?.id ?? 0);
-                                    }
-                                  },
-                                );
+                                    },
+                                  );
+                                }
                               }
-                            }
-                          },
-                        ),
+                            },
+                          ),
                         const SizedBox(width: 8), // spacing between buttons
                         OutlinedIconButton.svg(
                           widget.pdfModel?.bookmarked != null && (widget.pdfModel?.bookmarked ?? false) ? SvgPaths.bookmarkSelected : SvgPaths.bookmarkUnselected,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -63,7 +65,8 @@ class FeatureVideoList extends ConsumerWidget {
           print('------------dataModel-------------->${dataModel.toJson()}');
           return GestureDetector(
             onTap: () async {
-              if (dataModel.category?.isPurchased == true) {
+              log("====>featured vedio--${dataModel.category?.isPurchased}====${dataModel.video?.type==ResourceType.free}");
+              if ((dataModel.category?.isPurchased ?? false)  || dataModel.video?.type==ResourceType.free) {
                 if (dataModel.category != null) {
                   if (context.canPop()) {
                     context.pop();

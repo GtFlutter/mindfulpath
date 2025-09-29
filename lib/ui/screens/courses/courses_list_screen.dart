@@ -130,10 +130,10 @@ print("item count-------->$itemCount");
                   child: CircularProgressIndicator(),
                 )
               :(itemCount==0)?
-          const Center(
+          Center(
             child: Text(
-              "No Plus content yet",
-              style: TextStyle(fontSize: 16, color: Colors.white),
+             isPurchased? "No Plus content yet":"No downloaded content found.",
+              style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
           )
               : GridView.builder(

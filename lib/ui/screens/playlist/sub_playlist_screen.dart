@@ -108,6 +108,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
             shadowColor: draggableItemColor,
             borderRadius: BorderRadius.circular(_style.scaleX(25)),
             child: BookmarkItem.dragable(
+              onPlay: (){},
               isAudio: false,
               appStyle: _style,
               model: BookmarkListResponse(),
@@ -276,14 +277,15 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                       appStyle: _style,
                                                       model: model!,
                                                       onPlay: () async {
-                                                        if (model.video?.category?.isPurchased ?? false || model.video?.videoType == ResourceType.free) {
-                                                          ref.read(videoProvider.notifier).isSelected = index;
-                                                          playVideo(model, index);
-                                                          FocusManager.instance.primaryFocus?.unfocus();
-                                                        } else {
-                                                          await buyNow(context, categoryId: (model.video?.categoryId ?? 0).toString());
-                                                          playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
-                                                        }
+                                                        log("------->playlist item------>${model.video?.category?.isPurchased}----${model.video?.videoType == ResourceType.free}");
+                                                        // if (model.video?.category?.isPurchased ?? false || model.video?.videoType == ResourceType.free) {
+                                                        //   ref.read(videoProvider.notifier).isSelected = index;
+                                                        //   playVideo(model, index);
+                                                        //   FocusManager.instance.primaryFocus?.unfocus();
+                                                        // } else {
+                                                        //   await buyNow(context, categoryId: (model.video?.categoryId ?? 0).toString());
+                                                        //   playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
+                                                        // }
                                                       },
                                                       onRemovePress: () async {
                                                         await playlistP.removeFromPlaylist(

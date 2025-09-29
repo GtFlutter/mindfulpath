@@ -33,7 +33,7 @@ class BookmarkItem extends ConsumerStatefulWidget {
   final int? IsSelected;
   final bool dragging;
   final GestureTapCallback? onBookmarkRemove;
-  final void Function()? onPlay;
+  final void Function() onPlay;
 
   const BookmarkItem({
     super.key,
@@ -44,7 +44,7 @@ class BookmarkItem extends ConsumerStatefulWidget {
     required this.onBookmarkRemove,
     this.url,
     this.IsSelected,
-    this.onPlay,
+    required this.onPlay,
   })  : dragable = false,
         dragging = false;
 
@@ -55,7 +55,7 @@ class BookmarkItem extends ConsumerStatefulWidget {
     required this.index,
     required this.isAudio,
     this.url,
-    this.onPlay,
+    required this.onPlay,
     this.IsSelected,
     this.dragging = false,
     this.onBookmarkRemove,
@@ -130,7 +130,7 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
 //primaryColor
     return GestureDetector(
       onTap: () {
-        widget.onPlay!();
+        widget.onPlay();
       },
       child: Container(
         decoration: ShapeDecoration(

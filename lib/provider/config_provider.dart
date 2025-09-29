@@ -46,7 +46,7 @@ class ConfigNotifier extends ChangeNotifier {
       try {
         // ignore: unused_result
         await ref.refresh(getUserProfileProvider.future);
-        showCustomSnackBar('Notification Setting Updated Successfully');
+        // showCustomSnackBar('Notification Setting Updated Successfully');
         stopLoading();
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
