@@ -118,6 +118,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     child: Center(child: CircularProgressIndicator()),
                   )
                 else if (prov.reslut == null || prov.reslut!.statistics.isEmpty)
+                // else if (prov.reslut == null)
                   Expanded(
                     child: Center(
                       child: Column(

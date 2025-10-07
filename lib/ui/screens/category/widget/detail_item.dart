@@ -431,6 +431,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () async {
+                                    print("download call=========");
                                     if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
                                       log("model--------->${widget.model?.toJson()}");
                                       print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
@@ -452,8 +453,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       if (downloadP.model == null) {
                                         if (widget.model?.video != null) {
                                           downloadP.download(model: widget.model);
+                                          log("vedio download");
                                         } else {
-                                          ///do stuff for audio download
                                           downloadP.downloadAudio(model: widget.model);
                                         }
                                       } else if (widget.model!.id != downloadP.model!.id) {
@@ -485,9 +486,10 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             onPressed: () async {
                               log("create playlist-->${widget.model?.videoType == ResourceType.free}");
                               if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
-                                log("create playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
+                                log("create playlist---${widget.model?.id?.toString()}---${widget.model?.video}");
                                 bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
+                                // if ((widget.model?.video != null) && widget.model?.id != null && isLoggedIn) {
+                                if (widget.model?.id != null && isLoggedIn) {
                                   createPlaylist(context, videoId: widget.model?.id?.toString());
                                 } else {
                                   showCustomSnackBar(
@@ -512,31 +514,20 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                               style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
                             ),
                           ),
-                          SubmenuButton(
-                            menuChildren: [
-                              if (playlistP.playlistListResponse != null) ...[
+                          if (ref.read(authProvider).isUserLoggedIn && playlistP.playlistListResponse != null)
+                            SubmenuButton(
+                              menuStyle: const MenuStyle(backgroundColor: WidgetStatePropertyAll(AppColors.popupMenuItemColor), surfaceTintColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor)),
+                              menuChildren: [
                                 ...List.generate(playlistP.playlistListResponse!.length, (index) {
                                   return MenuItemButton(
-                                    // height: widget.appStyle.scaleX(24),
                                     onPressed: () async {
-                                      log("Add to  playlist-->${widget.model?.videoType == ResourceType.free}");
+                                      log("Add to playlist tapped");
                                       if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
-                                        log("Add to  playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
-                                        bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                        if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
-                                          await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio!);
-                                        } else {
-                                          showCustomSnackBar(
-                                            'Please Sign in to Add to Playlist',
-                                            action: SnackBarAction(
-                                              label: 'Sign in',
-                                              backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                              textColor: Colors.brown.shade800,
-                                              onPressed: () => appRouter.go(RoutePath.signIn),
-                                            ),
-                                            duration: const Duration(seconds: 5),
-                                          );
-                                        }
+                                        await playlistP.addToPlaylist(
+                                          playlistP.playlistListResponse![index].id.toString(),
+                                          widget.model!.id!.toString(),
+                                          widget.isAudio!,
+                                        );
                                       } else {
                                         await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
                                         paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
@@ -545,22 +536,94 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                     },
                                     child: Text(
                                       playlistP.playlistListResponse![index].title ?? '',
-                                      style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                                      style: widget.appStyle.text.font(
+                                        mulishSemiBold600,
+                                        sizePx: 12,
+                                        color: AppColors.deleteMenuText,
+                                      ),
                                     ),
                                   );
-                                })
-                              ]
-                            ],
-                            menuStyle: const MenuStyle(
-                              padding: MaterialStatePropertyAll(EdgeInsets.zero),
-                              backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
-                            ),
-                            style: SubmenuButton.styleFrom(backgroundColor: AppColors.popupMenuItemColor, surfaceTintColor: AppColors.popupMenuItemColor, iconColor: Colors.grey),
-                            child: Text(
-                              'Add to Playlist',
-                              style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
-                            ),
-                          ),
+                                }),
+                              ],
+                              child: Text(
+                                'Add to Playlist',
+                                style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              ),
+                              style: SubmenuButton.styleFrom(
+                                backgroundColor: AppColors.popupMenuItemColor,
+                                surfaceTintColor: AppColors.popupMenuItemColor,
+                                iconColor: Colors.grey,
+                              ),
+                            )
+                          else
+                            MenuItemButton(
+                              onPressed: () {
+                                showCustomSnackBar(
+                                  'Please Sign in to Add to Playlist',
+                                  action: SnackBarAction(
+                                    label: 'Sign in',
+                                    backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                                    textColor: Colors.brown.shade800,
+                                    onPressed: () => appRouter.go(RoutePath.signIn),
+                                  ),
+                                  duration: const Duration(seconds: 5),
+                                );
+                              },
+                              child: Text(
+                                'Add to Playlist',
+                                style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                              ),
+                            )
+
+                          // SubmenuButton(
+                          //   menuChildren: [
+                          //     if (playlistP.playlistListResponse != null && ref.read(authProvider).isUserLoggedIn) ...[
+                          //       ...List.generate(playlistP.playlistListResponse!.length, (index) {
+                          //         return MenuItemButton(
+                          //           // height: widget.appStyle.scaleX(24),
+                          //           onPressed: () async {
+                          //             log("Add to  playlist-->${widget.model?.videoType == ResourceType.free}");
+                          //             if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
+                          //               log("Add to  playlist---${widget.model!.id!.toString()}---${widget.model!.video!.id!.toString()}");
+                          //               bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                          //               if (widget.model!.video != null && widget.model!.id != null && isLoggedIn) {
+                          //                 await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio!);
+                          //               } else {
+                          //                 showCustomSnackBar(
+                          //                   'Please Sign in to Add to Playlist',
+                          //                   action: SnackBarAction(
+                          //                     label: 'Sign in',
+                          //                     backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                          //                     textColor: Colors.brown.shade800,
+                          //                     onPressed: () => appRouter.go(RoutePath.signIn),
+                          //                   ),
+                          //                   duration: const Duration(seconds: 5),
+                          //                 );
+                          //               }
+                          //             } else {
+                          //               await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
+                          //               paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
+                          //               paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
+                          //             }
+                          //           },
+                          //           child: Text(
+                          //             playlistP.playlistListResponse![index].title ?? '',
+                          //             style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                          //           ),
+                          //         );
+                          //       })
+                          //     ]
+                          //   ],
+                          //   menuStyle: const MenuStyle(
+                          //     padding: MaterialStatePropertyAll(EdgeInsets.zero),
+                          //     backgroundColor: MaterialStatePropertyAll(AppColors.popupMenuItemColor),
+                          //   ),
+                          //   style: SubmenuButton.styleFrom(backgroundColor: AppColors.popupMenuItemColor, surfaceTintColor: AppColors.popupMenuItemColor, iconColor: Colors.grey),
+                          //   child: Text(
+                          //     'Add to Playlist',
+                          //     style: widget.appStyle.text.font(mulishSemiBold600, sizePx: 12, color: AppColors.deleteMenuText),
+                          //   ),
+                          // ),
                         ],
                         style: const MenuStyle(
                           // padding: MaterialStatePropertyAll(EdgeInsets.zero),

@@ -65,6 +65,20 @@ class FeatureVideoList extends ConsumerWidget {
           print('------------dataModel-------------->${dataModel.toJson()}');
           return GestureDetector(
             onTap: () async {
+              log("is login --->${ref.read(authProvider).isUserLoggedIn}----paid content--->${dataModel.videoType}");
+              if (!(ref.read(authProvider).isUserLoggedIn) &&(dataModel.videoType==ResourceType.paid)) {
+                showCustomSnackBar(
+                  'Please Sign in to view Plus Content',
+                  action: SnackBarAction(
+                    label: 'Sign in',
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                    textColor: Colors.brown.shade800,
+                    onPressed: () => appRouter.go(RoutePath.signIn),
+                  ),
+                  duration: const Duration(seconds: 5),
+                );
+                return;
+              }
               log("====>featured vedio--${dataModel.category?.isPurchased}====${dataModel.video?.type==ResourceType.free}");
               if ((dataModel.category?.isPurchased ?? false)  || dataModel.video?.type==ResourceType.free) {
                 if (dataModel.category != null) {

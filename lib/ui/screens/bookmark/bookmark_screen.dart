@@ -20,6 +20,7 @@ import 'package:meditation_app/ui/screens/bookmark/widget/bookmark_item.dart';
 import 'package:meditation_app/ui/screens/category/widget/detail_item.dart';
 
 import '../../../theme/styles.dart';
+import '../settings/widget/logout_dialog.dart';
 
 class BookmarkScreen extends ConsumerStatefulWidget {
   const BookmarkScreen({super.key});
@@ -53,7 +54,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
   @override
   void deactivate() {
     ref.read(videoProvider.notifier).isSelected = null;
-    final pro=ref.read(bookmarkProvider);
+    final pro = ref.read(bookmarkProvider);
     pro.bookmarkListResponse?.clear();
     pro.bookmarkAudioListResponse?.clear();
     pro.bookmarkPDFListResponse?.clear();
@@ -269,11 +270,18 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                               model: model,
                                               index: index,
                                               IsSelected: videoCtrl.isSelected,
-                                              onPlay: () {
-                                                videoCtrl.isSelected = index;
+                                              onPlay: () async {
                                                 log("~~~~~121212~${model.bookmarkVideoResponse?.category}");
-                                                log("~~~333333344444~~~${bookmarkNotifier.category?.length}");
-                                                playVideo(model, model.bookmarkVideoResponse?.category ?? CategoryListResponse(), index, showAudioFile);
+                                                log("~~~333333344444~~~${bookmarkNotifier.category?.length}---${model.bookmarkVideoResponse?.category?.isPurchased}---${model.bookmarkVideoResponse?.videoType}");
+                                                if ((model.bookmarkVideoResponse?.category?.isPurchased ?? false) || model.bookmarkVideoResponse?.videoType == ResourceType.free) {
+                                                  videoCtrl.isSelected = index;
+                                                  playVideo(model, model.bookmarkVideoResponse?.category ?? CategoryListResponse(), index, showAudioFile);
+                                                } else {
+                                                  await buyNow(context, categoryId: model.bookmarkVideoResponse!.categoryId.toString());
+                                                  bookmarkNotifier.getBookmarkList();
+                                                  bookmarkNotifier.getAudioBookmarks();
+                                                  bookmarkNotifier.getPDFBookmarks();
+                                                }
                                               },
                                               url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
                                               onBookmarkRemove: () async {
@@ -330,9 +338,16 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                             model: model,
                                             index: index,
                                             IsSelected: videoCtrl.isSelected,
-                                            onPlay: () {
-                                              videoCtrl.isSelected = index;
-                                              playVideo(model, bookmarkNotifier.audioCategory?[index] ?? CategoryListResponse(), index, true);
+                                            onPlay: () async {
+                                              if ((model.bookmarkVideoResponse?.category?.isPurchased ?? false) || model.bookmarkVideoResponse?.videoType == ResourceType.free) {
+                                                videoCtrl.isSelected = index;
+                                                playVideo(model, bookmarkNotifier.audioCategory?[index] ?? CategoryListResponse(), index, true);
+                                              } else {
+                                                await buyNow(context, categoryId: model.bookmarkVideoResponse!.categoryId.toString());
+                                                bookmarkNotifier.getBookmarkList();
+                                                bookmarkNotifier.getAudioBookmarks();
+                                                bookmarkNotifier.getPDFBookmarks();
+                                              }
                                             },
                                             url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
                                             onBookmarkRemove: () async {
@@ -387,8 +402,15 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                               model: model,
                                               index: index,
                                               IsSelected: videoCtrl.isSelected,
-                                              onPlay: () {
-                                                viewPdf(model?.bookmarkPdfResponse?.pdfUrl ?? "");
+                                              onPlay: () async {
+                                                if ((model?.bookmarkPdfResponse?.category?.isPurchased ?? false) || model?.bookmarkPdfResponse?.pdfType == ResourceType.free) {
+                                                  viewPdf(model?.bookmarkPdfResponse?.pdfUrl ?? "");
+                                                } else {
+                                                  await buyNow(context, categoryId: (model?.bookmarkPdfResponse?.categoryId ?? 0).toString());
+                                                  bookmarkNotifier.getBookmarkList();
+                                                  bookmarkNotifier.getAudioBookmarks();
+                                                  bookmarkNotifier.getPDFBookmarks();
+                                                }
                                               },
                                               url: model?.bookmarkPdfResponse?.pdfUrl ?? "",
                                               onBookmarkRemove: () async {

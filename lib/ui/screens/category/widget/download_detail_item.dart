@@ -122,7 +122,7 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            SizedBox(width: widget.appStyle.scaleX(150)),
+                            // SizedBox(width: widget.appStyle.scaleX(150)),
                           ],
                         ),
                       ],

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -12,11 +13,13 @@ import 'package:meditation_app/ui/common/media_player/custom_track_shape.dart';
 import 'package:meditation_app/util/assets.dart';
 import 'package:meditation_app/util/dimensions.dart';
 
+import '../../screens/analytics/store_local_watch_time.dart';
 import '../outlined_icon_button.dart';
 
 class AppAudioPlayer extends ConsumerStatefulWidget {
   final AppStyle style;
   final int audioId;
+  final int? categoryId;
   final String duration;
   final String audioUrl;
   final String audioImage;
@@ -28,6 +31,7 @@ class AppAudioPlayer extends ConsumerStatefulWidget {
     required this.duration,
     required this.audioImage,
     required this.audioId,
+    this.categoryId,
   });
 
   @override
@@ -44,6 +48,7 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
   int lastSecond = 0;
 
   Duration playedDuration = Duration(seconds: 0);
+  bool get _isOfflineFile => widget.audioUrl.startsWith("file://");
 
   @override
   void initState() {
@@ -70,11 +75,39 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
   }
 
   @override
-  void deactivate() {
+  Future<void> deactivate() async {
     // TODO: implement deactivate
     _audioPlayer.stop();
     _audioPlayer.dispose();
-    ref.read(dashboardProvider).storeVideoWatchedTime(widget.audioId, Duration(seconds: lastSecond), true);
+    // ref.read(dashboardProvider).storeVideoWatchedTime(widget.audioId, Duration(seconds: lastSecond), true);
+    final watchedDuration = Duration(seconds: lastSecond);
+    log("offline or not--->$_isOfflineFile----${widget.categoryId}");
+    if (_isOfflineFile) {
+      // 🔹 Store locally if playing from downloaded file
+      LocalAnalyticsStore.addWatchTime(
+        isAudio: true,
+        seconds: lastSecond,
+        date: DateTime.now(),
+        categoryId: widget.categoryId,  // or pass actual category id if available
+        videoId: widget.audioId,
+      );
+      /// 🔹 Immediately read back & print to check
+      final all = await LocalAnalyticsStore.getAllWatchTime();
+      print("---- Local Audio Analytics ----");
+      print("All data: ${jsonEncode(all)}");
+
+      // 🔹 Example: today's data
+      final today = "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
+      final categoryKey = (widget.categoryId ?? 1).toString();
+      final audioKey = (widget.audioId ?? 0).toString();
+      final seconds = all["audio"]?[today]?[categoryKey]?[audioKey] ?? 0;
+
+      print("Audio ID $audioKey watch time today: $seconds seconds");
+    } else {
+      // 🔹 Store online via API if streaming from URL
+      ref.read(dashboardProvider).storeVideoWatchedTime(widget.audioId, watchedDuration, true);
+    }
+
     super.deactivate();
   }
 
@@ -102,6 +135,7 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    log("aidio play online or offline----->$_isOfflineFile");
     style = AppStyle(screenSize: MediaQuery.sizeOf(context));
     lastSecond = 0;
     setState(() {});

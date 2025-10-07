@@ -128,7 +128,10 @@ class DownloadNotifier extends ChangeNotifier {
 
   void download({VideoResponse? model}) async {
     print("call----${model?.category?.isPurchased}");
-
+    if (isDownloading) {
+      debugPrint("⚠️ Skipping duplicate download — already downloading ${this.model?.id}");
+      return;
+    }
     BuildContext? context = rootNavigator.currentContext;
     if (context == null) return;
     if (model == null) return;
@@ -174,6 +177,7 @@ class DownloadNotifier extends ChangeNotifier {
             tempProgress = ((count / total * 100).roundToDouble()) / 100;
             if (!_isDownloadComplete && !_isDownloading) {
               _isDownloading = true;
+              debugPrint('Download started for ===> ${model.video?.fileName}');
               notifyListeners();
             }
             if (tempProgress == 1.0) {

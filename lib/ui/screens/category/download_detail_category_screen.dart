@@ -133,6 +133,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                         child: AppVideoPlayer(
                           isLandscape: isLandscape,
+                          categoryId: int.parse(widget.categoryModal.categoryId ?? "0"),
                           key: const ValueKey('value'),
                           videoId: videoCtrl.video?.id ?? 0,
                           url: videoCtrl.video?.videoFile ?? '',
@@ -221,6 +222,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
                         duration: videoCtrl.video!.videoDuration ?? "",
                         audioUrl: "file://${videoCtrl.video!.videoFile ?? " "}",
                         audioImage: videoCtrl.video!.videoThumbnail ?? "",
+                        categoryId: int.parse(widget.categoryModal.categoryId ?? "0"),
                       ),
                     ),
                     SizedBox(height: _style.scaleX(24)),

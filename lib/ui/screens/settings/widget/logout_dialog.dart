@@ -147,12 +147,12 @@ class BuyNowDialog extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Upgrade For Full Access',
+                    'Upgrade for Additional Access',
                     style: style.text.font(mulishSemiBold600, sizePx: 20),
                   ),
                   SizedBox(height: style.scaleX(10)),
                   Text(
-                    'Upgrade for full access to exclusive videos and enjoy a premium viewing experience!',
+                    'Deepen your practice with additional meditations and programs',
                     textAlign: TextAlign.center,
                     style: style.text.font(mulishRegular400, sizePx: 13),
                   ),

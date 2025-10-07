@@ -13,12 +13,14 @@ import 'package:meditation_app/util/assets.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../util/dimensions.dart';
+import '../../screens/analytics/store_local_watch_time.dart';
 import '../outlined_icon_button.dart';
 
 /// all working but bookmark screen and playlist screen landscape to portrait second start from zero
 class AppVideoPlayer extends ConsumerStatefulWidget {
   final String url;
   final int videoId;
+  final int? categoryId;
   final String duration;
   final AppStyle style;
   final bool isLandscape;
@@ -33,6 +35,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
     required this.url,
     required this.duration,
     required this.style,
+    this.categoryId,
     this.onBackPress,
     required this.isLandscape,
     required this.videoId,
@@ -57,6 +60,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   Duration _currentPosition = Duration.zero;
 
   final Duration _period = const Duration(seconds: 10);
+  final Duration _offlinePeriod = const Duration(seconds: 2);
 
   @override
   void initState() {
@@ -152,13 +156,61 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
       widget.onPositionChanged!(_controller.value.position);
     }
 
-    if (_controller.value.isPlaying && !widget.isFileUrl) {
-      _watchTimer ??= Timer.periodic(_period, (timer) async {
-        if (!_isBuffering && _controller.value.isInitialized) {
+    // if (_controller.value.isPlaying && !widget.isFileUrl) {
+    //   _watchTimer ??= Timer.periodic(_period, (timer) async {
+    //     if (!_isBuffering && _controller.value.isInitialized) {
+    //       if (mounted) {
+    //         ref.read(videoProvider).watchedDuration = _period;
+    //       }
+    //       await ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period, false);
+    //     }
+    //   });
+    // } else {
+    //   _watchTimer?.cancel();
+    //   _watchTimer = null;
+    // }
+    log("isPlaying----->${_controller.value.isPlaying}");
+    if (_controller.value.isPlaying) {
+      _watchTimer ??= Timer.periodic(widget.isFileUrl?_offlinePeriod:_period, (timer) async {
+        // if ((!_isBuffering) && _controller.value.isInitialized) {
+        if (_controller.value.isInitialized) {
           if (mounted) {
             ref.read(videoProvider).watchedDuration = _period;
           }
-          await ref.read(dashboardProvider).storeVideoWatchedTime(widget.videoId, _period, false);
+          log("track offline time---->${!widget.isFileUrl}");
+          if (!widget.isFileUrl) {
+            /// ====== ONLINE MODE: Send to API ======
+              log("track online time---->${!widget.isFileUrl}");
+            await ref.read(dashboardProvider).storeVideoWatchedTime(
+                  widget.videoId,
+                  _period,
+                  false,
+                );
+          } else {
+            /// ====== OFFLINE MODE: Save to local pref ======
+            await LocalAnalyticsStore.addWatchTime(
+              isAudio: false,
+              // here video only, audio you handle separately
+              seconds: _offlinePeriod.inSeconds,
+              date: DateTime.now(),
+              categoryId: widget.categoryId ?? 1,
+              videoId: widget.videoId,
+            );
+
+            /// 🔹 Immediately read back & print to check
+            final all = await LocalAnalyticsStore.getAllWatchTime();
+            print("---- Watch Time Data ----");
+            print("All data=====>${all.keys}:${all.values}");
+
+// Example: read today's total for video category=2, videoId=123
+            final today = "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
+
+            final categoryKey = (widget.categoryId ?? 1).toString();
+            final videoKey = widget.videoId?.toString() ?? "all";
+
+            final videoData = all["video"]?[today]?[categoryKey]?[videoKey];
+            print("Video=====> $videoKey watch time today: ${videoData ?? 0} seconds");
+          }
         }
       });
     } else {

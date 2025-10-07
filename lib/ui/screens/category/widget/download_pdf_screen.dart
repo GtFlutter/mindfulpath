@@ -154,7 +154,7 @@ class _DownloadPdfCategoryScreenState extends ConsumerState<DownloadPdfCategoryS
                 ),
               )
             : Center(
-                child:courseP.isPDFLoading? const CircularProgressIndicator():const Center(child: Text("No downloaded PDF found.",style: TextStyle(fontSize: 16, color: Colors.white)),),
+                child:courseP.isPDFLoading? const CircularProgressIndicator():const Center(child: Text("No downloaded content found.",style: TextStyle(fontSize: 16, color: Colors.white)),),
               ));
   }
 

@@ -73,6 +73,8 @@ class AppConfigs {
   // Shared Preference Key
   static const String TOKEN = 'meditation_token';
   static const String RECENT_VIDEOS = 'recent_videos';
+  static const String localAnalytics = 'local_analytics';
+
 
   /// END [LOCAL_KEY]
 }
