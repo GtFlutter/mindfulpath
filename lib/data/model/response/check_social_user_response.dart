@@ -53,6 +53,7 @@ class SocialUserData {
   String? fcmToken;
   bool isSocialLogin;
   bool isGoogleLogin;
+  bool isAppleLogin;
 
-  SocialUserData({this.userName, this.socialId, this.mobileOrEmail, this.fcmToken, this.isSocialLogin = false, this.isGoogleLogin = false});
+  SocialUserData({this.userName, this.socialId, this.mobileOrEmail, this.fcmToken, this.isSocialLogin = false, this.isGoogleLogin = false, this.isAppleLogin = false});
 }

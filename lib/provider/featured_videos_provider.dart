@@ -38,56 +38,100 @@ class FeaturedVideosNotifier extends ChangeNotifier {
     _loading = false;
     if (notifie) notifyListeners();
   }
-
-  Future<void> getFeatureVideoList(int offset, bool reload, {bool showProgress = true}) async {
-    if (!reload && offset == 1) {
-      _data = null;
-      if (showProgress) {
-        startLoading(notifie: false);
-      }
-      notifyListeners();
-    }
-
-    Response response = await repo.getFeatureVideoList(offset);
-
+  Future<void> getFeatureVideoList(
+      int offset,
+      bool reload, {
+        bool showProgress = true,
+      }) async {
     try {
+      // ✅ Always show loader on reload or first page
+      if (reload || offset == 1) {
+        _data = null;
+        if (showProgress) startLoading(notifie: false);
+        notifyListeners();
+      }
+
+      final response = await repo.getFeatureVideoList(offset);
+
       if (response.statusCode == 200) {
-        var json = jsonDecode(response.body);
-        if (json['data'] == null) {
-          throw Exception('Unable to find data');
+        final json = jsonDecode(response.body);
+        if (json['data'] == null) throw Exception('Unable to find data');
+
+        final newData = VideosResponse.fromJson(json['data'], false);
+
+        if (offset == 1 || reload || _data == null) {
+          // ✅ Replace data on reload or first load
+          _data = newData;
+        } else {
+          // ✅ Append data for pagination
+          _data!.total = newData.total;
+          _data!.currentPage = newData.currentPage;
+          _data!.lastPage = newData.lastPage;
+          _data!.limit = newData.limit;
+          _data!.list?.addAll(newData.list ?? []);
         }
-        if (offset == 1 || _data == null) {
-          if (reload) _data = null;
-          _data = VideosResponse.fromJson(json['data'], false);
-          if (!reload && offset == 1 && showProgress) {
-            stopLoading(notifie: false);
-          }
-          notifyListeners();
-        } else if (_data != null) {
-          var tempModel = VideosResponse.fromJson(json['data'], false);
-          _data!.total = tempModel.total;
-          _data!.currentPage = tempModel.currentPage;
-          _data!.lastPage = tempModel.lastPage;
-          _data!.limit = tempModel.limit;
-          if (_data!.list != null) _data!.list!.addAll(tempModel.list ?? []);
-          if (!reload && offset == 1 && showProgress) {
-            stopLoading(notifie: false);
-          }
-          notifyListeners();
-        }
+
+        if (showProgress) stopLoading(notifie: false);
+        notifyListeners();
       } else {
-        if (!reload && offset == 1 && showProgress) {
-          stopLoading();
-        }
+        if (showProgress) stopLoading();
         ApiChecker.checkApi(response);
       }
     } catch (e) {
-      if (!reload && offset == 1 && showProgress) {
-        stopLoading();
-      }
+      if (showProgress) stopLoading();
       showCustomSnackBar('Something went wrong');
     }
   }
+
+  // Future<void> getFeatureVideoList(int offset, bool reload, {bool showProgress = true}) async {
+  //   if (!reload && offset == 1) {
+  //     _data = null;
+  //     if (showProgress) {
+  //       startLoading(notifie: false);
+  //     }
+  //     notifyListeners();
+  //   }
+  //
+  //   Response response = await repo.getFeatureVideoList(offset);
+  //
+  //   try {
+  //     if (response.statusCode == 200) {
+  //       var json = jsonDecode(response.body);
+  //       if (json['data'] == null) {
+  //         throw Exception('Unable to find data');
+  //       }
+  //       if (offset == 1 || _data == null) {
+  //         if (reload) _data = null;
+  //         _data = VideosResponse.fromJson(json['data'], false);
+  //         if (!reload && offset == 1 && showProgress) {
+  //           stopLoading(notifie: false);
+  //         }
+  //         notifyListeners();
+  //       } else if (_data != null) {
+  //         var tempModel = VideosResponse.fromJson(json['data'], false);
+  //         _data!.total = tempModel.total;
+  //         _data!.currentPage = tempModel.currentPage;
+  //         _data!.lastPage = tempModel.lastPage;
+  //         _data!.limit = tempModel.limit;
+  //         if (_data!.list != null) _data!.list!.addAll(tempModel.list ?? []);
+  //         if (!reload && offset == 1 && showProgress) {
+  //           stopLoading(notifie: false);
+  //         }
+  //         notifyListeners();
+  //       }
+  //     } else {
+  //       if (!reload && offset == 1 && showProgress) {
+  //         stopLoading();
+  //       }
+  //       ApiChecker.checkApi(response);
+  //     }
+  //   } catch (e) {
+  //     if (!reload && offset == 1 && showProgress) {
+  //       stopLoading();
+  //     }
+  //     showCustomSnackBar('Something went wrong');
+  //   }
+  // }
 
   void toggleBookmark(int itemId, {bool notifier = true}) {
     if (_data == null || _data!.list == null) {

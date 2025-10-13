@@ -25,9 +25,9 @@ class PlaylistRepo {
     return await apiClient.postData(AppConfigs.getPlaylistDetail,body);
   }
 
-  Future<Response> createPlaylist(String title, {String? videoId}) async {
+  Future<Response> createPlaylist(String title,bool isAudio, {String? videoId}) async {
     var body = {'title': title};
-    if (videoId != null) body.addAll({'video_id': videoId});
+    if (videoId != null) body.addAll({isAudio? 'audio_id':'video_id': videoId});
     return await apiClient.postData(AppConfigs.createPlaylist, body);
   }
 

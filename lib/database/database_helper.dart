@@ -56,32 +56,101 @@ class DatabaseHelper {
   ///save Video category
   Future<int> saveCategory(CategoryModal modal) async {
     var dbClient = await db;
-    int res;
+
+    // 🔹 Ensure all fields are not null (or provide default)
+    final data = modal.toJson().map((key, value) {
+      if (value == null) {
+        if (value is int) return MapEntry(key, 0);
+        if (value is String) return MapEntry(key, '');
+        return MapEntry(key, ''); // fallback
+      }
+      return MapEntry(key, value);
+    });
+
     try {
-      res = await dbClient.insert(DatabaseConsts.categoryTable, modal.toJson());
+      // ✅ Check if category with same id already exists
+      final existing = await dbClient.query(
+        DatabaseConsts.categoryTable,
+        where: 'id = ?',
+        whereArgs: [modal.id],
+      );
+
+      if (existing.isNotEmpty) {
+        debugPrint("⚠️ Category with id ${modal.id} already exists, skipping insert");
+        return 0;
+      }
+
+      int res = await dbClient.insert(DatabaseConsts.categoryTable, data);
       debugPrint("DATABASE:- ${DatabaseConsts.categoryTable} saved to db");
+      return res;
     } catch (e) {
-      await dbClient.delete(DatabaseConsts.categoryTable);
-      res = await dbClient.insert('CategoryTable', modal.toJson());
-      debugPrint("DATABASE:- ${DatabaseConsts.categoryTable} saved to db with Error");
+      debugPrint("DATABASE:- Error saving ${DatabaseConsts.categoryTable}: $e");
+      return -1;
     }
-    return res;
   }
+
+  // Future<int> saveCategory(CategoryModal modal) async {
+  //   var dbClient = await db;
+  //   int res;
+  //   try {
+  //     res = await dbClient.insert(DatabaseConsts.categoryTable, modal.toJson());
+  //     debugPrint("DATABASE:- ${DatabaseConsts.categoryTable} saved to db");
+  //   } catch (e) {
+  //     await dbClient.delete(DatabaseConsts.categoryTable);
+  //     res = await dbClient.insert('CategoryTable', modal.toJson());
+  //     debugPrint("DATABASE:- ${DatabaseConsts.categoryTable} saved to db with Error");
+  //   }
+  //   return res;
+  // }
 
   ///save video
   Future<int> saveVideo(VideoModal modal) async {
     var dbClient = await db;
-    int res;
+
+    final data = modal.toJson().map((key, value) {
+      if (value == null) {
+        if (value is int) return MapEntry(key, 0);
+        if (value is String) return MapEntry(key, '');
+        return MapEntry(key, '');
+      }
+      return MapEntry(key, value);
+    });
+
     try {
-      res = await dbClient.insert(DatabaseConsts.videoTable, modal.toJson());
+      // ✅ Skip if video id already exists
+      final existing = await dbClient.query(
+        DatabaseConsts.videoTable,
+        where: 'id = ?',
+        whereArgs: [modal.id],
+      );
+
+      if (existing.isNotEmpty) {
+        debugPrint("⚠️ Video with id ${modal.id} already exists, skipping insert");
+        return 0;
+      }
+
+      int res = await dbClient.insert(DatabaseConsts.videoTable, data);
       debugPrint("DATABASE:- ${DatabaseConsts.videoTable} saved to db");
+      return res;
     } catch (e) {
-      await dbClient.delete(DatabaseConsts.videoTable);
-      res = await dbClient.insert('VideoTable', modal.toJson());
-      debugPrint("DATABASE:- ${DatabaseConsts.videoTable} saved to db with Error");
+      debugPrint("DATABASE:- Error saving ${DatabaseConsts.videoTable}: $e");
+      return -1;
     }
-    return res;
   }
+
+  // Future<int> saveVideo(VideoModal modal) async {
+  //   var dbClient = await db;
+  //   int res;
+  //   try {
+  //     res = await dbClient.insert(DatabaseConsts.videoTable, modal.toJson());
+  //     debugPrint("DATABASE:- ${DatabaseConsts.videoTable} saved to db");
+  //   } catch (e) {
+  //     await dbClient.delete(DatabaseConsts.videoTable);
+  //     res = await dbClient.insert('VideoTable', modal.toJson());
+  //     debugPrint("DATABASE:- ${DatabaseConsts.videoTable} saved to db with Error");
+  //   }
+  //   return res;
+  // }
 
   ///Get single category of Video
   Future<CategoryModal?> getSingleCategory(String categoryId) async {

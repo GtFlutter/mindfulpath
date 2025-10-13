@@ -127,9 +127,9 @@ class PlaylistNotifier extends ChangeNotifier {
     }
   }
 
-  Future<bool> createPlaylist(String title, {String? videoId}) async {
+  Future<bool> createPlaylist(String title, {String? videoId,bool isAudio=false}) async {
     startCreatePlaylistLoading();
-    Response response = await repo.createPlaylist(title, videoId: videoId);
+    Response response = await repo.createPlaylist(title,isAudio, videoId: videoId);
     debugPrint('RESPONSE CODE :: ${response.statusCode}');
     if (response.statusCode != 200) {
       stopCreatePlaylistLoading();

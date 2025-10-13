@@ -9,19 +9,21 @@ import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/discover/widget/featured_item_painter.dart';
 import 'package:meditation_app/util/assets.dart';
 
+import '../../../provider/resource_provider/internet_provider.dart';
 import '../../../theme/styles.dart';
+import '../../common/no_internet_screen.dart';
 import 'discover_list_widget.dart';
 import 'featured_widget.dart';
 import 'widget/greeting.dart';
 
-class DiscoverScreen extends StatefulWidget {
+class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
 
   @override
-  State<DiscoverScreen> createState() => _DiscoverScreenState();
+  ConsumerState<DiscoverScreen> createState() => _DiscoverScreenState();
 }
 
-class _DiscoverScreenState extends State<DiscoverScreen> {
+class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   static AppStyle _style = AppStyle();
 
   @override
@@ -48,6 +50,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
     /// This is For Featured Card Image Clipper
     final DashboardCustomImageClipper clipper = DashboardCustomImageClipper(_style.scaleX(15));
+    final hasInternet = ref.watch(internetProvider);
+    final notifier = ref.read(internetProvider.notifier);
 
     return Scaffold(
       extendBody: true,
@@ -104,7 +108,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       body: BackgroundImage(
         child: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
+          child:hasInternet? SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.only(bottom: _style.scale * 100, top: _style.scale * 10),
             child: Column(
@@ -120,7 +124,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                 // RecentListWidget(style: _style, clipper: clipper),
               ],
             ),
-          ),
+          ): NoInternetScreen(onRetry: () => notifier.checkNow()),
         ),
       ),
     );

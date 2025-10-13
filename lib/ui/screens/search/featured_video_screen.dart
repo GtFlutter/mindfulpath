@@ -14,18 +14,27 @@ import '../../../util/assets.dart';
 import '../../common/feature_video_list.dart';
 import '../discover/widget/discover_header.dart';
 
-class FeaturedVideoScreen extends StatefulWidget {
+class FeaturedVideoScreen extends ConsumerStatefulWidget {
   const FeaturedVideoScreen({super.key});
 
   @override
-  State<FeaturedVideoScreen> createState() => _FeaturedVideoScreenState();
+  ConsumerState<FeaturedVideoScreen> createState() => _FeaturedVideoScreenState();
 }
 
-class _FeaturedVideoScreenState extends State<FeaturedVideoScreen> {
+class _FeaturedVideoScreenState extends ConsumerState<FeaturedVideoScreen> {
   static AppStyle _style = AppStyle();
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.watch(featuredVideosProvider);
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
 
@@ -37,8 +46,12 @@ class _FeaturedVideoScreenState extends State<FeaturedVideoScreen> {
             children: [
               Row(
                 children: [
-                  IconButton( iconSize: 25,
-                    icon: const Icon(Icons.arrow_back, color: Colors.white,),
+                  IconButton(
+                    iconSize: 25,
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    ),
                     onPressed: () => Navigator.of(context).maybePop(),
                   ),
                   Expanded(
@@ -70,9 +83,8 @@ class _FeaturedVideoScreenState extends State<FeaturedVideoScreen> {
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Hinted search text',
-                                hintStyle:
-                                    _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white.withOpacity(0.5)),
-                                contentPadding: EdgeInsets.only(bottom: _style.scaleX(Platform.isIOS?13:16)),
+                                hintStyle: _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white.withOpacity(0.5)),
+                                contentPadding: EdgeInsets.only(bottom: _style.scaleX(Platform.isIOS ? 13 : 16)),
                                 constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                                 alignLabelWithHint: true,
                               ),
@@ -112,9 +124,12 @@ class _FeaturedVideoScreenState extends State<FeaturedVideoScreen> {
                         Expanded(
                           child: FeatureVideoList.vertical(
                             key: const ValueKey<String>('fss-vl-1'),
-                            list:provider.data!.list!,
+                            list: provider.data!.list!,
                             style: _style,
                             physics: const BouncingScrollPhysics(),
+                            onBookmarkChanged: () async {
+                              await ref.read(featuredVideosProvider.notifier).getFeatureVideoList(1, true);
+                            },
                           ),
                         ),
                       ],

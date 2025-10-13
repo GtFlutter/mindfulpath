@@ -61,6 +61,7 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
     ref.read(videoProvider.notifier).isSelected = null;
     ref.read(courseProvider.notifier).downloadVideoResponse.clear();
     ref.read(courseProvider.notifier).downloadAudioResponse.clear();
+    ref.read(offlineVideoProvider).clearVideo();
     super.deactivate();
   }
 
@@ -88,13 +89,12 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
         if (didPop) {
           return;
         }
-        if (isVideoAvailable) {
+        if (isVideoAvailable || isAudioAvailable) {
           log("video disposed called");
           if (MediaQuery.orientationOf(context) == Orientation.landscape) {
             SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
           }
           videoCtrl.clearVideo();
-
           return;
         }
         if (isAudioAvailable) {

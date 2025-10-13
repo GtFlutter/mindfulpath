@@ -9,18 +9,21 @@ import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 
 class CreatePlaylistDialog extends ConsumerStatefulWidget {
-  CreatePlaylistDialog(this.style, {super.key, this.videoId});
+  CreatePlaylistDialog(this.style, {super.key, this.videoId, this.isAudio});
 
   final AppStyle style;
   final String? videoId;
+  final bool? isAudio;
+
   @override
   ConsumerState<CreatePlaylistDialog> createState() => _CreatePlaylistDialogState();
 }
-class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
 
+class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
   late final TextEditingController _playlistCtrl;
 
   final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -72,16 +75,15 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
                   cursorColor: CustomeTextFieldStyle.cursorColor,
                   textInputAction: TextInputAction.next,
                   decoration: CustomeTextFieldStyle.inputDecoration(style: style).copyWith(
-                    labelText: 'Enter Playlist Name',
-                    counterText: '',
-                    border: const OutlineInputBorder(),
-                    enabledBorder: outlineBorder,
-                    focusedBorder: outlineBorder,
-                    errorBorder: outlineBorder,
-                    focusedErrorBorder: outlineBorder,
-                    disabledBorder: outlineBorder,
-                    enabled: !playlistP.isCreatePlaylistLoading
-                  ),
+                      labelText: 'Enter Playlist Name',
+                      counterText: '',
+                      border: const OutlineInputBorder(),
+                      enabledBorder: outlineBorder,
+                      focusedBorder: outlineBorder,
+                      errorBorder: outlineBorder,
+                      focusedErrorBorder: outlineBorder,
+                      disabledBorder: outlineBorder,
+                      enabled: !playlistP.isCreatePlaylistLoading),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please Enter Playlist Name';
@@ -97,9 +99,7 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
               ),
               SizedBox(height: style.scaleX(37.5)),
               ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: style.scaleX(200)
-                ),
+                constraints: BoxConstraints(maxWidth: style.scaleX(200)),
                 child: Row(
                   children: [
                     Expanded(
@@ -115,30 +115,32 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
                     ),
                     SizedBox(width: style.scaleX(21)),
                     Expanded(
-                      child: playlistP.isCreatePlaylistLoading ? Center(
-                        child: Container(
-                          alignment: Alignment.center,
-                          margin: EdgeInsets.symmetric(horizontal: style.scaleX(10)),
-                          constraints: BoxConstraints(maxHeight: style.scaleX(20), maxWidth: style.scaleX(20)),
-                          child: CircularProgressIndicator.adaptive(
-                            strokeWidth: style.scaleX(2),
-                            backgroundColor: Colors.white,
-                            valueColor: AlwaysStoppedAnimation(Colors.green.shade900),
-                          ),
-                        ),
-                      ) : FilledButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            await playlistP.createPlaylist(_playlistCtrl.text.trim(), videoId: widget.videoId);
-                            if (context.mounted && context.canPop()) context.pop();
-                          }
-                        },
-                        style: FilledButton.styleFrom(
-                          textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
-                          padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
-                        ),
-                        child: const Text('Save'),
-                      ),
+                      child: playlistP.isCreatePlaylistLoading
+                          ? Center(
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.symmetric(horizontal: style.scaleX(10)),
+                                constraints: BoxConstraints(maxHeight: style.scaleX(20), maxWidth: style.scaleX(20)),
+                                child: CircularProgressIndicator.adaptive(
+                                  strokeWidth: style.scaleX(2),
+                                  backgroundColor: Colors.white,
+                                  valueColor: AlwaysStoppedAnimation(Colors.green.shade900),
+                                ),
+                              ),
+                            )
+                          : FilledButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  await playlistP.createPlaylist(_playlistCtrl.text.trim(), videoId: widget.videoId, isAudio: widget.isAudio ?? false);
+                                  if (context.mounted && context.canPop()) context.pop();
+                                }
+                              },
+                              style: FilledButton.styleFrom(
+                                textStyle: style.text.font(mulishSemiBold600, sizePx: 15),
+                                padding: EdgeInsets.symmetric(vertical: style.scaleX(10)),
+                              ),
+                              child: const Text('Save'),
+                            ),
                     ),
                   ],
                 ),
@@ -150,4 +152,3 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
     );
   }
 }
-

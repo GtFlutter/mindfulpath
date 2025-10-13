@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last
 
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart' show CupertinoButton;
 import 'package:flutter/gestures.dart';
@@ -295,30 +296,20 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                             ),
                           ),
                         ),
-                        // IconButton.outlined(
-                        //   onPressed: () {
-                        //     ref.read(authProvider).googleLogin();
-                        //   },
-                        //   padding: EdgeInsets.zero,
-                        //   alignment: Alignment.center,
-                        //   icon: SvgPicture.asset(
-                        //     SvgPaths.googleLogo,
-                        //     width: _style.scale * 36,
-                        //     height: _style.scale * 36,
-                        //   ),
-                        // ),
-                        // SizedBox(width: _style.scale * 40),
-                        // IconButton.outlined(
-                        //   onPressed: () {
-                        //     debugPrint("On Facebook Click");
-                        //     ref.read(authProvider).facebookAuth();
-                        //   },
-                        //   icon: SvgPicture.asset(
-                        //     SvgPaths.facebookLogo,
-                        //     width: _style.scale * 36,
-                        //     height: _style.scale * 36,
-                        //   ),
-                        // ),
+                        if (Platform.isIOS) ...[
+                          SizedBox(width: _style.scale * 10),
+                          IconButton.outlined(
+                            onPressed: () {
+                              debugPrint("On Apple Click");
+                              ref.read(authProvider).signInWithApple();
+                            },
+                            icon: Image.asset(
+                              ImagePaths.apple2,
+                              width: _style.scale * 34,
+                              height: _style.scale * 34,
+                            ),
+                          ),
+                        ],
                         Spacer(),
                       ],
                     ),

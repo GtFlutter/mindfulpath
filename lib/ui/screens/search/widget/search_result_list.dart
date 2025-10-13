@@ -20,15 +20,18 @@ import '../../../common/custom_snackbar.dart';
 import '../../settings/widget/logout_dialog.dart';
 
 class SearchResultsList extends ConsumerWidget {
-  const SearchResultsList({super.key, required AppStyle style, required VideosResponse model})
+  const SearchResultsList({super.key, required AppStyle style, required VideosResponse model,required this.onRefreshSearch})
       : _style = style,
         _model = model;
 
   final AppStyle _style;
   final VideosResponse _model;
+  final Future<void> Function() onRefreshSearch;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if(_model.list?.isEmpty ?? true){
+return const Center(child: Text("Search Result Not Found"));    }
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
       scrollDirection: Axis.vertical,
@@ -65,7 +68,7 @@ class SearchResultsList extends ConsumerWidget {
               appStyle: _style,
               model: _model.list![index],
               index: '$index',
-              onToggleBookmark: () => toggleItemBookmark(ref, _model.list?[index].video?.id,
+              onToggleBookmark: () => toggleItemBookmark(ref, _model.list?[index].id,
                   isRemove: _model.list?[index].bookmarked ?? false),
               isDownloaded: false,
             ),
@@ -106,7 +109,7 @@ class SearchResultsList extends ConsumerWidget {
     }
   }
 
-  void toggleItemBookmark(WidgetRef ref, int? itemId, {bool isRemove = false}) {
+  Future<void> toggleItemBookmark(WidgetRef ref, int? itemId, {bool isRemove = false}) async {
     bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
     if(!isLoggedIn){
       showCustomSnackBar(
@@ -121,7 +124,12 @@ class SearchResultsList extends ConsumerWidget {
       );
       return;
     }
+    FocusManager.instance.primaryFocus?.unfocus();
     if (itemId == null) return;
-    ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
+   await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);
+    // 🔹 Refresh search list after bookmark change
+    log("======bookmmmaarkkkk");
+    await onRefreshSearch();
+
   }
 }

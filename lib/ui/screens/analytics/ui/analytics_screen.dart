@@ -11,10 +11,12 @@ import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_chart.da
 import 'package:meditation_app/ui/screens/analytics/ui/widget/analytics_details.dart';
 
 import '../../../../provider/auth_provider.dart';
+import '../../../../provider/resource_provider/internet_provider.dart';
 import '../../../../theme/styles.dart';
 import '../../../../theme/text_style.dart';
 import '../../../common/background_image.dart';
 import '../../../common/custom_app_bar.dart';
+import '../../../common/no_internet_screen.dart';
 import '../../../common/sign_in_require.dart';
 import 'widget/analytics_filter.dart';
 
@@ -47,6 +49,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
     var orientation = MediaQuery.orientationOf(context);
+    final hasInternet = ref.watch(internetProvider);
+    final notifier = ref.read(internetProvider.notifier);
     _style = AppStyle(screenSize: size);
 
     var prov = ref.watch(analyticsProvider);
@@ -86,7 +90,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
             String resultOf = '${prov.duration.start.toStringFormat3}${prov.durationtype != FilterDuration.day ? ' To ${prov.duration.end.toStringFormat3}' : ''}';
 
-            return Column(
+            return hasInternet? Column(
               children: [
                 AbsorbPointer(
                   absorbing: prov.loading,
@@ -192,7 +196,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     ),
                   ),
               ],
-            );
+            ): NoInternetScreen(onRetry: () => notifier.checkNow());
           }),
         ),
       ),

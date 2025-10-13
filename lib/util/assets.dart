@@ -64,4 +64,6 @@ class ImagePaths {
   static const String splashLogo = 'assets/image/splash_screen_logo.png';
   static const String splashLogo1 = 'assets/image/app_logo.png';
   static const String pdfIcon = 'assets/image/pdf_icon.png';
+  static const String apple = 'assets/image/apple.png';
+  static const String apple2 = 'assets/image/apple2.png';
 }

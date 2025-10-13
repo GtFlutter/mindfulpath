@@ -144,11 +144,12 @@ class _DetailItemState extends ConsumerState<DownloadDetailItem> {
                   //   }
                   // });
                 },
-                icon: SvgPicture.asset(
-                  SvgPaths.remove,
-                  height: 17,
-                  fit: BoxFit.contain,
-                ),
+                icon: Icon(Icons.delete,color: AppColors.primaryColor),
+                // SvgPicture.asset(
+                //   SvgPaths.remove,
+                //   height: 17,
+                //   fit: BoxFit.contain,
+                // ),
                 style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
               ),
             ],

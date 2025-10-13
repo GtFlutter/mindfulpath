@@ -33,12 +33,21 @@ class _DiscoverLayoutState extends ConsumerState<DiscoverListWidget> {
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
     final dashboardNotifier = ref.watch(dashboardProvider);
-    if (dashboardNotifier.isLoading || dashboardNotifier.categoryListResponse == null) {
+    if (dashboardNotifier.isLoading) {
       return SizedBox(
         width: double.infinity,
         height: size.height,
         child: const Center(
           child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if (!(dashboardNotifier.isLoading) && dashboardNotifier.categoryListResponse == null) {
+      return SizedBox(
+        width: double.infinity,
+        height: size.height,
+        child: Center(
+          child: TextButton(onPressed: (){}, child: const Text('Retry')),
         ),
       );
     }

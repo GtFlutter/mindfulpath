@@ -17,6 +17,7 @@ import 'package:meditation_app/ui/common/custom_snackbar.dart';
 import 'package:meditation_app/ui/screens/authentication/otp_verification_screen.dart';
 import 'package:meditation_app/util/constants.dart';
 import 'package:path/path.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../data/model/response/check_social_user_response.dart';
@@ -155,6 +156,75 @@ class AuthNotifier extends ChangeNotifier {
     }
     return false;
   }
+  Future<void> signInWithApple() async {
+    try {
+      startProgress();
+
+      // 🔹 Request Apple ID credentials
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      // 🔹 Extract user details
+      final id = credential.userIdentifier ?? ''; // Social ID
+      var email = credential.email ?? '';
+
+      final givenName = credential.givenName ?? '';
+      final familyName = credential.familyName ?? '';
+      final fullName = (givenName.trim().isEmpty && familyName.trim().isEmpty)
+          ? 'N/A'
+          : '$givenName $familyName';
+
+      // 🔹 Get FCM token
+      String? fcmToken = await notificationServices.getDeviceToken();
+
+      // 🔹 Prepare request for backend validation
+      CheckSocialUserRequest request = CheckSocialUserRequest(
+        socialId: id,
+        email: email,
+        fcmToken: fcmToken,
+      );
+
+      debugPrint("Apple account detail: name=$fullName, email=$email, socialId=$id");
+
+      // // 🔹 Call backend check
+      // bool? response = await checkSocialUser(request);
+      //
+      // if (response == true) {
+      //   // ✅ Successful login
+      //   socialUserData = SocialUserData(
+      //     userName: fullName,
+      //     mobileOrEmail: email,
+      //     socialId: id,
+      //     isSocialLogin: true,
+      //     fcmToken: fcmToken,
+      //     isAppleLogin: true,
+      //   );
+      //
+      //   mobileOrEmail = email;
+      // } else {
+      //   // ❌ Failed response from server
+      //   showCustomSnackBar('Sign in failed: Invalid response from server.', type: false);
+      // }
+    } on PlatformException catch (e) {
+      // ⚠️ Handle specific platform issues (like user cancel)
+      showCustomSnackBar('Apple Sign-In error: ${e.message}', type: false);
+    } on Exception catch (e) {
+      // ❗ Known exception types
+      showCustomSnackBar(e.toString().replaceAll('Exception:', '').trim(), type: false);
+    } catch (e) {
+      // ❗ Unexpected or unknown errors
+      debugPrint('Apple Sign in Error :: $e');
+      showCustomSnackBar('Something went wrong. Please try again.', type: false);
+    } finally {
+      stopProgress();
+      notifyListeners();
+    }
+  }
+
   Future<void> googleLogin() async {
     try {
       final gLogin = GoogleSignIn(

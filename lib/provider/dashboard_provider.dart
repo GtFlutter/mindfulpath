@@ -70,6 +70,7 @@ class DashboardNotifier extends ChangeNotifier {
   Future<void> getCategoryList() async {
     startLoading();
     Response response = await repo.getCategories(1);
+    stopLoading();
     log("==========status code---${response.statusCode}");
     log("==========msg---${response.body}");
     if (response.statusCode != 200) {

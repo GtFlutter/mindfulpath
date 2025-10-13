@@ -18,9 +18,11 @@ import 'package:meditation_app/ui/screens/category/widget/tabs/paid_video_list_w
 import 'package:meditation_app/util/dimensions.dart';
 
 import '../../../../provider/dashboard_provider.dart';
+import '../../../../provider/resource_provider/internet_provider.dart';
 import '../../../../provider/resource_provider/paid_all_item_list_provider.dart';
 import '../../../../theme/colors.dart';
 import '../../../common/custom_dropdown_button.dart';
+import '../../../common/no_internet_screen.dart';
 import 'custom_selecteable_button.dart';
 import 'tabs/free_pdf_list_widget.dart';
 import 'tabs/free_video_list_widget.dart';
@@ -347,7 +349,8 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   @override
   Widget build(BuildContext context) {
     _style = AppStyle(screenSize: MediaQuery.sizeOf(context));
-
+    final hasInternet = ref.watch(internetProvider);
+    final notifier = ref.read(internetProvider.notifier);
     var provider = ref.watch(paidVideosProvider);
     var audioProvider = ref.watch(paidAudiosProvider);
     var dashboardPro = ref.watch(dashboardProvider);
@@ -415,7 +418,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
           ],
         ),
         SizedBox(height: _style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
-        Expanded(
+        hasInternet?Expanded(
           child: TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             controller: _tabController,
@@ -448,7 +451,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
               PaidAllItemListWidget(category: widget.category),
             ],
           ),
-        ),
+        ):Expanded(child: Center(child: NoInternetScreen(onRetry: () => notifier.checkNow()))),
       ],
     );
   }

@@ -81,10 +81,23 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   void setSearchValue(String value) {
     _controller.text = value;
-    if (!_focusNode.hasFocus) {
-      _focusNode.requestFocus();
-    }
+    FocusManager.instance.primaryFocus?.unfocus();
+    // if (!_focusNode.hasFocus) {
+    //   _focusNode.requestFocus();
+    // }
     _controller.moveCursorToEnd();
+    List<int>? ids = [];
+    if (_selectedCategories.isNotEmpty) {
+      _selectedCategories.map((e) {
+        ids.add(e.id ?? 0);
+      }).toList();
+    }
+    ref.read(dashboardProvider).searchVideo(value, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+    if (value.isEmpty) {
+      setState(() {
+        showSearchResult = true;
+      });
+    }
   }
 
   List<CategoryListResponse> _selectedCategories = [];
@@ -143,8 +156,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               if (!isLandscape) ...[
                 Row(
                   children: [
-                    IconButton( iconSize: 25,
-                      icon: const Icon(Icons.arrow_back, color: Colors.white,),
+                    IconButton(
+                      iconSize: 25,
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                      ),
                       onPressed: () => Navigator.of(context).maybePop(),
                     ),
                     Expanded(
@@ -187,7 +204,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                       ids.add(e.id ?? 0);
                                     }).toList();
                                   }
-                      
+
                                   // setState(() {
                                   // dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
                                   dashboardNotifier.searchVideo(text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
@@ -196,7 +213,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                       showSearchResult = true;
                                     });
                                   }
-                      
+
                                   // });
                                 },
                                 style: _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white, spacingPc: 10),
@@ -210,8 +227,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   isCollapsed: true,
                                   border: InputBorder.none,
                                   hintText: 'Hinted search text',
-                                  hintStyle: _style.text.font(mulishMedium500, sizePx:14, color: Colors.white.withOpacity(0.5), spacingPc: 10),
-                                    contentPadding: EdgeInsets.zero,
+                                  hintStyle: _style.text.font(mulishMedium500, sizePx: 14, color: Colors.white.withOpacity(0.5), spacingPc: 10),
+                                  contentPadding: EdgeInsets.zero,
                                   // contentPadding: EdgeInsets.symmetric(vertical: _style.scaleX(12)), // keeps it centered
                                   constraints: BoxConstraints(maxHeight: _style.scaleX(40)),
                                   // alignLabelWithHint: true,
@@ -330,6 +347,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               : SearchResultsList(
                                   style: _style,
                                   model: dashboardNotifier.data!,
+                                  onRefreshSearch: () async {
+                                    List<int>? ids = [];
+                                    if (_selectedCategories.isNotEmpty) {
+                                      _selectedCategories.map((e) {
+                                        ids.add(e.id ?? 0);
+                                      }).toList();
+                                    }
+                                    await dashboardNotifier.searchVideo(
+                                      _controller.text,
+                                      queryTime: _selectedQueryTime ?? QueryTime.qTime1,
+                                      categoryId: ids,
+                                    );
+                                    setState(() {}); // To rebuild updated results
+                                  },
                                 )
                           : RecentSearchResultList(
                               style: _style,
@@ -421,6 +452,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           useGridLayout: true,
           title: 'Time',
           onTimeSelect: (item) async {
+            print("item----->$item");
             _selectedQueryTime = item;
             List<int>? ids = [];
             if (_selectedCategories.isNotEmpty) {

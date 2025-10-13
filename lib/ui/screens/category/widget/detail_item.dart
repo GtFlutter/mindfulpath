@@ -486,11 +486,11 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                             onPressed: () async {
                               log("create playlist-->${widget.model?.videoType == ResourceType.free}");
                               if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
-                                log("create playlist---${widget.model?.id?.toString()}---${widget.model?.video}");
+                                log("create playlist---${widget.model?.id?.toString()}---${widget.model?.video}-widget.isAudio---${widget.isAudio}");
                                 bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
                                 // if ((widget.model?.video != null) && widget.model?.id != null && isLoggedIn) {
                                 if (widget.model?.id != null && isLoggedIn) {
-                                  createPlaylist(context, videoId: widget.model?.id?.toString());
+                                  createPlaylist(context, videoId: widget.model?.id?.toString(), isAudio: widget.isAudio ?? false);
                                 } else {
                                   showCustomSnackBar(
                                     'Please Sign in to create playlist.',
@@ -523,11 +523,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                     onPressed: () async {
                                       log("Add to playlist tapped");
                                       if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
-                                        await playlistP.addToPlaylist(
-                                          playlistP.playlistListResponse![index].id.toString(),
-                                          widget.model!.id!.toString(),
-                                          widget.isAudio!,
-                                        );
+                                        await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio ?? false);
                                       } else {
                                         await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
                                         paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
@@ -735,7 +731,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
     );
   }
 
-  void createPlaylist(BuildContext context, {String? videoId}) {
+  void createPlaylist(BuildContext context, {String? videoId, bool isAudio = false}) {
     showDialog(
       context: context,
       // barrierDismissible: false,
@@ -747,6 +743,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
             child: CreatePlaylistDialog(
               widget.appStyle,
               videoId: videoId,
+              isAudio: isAudio,
             ),
           ),
         );
