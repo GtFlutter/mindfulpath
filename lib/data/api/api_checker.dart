@@ -10,7 +10,7 @@ import '../model/response/error_res_model.dart';
 
 class ApiChecker {
   static void checkApi(http.Response response, {AuthNotifier? authNotifier}) {
-    debugPrint('Response StatusCode--${response.statusCode}');
+    debugPrint('Response StatusCode--${response.statusCode}----${response.body}');
     if (response.statusCode == 401) {
       // TODO : Logout User
       debugPrint('Response StatusCode 401 Logout User');

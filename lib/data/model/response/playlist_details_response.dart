@@ -367,6 +367,7 @@ class PlaylistVideoList {
   int? userId;
   int? playlistId;
   int? videoId;
+  int? audioId;
   String? videoTitle;
   String? createdAt;
   String? updatedAt;
@@ -379,6 +380,7 @@ class PlaylistVideoList {
         this.userId,
         this.playlistId,
         this.videoId,
+        this.audioId,
         this.videoTitle,
         this.createdAt,
         this.updatedAt,
@@ -390,6 +392,7 @@ class PlaylistVideoList {
     userId = json['user_id'];
     playlistId = json['playlist_id'];
     videoId = json['video_id'];
+    audioId = json['audio_id'];
     videoTitle = json['video_title'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
@@ -407,6 +410,7 @@ class PlaylistVideoList {
     data['user_id'] = userId;
     data['playlist_id'] = playlistId;
     data['video_id'] = videoId;
+    data['audio_id'] = audioId;
     data['video_title'] = videoTitle;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;

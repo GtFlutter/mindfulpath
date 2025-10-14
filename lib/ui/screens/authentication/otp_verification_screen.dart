@@ -79,7 +79,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CustomHeader(
-                    title: 'OTP has been sent to ${widget.model.otp}',
+                    title: 'OTP has been sent to your email',
                     subTitle: widget.model.email,
                     style: _style,
                   ),

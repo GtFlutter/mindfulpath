@@ -290,7 +290,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
       final authPro = ref.read(authProvider);
       ref.read(userProvider).createUserProfile(
             UserBody.register(name, email, code + phone, dateOfBirth!, gender, password, fcm ?? "",
-                googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : "", facebookId: !(authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : ""),
+                googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : "", appleId: !(authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : ""),
           );
     }
   }

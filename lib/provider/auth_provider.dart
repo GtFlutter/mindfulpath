@@ -143,7 +143,7 @@ class AuthNotifier extends ChangeNotifier {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CreateProfileScreen(),
+                    builder: (context) => CreateProfileScreen(value: (request.email ?? "","")),
                   ));
             }
           }
@@ -190,25 +190,25 @@ class AuthNotifier extends ChangeNotifier {
 
       debugPrint("Apple account detail: name=$fullName, email=$email, socialId=$id");
 
-      // // 🔹 Call backend check
-      // bool? response = await checkSocialUser(request);
-      //
-      // if (response == true) {
-      //   // ✅ Successful login
-      //   socialUserData = SocialUserData(
-      //     userName: fullName,
-      //     mobileOrEmail: email,
-      //     socialId: id,
-      //     isSocialLogin: true,
-      //     fcmToken: fcmToken,
-      //     isAppleLogin: true,
-      //   );
-      //
-      //   mobileOrEmail = email;
-      // } else {
-      //   // ❌ Failed response from server
-      //   showCustomSnackBar('Sign in failed: Invalid response from server.', type: false);
-      // }
+      // 🔹 Call backend check
+      bool? response = await checkSocialUser(request);
+
+      if (response == true) {
+        // ✅ Successful login
+        socialUserData = SocialUserData(
+          userName: fullName,
+          mobileOrEmail: email,
+          socialId: id,
+          isSocialLogin: true,
+          fcmToken: fcmToken,
+          isAppleLogin: true,
+        );
+
+        mobileOrEmail = email;
+      } else {
+        // ❌ Failed response from server
+        showCustomSnackBar('Sign in failed: Invalid response from server.', type: false);
+      }
     } on PlatformException catch (e) {
       // ⚠️ Handle specific platform issues (like user cancel)
       showCustomSnackBar('Apple Sign-In error: ${e.message}', type: false);
@@ -259,6 +259,7 @@ class AuthNotifier extends ChangeNotifier {
       log('Account :: $account', name: 'GoogleAccount');
 
       bool? response = await checkSocialUser(request);
+
 
       if (response == true) {
         socialUserData = SocialUserData(

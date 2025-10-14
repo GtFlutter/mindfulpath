@@ -16,9 +16,9 @@ class UserBody {
   final String? password;
   final String fcmToken;
   String? googleId;
-  String? facebookId;
+  String? appleId;
 
-  UserBody.register(this.name, this.email, this.phoneNo, this.birthDate, this.gender, this.password, this.fcmToken, {this.googleId, this.facebookId});
+  UserBody.register(this.name, this.email, this.phoneNo, this.birthDate, this.gender, this.password, this.fcmToken, {this.googleId, this.appleId});
 
   UserBody.update(
     this.name,
@@ -37,7 +37,7 @@ class UserBody {
       'birth_date': birthDate.toStringFormat3.trim(),
       'gender': gender.trim().toLowerCase(),
       if(googleId?.isNotEmpty ?? false)'google_id': googleId?.trim().toLowerCase() ?? "",
-      if(facebookId?.isNotEmpty ?? false)'facebookId': facebookId?.trim().toLowerCase() ?? "",
+      if(appleId?.isNotEmpty ?? false)'apple_id': appleId?.trim().toLowerCase() ?? "",
       if (password?.trim().isNotEmpty ?? false) 'password': password?.trim() ?? "",
       if (fcmToken.trim().isNotEmpty) 'fcm_token': fcmToken.trim(),
     };
