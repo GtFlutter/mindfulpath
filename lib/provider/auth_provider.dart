@@ -439,4 +439,17 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   bool get isUserLoggedIn => repo.isUserLoggedIn;
+  Future<void> deleteAccount() async {
+    startProgress();
+    await repo.deleteAccount();
+    await repo.clearUserData();
+    await deleteLocalDatabase();
+    socialUserData = null;
+    mobileOrEmail = null;
+    stopProgress();
+    BuildContext? context = rootNavigator.currentContext;
+    if (context != null && context.mounted) {
+      context.go(RoutePath.splash);
+    }
+  }
 }

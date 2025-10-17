@@ -8,6 +8,7 @@ import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/config_provider.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 import 'package:meditation_app/ui/screens/settings/widget/custom_switch.dart';
+import 'package:meditation_app/ui/screens/settings/widget/delete_account_dialog.dart';
 import 'package:meditation_app/ui/screens/settings/widget/settings_listtile.dart';
 import 'package:meditation_app/util/app_config.dart';
 import 'package:meditation_app/util/assets.dart';
@@ -193,6 +194,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   // ),
                   SettingsListTile(style: _style, onPressed: logout, title: 'Sign out'),
                   SizedBox(height: _style.scaleX(25)),
+                  SettingsListTile(style: _style, onPressed: deleteAccount, title: 'Delete Account'),
+                  SizedBox(height: _style.scaleX(25)),
                 ],
               ),
             ),
@@ -214,6 +217,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           child: Dialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
             child: LogoutDialog(style),
+          ),
+        );
+      },
+    );
+  }
+  void deleteAccount() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (c) {
+        Size size = MediaQuery.of(c).size;
+        AppStyle style = AppStyle(screenSize: size);
+        return ProviderScope(
+          parent: ProviderScope.containerOf(context),
+          child: Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
+            child: DeleteAccountDialog(style),
           ),
         );
       },

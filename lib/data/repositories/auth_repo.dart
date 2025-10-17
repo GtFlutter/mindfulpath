@@ -68,6 +68,9 @@ class AuthRepo {
   Future<Response> logoutUser() async {
     return await apiClient.getData(AppConfigs.logoutUser);
   }
+  Future<Response> deleteAccount() async {
+    return await apiClient.getData(AppConfigs.deleteAccount);
+  }
 
   Future<Response> getUserProfile() async {
     return await apiClient.getData(AppConfigs.getUserProfile);

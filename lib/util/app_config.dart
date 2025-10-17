@@ -14,6 +14,7 @@ class AppConfigs {
   static const String registerUser = '/register';
   static const String loginUser = '/login';
   static const String logoutUser = '/log-out';
+  static const String deleteAccount = '/delete-account';
   static const String getUserProfile = '/get-user-profile';
   static const String updateUserProfile = '/update-profile';
   static const String checkSocialUser = '/check-social-user';
