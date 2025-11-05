@@ -192,8 +192,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   //   error: (Object _, StackTrace __) => const SizedBox.shrink(),
                   //   loading: () => const SizedBox.shrink(),
                   // ),
-                  SettingsListTile(style: _style, onPressed: logout, title: 'Sign out'),
-                  SizedBox(height: _style.scaleX(25)),
                   SettingsListTile(style: _style, onPressed: deleteAccount, title: 'Delete Account'),
                   SizedBox(height: _style.scaleX(25)),
                 ],
@@ -205,23 +203,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void logout() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (c) {
-        Size size = MediaQuery.of(c).size;
-        AppStyle style = AppStyle(screenSize: size);
-        return ProviderScope(
-          parent: ProviderScope.containerOf(context),
-          child: Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
-            child: LogoutDialog(style),
-          ),
-        );
-      },
-    );
-  }
+
   void deleteAccount() {
     showDialog(
       context: context,

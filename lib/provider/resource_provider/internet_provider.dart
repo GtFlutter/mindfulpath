@@ -26,7 +26,7 @@ class InternetNotifier extends StateNotifier<bool> {
     );
   }
 
-  Future<void> _checkInternet() async {
+  Future<bool> _checkInternet() async {
     bool connected = false;
 
     try {
@@ -48,10 +48,12 @@ class InternetNotifier extends StateNotifier<bool> {
     if (state != connected) {
       state = connected;
     }
+    return connected;
   }
 
-  Future<void> checkNow() async {
-    await _checkInternet();
+  Future<bool> checkNow() async {
+    final res=await _checkInternet();
+    return res;
   }
 
   @override

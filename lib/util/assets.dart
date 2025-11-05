@@ -52,6 +52,7 @@ class SvgPaths {
   static const String notification = 'assets/icons/svg/notification_icon.svg';
   static const String support = 'assets/icons/svg/support_icon.svg';
   static const String settings = 'assets/icons/svg/settings_icon.svg';
+  static const String signOut = 'assets/icons/svg/exit.svg';
 
   /// Support
   static const String ticket = 'assets/icons/svg/ticket_icon.svg';
@@ -66,4 +67,5 @@ class ImagePaths {
   static const String pdfIcon = 'assets/image/pdf_icon.png';
   static const String apple = 'assets/image/apple.png';
   static const String apple2 = 'assets/image/apple2.png';
+  static const String apple22 = 'assets/image/apple22.png';
 }

@@ -8,6 +8,7 @@ import 'package:meditation_app/data/repositories/dashboard_repo.dart';
 import 'package:meditation_app/provider/repo_provider/dashboard_repo_provider.dart';
 
 import '../data/api/api_checker.dart';
+import '../database/database_model.dart';
 import '../ui/common/custom_snackbar.dart';
 
 final featuredVideosProvider = ChangeNotifierProvider<FeaturedVideosNotifier>((ref) {
@@ -23,7 +24,7 @@ class FeaturedVideosNotifier extends ChangeNotifier {
 
   VideosResponse? _data;
   VideosResponse? get data => _data;
-
+  List<VideoModal> downloadedVideo = [];
 
 
   bool _loading = false;

@@ -42,6 +42,7 @@ class AuthNotifier extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   bool plan = false;
+  String emailForAppleId="";
 
   void startProgress() {
     if (!_isLoading) {
@@ -171,11 +172,14 @@ class AuthNotifier extends ChangeNotifier {
       // 🔹 Extract user details
       final id = credential.userIdentifier ?? ''; // Social ID
       var email = credential.email ?? '';
+      if(emailForAppleId.isEmpty) {
+        emailForAppleId = credential.email ?? '';
+      }
 
       final givenName = credential.givenName ?? '';
       final familyName = credential.familyName ?? '';
       final fullName = (givenName.trim().isEmpty && familyName.trim().isEmpty)
-          ? 'N/A'
+          ? ''
           : '$givenName $familyName';
 
       // 🔹 Get FCM token
@@ -184,7 +188,7 @@ class AuthNotifier extends ChangeNotifier {
       // 🔹 Prepare request for backend validation
       CheckSocialUserRequest request = CheckSocialUserRequest(
         socialId: id,
-        email: email,
+        email: email.isNotEmpty?email:emailForAppleId,
         fcmToken: fcmToken,
       );
 
@@ -207,14 +211,15 @@ class AuthNotifier extends ChangeNotifier {
         mobileOrEmail = email;
       } else {
         // ❌ Failed response from server
-        showCustomSnackBar('Sign in failed: Invalid response from server.', type: false);
+        // showCustomSnackBar('Sign in failed: Invalid response from server.', type: false);
       }
     } on PlatformException catch (e) {
       // ⚠️ Handle specific platform issues (like user cancel)
       showCustomSnackBar('Apple Sign-In error: ${e.message}', type: false);
     } on Exception catch (e) {
       // ❗ Known exception types
-      showCustomSnackBar(e.toString().replaceAll('Exception:', '').trim(), type: false);
+      // showCustomSnackBar(e.toString().replaceAll('Exception:', '').trim(), type: false);
+      print("Apple sign in exception in catch part------------->${e.toString()}");
     } catch (e) {
       // ❗ Unexpected or unknown errors
       debugPrint('Apple Sign in Error :: $e');

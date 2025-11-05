@@ -212,10 +212,6 @@ class DetailItem extends ConsumerStatefulWidget {
 }
 
 class _DetailItemState extends ConsumerState<DetailItem> {
-  // bool _isDownloading = false, _isDownloadComplete = false;
-  //
-  // double _progress = 0.0;
-
   @override
   void initState() {
     final playlistP = ref.read(playListProvider);
@@ -225,12 +221,6 @@ class _DetailItemState extends ConsumerState<DetailItem> {
       Duration.zero,
       () {
         playlistP.getPlaylistList();
-        // print("playlist gettttttt........=>${playlistP.playlistListResponse == null}=====${playlistP.playlistListResponse?.isEmpty}.");
-        // if (playlistP.playlistListResponse != null && playlistP.playlistListResponse!.isNotEmpty) {
-        //   print("playlist gettttttt.........");
-        //   playlistP.getPlaylistList();
-        // }
-
         getCategory();
       },
     );
@@ -239,7 +229,6 @@ class _DetailItemState extends ConsumerState<DetailItem> {
 
   getCategory() async {
     final coursePRead = ref.read(courseProvider);
-    final coursePWatch = ref.watch(courseProvider);
     await coursePRead.getCategoryPdfFromDatabase();
     await coursePRead.getCategoryFromDatabase();
     await coursePRead.getAudioCategoryFromDatabase();
@@ -432,24 +421,24 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () async {
                                     print("download call=========");
+                                    bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                                    if (!isLoggedIn) {
+                                      showCustomSnackBar(
+                                        'Please Sign in to Download',
+                                        action: SnackBarAction(
+                                          label: 'Sign in',
+                                          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                                          textColor: Colors.brown.shade800,
+                                          onPressed: () => appRouter.go(RoutePath.signIn),
+                                        ),
+                                        duration: const Duration(seconds: 5),
+                                      );
+                                      return;
+                                    }
                                     if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
                                       log("model--------->${widget.model?.toJson()}");
                                       print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
-                                      debugPrint('File Path :: ${widget.model?.video?.fileName ?? ""}');
-                                      bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                      if (!isLoggedIn) {
-                                        showCustomSnackBar(
-                                          'Please Sign in to Download',
-                                          action: SnackBarAction(
-                                            label: 'Sign in',
-                                            backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                            textColor: Colors.brown.shade800,
-                                            onPressed: () => appRouter.go(RoutePath.signIn),
-                                          ),
-                                          duration: const Duration(seconds: 5),
-                                        );
-                                        return;
-                                      }
+                                      debugPrint('File Path :: --------${widget.model?.video?.fileName ?? ""}');
                                       if (downloadP.model == null) {
                                         if (widget.model?.video != null) {
                                           downloadP.download(model: widget.model);
@@ -459,9 +448,9 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                         }
                                       } else if (widget.model!.id != downloadP.model!.id) {
                                         if (widget.model?.video != null) {
-                                          showCustomSnackBar('Another Video is in progress');
+                                          showCustomSnackBar('Another File is already in progress');
                                         } else {
-                                          showCustomSnackBar('Another Audio is in progress');
+                                          showCustomSnackBar('Another File is already in progress');
                                         }
                                       }
                                     } else {
@@ -683,26 +672,26 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       print('------------pdf download-------->${widget.pdfModel?.toJson()}');
                                       print('------------pdf download11-------->${downloadP.pdfModel?.toJson()}');
                                       print('------------pdf download22-------->${widget.pdfModel?.pdfType == ResourceType.free}');
+                                      bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
+                                      if (!isLoggedIn) {
+                                        showCustomSnackBar(
+                                          'Please Sign in to Download',
+                                          action: SnackBarAction(
+                                            label: 'Sign in',
+                                            backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                                            textColor: Colors.brown.shade800,
+                                            onPressed: () => appRouter.go(RoutePath.signIn),
+                                          ),
+                                          duration: const Duration(seconds: 5),
+                                        );
+                                        return;
+                                      }
                                       if ((widget.pdfModel?.category?.isPurchased ?? false) || widget.pdfModel?.pdfType == ResourceType.free) {
-                                        bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                        if (!isLoggedIn) {
-                                          showCustomSnackBar(
-                                            'Please Sign in to Download',
-                                            action: SnackBarAction(
-                                              label: 'Sign in',
-                                              backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                              textColor: Colors.brown.shade800,
-                                              onPressed: () => appRouter.go(RoutePath.signIn),
-                                            ),
-                                            duration: const Duration(seconds: 5),
-                                          );
-                                          return;
-                                        }
-                                        if (downloadP.pdfModel == null) {
+                                        if (downloadP.pdfModel == null && downloadP.model == null) {
                                           print(widget.pdfModel?.categoryId ?? "");
                                           downloadP.pdfDownload(model: widget.pdfModel);
-                                        } else if (widget.pdfModel?.id != downloadP.pdfModel?.id) {
-                                          showCustomSnackBar('Another PDF is in progress');
+                                        } else if (widget.pdfModel?.id != downloadP.pdfModel?.id || downloadP.model == null) {
+                                          showCustomSnackBar('Another File is already in progress');
                                         }
                                       } else {
                                         await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString());

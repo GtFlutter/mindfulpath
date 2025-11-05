@@ -159,7 +159,11 @@ class _ChnagePasswordSheetState extends ConsumerState<ChnagePasswordSheet> {
 
     ///new password validation
     if (newPassword.isEmpty) {
-      _newPwdFocusNode.requestFocus();
+      if (oldPassword.isNotEmpty) {
+        _newPwdFocusNode.requestFocus();
+      } else {
+        _oldPwdFocusNode.requestFocus();
+      }
       ref.read(changePasswordProvider).setNewPwdError(error: 'Please enter a new Password');
     } else if (newPassword.length < AppConstants.PWD_MIN_LENGTH) {
       _newPwdFocusNode.requestFocus();

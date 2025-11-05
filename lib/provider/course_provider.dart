@@ -96,6 +96,10 @@ class CourseNotifier extends ChangeNotifier {
 
   List<VideoModal> get downloadVideoResponse => _downloadVideoResponse;
 
+  List<VideoModal> _downloadAllVideoResponse = [];
+
+  List<VideoModal> get downloadAllVideoResponse => _downloadAllVideoResponse;
+
   List<VideoModal> _downloadAudioResponse = [];
 
   List<VideoModal> get downloadAudioResponse => _downloadAudioResponse;
@@ -212,6 +216,15 @@ class CourseNotifier extends ChangeNotifier {
     _downloadVideoResponse.clear();
     List<VideoModal> list = await ref.read(databaseProvider).getVideo(categoryId);
     _downloadVideoResponse.addAll(list);
+    _stopLoading();
+  }
+
+  /// Get all downloaded videos (no category filter)
+  Future<void> getAllDownloadedVideos() async {
+    _startLoading();
+    _downloadAllVideoResponse.clear();
+    List<VideoModal> list = await ref.read(databaseProvider).getAllDownloadedVideos();
+    _downloadAllVideoResponse.addAll(list);
     _stopLoading();
   }
 ///Get audio from database

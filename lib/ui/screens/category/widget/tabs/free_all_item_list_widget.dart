@@ -127,9 +127,8 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
     if (downloadP.complate == true) {
       refreshh();
       ref.read(downloadProvider.notifier).complate = false;
+      setState(() {});
     }
-
-    print('++++++++++===========++++++++++${downloadP.Pdfcomplate}');
     if (downloadP.Pdfcomplate == true) {
       refreshh();
       ref.read(downloadProvider.notifier).Pdfcomplate = false;

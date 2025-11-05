@@ -143,7 +143,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                 return MediaImageCard(
                   appStyle: widget.appStyle,
                   imgUrl: model?.thumbnailImageUrlSrc ?? "",
-                  duration:(widget.model.video?.duration?.isNotEmpty ?? false)? (widget.model.video?.duration ?? "00:00:00").toDuration:"",
+                  duration: (widget.model.video?.duration?.isNotEmpty ?? false) ? (widget.model.video?.duration ?? "00:00:00").toDuration : "",
                   imgRadius: widget.appStyle.scaleX(25),
                   imgSize: widget.appStyle.scaleX(100),
                 );
@@ -238,7 +238,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                 return const SizedBox.shrink();
                               } else {
                                 // if (downloadP.isDownloading && bookmarkNotifier.bookmarkListResponse?[widget.index].bookmarkVideoResponse!.id == downloadP.model!.id) {
-                                if (downloadP.isDownloading && widget.model.video?.id == downloadP.model!.id) {
+                                if ((downloadP.isDownloading && widget.model.video?.id == downloadP.model!.id && !(widget.isAudio))) {
                                   return SizedBox(
                                     height: 15,
                                     width: 15,
@@ -262,9 +262,9 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                           } else {
                                             if (widget.model.video!.id != downloadP.model!.id) {
                                               if (widget.model.video?.video != null) {
-                                                showCustomSnackBar('Another Video is in progress');
+                                                showCustomSnackBar('Another File is already in progress');
                                               } else {
-                                                showCustomSnackBar('Another Audio is in progress');
+                                                showCustomSnackBar('Another File is already in progress');
                                               }
                                             }
                                           }

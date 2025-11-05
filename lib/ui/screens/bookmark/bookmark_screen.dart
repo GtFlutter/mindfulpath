@@ -113,10 +113,13 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
 
     final bookmarkNotifier = ref.watch(bookmarkProvider);
     final downloadP = ref.watch(downloadProvider);
-    if (downloadP.complate == true || downloadP.Pdfcomplate == true) {
-      ///TODO...........
+    if (downloadP.complate == true) {
       refreshh();
       ref.read(downloadProvider.notifier).complate = false;
+      setState(() {});
+    }
+    if (downloadP.Pdfcomplate == true) {
+      refreshh();
       ref.read(downloadProvider.notifier).Pdfcomplate = false;
       setState(() {});
     }

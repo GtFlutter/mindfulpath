@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/ui/screens/profile/widget/profile_item.dart';
@@ -7,6 +8,7 @@ import '../../../theme/styles.dart';
 import '../../../util/assets.dart';
 import '../../common/background_image.dart';
 import '../../common/custom_app_bar.dart';
+import '../settings/widget/logout_dialog.dart';
 
 class PIModel {
   final String title;
@@ -16,6 +18,7 @@ class PIModel {
 
   /// Screen Path
   final String path;
+
   PIModel(this.title, this.src, this.path);
 }
 
@@ -55,6 +58,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       SvgPaths.settings,
       'path',
     ),
+    PIModel(
+      'Sign out',
+      SvgPaths.signOut,
+      'path',
+    ),
   ];
 
   @override
@@ -92,6 +100,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context.go(RoutePath.supportSectionScreenPath);
                   } else if (index == 3) {
                     context.go(RoutePath.settingsScreenPath);
+                  } else if (index == 4) {
+                    logout();
                   }
                 },
               );
@@ -103,6 +113,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void logout() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (c) {
+        Size size = MediaQuery.of(c).size;
+        AppStyle style = AppStyle(screenSize: size);
+        return ProviderScope(
+          parent: ProviderScope.containerOf(context),
+          child: Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
+            child: LogoutDialog(style),
+          ),
+        );
+      },
     );
   }
 }

@@ -419,24 +419,6 @@ class DownloadNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> _getSingleVideo(String videoFile, {VideoResponse? model}) async {
-    if (model == null) return;
-    final dbHelper = ref.read(databaseProvider);
-    VideoModal? res = await dbHelper.getSingleVideo(model.id!.toString());
-    if (res == null) {
-      _saveCategoryAndVideo(videoFile, model: model); //_getSingleVideo
-    }
-  }
-
-  Future<void> _getSinglePdf(String pdfFile, {PdfResponse? model}) async {
-    if (model == null) return;
-    final dbHelper = ref.read(databaseProvider);
-    PdfModel? res = await dbHelper.getSinglePdf(model.id!.toString());
-    if (res == null) {
-      _saveCategoryAndVideo(pdfFile, pdfModel: model); //_getSinglePdf
-    }
-  }
-
   ///save category vedio ,pdf,audio
   Future<void> _saveCategoryAndVideo(String videoFile, {VideoResponse? model, PdfResponse? pdfModel, bool isPdf = false, bool isAudio = false}) async {
     print('-------audio or video model------++++${model}');

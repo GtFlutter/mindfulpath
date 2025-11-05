@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
 import 'package:meditation_app/provider/support_provider.dart';
+import 'package:meditation_app/provider/video_provider.dart';
 import 'package:meditation_app/theme/colors.dart';
 import 'package:meditation_app/theme/styles.dart';
 
@@ -67,6 +68,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
                 }
                 if (context.canPop()) {
+                  ref.read(videoProvider).clearVideo(notifie: false);
                   context.pop();
                 }
               },

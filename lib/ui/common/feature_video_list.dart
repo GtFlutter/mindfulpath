@@ -7,10 +7,13 @@ import 'package:meditation_app/data/model/response/videos_response.dart';
 import 'package:meditation_app/helper/navigation.dart';
 
 import '../../data/model/body/resource_type.dart';
+import '../../database/database_helper.dart';
 import '../../helper/route/route_paths.dart';
 import '../../helper/route/router.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/bookmark_provider.dart';
+import '../../provider/course_provider.dart';
+import '../../provider/download_provider.dart';
 import '../../provider/featured_videos_provider.dart';
 import '../../theme/colors.dart';
 import '../../theme/styles.dart';
@@ -63,6 +66,12 @@ class FeatureVideoList extends ConsumerStatefulWidget {
 class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
   @override
   Widget build(BuildContext context) {
+    final downloadP = ref.watch(downloadProvider);
+    if (downloadP.complate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).complate = false;
+      setState(() {});
+    }
     return SizedBox(
       height: widget.scrollDirection == Axis.horizontal ? (120 * widget.style.scale) : null,
       child: ListView.separated(
@@ -75,14 +84,17 @@ class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
         itemBuilder: (context, index) {
           final dataModel = widget.list[index];
           print('------------dataModel-------------->${dataModel.toJson()}');
-
+          final provider = ref.watch(featuredVideosProvider);
+          bool isDownloaded = provider.downloadedVideo.any(
+            (element) => dataModel.id == int.tryParse(element.videoId ?? '0'),
+          );
           return GestureDetector(
             onTap: () async {
               final auth = ref.read(authProvider);
               log("is login --->${auth.isUserLoggedIn}----paid content--->${dataModel.videoType}");
 
               // 🔒 Check login for paid content
-              if (!auth.isUserLoggedIn && dataModel.videoType == ResourceType.paid) {
+              if ((!auth.isUserLoggedIn) && (dataModel.videoType == ResourceType.paid)) {
                 showCustomSnackBar(
                   'Please Sign in to view Plus Content',
                   action: SnackBarAction(
@@ -95,11 +107,8 @@ class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
                 );
                 return;
               }
-
-              log("====>featured video--${dataModel.category?.isPurchased}====${dataModel.video?.type == ResourceType.free}");
-
               // 🆓 Free or Purchased content
-              if ((dataModel.category?.isPurchased ?? false) || dataModel.video?.type == ResourceType.free) {
+              if ((dataModel.category?.isPurchased ?? false) || dataModel.videoType == ResourceType.free) {
                 if (dataModel.category != null) {
                   if (context.canPop()) context.pop();
 
@@ -137,7 +146,7 @@ class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
                     appStyle: widget.style,
                     model: dataModel,
                     index: '$index',
-                    isDownloaded: false,
+                    isDownloaded: isDownloaded,
                     onToggleBookmark: () async {
                       final auth = ref.read(authProvider);
                       if (!auth.isUserLoggedIn) {
@@ -156,12 +165,12 @@ class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
 
                       if (dataModel.id == null) return;
                       await ref.read(bookmarkProvider).toggleBookmark(
-                        dataModel.id ?? 0,
-                        isRemove: dataModel.bookmarked ?? false,
-                      );
+                            dataModel.id ?? 0,
+                            isRemove: dataModel.bookmarked ?? false,
+                          );
 
                       // 🔁 Let parent handle refresh
-                        widget.onBookmarkChanged?.call();
+                      widget.onBookmarkChanged?.call();
                     },
                   ),
           );
@@ -172,6 +181,21 @@ class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
         ),
       ),
     );
+  }
+
+  Future<void> initCall() async {
+    final provider = ref.read(featuredVideosProvider.notifier);
+    final database = ref.read(databaseProvider);
+
+    provider.downloadedVideo = await database.getAllDownloadedVideos();
+  }
+
+  Future<void> refreshh() async {
+    Future.delayed(Duration.zero, () async {
+      final coursePRead = ref.read(courseProvider);
+      await coursePRead.getAllDownloadedVideos();
+      await initCall();
+    });
   }
 }
 

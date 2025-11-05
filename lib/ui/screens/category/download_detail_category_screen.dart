@@ -108,7 +108,8 @@ class _DetailCategoryScreenState extends ConsumerState<DownloadDetailCategoryScr
       },
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: isVideoAvailable ? null : CustomAppBar(screenSize: size, style: _style),
+        // appBar: isVideoAvailable ? null : CustomAppBar(screenSize: size, style: _style),
+        appBar: CustomAppBar(screenSize: size, style: _style),
         body: BackgroundImage.network(
           // imgUrl: widget.categoryListResponse.imageResponse?.imageUrl ?? AppConstants.placeHolder,
           imgUrl: AppConstants.placeHolder,

@@ -293,20 +293,21 @@ class _SignInUpScreenState extends ConsumerState<SignInUpScreen> {
                               SvgPaths.googleLogo,
                               width: _style.scale * 36,
                               height: _style.scale * 36,
+                              color: Colors.white,
                             ),
                           ),
                         ),
                         if (Platform.isIOS) ...[
                           SizedBox(width: _style.scale * 10),
-                          IconButton.outlined(
+                          IconButton.outlined(padding: EdgeInsets.zero,
                             onPressed: () {
                               debugPrint("On Apple Click");
                               ref.read(authProvider).signInWithApple();
                             },
                             icon: Image.asset(
-                              ImagePaths.apple2,
-                              width: _style.scale * 34,
-                              height: _style.scale * 34,
+                              ImagePaths.apple22,
+                              width: _style.scale * 48,
+                              height: _style.scale * 48,
                             ),
                           ),
                         ],

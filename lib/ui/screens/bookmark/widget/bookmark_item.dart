@@ -76,7 +76,6 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
         getDownload();
         getCategory();
         getAudioDownload();
-
       },
     );
     super.initState();
@@ -207,102 +206,102 @@ class _BookmarkItemState extends ConsumerState<BookmarkItem> {
                     const Spacer(),
                     Padding(
                       padding: EdgeInsets.only(left: widget.appStyle.scaleX(12.5)),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: widget.onBookmarkRemove,
-                            icon: SvgPicture.asset(
-                              SvgPaths.remove,
-                              height: widget.appStyle.scaleX(18),
-                              fit: BoxFit.contain,
+                      child: Expanded(
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: widget.onBookmarkRemove,
+                              icon: SvgPicture.asset(
+                                SvgPaths.remove,
+                                height: widget.appStyle.scaleX(18),
+                                fit: BoxFit.contain,
+                              ),
+                              style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                             ),
-                            style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Share.share(
-                                widget.url ?? "",
-                              );
-                            },
-                            icon: SvgPicture.asset(
-                              SvgPaths.share,
-                              height: widget.appStyle.scaleX(18),
-                              fit: BoxFit.contain, // 155861
+                            IconButton(
+                              onPressed: () {
+                                Share.share(
+                                  widget.url ?? "",
+                                );
+                              },
+                              icon: SvgPicture.asset(
+                                SvgPaths.share,
+                                height: widget.appStyle.scaleX(18),
+                                fit: BoxFit.contain, // 155861
+                              ),
+                              style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                             ),
-                            style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                          ),
-                          Consumer(
-                            builder: (context, ref, child) {
-                              final downloadP = ref.watch(downloadProvider);
-                              final coursePWatch = ref.watch(courseProvider);
-                              bool getCat = false;
-                              if (widget.isAudio) {
-                                getCat = ref.read(courseProvider).downloadAudioResponse.any((element) {
-                                  log("audio bookmark download--->${element.videoId}~~~~~${widget.model.bookmarkVideoResponse?.id}");
-                                  return int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.id;
-                                });
-                                log("getcat-----1 $getCat");
-                              } else {
-                                getCat = ref.read(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.video?.id);
-                                log("getcat-----2 $getCat");
-                              }
-
-                              if (getCat == true) {
-                                return const SizedBox.shrink();
-                              } else {
-                                if (downloadP.isDownloading && widget.model.bookmarkVideoResponse!.id == downloadP.model!.id) {
-                                  return SizedBox(
-                                    height: 15,
-                                    width: 15,
-                                    child: CircularProgressIndicator(
-                                      strokeCap: StrokeCap.butt,
-                                      strokeWidth: 2,
-                                      value: downloadP.progress,
-                                    ),
-                                  );
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final downloadP = ref.watch(downloadProvider);
+                                final coursePWatch = ref.watch(courseProvider);
+                                bool getCat = false;
+                                if (widget.isAudio) {
+                                  getCat = ref.read(courseProvider).downloadAudioResponse.any((element) {
+                                    log("audio bookmark download--->${element.videoId}~~~~~${widget.model.bookmarkVideoResponse?.id}");
+                                    return int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.id;
+                                  });
+                                  log("getcat-----1 $getCat");
                                 } else {
-                                  if (!result) {
-                                    return IconButton(
-                                      onPressed: () async {
-                                        if((widget.model.bookmarkVideoResponse?.category?.isPurchased ?? false) || widget.model.bookmarkVideoResponse?.videoType==ResourceType.free){
-                                          if (downloadP.model == null) {
-                                            if (widget.isAudio) {
-                                              downloadP.downloadAudio(model: widget.model.bookmarkVideoResponse);
-                                            } else {
-                                              downloadP.download(model: widget.model.bookmarkVideoResponse);
-                                            }
-                                          } else {
-                                            if (widget.model.bookmarkVideoResponse!.id != downloadP.model!.id) {
-                                              if (widget.model.bookmarkVideoResponse?.video != null) {
-                                                showCustomSnackBar('Another Video is in progress');
-                                              } else {
-                                                showCustomSnackBar('Another Audio is in progress');
-                                              }
-                                            }
-                                          }
-                                        }else{
-                                          await buyNow(context, categoryId: widget.model.bookmarkVideoResponse!.categoryId.toString());
-                                          ref.read(bookmarkProvider.notifier).getBookmarkList();
-                                          ref.read(bookmarkProvider.notifier).getAudioBookmarks();
+                                  getCat = ref.read(courseProvider).downloadVideoResponse.any((element) => int.parse(element.videoId ?? "") == widget.model.bookmarkVideoResponse?.video?.id);
+                                  log("getcat-----2 $getCat");
+                                }
 
-                                        }
-
-                                      },
-                                      icon: SvgPicture.asset(
-                                        SvgPaths.download,
-                                        height: widget.appStyle.scaleX(18),
-                                        fit: BoxFit.contain,
+                                if (getCat == true) {
+                                  return const SizedBox.shrink();
+                                } else {
+                                  if (downloadP.isDownloading && widget.model.bookmarkVideoResponse?.id == downloadP.model!.id) {
+                                    return SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: CircularProgressIndicator(
+                                        strokeCap: StrokeCap.butt,
+                                        strokeWidth: 2,
+                                        value: downloadP.progress,
                                       ),
-                                      style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                                     );
                                   } else {
-                                    return const SizedBox.shrink();
+                                    if (!result) {
+                                      return IconButton(
+                                        onPressed: () async {
+                                          if ((widget.model.bookmarkVideoResponse?.category?.isPurchased ?? false) || widget.model.bookmarkVideoResponse?.videoType == ResourceType.free) {
+                                            if (downloadP.model == null) {
+                                              if (widget.isAudio) {
+                                                downloadP.downloadAudio(model: widget.model.bookmarkVideoResponse);
+                                              } else {
+                                                downloadP.download(model: widget.model.bookmarkVideoResponse);
+                                              }
+                                            } else {
+                                              if (widget.model.bookmarkVideoResponse!.id != downloadP.model!.id) {
+                                                if (widget.model.bookmarkVideoResponse?.video != null) {
+                                                  showCustomSnackBar('Another File is already in progress');
+                                                } else {
+                                                  showCustomSnackBar('Another File is already in progress');
+                                                }
+                                              }
+                                            }
+                                          } else {
+                                            await buyNow(context, categoryId: widget.model.bookmarkVideoResponse!.categoryId.toString());
+                                            ref.read(bookmarkProvider.notifier).getBookmarkList();
+                                            ref.read(bookmarkProvider.notifier).getAudioBookmarks();
+                                          }
+                                        },
+                                        icon: SvgPicture.asset(
+                                          SvgPaths.download,
+                                          height: widget.appStyle.scaleX(18),
+                                          fit: BoxFit.contain,
+                                        ),
+                                        style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                      );
+                                    } else {
+                                      return const SizedBox.shrink();
+                                    }
                                   }
                                 }
-                              }
-                            },
-                          ),
-                        ],
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

@@ -413,12 +413,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 _selectedCategories.map((e) {
                   ids.add(e.id ?? 0);
                 }).toList();
+                await dashboardNotifier.searchVideo(_controller.text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
+                setState(() {
+                  showSearchResult = true;
+                });
+              }else{
+                showCustomSnackBar("Please select category before save");
               }
 
-              await dashboardNotifier.searchVideo(_controller.text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: ids);
-              setState(() {
-                showSearchResult = true;
-              });
+
               // dashboardNotifier.searchVideo(_controller.text, queryTime: _selectedQueryTime ?? QueryTime.qTime1, categoryId: _selectedCategories.isNotEmpty ? _selectedCategories.first.id : null);
             }
           },

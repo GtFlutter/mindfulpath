@@ -203,6 +203,32 @@ class DatabaseHelper {
     }
   }
 
+
+  /// Get all downloaded videos across all categories
+  Future<List<VideoModal>> getAllDownloadedVideos() async {
+    var dbClient = await db;
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.videoTable);
+    debugPrint("Res getAllDownloadedVideos:: $res");
+    return res.isNotEmpty ? VideoModal.listFromJson(res) : [];
+  }
+
+  /// Get all downloaded audios across all categories
+  Future<List<VideoModal>> getAllDownloadedAudios() async {
+    var dbClient = await db;
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.audioTable);
+    debugPrint("Res getAllDownloadedAudios:: $res");
+    return res.isNotEmpty ? VideoModal.listFromJson(res) : [];
+  }
+
+  /// Get all downloaded PDFs across all categories
+  Future<List<PdfModel>> getAllDownloadedPdfs() async {
+    var dbClient = await db;
+    List<Map<String, dynamic>> res = await dbClient.query(DatabaseConsts.pdfTable);
+    debugPrint("Res getAllDownloadedPdfs:: $res");
+    return res.isNotEmpty ? PdfModel.listFromJson(res) : [];
+  }
+
+
   /// ==========================================================for pdf===================================================///
   ///save pdf category
   Future<int> savePdfCategory(CategoryModal modal) async {

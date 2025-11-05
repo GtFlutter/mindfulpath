@@ -9,6 +9,10 @@ import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/theme/text_style.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 
+import '../../../database/database_helper.dart';
+import '../../../database/database_model.dart';
+import '../../../provider/course_provider.dart';
+import '../../../provider/download_provider.dart';
 import '../../../provider/featured_videos_provider.dart';
 import '../../../util/assets.dart';
 import '../../common/feature_video_list.dart';
@@ -27,8 +31,24 @@ class _FeaturedVideoScreenState extends ConsumerState<FeaturedVideoScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
+    Future.microtask(() async {
+      await ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
+      await initCall();
+    });
+  }
+
+  Future<void> initCall() async {
+    final provider = ref.read(featuredVideosProvider.notifier);
+    final database = ref.read(databaseProvider);
+
+    provider.downloadedVideo = await database.getAllDownloadedVideos();
+  }
+
+  Future<void> refreshh() async {
+    Future.delayed(Duration.zero, () async {
+      final coursePRead = ref.read(courseProvider);
+      await coursePRead.getAllDownloadedVideos();
+      await initCall();
     });
   }
 
@@ -37,7 +57,12 @@ class _FeaturedVideoScreenState extends ConsumerState<FeaturedVideoScreen> {
     ref.watch(featuredVideosProvider);
     var size = MediaQuery.of(context).size;
     _style = AppStyle(screenSize: size);
-
+    final downloadP = ref.watch(downloadProvider);
+    if (downloadP.complate == true) {
+      refreshh();
+      ref.read(downloadProvider.notifier).complate = false;
+      setState(() {});
+    }
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: BackgroundImage(
@@ -99,6 +124,11 @@ class _FeaturedVideoScreenState extends ConsumerState<FeaturedVideoScreen> {
               Expanded(
                 child: Consumer(
                   builder: (context, ref, child) {
+                    if (downloadP.complate == true) {
+                      refreshh();
+                      ref.read(downloadProvider.notifier).complate = false;
+                      setState(() {});
+                    }
                     final provider = ref.watch(featuredVideosProvider);
                     if (provider.loading) {
                       return const Center(child: CircularProgressIndicator());
