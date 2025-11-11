@@ -221,33 +221,3 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   }
 }
 
-// class NoDataFound extends StatelessWidget {
-//   final String? message;
-//   final String? buttonLable;
-//   final VoidCallback? onRetry;
-//   const NoDataFound({super.key, this.message, this.buttonLable, this.onRetry});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Center(
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(
-//           horizontal: Dimensions.PADDING_SIZE_DEFAULT,
-//           vertical: Dimensions.PADDING_SIZE_DEFAULT,
-//         ),
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Text(
-//               message ?? 'Unable to fetch Data',
-//               textAlign: TextAlign.center,
-//               style: Theme.of(context).textTheme.bodyLarge,
-//             ),
-//             const SizedBox(height: Dimensions.PADDING_SIZE_DEFAULT),
-//             TextButton(onPressed: onRetry, child: Text(buttonLable ?? 'Retry')),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

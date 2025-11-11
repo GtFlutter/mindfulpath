@@ -21,14 +21,6 @@ class CustomScrollableColumnLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var query = MediaQuery.of(context);
-    // This removing already occupi by some ui like appbar,statusbar notch, bottom navigation button (back,home,recent)
-    // var alredyOccupiedHeight = kToolbarHeight +
-    //     (style.scale * query.size.height < 800 ? 0.0 : 28.5) +
-    //     query.viewPadding.top +
-    //     query.viewPadding.bottom +
-    //     24;
-    // var height = testScreenHeight ?? query.size.height - alredyOccupiedHeight;
     return Container(
       width: double.infinity,
       height: double.infinity,

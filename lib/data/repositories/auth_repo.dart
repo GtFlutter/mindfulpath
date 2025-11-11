@@ -43,18 +43,6 @@ class AuthRepo {
 
   Future<Response> createUserProfile(UserBody model) async {
     return await apiClient.postData(AppConfigs.registerUser, model.toJson);
-    /*
-    * {
-      if (model.phoneNo?.isNotEmpty ?? false) 'phone_no': model.phoneNo,
-      if (model.password?.isNotEmpty ?? false) 'password': model.password,
-      'name': model.name,
-      'email': model.email,
-      'birth_date': model.birthDate,
-      'gender': model.gender,
-      if (model.googleId?.isNotEmpty ?? false)'google_id': model.googleId,
-      if (model.facebookId?.isNotEmpty ?? false)'facebookId': model.facebookId,
-      'fcm_token': model.fcmToken,
-    }*/
   }
 
   Future<Response> updateUserProfile(UserBody model) async {

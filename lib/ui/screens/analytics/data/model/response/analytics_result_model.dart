@@ -2,24 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'analytics_result_model.g.dart';
 
-// Map<String, dynamic> get value {
-//   return {
-//     "statistics_data": [
-//       {
-//         "play_date": "2023-10-10",
-//         "total_duration_in_second": 20,
-//         "month": 10,
-//         "month_name": "Oct",
-//         "day_name": "Tue",
-//       }
-//     ],
-//     "total_watch_time_hr": 0.0055,
-//     "total_watch_time": "00h 00m 20s",
-//     "avg_watch_time": "00h 00m 20s",
-//     "day_diff": 1
-//   };
-// }
-
 enum ShowType { weekDayName, monthName, unknown }
 
 @JsonSerializable(explicitToJson: false, createToJson: false)

@@ -10,28 +10,6 @@ import 'package:meditation_app/ui/common/custom_app_bar.dart';
 import '../../../theme/styles.dart';
 import 'widget/course_item.dart';
 
-List<CITempModel> list = [
-  CITempModel(
-    'Anticancer Foods and Their Benefits',
-    'https://images.pexels.com/photos/1640770/pexels-photo-1640770.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  ),
-  CITempModel(
-    'Exercise and Mental Well-being',
-    'https://images.pexels.com/photos/7353048/pexels-photo-7353048.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  ),
-  CITempModel(
-    'Transcendental Meditation ',
-    'https://images.pexels.com/photos/1034940/pexels-photo-1034940.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  ),
-  CITempModel(
-    'Creating a Personalized Cancer Prevention Plan',
-    'https://images.pexels.com/photos/4058411/pexels-photo-4058411.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  ),
-  CITempModel(
-    'Understanding Meditation',
-    'https://images.pexels.com/photos/5807630/pexels-photo-5807630.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  ),
-];
 
 class CoursesListScreen extends ConsumerStatefulWidget {
   final String title;

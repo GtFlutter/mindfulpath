@@ -66,9 +66,6 @@ class _CupertinoDatePickerWidgetState extends State<CupertinoDatePickerWidget> {
                 initialDateTime: widget.initialDate,
                 minimumDate: widget.firstDate,
                 maximumDate: widget.lastDate,
-                // initialDateTime: selectedDate,
-                // minimumDate: selectedDate.subtract(Duration(days: 2)),
-                // maximumDate: selectedDate,
                 mode: CupertinoDatePickerMode.date,
                 onDateTimeChanged: (DateTime newDate) {
                   setState(() => _date = newDate);

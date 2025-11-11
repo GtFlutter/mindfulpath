@@ -59,17 +59,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   void initState() {
     super.initState();
     _tabController = TabController(initialIndex: 6, length: 8, vsync: this);
-    // (widget.isFromPdfNotification ?? false) ? _changeFilter(ItemName(id: 1, title: 'PDF')) : _changeFilter(ItemName(id: 0, title: 'Video'));
-    // if(widget.isFromPdfNotification ?? false)  _changeFilter(ItemName(id: 1, title: 'PDF'));
     Future.delayed(Duration(seconds: 0), () async {
       log("------>cst id for all item--${widget.category.id}");
       await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
-      // // ✅ Build _freeFilters after fetching free items
-      // final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
-      // final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
-      // final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
-      //
-      // _freeFilters = buildFilterOptions(hasVideo: isVideo, hasAudio: isAudio, hasPdf: isPdf);
       final data = ref.read(freeAllItemProvider).allItemResponse?.data;
 
       final hasVideo = (data?.video?.isNotEmpty ?? false);
@@ -83,7 +75,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       );
       setState(() {
         _filters = _freeFilters;
-        // filterIndex = _filters.first.id;
         final availableCount = [hasVideo, hasAudio, hasPdf].where((e) => e).length;
         log("available count---->$availableCount");
         if (availableCount == 0) {
@@ -124,10 +115,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
           _changeCourseType(0);
         }
       }
-      // else {
-      //   _changeCourseType(0);
-      //   _changeFilter(ItemName(id: 0, title: 'Video'));
-      // }
     });
 
   }
@@ -165,31 +152,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     return filters;
   }
 
-  // List<ItemName> buildFilterOptions({
-  //   required bool isVideo,
-  //   required bool isAudio,
-  //   required bool isPdf,
-  // }) {
-  //   final List<ItemName> filters = [];
-  //
-  //   if (isVideo) {
-  //     filters.add(ItemName(id: 0, title: 'Video'));
-  //   }
-  //   if (isPdf) {
-  //     filters.add(ItemName(id: 1, title: 'PDF'));
-  //   }
-  //   if (isAudio) {
-  //     filters.add(ItemName(id: 2, title: 'Audio'));
-  //   }
-  //
-  //   if (filters.isEmpty) {
-  //     filters.add(ItemName(id: 3, title: 'All'));
-  //   } else {
-  //     filters.add(ItemName(id: 3, title: 'All'));
-  //   }
-  //
-  //   return filters;
-  // }
 
   void _changeTab(int filterIndex, int courseTypeIndex) {
     int currentTabIndex = _tabController.index;
@@ -247,13 +209,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     });
   }
 
-  // void _changeCourseType(int index) {
-  //   if (index == courseIndex) return;
-  //   setState(() {
-  //     courseIndex = index;
-  //     _changeTab(filterIndex, courseIndex);
-  //   });
-  // }
   void _changeCourseType(int index) async {
     if (index == courseIndex) return;
 
@@ -263,13 +218,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
 
     if (courseIndex == 1) {
      log("paid filter is empty----->${_paidFilters.isEmpty}");
-      // if (_paidFilters.isEmpty) {
+
       if (true) {
         await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
-        // final isVideo = (ref.read(paidAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
-        // final isAudio = (ref.read(paidAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
-        // final isPdf = (ref.read(paidAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
-        // _paidFilters = buildFilterOptions(hasVideo: isVideo, hasAudio: isAudio, hasPdf: isPdf);
         final data = ref.read(paidAllItemProvider).allItemResponse?.data;
 
         final hasVideo = (data?.video?.isNotEmpty ?? false);
@@ -284,7 +235,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       }
       setState(() {
         _filters = _paidFilters;
-        // filterIndex = _filters.first.id;
         final data = ref.read(paidAllItemProvider).allItemResponse?.data;
 
         final hasVideo = (data?.video?.isNotEmpty ?? false);
@@ -302,14 +252,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       });
     } else {
       log("free filter is empty----->${_freeFilters.isEmpty}");
-      // if (_freeFilters.isEmpty) {
       if (true) {
         // fallback: rebuild filters from existing data if needed
         await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
-        // final isVideo = (ref.read(freeAllItemProvider).allItemResponse?.data?.isVideo ?? 0) == 1;
-        // final isAudio = (ref.read(freeAllItemProvider).allItemResponse?.data?.isAudio ?? 0) == 1;
-        // final isPdf = (ref.read(freeAllItemProvider).allItemResponse?.data?.isPdf ?? 0) == 1;
-        // _freeFilters = buildFilterOptions(hasVideo: isVideo, hasAudio: isAudio, hasPdf: isPdf);
         final data = ref.read(freeAllItemProvider).allItemResponse?.data;
 
         final hasVideo = (data?.video?.isNotEmpty ?? false);

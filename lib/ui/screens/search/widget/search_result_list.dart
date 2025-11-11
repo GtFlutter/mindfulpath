@@ -50,17 +50,6 @@ return const Center(child: Text("Search Result Not Found"));    }
             ref.read(videoProvider.notifier).isSelected = index;
             playVideo(_model.list![index], _model.list?[index].category ?? CategoryListResponse(), ref, context);
             ref.read(dashboardProvider.notifier).selectedSearchIndex = index;
-            // context.goToDetailCategoryScreen(
-            //     _model[index].category!,
-            //     video: DIModel(
-            //         videoType: _model[index].videoType!,
-            //         videoId: _model[index].id!,
-            //         thumbnailUrl: _model[index].thumbnailImageUrlSrc!,
-            //         videoUrl: _model[index].videoUrl!,
-            //         duration: _model[index].duration!,
-            //         title: _model[index].title!,
-            //         categoryName: _model[index].categoryTitle!
-            //     ));
           },
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: 20),

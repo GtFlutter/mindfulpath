@@ -89,20 +89,6 @@ class DatabaseHelper {
     }
   }
 
-  // Future<int> saveCategory(CategoryModal modal) async {
-  //   var dbClient = await db;
-  //   int res;
-  //   try {
-  //     res = await dbClient.insert(DatabaseConsts.categoryTable, modal.toJson());
-  //     debugPrint("DATABASE:- ${DatabaseConsts.categoryTable} saved to db");
-  //   } catch (e) {
-  //     await dbClient.delete(DatabaseConsts.categoryTable);
-  //     res = await dbClient.insert('CategoryTable', modal.toJson());
-  //     debugPrint("DATABASE:- ${DatabaseConsts.categoryTable} saved to db with Error");
-  //   }
-  //   return res;
-  // }
-
   ///save video
   Future<int> saveVideo(VideoModal modal) async {
     var dbClient = await db;
@@ -137,20 +123,6 @@ class DatabaseHelper {
       return -1;
     }
   }
-
-  // Future<int> saveVideo(VideoModal modal) async {
-  //   var dbClient = await db;
-  //   int res;
-  //   try {
-  //     res = await dbClient.insert(DatabaseConsts.videoTable, modal.toJson());
-  //     debugPrint("DATABASE:- ${DatabaseConsts.videoTable} saved to db");
-  //   } catch (e) {
-  //     await dbClient.delete(DatabaseConsts.videoTable);
-  //     res = await dbClient.insert('VideoTable', modal.toJson());
-  //     debugPrint("DATABASE:- ${DatabaseConsts.videoTable} saved to db with Error");
-  //   }
-  //   return res;
-  // }
 
   ///Get single category of Video
   Future<CategoryModal?> getSingleCategory(String categoryId) async {

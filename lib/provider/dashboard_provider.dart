@@ -37,12 +37,6 @@ class DashboardNotifier extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-// ///search screen parameters
-//   List<CategoryListResponse> selectedCategories = [];
-//   List<String> selectedCatTitle = [];
-//   QueryTime? selectedQueryTime;
-//   final TextEditingController controller = TextEditingController();
-
   void startLoading() {
     if (!_isLoading) {
       _isLoading = true;

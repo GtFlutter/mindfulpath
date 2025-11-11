@@ -51,13 +51,6 @@ class AnalyticsDetails extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: _style.scaleX(25)),
-                    // Text(
-                    //   'Total video time',
-                    //   style: textStyle,
-                    //   maxLines: 1,
-                    //   overflow: TextOverflow.ellipsis,
-                    // ),
-                    // SizedBox(height: _style.scaleX(25)),
                     Text(
                       'Total average time',
                       style: textStyle,
@@ -81,12 +74,6 @@ class AnalyticsDetails extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // Text(
-                    //   '45m',
-                    //   style: subTextStyle,
-                    //   maxLines: 1,
-                    //   overflow: TextOverflow.ellipsis,
-                    // ),
                     Text(
                       totalAverageWatchTime,
                       style: subTextStyle,
