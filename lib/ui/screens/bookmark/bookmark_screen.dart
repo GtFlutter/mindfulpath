@@ -240,7 +240,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                                   videoCtrl.isSelected = index;
                                                   playVideo(model, model.bookmarkVideoResponse?.category ?? CategoryListResponse(), index, showAudioFile);
                                                 } else {
-                                                  await buyNow(context, categoryId: model.bookmarkVideoResponse!.categoryId.toString());
+                                                  await buyNow(context, categoryId: model.bookmarkVideoResponse!.categoryId.toString(), amount: double.parse(model.bookmarkVideoResponse?.category?.price ?? "0.0"));
                                                   bookmarkNotifier.getBookmarkList();
                                                   bookmarkNotifier.getAudioBookmarks();
                                                   bookmarkNotifier.getPDFBookmarks();
@@ -281,46 +281,49 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                   controller: expansionTileController1,
                                   children: [
                                     if (bookmarkNotifier.bookmarkAudioListResponse?.isNotEmpty ?? false) ...[
-                                      ListView.separated(
-                                        shrinkWrap: true,
-                                        scrollDirection: Axis.vertical,
-                                        padding: EdgeInsets.only(
-                                          //bottom: _style.scale * 100,
-                                          top: _style.scale * 12.5,
-                                          right: _style.scale * 10,
-                                          left: _style.scale * 10,
-                                        ),
-                                        itemCount: bookmarkNotifier.bookmarkAudioListResponse!.length,
-                                        itemBuilder: (context, index) {
-                                          log("index------$index------${bookmarkNotifier.audioCategory?.length}");
-                                          var model = bookmarkNotifier.bookmarkAudioListResponse![index];
+                                      SizedBox(
+                                        height: 300,
+                                        child: ListView.separated(
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.vertical,
+                                          padding: EdgeInsets.only(
+                                            //bottom: _style.scale * 100,
+                                            top: _style.scale * 12.5,
+                                            right: _style.scale * 10,
+                                            left: _style.scale * 10,
+                                          ),
+                                          itemCount: bookmarkNotifier.bookmarkAudioListResponse!.length,
+                                          itemBuilder: (context, index) {
+                                            log("index------$index------${bookmarkNotifier.audioCategory?.length}");
+                                            var model = bookmarkNotifier.bookmarkAudioListResponse![index];
 
-                                          return BookmarkItem(
-                                            isAudio: true,
-                                            appStyle: _style,
-                                            model: model,
-                                            index: index,
-                                            IsSelected: videoCtrl.isSelected,
-                                            onPlay: () async {
-                                              if ((model.bookmarkVideoResponse?.category?.isPurchased ?? false) || model.bookmarkVideoResponse?.videoType == ResourceType.free) {
-                                                videoCtrl.isSelected = index;
-                                                playVideo(model, bookmarkNotifier.audioCategory?[index] ?? CategoryListResponse(), index, true);
-                                              } else {
-                                                await buyNow(context, categoryId: model.bookmarkVideoResponse!.categoryId.toString());
-                                                bookmarkNotifier.getBookmarkList();
-                                                bookmarkNotifier.getAudioBookmarks();
-                                                bookmarkNotifier.getPDFBookmarks();
-                                              }
-                                            },
-                                            url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
-                                            onBookmarkRemove: () async {
-                                              if (model.videoId == null) return;
-                                              await ref.read(bookmarkProvider).toggleBookmark(model.videoId!, isRemove: true, isAudio: true);
-                                              bookmarkNotifier.bookmarkAudioListResponse!.removeAt(index);
-                                            },
-                                          );
-                                        },
-                                        separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                            return BookmarkItem(
+                                              isAudio: true,
+                                              appStyle: _style,
+                                              model: model,
+                                              index: index,
+                                              IsSelected: videoCtrl.isSelected,
+                                              onPlay: () async {
+                                                if ((model.bookmarkVideoResponse?.category?.isPurchased ?? false) || model.bookmarkVideoResponse?.videoType == ResourceType.free) {
+                                                  videoCtrl.isSelected = index;
+                                                  playVideo(model, bookmarkNotifier.audioCategory?[index] ?? CategoryListResponse(), index, true);
+                                                } else {
+                                                  await buyNow(context, categoryId: model.bookmarkVideoResponse!.categoryId.toString(), amount: double.parse(model.bookmarkVideoResponse?.category?.price ?? "0.0"));
+                                                  bookmarkNotifier.getBookmarkList();
+                                                  bookmarkNotifier.getAudioBookmarks();
+                                                  bookmarkNotifier.getPDFBookmarks();
+                                                }
+                                              },
+                                              url: model.bookmarkVideoResponse?.videoUrlSrc ?? "",
+                                              onBookmarkRemove: () async {
+                                                if (model.videoId == null) return;
+                                                await ref.read(bookmarkProvider).toggleBookmark(model.videoId!, isRemove: true, isAudio: true);
+                                                bookmarkNotifier.bookmarkAudioListResponse!.removeAt(index);
+                                              },
+                                            );
+                                          },
+                                          separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
+                                        ),
                                       ),
                                     ] else ...[
                                       const Padding(
@@ -331,23 +334,24 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                   ],
                                 ),
                               ),
-                              Expanded(
-                                child: Theme(
-                                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                                  child: ExpansionTile(
-                                    title: Text("Bookmarked PDFs"),
-                                    onExpansionChanged: (expanded) {
-                                      setState(() {
-                                        if (expanded) {
-                                          expansionTileController.collapse();
-                                          expansionTileController1.collapse();
-                                        }
-                                      });
-                                    },
-                                    controller: expansionTileController2,
-                                    children: [
-                                      if (bookmarkNotifier.bookmarkPDFListResponse?.isNotEmpty ?? false) ...[
-                                        ListView.separated(
+                              Theme(
+                                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                child: ExpansionTile(
+                                  title: Text("Bookmarked PDFs"),
+                                  onExpansionChanged: (expanded) {
+                                    setState(() {
+                                      if (expanded) {
+                                        expansionTileController.collapse();
+                                        expansionTileController1.collapse();
+                                      }
+                                    });
+                                  },
+                                  controller: expansionTileController2,
+                                  children: [
+                                    if (bookmarkNotifier.bookmarkPDFListResponse?.isNotEmpty ?? false) ...[
+                                      SizedBox(
+                                        height: 300,
+                                        child: ListView.separated(
                                           shrinkWrap: true,
                                           scrollDirection: Axis.vertical,
                                           padding: EdgeInsets.only(
@@ -369,7 +373,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                                 if ((model?.bookmarkPdfResponse?.category?.isPurchased ?? false) || model?.bookmarkPdfResponse?.pdfType == ResourceType.free) {
                                                   viewPdf(model?.bookmarkPdfResponse?.pdfUrl ?? "");
                                                 } else {
-                                                  await buyNow(context, categoryId: (model?.bookmarkPdfResponse?.categoryId ?? 0).toString());
+                                                  await buyNow(context, categoryId: (model?.bookmarkPdfResponse?.categoryId ?? 0).toString(), amount: double.parse(model?.bookmarkPdfResponse?.category?.price ?? "0.0"));
                                                   bookmarkNotifier.getBookmarkList();
                                                   bookmarkNotifier.getAudioBookmarks();
                                                   bookmarkNotifier.getPDFBookmarks();
@@ -385,14 +389,14 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                                           },
                                           separatorBuilder: (BuildContext context, int index) => SizedBox(height: _style.scaleX(25)),
                                         ),
-                                      ] else ...[
-                                        const Padding(
-                                          padding: EdgeInsets.only(bottom: 20.0, top: 20),
-                                          child: Text("Data Not Available"),
-                                        )
-                                      ],
+                                      ),
+                                    ] else ...[
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 20.0, top: 20),
+                                        child: Text("Data Not Available"),
+                                      )
                                     ],
-                                  ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -410,4 +414,3 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
     context.pushViewPDFScreen(pdfUrl);
   }
 }
-

@@ -164,7 +164,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
               if (item.category?.isPurchased ?? false) {
                 viewPdf(item.pdfUrl);
               } else {
-                await buyNow(context, categoryId: widget.category.id.toString());
+                await buyNow(context, categoryId: widget.category.id.toString(), amount:double.parse(item.category?.price ?? "0.0"));
                 allItemProvider.fetchAllPaidItem(widget.category.id ?? 0);
               }
 
@@ -206,7 +206,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
                   playAudio(item, index);
                 }
               } else {
-                await buyNow(context, categoryId: widget.category.id.toString());
+                await buyNow(context, categoryId: widget.category.id.toString(), amount:double.parse(item.category?.price ?? "0.0"));
                 allItemProvider.fetchAllPaidItem(widget.category.id ?? 0);
               }
             },

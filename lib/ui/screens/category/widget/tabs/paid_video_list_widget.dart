@@ -129,7 +129,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
             if (model.category?.isPurchased??false) {
               playVideo(model);
             } else {
-              await buyNow(context, categoryId: widget.category.id.toString());
+              await buyNow(context, categoryId: widget.category.id.toString(),amount:double.parse(widget.category.price ?? "0.0"));
               provider.fetchVideos(widget.category.id ?? 0);
               audioP.fetchAudios(widget.category.id ?? 0);
             }

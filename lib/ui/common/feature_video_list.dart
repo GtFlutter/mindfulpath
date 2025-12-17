@@ -131,6 +131,7 @@ class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
                 await buyNow(
                   context,
                   categoryId: (dataModel.category!.id ?? 0).toString(),
+                  amount:double.parse(dataModel.category?.price ?? "0.0")
                 );
                 ref.read(featuredVideosProvider).getFeatureVideoList(1, true);
               }

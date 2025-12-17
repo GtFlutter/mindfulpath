@@ -109,7 +109,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
             if (widget.category.isPurchased ?? false) {
               viewPdf(model.pdfUrl);
             } else {
-              buyNow(context, categoryId: widget.category.id.toString());
+              buyNow(context, categoryId: widget.category.id.toString(),amount: double.parse(widget.category.price ?? "0.0"));
             }
           },
           child: DetailItem.pdf(

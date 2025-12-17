@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "750868217623",
     "project_id": "mindful-path-3bc36",
-    "storage_bucket": "mindful-path-3bc36.appspot.com"
+    "storage_bucket": "mindful-path-3bc36.firebasestorage.app"
   },
   "client": [
     {
@@ -13,6 +13,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "750868217623-kflp87pr6bk1kldn5g6gln3cm7btne7n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mindfulpath.app",
+            "certificate_hash": "1da01d4164df4d71c3dc5781725f29ca5df9b9fa"
+          }
+        },
+        {
+          "client_id": "750868217623-rktootgjub5m16pn53abv1vkbaol87pk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mindfulpath.app",
+            "certificate_hash": "df3ee06350cfc640a7a362bbf9e22bb61c6a8147"
+          }
+        },
         {
           "client_id": "750868217623-ju553nm7o2vq6l4jt7ukf0jfcj411qov.apps.googleusercontent.com",
           "client_type": 3

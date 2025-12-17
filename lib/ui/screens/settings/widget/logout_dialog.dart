@@ -101,7 +101,7 @@ class LogoutDialog extends ConsumerWidget {
   }
 }
 
-Future<void> buyNow(BuildContext context, {required String categoryId, bool? isFromSearch}) async {
+Future<void> buyNow(BuildContext context, {required String categoryId, bool? isFromSearch,required double amount}) async {
   await showDialog(
     context: context,
     barrierDismissible: false,
@@ -112,7 +112,7 @@ Future<void> buyNow(BuildContext context, {required String categoryId, bool? isF
         parent: ProviderScope.containerOf(context),
         child: Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(style.scaleX(10))),
-          child: BuyNowDialog(style, categoryId, isFromSearch ?? false),
+          child: BuyNowDialog(style, categoryId, isFromSearch ?? false,amount),
         ),
       );
     },
@@ -120,11 +120,12 @@ Future<void> buyNow(BuildContext context, {required String categoryId, bool? isF
 }
 
 class BuyNowDialog extends ConsumerWidget {
-  const BuyNowDialog(this.style, this.categoryId, this.isFromSearch, {super.key});
+  const BuyNowDialog(this.style, this.categoryId, this.isFromSearch,this.amount, {super.key});
 
   final AppStyle style;
   final String categoryId;
   final bool? isFromSearch;
+  final double? amount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -188,16 +189,16 @@ class BuyNowDialog extends ConsumerWidget {
                             Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => UsePaypal(
                                 isFromSearch: isFromSearch ?? false,
-                                clientId: 'AY6pLhhWX00Vac5a3WWDSq2E-uM24d-2r263Qo3a0FHvh755tEw5lh8tTkbTl24VB2vgceToCyqMqjLa',
-                                secretKey: 'EHT63o9JrnCT_VJH1_OXHmJmZCGY_sYQShbMQAIHXbt0q9kqt2WFsUl6bLK1KutTrvDLnbrrtbIUmL0h',
+                                clientId: 'ASAps7GU63WtES2kI7p3kp1RRBJb0_SofYuIIw00T5p73Bn06d3E6y77GKy_hCngUm7jX7S9brx-mr_l',
+                                secretKey: 'EMWaUYaJSUY8Kn91y0lZE68RaYk6AqkTse-M1HLBUfVQI-k06wefaE43Uz3J3pv0X_wAmlDShP1lKfZT',
                                 cancelURL: 'https://samplesite.com/return',
                                 returnURL: 'https://samplesite.com/cancel',
-                                sandboxMode: true,
-                                transactions: const [
+                                sandboxMode: false,
+                                transactions:  [
                                   {
                                     "amount": {
-                                      "total": 2,
-                                      "currency": "AUD",
+                                      "total": amount,
+                                      "currency": "CAD",
                                     },
                                     "description": "The payment transaction description.",
                                   }

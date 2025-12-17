@@ -366,7 +366,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   appStyle: widget.appStyle,
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () async {
-                                    print("download call=========");
+                                    print("download call=========${widget.model?.category?.isPurchased}---${widget.model?.videoType == ResourceType.free}");
                                     bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
                                     if (!isLoggedIn) {
                                       showCustomSnackBar(
@@ -400,7 +400,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                         }
                                       }
                                     } else {
-                                      await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
+                                      await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(),amount: double.parse(widget.model?.category?.price ?? "0.0"));
                                       paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
                                       paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                                       paidAllItem.fetchAllPaidItem(widget.model?.category?.id ?? 0);
@@ -439,7 +439,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   );
                                 }
                               } else {
-                                await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
+                                await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(),amount: double.parse(widget.model?.category?.price ?? "0.0"));
                                 paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
                                 paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                               }
@@ -460,7 +460,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
                                         await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio ?? false);
                                       } else {
-                                        await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString());
+                                        await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(),amount: double.parse(widget.model?.category?.price ?? "0.0"));
                                         paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
                                         paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                                       }
@@ -640,7 +640,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                           showCustomSnackBar('Another File is already in progress');
                                         }
                                       } else {
-                                        await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString());
+                                        await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString(),amount: double.parse(widget.pdfModel?.category?.price ?? "0.0"));
                                         paidPdf.fetchPdfs(widget.pdfModel?.category?.id ?? 0);
                                         paidAllItem.fetchAllPaidItem(widget.pdfModel?.category?.id ?? 0);
                                       }

@@ -91,7 +91,7 @@ return const Center(child: Text("Search Result Not Found"));    }
       // appRouter.push(RoutePath.signIn);
       return;
     } else if (!(category.isPurchased ?? false) && videoResponse.videoType==ResourceType.paid) {
-      buyNow(context, categoryId: category.id.toString(), isFromSearch: true);
+      buyNow(context, categoryId: category.id.toString(), isFromSearch: true, amount: double.parse(category.price ?? "0.0"));
     } else {
       ref.read(videoProvider.notifier).isVideoChanged=true;
       ref.read(videoProvider).playVideo(detailedVideoModel);

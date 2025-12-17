@@ -245,7 +245,7 @@ getCategory() async {
                                             showCustomSnackBar('Another PDF is in progress');
                                           }
                                         }else{
-                                          await buyNow(context, categoryId: (widget.model?.bookmarkPdfResponse?.categoryId ?? 0).toString());
+                                          await buyNow(context, categoryId: (widget.model?.bookmarkPdfResponse?.categoryId ?? 0).toString(), amount:double.parse(widget.model?.bookmarkPdfResponse?.category?.price ?? "0.0"));
                                           ref.read(bookmarkProvider.notifier).getPDFBookmarks();
 
                                         }

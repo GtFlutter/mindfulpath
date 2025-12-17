@@ -1,7 +1,8 @@
 name: meditation_app
 description: A new Flutter Meditation App project.
 publish_to: "none"
-version: 1.0.0+3
+#version: 1.0.0+7 #androdid
+version: 1.0.1+1 #ios
 
 environment:
   sdk: ">=3.0.5 <4.0.0"

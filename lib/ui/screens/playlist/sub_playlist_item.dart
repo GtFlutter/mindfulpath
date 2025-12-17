@@ -269,7 +269,7 @@ class _SubPlayListItemState extends ConsumerState<SubPlayListItem> {
                                             }
                                           }
                                         } else {
-                                          await buyNow(context, categoryId: (widget.model.video?.categoryId ?? 0).toString());
+                                          await buyNow(context, categoryId: (widget.model.video?.categoryId ?? 0).toString(),amount: double.parse(widget.model.video?.category?.price ?? "0.0"));
                                           ref.read(playListProvider).getPlaylistDetails(widget.model.playlistId ?? 0, showProgress: true);
                                         }
                                       },

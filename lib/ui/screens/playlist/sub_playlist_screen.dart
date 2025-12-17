@@ -363,7 +363,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                             playVideo(model, index);
                                                             FocusManager.instance.primaryFocus?.unfocus();
                                                           } else {
-                                                            await buyNow(context, categoryId: (model.video?.categoryId ?? 0).toString());
+                                                            await buyNow(context, categoryId: (model.video?.categoryId ?? 0).toString(), amount: double.parse(model.video?.category?.price ?? "0.0"));
                                                             playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
                                                           }
                                                         },
