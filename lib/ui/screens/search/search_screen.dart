@@ -362,10 +362,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                     setState(() {}); // To rebuild updated results
                                   },
                                 )
-                          : RecentSearchResultList(
-                              style: _style,
-                              onRecentSearchTap: setSearchValue,
-                            ),
+                          : SizedBox.shrink()
+                      // RecentSearchResultList(
+                      //         style: _style,
+                      //         onRecentSearchTap: setSearchValue,
+                      //       ),
                     )
                   : const SizedBox.shrink()
             ],
