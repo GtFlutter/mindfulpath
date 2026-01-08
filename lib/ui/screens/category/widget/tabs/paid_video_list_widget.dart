@@ -13,6 +13,7 @@ import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../provider/resource_provider/paid_videos_provider.dart';
 import '../../../../../provider/video_provider.dart';
 import '../../../../../theme/styles.dart';
+import '../../../../common/custom_snackbar.dart';
 import '../detail_item.dart';
 
 class PaidVideoListWidget extends ConsumerStatefulWidget {
@@ -126,6 +127,8 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
         }
         return GestureDetector(
           onTap: () async {
+            bool isLoggedIn = isLogin('Please Sign in to View Content', ref);
+            if(!isLoggedIn)return;
             if (model.category?.isPurchased??false) {
               playVideo(model);
             } else {

@@ -139,26 +139,16 @@ class _FreePdfListWidgetState extends ConsumerState<FreePdfListWidget> with Auto
   }
 
   Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false}) async {
-    bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-    if(!isLoggedIn){
-      showCustomSnackBar(
-        'Please Sign in to Bookmark',
-        action: SnackBarAction(
-          label: 'Sign in',
-          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-          textColor: Colors.brown.shade800,
-          onPressed: () => appRouter.go(RoutePath.signIn),
-        ),
-        duration: const Duration(seconds: 5),
-      );
-      return;
-    }
+    bool isLoggedIn = isLogin('Please Sign in to Bookmark', ref);
+    if(!isLoggedIn)return;
     if (itemId == null) return;
     await ref.read(bookmarkProvider.notifier).toggleBookmark(itemId, isRemove: isRemove,isPDF: true);
     ref.read(freePdfsProvider.notifier).fetchPdfs(widget.category.id ?? 0);
   }
 
   void viewPdf(String? pdfUrl) {
+    bool isLoggedIn = isLogin('Please Sign in to View Content', ref);
+    if(!isLoggedIn)return;
     if (pdfUrl == null) return;
     context.pushViewPDFScreen(pdfUrl);
   }

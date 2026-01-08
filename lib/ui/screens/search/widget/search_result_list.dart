@@ -99,20 +99,8 @@ return const Center(child: Text("Search Result Not Found"));    }
   }
 
   Future<void> toggleItemBookmark(WidgetRef ref, int? itemId, {bool isRemove = false}) async {
-    bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-    if(!isLoggedIn){
-      showCustomSnackBar(
-        'Please Sign in to Bookmark',
-        action: SnackBarAction(
-          label: 'Sign in',
-          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-          textColor: Colors.brown.shade800,
-          onPressed: () => appRouter.go(RoutePath.signIn),
-        ),
-        duration: const Duration(seconds: 5),
-      );
-      return;
-    }
+    bool isLoggedIn = isLogin('Please Sign in to Bookmark', ref);
+    if(!isLoggedIn)return;
     FocusManager.instance.primaryFocus?.unfocus();
     if (itemId == null) return;
    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove);

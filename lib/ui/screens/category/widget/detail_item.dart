@@ -367,20 +367,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   // svgIconSrc: SvgPaths.bookmarkSelected,
                                   onTap: () async {
                                     print("download call=========${widget.model?.category?.isPurchased}---${widget.model?.videoType == ResourceType.free}");
-                                    bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                    if (!isLoggedIn) {
-                                      showCustomSnackBar(
-                                        'Please Sign in to Download',
-                                        action: SnackBarAction(
-                                          label: 'Sign in',
-                                          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                          textColor: Colors.brown.shade800,
-                                          onPressed: () => appRouter.go(RoutePath.signIn),
-                                        ),
-                                        duration: const Duration(seconds: 5),
-                                      );
-                                      return;
-                                    }
+                                    bool isLoggedIn = isLogin('Please Sign in to Download', ref);
+                                    if(!isLoggedIn)return;
                                     if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
                                       log("model--------->${widget.model?.toJson()}");
                                       print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
@@ -427,16 +415,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                 if (widget.model?.id != null && isLoggedIn) {
                                   createPlaylist(context, videoId: widget.model?.id?.toString(), isAudio: widget.isAudio ?? false);
                                 } else {
-                                  showCustomSnackBar(
-                                    'Please Sign in to create playlist.',
-                                    action: SnackBarAction(
-                                      label: 'Sign in',
-                                      backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                      textColor: Colors.brown.shade800,
-                                      onPressed: () => appRouter.go(RoutePath.signIn),
-                                    ),
-                                    duration: const Duration(seconds: 5),
-                                  );
+                                  bool isLoggedIn = isLogin('Please Sign in to Create Playlist', ref);
                                 }
                               } else {
                                 await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(),amount: double.parse(widget.model?.category?.price ?? "0.0"));
@@ -489,16 +468,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                           else
                             MenuItemButton(
                               onPressed: () {
-                                showCustomSnackBar(
-                                  'Please Sign in to Add to Playlist',
-                                  action: SnackBarAction(
-                                    label: 'Sign in',
-                                    backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                    textColor: Colors.brown.shade800,
-                                    onPressed: () => appRouter.go(RoutePath.signIn),
-                                  ),
-                                  duration: const Duration(seconds: 5),
-                                );
+                                bool isLoggedIn = isLogin('Please Sign in to Add to Playlist', ref);
                               },
                               child: Text(
                                 'Add to Playlist',
@@ -618,20 +588,8 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       print('------------pdf download-------->${widget.pdfModel?.toJson()}');
                                       print('------------pdf download11-------->${downloadP.pdfModel?.toJson()}');
                                       print('------------pdf download22-------->${widget.pdfModel?.pdfType == ResourceType.free}');
-                                      bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-                                      if (!isLoggedIn) {
-                                        showCustomSnackBar(
-                                          'Please Sign in to Download',
-                                          action: SnackBarAction(
-                                            label: 'Sign in',
-                                            backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                                            textColor: Colors.brown.shade800,
-                                            onPressed: () => appRouter.go(RoutePath.signIn),
-                                          ),
-                                          duration: const Duration(seconds: 5),
-                                        );
-                                        return;
-                                      }
+                                      bool isLoggedIn = isLogin('Please Sign in to Download', ref);
+                                      if(!isLoggedIn)return;
                                       if ((widget.pdfModel?.category?.isPurchased ?? false) || widget.pdfModel?.pdfType == ResourceType.free) {
                                         if (downloadP.pdfModel == null && downloadP.model == null) {
                                           print(widget.pdfModel?.categoryId ?? "");

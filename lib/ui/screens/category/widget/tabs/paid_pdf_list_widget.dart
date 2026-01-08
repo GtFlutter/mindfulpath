@@ -10,6 +10,7 @@ import '../../../../../data/model/response/category_list_reponse.dart';
 import '../../../../../database/database_helper.dart';
 import '../../../../../provider/bookmark_provider.dart';
 import '../../../../../theme/styles.dart';
+import '../../../../common/custom_snackbar.dart';
 import '../detail_item.dart';
 
 class PaidPdfListWidget extends ConsumerStatefulWidget {

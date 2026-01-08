@@ -19,6 +19,7 @@ import '../../../../../provider/course_provider.dart';
 import '../../../../../provider/download_provider.dart';
 import '../../../../../provider/recent_videos_provider.dart';
 import '../../../../../provider/video_provider.dart';
+import '../../../../common/custom_snackbar.dart';
 import '../../../settings/widget/logout_dialog.dart';
 import '../detail_item.dart';
 

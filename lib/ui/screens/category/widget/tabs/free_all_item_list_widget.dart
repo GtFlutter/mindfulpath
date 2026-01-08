@@ -195,6 +195,8 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
 
           return GestureDetector(
             onTap: () {
+              bool isLoggedIn = isLogin('Please Sign in to View Content', ref);
+              if(!isLoggedIn)return;
               if (!isAudio) {
                 playVideo(item, index);
               } else {
@@ -223,6 +225,8 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
 
   void viewPdf(String? pdfUrl) {
     if (pdfUrl == null) return;
+    bool isLoggedIn = isLogin('Please Sign in to View Content', ref);
+    if(!isLoggedIn)return;
     context.pushViewPDFScreen(pdfUrl);
   }
 
@@ -265,20 +269,8 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
   }
 
   Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false, required bool isAudio,bool isPDF=false}) async {
-    bool isLoggedIn = ref.read(authProvider).isUserLoggedIn;
-    if(!isLoggedIn){
-      showCustomSnackBar(
-        'Please Sign in to Bookmark',
-        action: SnackBarAction(
-          label: 'Sign in',
-          backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-          textColor: Colors.brown.shade800,
-          onPressed: () => appRouter.go(RoutePath.signIn),
-        ),
-        duration: const Duration(seconds: 5),
-      );
-      return;
-    }
+    bool isLoggedIn = isLogin('Please Sign in to Bookmark', ref);
+    if(!isLoggedIn)return;
     if (itemId == null) return;
     await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isAudio: isAudio,isPDF: isPDF);
     ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
