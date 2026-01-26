@@ -139,7 +139,6 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
     final items = flatItems;
     log("flat item--->${flatItems.length}");
 
-
     if (items.isEmpty && !allItemProvider.loading) {
       return const Center(child: Text('No data available.'));
     }
@@ -165,10 +164,9 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
               if (item.category?.isPurchased ?? false) {
                 viewPdf(item.pdfUrl);
               } else {
-                await buyNow(context, categoryId: widget.category.id.toString(), amount:double.parse(item.category?.price ?? "0.0"));
+                await buyNow(context, categoryId: widget.category.id.toString(), amount: double.parse(item.category?.price ?? "0.0"));
                 allItemProvider.fetchAllPaidItem(widget.category.id ?? 0);
               }
-
             },
             child: DetailItem.pdf(
               appStyle: _style,
@@ -180,6 +178,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
               isShow: true,
               isDownloaded: isDownloaded,
               onToggleBookmark: () {
+                if (item.id == null || !(widget.category.isPurchased ?? false)) return;
                 toggleItemBookmark(item.id, isRemove: item.bookmarked ?? false, isAudio: false, isPDF: true);
               },
             ),
@@ -207,7 +206,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
                   playAudio(item, index);
                 }
               } else {
-                await buyNow(context, categoryId: widget.category.id.toString(), amount:double.parse(item.category?.price ?? "0.0"));
+                await buyNow(context, categoryId: widget.category.id.toString(), amount: double.parse(item.category?.price ?? "0.0"));
                 allItemProvider.fetchAllPaidItem(widget.category.id ?? 0);
               }
             },
@@ -218,6 +217,10 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
               index: '$index',
               seletedItemId: item.id,
               onToggleBookmark: () {
+                if (item.id == null || !(widget.category.isPurchased ?? false)) return;
+                if (!(widget.category.isPurchased ?? false)) {
+                  buyNow(context, categoryId: (widget.category.id ?? 0).toString(), amount: double.parse(widget.category.price ?? "0"));
+                }
                 toggleItemBookmark(item.id, isRemove: item.bookmarked ?? false, isAudio: isAudio);
               },
               isDownloaded: isDownloaded,

@@ -122,6 +122,7 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
             seletedItemId: model.id,
             isShow: true,
             onToggleBookmark: () {
+              if (model.id == null || !(widget.category.isPurchased ?? false)) return;
               toggleItemBookmark(model.id, isRemove: model.bookmarked ?? false);
             },
             isDownloaded: provider.downloadedPDF.any((element) => element.id == provider.pdfsResponse?.list?[index].id),
@@ -133,8 +134,12 @@ class _PaidPdfListWidgetState extends ConsumerState<PaidPdfListWidget> with Auto
   }
 
   Future<void> toggleItemBookmark(int? itemId, {bool isRemove = false}) async {
-    if (itemId == null) return;
-    await ref.read(bookmarkProvider).toggleBookmark(itemId, isRemove: isRemove, isPDF: true);
+    if (itemId == null &&!(widget.category.isPurchased ?? false)) return;
+    if(!(widget.category.isPurchased ?? false))
+    {
+      buyNow(context, categoryId: (widget.category.id??0).toString(), amount: double.parse(widget.category.price ?? "0"));
+    }
+    await ref.read(bookmarkProvider).toggleBookmark(itemId!, isRemove: isRemove, isPDF: true);
     ref.read(paidPdfsProvider.notifier).fetchPdfs(widget.category.id ?? 0);
   }
 
