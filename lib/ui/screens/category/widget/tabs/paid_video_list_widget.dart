@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/provider/course_provider.dart';
@@ -129,6 +131,7 @@ class _PaidVideoListWidgetState extends ConsumerState<PaidVideoListWidget>
           onTap: () async {
             bool isLoggedIn = isLogin('Please Sign in to View Content', ref);
             if(!isLoggedIn)return;
+            log("------>audio-----${model.category?.isPurchased}--------price-----${widget.category.price}");
             if (model.category?.isPurchased??false) {
               playVideo(model);
             } else {

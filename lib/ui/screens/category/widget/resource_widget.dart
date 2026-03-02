@@ -68,6 +68,51 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       final hasAudio = (data?.audio?.isNotEmpty ?? false);
       final hasPdf = (data?.pdf?.isNotEmpty ?? false);
       log("------>hasVideo=$hasVideo-------->hasAudio=$hasAudio------->hasPdf=$hasPdf");
+      final hasAnyCoreData = hasVideo || hasAudio || hasPdf;
+      if (!hasAnyCoreData) {
+        log("❌ Core has no data → switching to Plus");
+
+        // switch UI first
+        setState(() {
+          courseIndex = 1;
+        });
+
+        // fetch paid data
+        await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
+
+        final paidData = ref.read(paidAllItemProvider).allItemResponse?.data;
+
+        final hasPaidVideo = (paidData?.video?.isNotEmpty ?? false);
+        final hasPaidAudio = (paidData?.audio?.isNotEmpty ?? false);
+        final hasPaidPdf = (paidData?.pdf?.isNotEmpty ?? false);
+
+        _paidFilters = buildFilterOptions(
+          hasVideo: hasPaidVideo,
+          hasAudio: hasPaidAudio,
+          hasPdf: hasPaidPdf,
+        );
+
+        setState(() {
+          _filters = _paidFilters;
+
+          final availableCount =
+              [hasPaidVideo, hasPaidAudio, hasPaidPdf].where((e) => e).length;
+
+          if (availableCount == 0) {
+            filterIndex = 3;
+          } else if (availableCount == 1) {
+            filterIndex = _filters.first.id;
+          } else {
+            filterIndex = 3;
+          }
+        });
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _changeTab(filterIndex, 1); // 👉 move to Plus tab
+        });
+
+        return; // 🚨 IMPORTANT → stop further execution
+      }
       _freeFilters = buildFilterOptions(
         hasVideo: hasVideo,
         hasAudio: hasAudio,
