@@ -55,6 +55,8 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
   /// Either 0(Free) or 1(Paid)
   int courseIndex = 0;
 
+  bool hasPlusContent = true;
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +71,27 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       final hasPdf = (data?.pdf?.isNotEmpty ?? false);
       log("------>hasVideo=$hasVideo-------->hasAudio=$hasAudio------->hasPdf=$hasPdf");
       final hasAnyCoreData = hasVideo || hasAudio || hasPdf;
+
+      ///------------start---------paid tab hide when paid data not available
+      await ref.read(paidAllItemProvider.notifier)
+          .fetchAllPaidItem(widget.category.id ?? 0);
+
+      final paidData =
+          ref.read(paidAllItemProvider).allItemResponse?.data;
+
+      final hasPaidVideo = paidData?.video?.isNotEmpty ?? false;
+      final hasPaidAudio = paidData?.audio?.isNotEmpty ?? false;
+      final hasPaidPdf = paidData?.pdf?.isNotEmpty ?? false;
+
+      setState(() {
+        hasPlusContent =
+            hasPaidVideo ||
+                hasPaidAudio ||
+                hasPaidPdf;
+      });
+
+      log("hasPlusContent => $hasPlusContent");
+      ///------------end-----------------
       if (!hasAnyCoreData) {
         log("❌ Core has no data → switching to Plus");
 
@@ -134,7 +157,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         }
         // ✅ run after first frame
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if(filterIndex!=3) {
+          if (filterIndex != 3) {
             _changeTab(filterIndex, courseIndex);
           }
           log("👉 Default filterIndex applied AFTER build: $filterIndex");
@@ -161,7 +184,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         }
       }
     });
-
   }
 
   @override
@@ -196,7 +218,6 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
 
     return filters;
   }
-
 
   void _changeTab(int filterIndex, int courseTypeIndex) {
     int currentTabIndex = _tabController.index;
@@ -262,7 +283,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
     });
 
     if (courseIndex == 1) {
-     log("paid filter is empty----->${_paidFilters.isEmpty}");
+      log("paid filter is empty----->${_paidFilters.isEmpty}");
 
       if (true) {
         await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
@@ -356,26 +377,27 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
               onTap: () => _changeCourseType(0),
             ),
             const SizedBox(width: Dimensions.PADDING_SIZE_DEFAULT),
-            CustomSelecteableButton(
-              text: 'Plus',
-              selected: courseIndex == 1,
-              onTap: () async {
-                if (!ref.read(authProvider).isUserLoggedIn) {
-                  showCustomSnackBar(
-                    'Please Sign in to view Plus Content',
-                    action: SnackBarAction(
-                      label: 'Sign in',
-                      backgroundColor: AppColors.primaryColor.withOpacity(0.8),
-                      textColor: Colors.brown.shade800,
-                      onPressed: () => appRouter.go(RoutePath.signIn),
-                    ),
-                    duration: const Duration(seconds: 5),
-                  );
-                  return;
-                }
-                _changeCourseType(1);
-              },
-            ),
+            if (hasPlusContent)
+              CustomSelecteableButton(
+                text: 'Plus',
+                selected: courseIndex == 1,
+                onTap: () async {
+                  if (!ref.read(authProvider).isUserLoggedIn) {
+                    showCustomSnackBar(
+                      'Please Sign in to view Plus Content',
+                      action: SnackBarAction(
+                        label: 'Sign in',
+                        backgroundColor: AppColors.primaryColor.withOpacity(0.8),
+                        textColor: Colors.brown.shade800,
+                        onPressed: () => appRouter.go(RoutePath.signIn),
+                      ),
+                      duration: const Duration(seconds: 5),
+                    );
+                    return;
+                  }
+                  _changeCourseType(1);
+                },
+              ),
             const Spacer(),
             Container(
               decoration: ShapeDecoration(
@@ -408,40 +430,42 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
           ],
         ),
         SizedBox(height: _style.scaleX(Dimensions.PADDING_SIZE_DEFAULT)),
-        hasInternet?Expanded(
-          child: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: _tabController,
-            children: [
-              FreeVideoListWidget(
-                category: widget.category,
-                isAudio: false,
-              ),
-              PaidVideoListWidget(
-                category: widget.category,
-                isAudio: false,
-                isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
-              ),
-              FreePdfListWidget(category: widget.category),
-              PaidPdfListWidget(
-                category: widget.category,
-                isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
-              ),
-              FreeVideoListWidget(
-                category: widget.category,
-                isAudio: true,
-              ),
-              PaidVideoListWidget(
-                category: widget.category,
-                isAudio: true,
-                isPurchased: audioProvider.videosResponse?.category?.isPurchased ?? false,
-              ),
-              AllItemListWidget(category: widget.category),
-              //All Paid Content
-              PaidAllItemListWidget(category: widget.category),
-            ],
-          ),
-        ):Expanded(child: Center(child: NoInternetScreen(onRetry: () => notifier.checkNow()))),
+        hasInternet
+            ? Expanded(
+                child: TabBarView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: _tabController,
+                  children: [
+                    FreeVideoListWidget(
+                      category: widget.category,
+                      isAudio: false,
+                    ),
+                    PaidVideoListWidget(
+                      category: widget.category,
+                      isAudio: false,
+                      isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
+                    ),
+                    FreePdfListWidget(category: widget.category),
+                    PaidPdfListWidget(
+                      category: widget.category,
+                      isPurchased: provider.videosResponse?.category?.isPurchased ?? false,
+                    ),
+                    FreeVideoListWidget(
+                      category: widget.category,
+                      isAudio: true,
+                    ),
+                    PaidVideoListWidget(
+                      category: widget.category,
+                      isAudio: true,
+                      isPurchased: audioProvider.videosResponse?.category?.isPurchased ?? false,
+                    ),
+                    AllItemListWidget(category: widget.category),
+                    //All Paid Content
+                    PaidAllItemListWidget(category: widget.category),
+                  ],
+                ),
+              )
+            : Expanded(child: Center(child: NoInternetScreen(onRetry: () => notifier.checkNow()))),
       ],
     );
   }

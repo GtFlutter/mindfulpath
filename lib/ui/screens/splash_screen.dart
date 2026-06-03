@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meditation_app/helper/route/route_paths.dart';
-import 'package:meditation_app/provider/auth_provider.dart';
 import 'package:meditation_app/theme/styles.dart';
 import 'package:meditation_app/ui/common/background_image.dart';
 
-import '../../provider/shared_pref_provider.dart';
 import '../../util/assets.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
