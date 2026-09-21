@@ -45,9 +45,10 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   static AppStyle _style = AppStyle();
 
   final TextEditingController _nameCtrl = TextEditingController();
-  final TextEditingController _phoneCtrl = TextEditingController();
+
+  // final TextEditingController _phoneCtrl = TextEditingController();
   final TextEditingController _dateCtrl = TextEditingController();
-  DateTime? _dateOfBirth;
+  // DateTime? _dateOfBirth;
   String? _gender;
   String? fcm;
   final String initCountryCode = '+1';
@@ -92,7 +93,7 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _phoneCtrl.dispose();
+    // _phoneCtrl.dispose();
     _dateCtrl.dispose();
 
     super.dispose();
@@ -163,17 +164,17 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
                               style: CustomeTextFieldStyle.valueStyle(style: _style),
                             ),
                             SizedBox(height: _style.scale * 27.5),
-                            MobileNumberTextField(
-                              onCountryCodeChanged: setCountryCode,
-                              controller: _phoneCtrl,
-                              initialCountryCodeSelection: initCountryCode,
-                              errorText: userP.phoneErrorText,
-                              textInputAction: TextInputAction.next,
-                              onChanged: (_) {
-                                userP.setPhoneError();
-                              },
-                              style: _style,
-                            ),
+                            // MobileNumberTextField(
+                            //   onCountryCodeChanged: setCountryCode,
+                            //   controller: _phoneCtrl,
+                            //   initialCountryCodeSelection: initCountryCode,
+                            //   errorText: userP.phoneErrorText,
+                            //   textInputAction: TextInputAction.next,
+                            //   onChanged: (_) {
+                            //     userP.setPhoneError();
+                            //   },
+                            //   style: _style,
+                            // ),
                             // TextField(
                             //   controller: _emailCtrl,
                             //   cursorColor: CustomeTextFieldStyle.cursorColor,
@@ -258,9 +259,9 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
 
   void onNext() {
     String name = _nameCtrl.text.trim();
-    String phone = _phoneCtrl.text.trim();
+    // String phone = _phoneCtrl.text.trim();
     String code = _countryCode.trim();
-    DateTime? dateOfBirth = _dateOfBirth;
+    // DateTime? dateOfBirth = _dateOfBirth;
     String? gender;
     if (_gender == null) {
       gender = null;
@@ -276,22 +277,29 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
         context.pop();
       }
       return;
-    }  if (name.isEmpty) {
-      ref.read(userProvider).setNameError(error: 'Please Enter Your Full Name');
-    }  if (phone.isEmpty) {
-      ref.read(userProvider).setPhoneError(error: 'Please Enter Your Phone');
     }
-     if (dateOfBirth == null) {
-      ref.read(userProvider).setDateError(error: 'Please Select Your Date of Birth');
-    }  if (gender == null || gender.isEmpty) {
+    if (name.isEmpty) {
+      ref.read(userProvider).setNameError(error: 'Please Enter Your Full Name');
+    }
+    // if (phone.isEmpty) {
+    //   ref.read(userProvider).setPhoneError(error: 'Please Enter Your Phone');
+    // }
+    // if (dateOfBirth == null) {
+    //   ref.read(userProvider).setDateError(error: 'Please Select Your Date of Birth');
+    // }
+    if (gender == null || gender.isEmpty) {
       ref.read(userProvider).setGenderError(error: 'Please Select Your Gender');
     } else {
       print('------------>${fcm}');
       final authPro = ref.read(authProvider);
       ref.read(userProvider).createUserProfile(
-            UserBody.register(name, email, code + phone, dateOfBirth!, gender, password, fcm ?? "",
+            UserBody.register(name, email, null, null, gender, password, fcm ?? "",
                 googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : "", appleId: !(authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : ""),
           );
+      // ref.read(userProvider).createUserProfile(
+      //       UserBody.register(name, email, code + phone, dateOfBirth!, gender, password, fcm ?? "",
+      //           googleId: (authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : "", appleId: !(authPro.socialUserData?.isGoogleLogin ?? false) ? authPro.socialUserData?.socialId ?? "" : ""),
+      //     );
     }
   }
 
@@ -301,9 +309,9 @@ class _CreateNewProfileScreenState extends ConsumerState<CreateProfileScreen> {
     if (result != null) {
       _dateCtrl.text = result.toStringFormat1;
       ref.read(userProvider).setDateError();
-      setState(() {
-        _dateOfBirth = result;
-      });
+      // setState(() {
+      //   _dateOfBirth = result;
+      // });
     }
   }
 }

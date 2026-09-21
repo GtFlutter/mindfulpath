@@ -244,6 +244,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
           DetailedVideoModel(
             category: widget.category,
             video: DIModel(
+              videoOrientation: model.videoOrientation ?? VideoOrientation.portrait,
               thumbnailUrl: model.imgUrl ?? '',
               videoUrl: model.videoUrl!,
               duration: model.duration ?? '',
@@ -263,6 +264,7 @@ class _PaidAllItemListWidgetState extends ConsumerState<PaidAllItemListWidget> w
           DetailedVideoModel(
             category: widget.category,
             video: DIModel(
+              videoOrientation: model.videoOrientation ?? VideoOrientation.portrait,
               thumbnailUrl: model.imgUrl ?? '',
               videoUrl: model.videoUrl!,
               duration: model.duration ?? '',

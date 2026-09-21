@@ -122,8 +122,9 @@ class _DetailCategoryScreenState extends ConsumerState<DetailCategoryScreen> {
                         width: !isLandscape ? null : double.infinity,
                         height: !isLandscape ? null : double.infinity,
                         alignment: !isLandscape ? null : Alignment.topCenter,
-                        constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
+                        constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.45) : null,
                         child: AppVideoPlayer(
+                          videoType: videoCtrl.video?.videoOrientation,
                           key: const ValueKey('value'),
                           videoId: videoCtrl.video!.videoId,
                           url: videoCtrl.video!.videoUrl,

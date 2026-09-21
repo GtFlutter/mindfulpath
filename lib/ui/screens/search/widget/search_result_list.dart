@@ -75,6 +75,7 @@ return const Center(child: Text("Search Result Not Found"));    }
     final detailedVideoModel = DetailedVideoModel(
       category: category,
       video: DIModel(
+        videoOrientation: videoResponse.videoOrientation ?? VideoOrientation.portrait,
         thumbnailUrl: videoResponse.imgUrl ?? '',
         videoUrl: videoResponse.videoUrl!,
         duration: videoResponse.duration ?? '',

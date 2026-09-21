@@ -116,6 +116,7 @@ class _FeatureVideoListState extends ConsumerState<FeatureVideoList> {
                     dataModel.category!,
                     isAudio: false,
                     video: DIModel(
+                      videoOrientation: dataModel.videoOrientation ?? VideoOrientation.portrait,
                       thumbnailUrl: dataModel.imgUrl ?? '',
                       videoType: dataModel.category?.isPurchased ?? false ? ResourceType.paid : ResourceType.free,
                       videoId: dataModel.video!.id!,

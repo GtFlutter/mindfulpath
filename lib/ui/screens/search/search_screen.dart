@@ -300,6 +300,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     alignment: !isLandscape ? null : Alignment.topCenter,
                     constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                     child: AppVideoPlayer(
+                      videoType: videoCtrl.video?.videoOrientation,
                       isLandscape: isLandscape,
                       key: const ValueKey('value'),
                       videoId: videoCtrl.video!.videoId,

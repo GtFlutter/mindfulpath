@@ -143,6 +143,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
       ref.read(videoProvider).playVideo(
           DetailedVideoModel(
             video: DIModel(
+                videoOrientation: model.video?.videoOrientation ?? VideoOrientation.portrait,
                 thumbnailUrl: model.video != null ? model.video!.thumbnailImageUrlSrc ?? '' : '',
                 videoUrl: model.video?.videoUrl ?? "",
                 duration: model.video?.duration ?? "",
@@ -188,6 +189,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                 alignment: !isLandscape ? null : Alignment.topCenter,
                                 constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                                 child: AppVideoPlayer(
+                                  videoType: videoCtrl.video?.videoOrientation,
                                   isLandscape: isLandscape,
                                   key: const ValueKey('value'),
                                   videoId: videoCtrl.video!.videoId,

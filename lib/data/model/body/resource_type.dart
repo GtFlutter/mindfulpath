@@ -16,3 +16,7 @@ enum ResourceType {
 
   int toInt() => value;
 }
+enum VideoOrientation {
+  portrait,
+  landscape,
+}

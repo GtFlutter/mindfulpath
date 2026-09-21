@@ -15,13 +15,13 @@ AnalyticsResult _$AnalyticsResultFromJson(Map<String, dynamic> json) =>
       totalWatchTime: json['total_watch_time'] as String?,
       totalAvgWatchTimeHr: (json['avg_watch_time_hr'] as num?)?.toDouble(),
       avgWatchTime: json['avg_watch_time'] as String?,
-      dayDiff: json['day_diff'] as int?,
+      dayDiff: (json['day_diff'] as num?)?.toInt(),
     );
 
 Statistic _$StatisticFromJson(Map<String, dynamic> json) => Statistic(
       playDate: json['play_date'] as String,
-      totalDurationInSecond: json['total_duration_in_second'] as int,
-      month: json['month'] as int,
+      totalDurationInSecond: (json['total_duration_in_second'] as num).toInt(),
+      month: (json['month'] as num).toInt(),
       monthName: json['month_name'] as String,
       dayName: json['day_name'] as String,
     );

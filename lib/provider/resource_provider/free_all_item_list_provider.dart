@@ -74,7 +74,8 @@ class FreeAllItemNotifier extends ChangeNotifier {
         log("all item list=======>${_allItemResponse?.toJson()}");
         stopLoading();
         notifyListeners();
-      } catch (e) {
+      } catch (e,st) {
+        log("all item list catch=======>${st}");
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);
         stopLoading();
       }

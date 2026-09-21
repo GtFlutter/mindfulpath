@@ -96,6 +96,8 @@ class VideoResponse {
   /// no need to use this variable beacause [feature_list] always return [free] vedio list
   @JsonKey(name: 'video_type', fromJson: ResourceType.fromJson)
   final ResourceType? videoType;
+  @JsonKey(name: 'video_orientation')
+  final VideoOrientation? videoOrientation;
   @JsonKey(name: 'is_bookmark')
   bool? bookmarked;
 
@@ -129,6 +131,7 @@ class VideoResponse {
     required this.duration,
     required this.uniqueId,
     required this.videoType,
+    required this.videoOrientation,
     required this.bookmarked,
     required this.thumbnailImageUrlSrc,
     required this.videoUrlSrc,
@@ -138,6 +141,7 @@ class VideoResponse {
   });
 
   String? get imgUrl => thumbnailImageUrlSrc ?? image?.url;
+
   String? get videoUrl => videoUrlSrc ?? video?.url;
 
   factory VideoResponse.fromJson(Map<String, dynamic> json, bool isFromAudio) => _$VideoResponseFromJson(json, isFromAudio);

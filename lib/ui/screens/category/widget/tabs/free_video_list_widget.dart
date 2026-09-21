@@ -179,6 +179,7 @@ class _FreeVideoListWidgetState extends ConsumerState<FreeVideoListWidget> with 
         DetailedVideoModel(
           category: widget.category,
           video: DIModel(
+            videoOrientation: model.videoOrientation ?? VideoOrientation.portrait,
             thumbnailUrl: model.imgUrl ?? '',
             videoUrl: model.videoUrl!,
             duration: model.duration ?? '',

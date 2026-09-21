@@ -65,32 +65,28 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
       log("------>cst id for all item--${widget.category.id}");
       await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
       final data = ref.read(freeAllItemProvider).allItemResponse?.data;
-
-      final hasVideo = (data?.video?.isNotEmpty ?? false);
-      final hasAudio = (data?.audio?.isNotEmpty ?? false);
-      final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+      log("------>free data---${data?.isAudio}");
+      final hasVideo = (data?.isVideo == 1) || (data?.video?.isNotEmpty ?? false);
+      final hasAudio = (data?.isAudio == 1) || (data?.audio?.isNotEmpty ?? false);
+      final hasPdf = (data?.isPdf == 1) || (data?.pdf?.isNotEmpty ?? false);
       log("------>hasVideo=$hasVideo-------->hasAudio=$hasAudio------->hasPdf=$hasPdf");
       final hasAnyCoreData = hasVideo || hasAudio || hasPdf;
 
       ///------------start---------paid tab hide when paid data not available
-      await ref.read(paidAllItemProvider.notifier)
-          .fetchAllPaidItem(widget.category.id ?? 0);
+      await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
 
-      final paidData =
-          ref.read(paidAllItemProvider).allItemResponse?.data;
+      final paidData = ref.read(paidAllItemProvider).allItemResponse?.data;
 
-      final hasPaidVideo = paidData?.video?.isNotEmpty ?? false;
-      final hasPaidAudio = paidData?.audio?.isNotEmpty ?? false;
-      final hasPaidPdf = paidData?.pdf?.isNotEmpty ?? false;
+      final hasPaidVideo = (paidData?.isVideo == 1) || (paidData?.video?.isNotEmpty ?? false);
+      final hasPaidAudio = (paidData?.isAudio == 1) || (paidData?.audio?.isNotEmpty ?? false);
+      final hasPaidPdf = (paidData?.isPdf == 1) || (paidData?.pdf?.isNotEmpty ?? false);
 
       setState(() {
-        hasPlusContent =
-            hasPaidVideo ||
-                hasPaidAudio ||
-                hasPaidPdf;
+        hasPlusContent = hasPaidVideo || hasPaidAudio || hasPaidPdf;
       });
 
       log("hasPlusContent => $hasPlusContent");
+
       ///------------end-----------------
       if (!hasAnyCoreData) {
         log("❌ Core has no data → switching to Plus");
@@ -105,9 +101,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
 
         final paidData = ref.read(paidAllItemProvider).allItemResponse?.data;
 
-        final hasPaidVideo = (paidData?.video?.isNotEmpty ?? false);
-        final hasPaidAudio = (paidData?.audio?.isNotEmpty ?? false);
-        final hasPaidPdf = (paidData?.pdf?.isNotEmpty ?? false);
+        final hasPaidVideo = (paidData?.isVideo == 1) || (paidData?.video?.isNotEmpty ?? false);
+        final hasPaidAudio = (paidData?.isAudio == 1) || (paidData?.audio?.isNotEmpty ?? false);
+        final hasPaidPdf = (paidData?.isPdf == 1) || (paidData?.pdf?.isNotEmpty ?? false);
 
         _paidFilters = buildFilterOptions(
           hasVideo: hasPaidVideo,
@@ -118,8 +114,7 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         setState(() {
           _filters = _paidFilters;
 
-          final availableCount =
-              [hasPaidVideo, hasPaidAudio, hasPaidPdf].where((e) => e).length;
+          final availableCount = [hasPaidVideo, hasPaidAudio, hasPaidPdf].where((e) => e).length;
 
           if (availableCount == 0) {
             filterIndex = 3;
@@ -289,9 +284,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         await ref.read(paidAllItemProvider.notifier).fetchAllPaidItem(widget.category.id ?? 0);
         final data = ref.read(paidAllItemProvider).allItemResponse?.data;
 
-        final hasVideo = (data?.video?.isNotEmpty ?? false);
-        final hasAudio = (data?.audio?.isNotEmpty ?? false);
-        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+        final hasVideo = (data?.isVideo == 1) || (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.isAudio == 1) || (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.isPdf == 1) || (data?.pdf?.isNotEmpty ?? false);
 
         _paidFilters = buildFilterOptions(
           hasVideo: hasVideo,
@@ -303,9 +298,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         _filters = _paidFilters;
         final data = ref.read(paidAllItemProvider).allItemResponse?.data;
 
-        final hasVideo = (data?.video?.isNotEmpty ?? false);
-        final hasAudio = (data?.audio?.isNotEmpty ?? false);
-        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+        final hasVideo = (data?.isVideo == 1) || (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.isAudio == 1) || (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.isPdf == 1) || (data?.pdf?.isNotEmpty ?? false);
         final availableCount = [hasVideo, hasAudio, hasPdf].where((e) => e).length;
 
         if (availableCount == 0) {
@@ -323,9 +318,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         await ref.read(freeAllItemProvider.notifier).fetchAllFreeItem(widget.category.id ?? 0);
         final data = ref.read(freeAllItemProvider).allItemResponse?.data;
 
-        final hasVideo = (data?.video?.isNotEmpty ?? false);
-        final hasAudio = (data?.audio?.isNotEmpty ?? false);
-        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+        final hasVideo = (data?.isVideo == 1) || (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.isAudio == 1) || (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.isPdf == 1) || (data?.pdf?.isNotEmpty ?? false);
 
         _freeFilters = buildFilterOptions(
           hasVideo: hasVideo,
@@ -339,9 +334,9 @@ class _ResourceDetailCategoryState extends ConsumerState<ResourceDetailCategory>
         // filterIndex = _filters.first.id;
         final data = ref.read(freeAllItemProvider).allItemResponse?.data;
 
-        final hasVideo = (data?.video?.isNotEmpty ?? false);
-        final hasAudio = (data?.audio?.isNotEmpty ?? false);
-        final hasPdf = (data?.pdf?.isNotEmpty ?? false);
+        final hasVideo = (data?.isVideo == 1) || (data?.video?.isNotEmpty ?? false);
+        final hasAudio = (data?.isAudio == 1) || (data?.audio?.isNotEmpty ?? false);
+        final hasPdf = (data?.isPdf == 1) || (data?.pdf?.isNotEmpty ?? false);
         final availableCount = [hasVideo, hasAudio, hasPdf].where((e) => e).length;
 
         if (availableCount == 0) {

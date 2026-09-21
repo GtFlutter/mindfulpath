@@ -39,6 +39,7 @@ class DIModel {
   final String duration;
   final String title;
   final String categoryName;
+  final VideoOrientation videoOrientation;
   final ResourceType videoType;
   Duration? position;
   final VideoPlayerController? controller; // Added controller
@@ -51,6 +52,7 @@ class DIModel {
     required this.duration,
     required this.title,
     required this.categoryName,
+    required this.videoOrientation,
     this.position,
     this.controller, // Added controller
   });
@@ -73,6 +75,7 @@ class DIModel {
         duration: duration ?? this.duration,
         title: title ?? this.title,
         categoryName: categoryName ?? this.categoryName,
+        videoOrientation: videoOrientation ?? this.videoOrientation,
         videoType: videoType ?? this.videoType,
         position: position ?? this.position,
         controller: controller ?? this.controller,
@@ -86,6 +89,7 @@ class DIModel {
       duration: json['duration'] as String,
       title: json['title'] as String,
       categoryName: json['category_name'] as String,
+      videoOrientation: json['video_orientation'] as VideoOrientation,
       videoType: ResourceType.fromJson(json['video_type'] as int)!,
       position: json.containsKey('position') ? Duration(milliseconds: json['position']) : null,
     );
@@ -241,21 +245,27 @@ class _DetailItemState extends ConsumerState<DetailItem> {
               )
             else
               Container(
-                key: const ValueKey<String>('pdf-icon'),
-                width: dimension,
-                height: dimension,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radius),
-                  color: AppColors.pdfItemBgColor,
-                ),
-                alignment: Alignment.center,
-                child: Image.asset(
-                  ImagePaths.pdfIcon,
-                  width: pdfIconSize,
-                  height: pdfIconSize,
-                  fit: BoxFit.contain,
-                ),
-              ),
+                  key: const ValueKey<String>('pdf-icon'),
+                  width: dimension,
+                  height: dimension,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(radius),
+                    color: AppColors.pdfItemBgColor,
+                  ),
+                  alignment: Alignment.center,
+                  child: widget.pdfModel?.thumbnailImageUrlSrc != null
+                      ? Image.network(
+                          widget.pdfModel?.thumbnailImageUrlSrc ?? "",
+                          width: dimension,
+                          height: dimension,
+                          fit: BoxFit.contain,
+                        )
+                      : Image.asset(
+                          ImagePaths.pdfIcon,
+                          width: pdfIconSize,
+                          height: pdfIconSize,
+                          fit: BoxFit.contain,
+                        )),
             SizedBox(width: widget.appStyle.scaleX(20)),
             Expanded(
               child: Column(
@@ -368,7 +378,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   onTap: () async {
                                     print("download call=========${widget.model?.category?.isPurchased}---${widget.model?.videoType == ResourceType.free}");
                                     bool isLoggedIn = isLogin('Please Sign in to Download', ref);
-                                    if(!isLoggedIn)return;
+                                    if (!isLoggedIn) return;
                                     if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
                                       log("model--------->${widget.model?.toJson()}");
                                       print("download--${downloadP.isDownloading}---${widget.model!.id}---${downloadP.model?.id}----${downloadP.model}");
@@ -388,7 +398,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                         }
                                       }
                                     } else {
-                                      await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(),amount: double.parse(widget.model?.category?.price ?? "0.0"));
+                                      await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(), amount: double.parse(widget.model?.category?.price ?? "0.0"));
                                       paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
                                       paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                                       paidAllItem.fetchAllPaidItem(widget.model?.category?.id ?? 0);
@@ -418,7 +428,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                   bool isLoggedIn = isLogin('Please Sign in to Create Playlist', ref);
                                 }
                               } else {
-                                await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(),amount: double.parse(widget.model?.category?.price ?? "0.0"));
+                                await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(), amount: double.parse(widget.model?.category?.price ?? "0.0"));
                                 paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
                                 paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                               }
@@ -439,7 +449,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       if ((widget.model?.category?.isPurchased ?? false) || widget.model?.videoType == ResourceType.free) {
                                         await playlistP.addToPlaylist(playlistP.playlistListResponse![index].id.toString(), widget.model!.id!.toString(), widget.isAudio ?? false);
                                       } else {
-                                        await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(),amount: double.parse(widget.model?.category?.price ?? "0.0"));
+                                        await buyNow(context, categoryId: (widget.model?.category?.id ?? 0).toString(), amount: double.parse(widget.model?.category?.price ?? "0.0"));
                                         paidVideo.fetchVideos(widget.model?.category?.id ?? 0);
                                         paidAudio.fetchAudios(widget.model?.category?.id ?? 0);
                                       }
@@ -589,7 +599,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                       print('------------pdf download11-------->${downloadP.pdfModel?.toJson()}');
                                       print('------------pdf download22-------->${widget.pdfModel?.pdfType == ResourceType.free}');
                                       bool isLoggedIn = isLogin('Please Sign in to Download', ref);
-                                      if(!isLoggedIn)return;
+                                      if (!isLoggedIn) return;
                                       if ((widget.pdfModel?.category?.isPurchased ?? false) || widget.pdfModel?.pdfType == ResourceType.free) {
                                         if (downloadP.pdfModel == null && downloadP.model == null) {
                                           print(widget.pdfModel?.categoryId ?? "");
@@ -598,7 +608,7 @@ class _DetailItemState extends ConsumerState<DetailItem> {
                                           showCustomSnackBar('Another File is already in progress');
                                         }
                                       } else {
-                                        await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString(),amount: double.parse(widget.pdfModel?.category?.price ?? "0.0"));
+                                        await buyNow(context, categoryId: (widget.pdfModel?.category?.id ?? 0).toString(), amount: double.parse(widget.pdfModel?.category?.price ?? "0.0"));
                                         paidPdf.fetchPdfs(widget.pdfModel?.category?.id ?? 0);
                                         paidAllItem.fetchAllPaidItem(widget.pdfModel?.category?.id ?? 0);
                                       }

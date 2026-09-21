@@ -235,6 +235,7 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
           DetailedVideoModel(
             category: widget.category,
             video: DIModel(
+              videoOrientation: model.videoOrientation ?? VideoOrientation.portrait,
               thumbnailUrl: model.imgUrl ?? '',
               videoUrl: model.videoUrl!,
               duration: model.duration ?? '',
@@ -254,6 +255,7 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
           DetailedVideoModel(
             category: widget.category,
             video: DIModel(
+              videoOrientation: model.videoOrientation ?? VideoOrientation.portrait,
               thumbnailUrl: model.imgUrl ?? '',
               videoUrl: model.videoUrl!,
               duration: model.duration ?? '',

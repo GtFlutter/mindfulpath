@@ -12,6 +12,8 @@ import 'package:meditation_app/ui/common/media_player/custom_track_shape.dart';
 import 'package:meditation_app/util/assets.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../data/model/body/resource_type.dart';
+import '../../../util/constants.dart';
 import '../../../util/dimensions.dart';
 import '../../screens/analytics/store_local_watch_time.dart';
 import '../outlined_icon_button.dart';
@@ -28,6 +30,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
   final bool isFileUrl;
   final VoidCallback? onFullScreen;
   final Duration startPosition;
+  final VideoOrientation? videoType;
   final Function(Duration position)? onPositionChanged;
 
   const AppVideoPlayer({
@@ -42,6 +45,7 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
     this.isFileUrl = false,
     this.onFullScreen,
     this.startPosition = Duration.zero,
+    this.videoType,
     this.onPositionChanged,
   });
 
@@ -61,6 +65,8 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   final Duration _period = const Duration(seconds: 10);
   final Duration _offlinePeriod = const Duration(seconds: 2);
+
+  VideoOrientation get currentVideoType => widget.videoType ?? VideoOrientation.portrait;
 
   @override
   void initState() {
@@ -157,7 +163,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     }
     log("isPlaying----->${_controller.value.isPlaying}");
     if (_controller.value.isPlaying) {
-      _watchTimer ??= Timer.periodic(widget.isFileUrl?_offlinePeriod:_period, (timer) async {
+      _watchTimer ??= Timer.periodic(widget.isFileUrl ? _offlinePeriod : _period, (timer) async {
         // if ((!_isBuffering) && _controller.value.isInitialized) {
         if (_controller.value.isInitialized) {
           if (mounted) {
@@ -166,7 +172,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
           log("track offline time---->${!widget.isFileUrl}");
           if (!widget.isFileUrl) {
             /// ====== ONLINE MODE: Send to API ======
-              log("track online time---->${!widget.isFileUrl}");
+            log("track online time---->${!widget.isFileUrl}");
             await ref.read(dashboardProvider).storeVideoWatchedTime(
                   widget.videoId,
                   _period,
@@ -239,15 +245,41 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     bool isPlaying = _controller.value.isPlaying;
     bool isMute = _controller.value.volume == 0;
     bool isInitialized = _controller.value.isInitialized;
+    debugPrint(
+      "Player height: ${MediaQuery.of(context).size.height}",
+    );
+    print("currentVideoType--->$currentVideoType----${widget.videoType}");
     return IntrinsicHeight(
       child: Stack(
         alignment: Alignment.center,
         children: [
           if (isInitialized && !isFlickering)
-            AspectRatio(
-              aspectRatio: isInitialized ? _controller.value.aspectRatio : 16 / 9,
-              child: ClipRRect(borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)), child: VideoPlayer(_controller)),
-            ),
+            if (currentVideoType == VideoOrientation.portrait)
+              Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.85,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: OverflowBox(
+                  maxWidth: double.infinity,
+                  maxHeight: double.infinity,
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _controller.value.size.width,
+                      height: _controller.value.size.height,
+                      child: VideoPlayer(_controller),
+                    ),
+                  ),
+                ),
+              )
+            else
+              AspectRatio(
+                aspectRatio: isInitialized ? _controller.value.aspectRatio : 16 / 9,
+                child: ClipRRect(borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)), child: VideoPlayer(_controller)),
+              ),
           if (!isInitialized || (_isBuffering && !_showReload)) const CircularProgressIndicator(),
           if (_showReload && isInitialized)
             IconButton(
@@ -322,13 +354,14 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                             onTap: toggleAudio,
                           ),
                           if (widget.isLandscape) SizedBox(width: widget.style.scaleX(15)),
-                          OutlinedIconButton.svg(
-                            SvgPaths.maximize,
-                            appStyle: widget.style,
-                            hideBorder: true,
-                            iconSize: widget.isLandscape ? 23 : 20,
-                            onTap: widget.onFullScreen,
-                          ),
+                          if (widget.videoType == VideoOrientation.landscape)
+                            OutlinedIconButton.svg(
+                              SvgPaths.maximize,
+                              appStyle: widget.style,
+                              hideBorder: true,
+                              iconSize: widget.isLandscape ? 23 : 20,
+                              onTap: widget.onFullScreen,
+                            ),
                         ],
                       ),
                       SizedBox(height: widget.style.scaleX(widget.isLandscape ? 10 : 5)),
@@ -425,4 +458,3 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
     return "00.00.00";
   }
 }
-

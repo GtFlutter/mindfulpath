@@ -20,6 +20,6 @@ VideoNames _$VideoNamesFromJson(Map<String, dynamic> json) => VideoNames(
     );
 
 ItemName _$ItemNameFromJson(Map<String, dynamic> json) => ItemName(
-      id: json['id'] as int,
+      id: (json['id'] as num).toInt(),
       title: json['title'] as String,
     );

@@ -4,7 +4,6 @@ import '../body/resource_type.dart';
 import 'category_list_reponse.dart';
 import 'video_response_media.dart';
 
-part 'pdfs_response.g.dart';
 
 // {
 //     "status": true,

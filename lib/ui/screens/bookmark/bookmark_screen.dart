@@ -88,6 +88,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
         DetailedVideoModel(
           category: category,
           video: DIModel(
+            videoOrientation: bookmarkListResponse.bookmarkVideoResponse?.videoOrientation ?? VideoOrientation.portrait,
             thumbnailUrl: bookmarkListResponse.bookmarkVideoResponse!.thumbnailImageUrlSrc ?? '',
             videoUrl: bookmarkListResponse.bookmarkVideoResponse!.videoUrl!,
             duration: bookmarkListResponse.bookmarkVideoResponse?.duration ?? '',
@@ -146,6 +147,7 @@ class _BookmarkScreenState extends ConsumerState<BookmarkScreen> {
                         alignment: !isLandscape ? null : Alignment.topCenter,
                         constraints: !isLandscape ? BoxConstraints(maxHeight: size.height * 0.4) : null,
                         child: AppVideoPlayer(
+                          videoType: videoCtrl.video?.videoOrientation,
                           isLandscape: isLandscape,
                           key: const ValueKey('value'),
                           videoId: videoCtrl.video!.videoId,

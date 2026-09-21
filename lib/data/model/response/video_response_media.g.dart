@@ -8,7 +8,7 @@ part of 'video_response_media.dart';
 
 MediaResponse _$MediaResponseFromJson(Map<String, dynamic> json) =>
     MediaResponse(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       typeId: json['type_id'] as String?,
       fileName: json['file_name'] as String?,
       type: json['type'] as String?,
