@@ -237,7 +237,7 @@ class _AllItemListWidgetState extends ConsumerState<AllItemListWidget> with Auto
             video: DIModel(
               videoOrientation: model.videoOrientation ?? VideoOrientation.portrait,
               thumbnailUrl: model.imgUrl ?? '',
-              videoUrl: model.videoUrl!,
+              videoUrl: model.videoUrl ?? "",
               duration: model.duration ?? '',
               title: model.title ?? '',
               categoryName: widget.category.title ?? '',

@@ -65,7 +65,7 @@ class PaidVideosNotifier extends AudioResourceNotifier {
     } else {
       try {
         var json = jsonDecode(response.body);
-        _videosResponse = VideosResponse.fromJson(json['data'], false);
+        _videosResponse = VideosResponse.fromJson(json['data'], true);
         stopLoading(isLoading:isLoading ?? true);
       } catch (e) {
         showCustomSnackBar(AppConstants.WENT_WRONG, type: false);

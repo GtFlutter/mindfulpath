@@ -54,7 +54,8 @@ class AppVideoPlayer extends ConsumerStatefulWidget {
 }
 
 class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
+  bool _isControllerInitialized = false;
   bool _isBuffering = false;
   bool isFlickering = true;
   double _progress = 0.1;
@@ -62,24 +63,36 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   bool _isDragging = false;
   Timer? _watchTimer;
   Duration _currentPosition = Duration.zero;
+  bool _isInitializing = false;
 
   final Duration _period = const Duration(seconds: 10);
   final Duration _offlinePeriod = const Duration(seconds: 2);
 
   VideoOrientation get currentVideoType => widget.videoType ?? VideoOrientation.portrait;
 
+  Future<void> _safeDisposeController() async {
+    if (!_isControllerInitialized || _controller == null) return;
+    try {
+      _controller!.removeListener(listener);
+      if (_controller!.value.isInitialized) {
+        _controller!.pause();
+      }
+      await _controller!.dispose();
+    } catch (e) {
+      log("Error disposing video controller: $e");
+    } finally {
+      _controller = null;
+      _isControllerInitialized = false;
+    }
+  }
+
   @override
   void initState() {
     debugPrint('Video Init :: ${widget.videoId}-----${widget.startPosition}');
     super.initState();
-    _currentPosition = widget.startPosition; // Set initial position from the widget's startPosition
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   initVideoPlayer();
-    // });
+    _currentPosition = widget.startPosition;
   }
 
-  /// Another alternative is to move the initialization logic to didChangeDependencies. This method is called after initState and any time the widget’s dependencies
-  /// change (such as when switching between screens or orientations). It’s safe to initialize controllers here because the widget is already mounted, and the context is fully available.
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
@@ -92,26 +105,35 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   }
 
   Future<void> initVideoPlayer() async {
-    VideoPlayerController videoPlayerController;
-
     try {
+      if (widget.url.isEmpty) {
+        return;
+      }
+
+      _isInitializing = true;
+      if (mounted) setState(() {});
+      await _safeDisposeController();
+
+      VideoPlayerController videoPlayerController;
       if (widget.isFileUrl) {
         videoPlayerController = VideoPlayerController.file(File(widget.url));
       } else {
         videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.url), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       }
-      // await videoPlayerController.initialize();
       _controller = videoPlayerController
         ..initialize().then((_) async {
-          _controller.addListener(listener);
+          _isInitializing = false;
+          _isControllerInitialized = true;
+          _controller!.addListener(listener);
           if (mounted) {
             setState(() {});
           }
-          await _controller.seekTo(_currentPosition); // Seek to the saved or initial position
+          await _controller!.seekTo(_currentPosition);
           toggleVideo();
         })
         ..setLooping(false);
     } catch (e) {
+      _isInitializing = false;
       print("video initilize error${e.toString()}");
     }
   }
@@ -131,7 +153,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
         }
       });
     } else {
-      debugPrint('No video change, maintaining current position: ${_controller.value.position}');
+      debugPrint('No video change, maintaining current position: ${_controller?.value.position}');
       // _currentPosition = _controller.value.position;// this commented because bookmark nd playlist screen second not working when landscape to portrait
       _currentPosition = widget.startPosition; // this line added  because bookmark nd playlist screen second not working when landscape to portrait
     }
@@ -140,32 +162,32 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
   }
 
   void toggleAudio() {
-    if (_controller.value.volume != 0) {
-      _controller.setVolume(0);
+    if (_controller!.value.volume != 0) {
+      _controller!.setVolume(0);
     } else {
-      _controller.setVolume(1);
+      _controller!.setVolume(1);
     }
   }
 
   void listener() {
-    if (_controller.value.isInitialized) {
+    if (_controller != null && _controller!.value.isInitialized) {
       if (mounted && !_isDragging) {
         setState(() {
-          _isBuffering = _controller.value.isBuffering;
-          _showReload = _controller.value.position >= _controller.value.duration;
-          _progress = _controller.value.position.inSeconds.toDouble();
+          _isBuffering = _controller!.value.isBuffering;
+          _showReload = _controller!.value.position >= _controller!.value.duration;
+          _progress = _controller!.value.position.inSeconds.toDouble();
         });
       }
     }
     // Notify parent widget if needed
     if (widget.onPositionChanged != null && !_isDragging) {
-      widget.onPositionChanged!(_controller.value.position);
+      widget.onPositionChanged!(_controller!.value.position);
     }
-    log("isPlaying----->${_controller.value.isPlaying}");
-    if (_controller.value.isPlaying) {
+    log("isPlaying----->${_controller!.value.isPlaying}");
+    if (_controller != null && _controller!.value.isPlaying) {
       _watchTimer ??= Timer.periodic(widget.isFileUrl ? _offlinePeriod : _period, (timer) async {
         // if ((!_isBuffering) && _controller.value.isInitialized) {
-        if (_controller.value.isInitialized) {
+        if (_controller != null && _controller!.value.isInitialized) {
           if (mounted) {
             ref.read(videoProvider).watchedDuration = _period;
           }
@@ -198,7 +220,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
             final today = "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
 
             final categoryKey = (widget.categoryId ?? 1).toString();
-            final videoKey = widget.videoId?.toString() ?? "all";
+            final videoKey = widget.videoId.toString();
 
             final videoData = all["video"]?[today]?[categoryKey]?[videoKey];
             print("Video=====> $videoKey watch time today: ${videoData ?? 0} seconds");
@@ -212,29 +234,45 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
     // Notify parent widget of the current position
     if (widget.onPositionChanged != null) {
-      log("on position change======>${_controller.value.position}");
-      widget.onPositionChanged!(_controller.value.position);
+      log("on position change======>${_controller!.value.position}");
+      widget.onPositionChanged!(_controller!.value.position);
     }
   }
 
   void toggleVideo() {
     setState(() {
-      if (_controller.value.isPlaying) {
-        _controller.pause();
+      if (_controller != null && _controller!.value.isPlaying) {
+        _controller!.pause();
       } else {
-        _controller.play();
+        _controller!.play();
       }
     });
   }
 
   @override
-  void dispose() {
-    if (_controller.value.isInitialized) {
-      _currentPosition = _controller.value.position; // Save the current position before disposing
-      _controller.removeListener(listener);
-      log("called player disposed");
+  void deactivate() {
+    if (_controller != null && _controller!.value.isInitialized) {
+      _controller!.pause();
     }
-    _controller.dispose();
+    super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    if (_controller != null && _isControllerInitialized) {
+      _controller!.removeListener(listener);
+      if (_controller!.value.isInitialized) {
+        _currentPosition = _controller!.value.position;
+        _controller!.pause();
+      }
+      try {
+        _controller!.dispose();
+      } catch (e) {
+        log("Error disposing video controller: $e");
+      }
+      _controller = null;
+      _isControllerInitialized = false;
+    }
     _watchTimer?.cancel();
     _watchTimer = null;
     super.dispose();
@@ -242,45 +280,41 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    bool isPlaying = _controller.value.isPlaying;
-    bool isMute = _controller.value.volume == 0;
-    bool isInitialized = _controller.value.isInitialized;
+    bool isPlaying = _controller != null && _controller!.value.isPlaying;
+    bool isMute = _controller != null && _controller!.value.volume == 0;
+    bool isInitialized = _controller != null && _controller!.value.isInitialized;
     debugPrint(
       "Player height: ${MediaQuery.of(context).size.height}",
     );
     print("currentVideoType--->$currentVideoType----${widget.videoType}");
-    return IntrinsicHeight(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
+    return Stack(
+      alignment: Alignment.center,
+      children: [
           if (isInitialized && !isFlickering)
             if (currentVideoType == VideoOrientation.portrait)
               Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.85,
-                clipBehavior: Clip.hardEdge,
+                clipBehavior: Clip.none,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                 ),
-                child: OverflowBox(
-                  maxWidth: double.infinity,
-                  maxHeight: double.infinity,
+                child: Center(
                   child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: _controller.value.size.width,
-                      height: _controller.value.size.height,
-                      child: VideoPlayer(_controller),
-                    ),
+                    fit: BoxFit.contain,
+                  child: SizedBox(
+                    width: _controller!.value.size.width,
+                    height: _controller!.value.size.height,
+                    child: VideoPlayer(_controller!),
+                  ),
                   ),
                 ),
               )
             else
               AspectRatio(
-                aspectRatio: isInitialized ? _controller.value.aspectRatio : 16 / 9,
-                child: ClipRRect(borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)), child: VideoPlayer(_controller)),
+                aspectRatio: isInitialized ? _controller!.value.aspectRatio : 16 / 9,
+                child: ClipRRect(borderRadius: widget.isLandscape ? BorderRadius.zero : BorderRadius.circular(widget.style.scaleX(25)), child: VideoPlayer(_controller!)),
               ),
-          if (!isInitialized || (_isBuffering && !_showReload)) const CircularProgressIndicator(),
+          if (!_isInitializing && (!isInitialized || (_isBuffering && !_showReload))) const CircularProgressIndicator(),
           if (_showReload && isInitialized)
             IconButton(
               onPressed: toggleVideo,
@@ -377,28 +411,28 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                           child: Slider(
                             value: _progress,
                             min: 0.0,
-                            max: _controller.value.duration.inSeconds.toDouble(),
+                            max: _controller != null ? _controller!.value.duration.inSeconds.toDouble() : 0.0,
                             onChangeStart: (progress) {
                               setState(() {
                                 _isDragging = true; // User starts dragging
                               });
                               // Stop listening to video updates while the user is dragging
-                              _controller.removeListener(listener);
+                               _controller!.removeListener(listener);
                             },
                             onChangeEnd: (progress) {
                               setState(() {
                                 _isDragging = false; // User stops dragging
                               });
                               // Seek to the new position after dragging is finished
-                              _controller.seekTo(Duration(seconds: progress.toInt()));
-                              // Resume listening to video updates
-                              _controller.addListener(listener);
+                               _controller!.seekTo(Duration(seconds: progress.toInt()));
+                               // Resume listening to video updates
+                               _controller!.addListener(listener);
                             },
                             onChanged: (progress) {
                               setState(() {
                                 _progress = progress;
                               });
-                              _controller.seekTo(Duration(seconds: progress.toInt()));
+                               _controller!.seekTo(Duration(seconds: progress.toInt()));
                             },
                             activeColor: AppColors.primaryColor,
                             inactiveColor: Colors.black,
@@ -411,7 +445,7 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             FutureBuilder<Duration?>(
-                              future: _controller.position,
+                              future: _controller != null ? _controller!.position : Future.value(null),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   final position = snapshot.data;
@@ -432,11 +466,12 @@ class _AppVideoPlayerState extends ConsumerState<AppVideoPlayer> {
             ],
           ),
         ],
-      ),
+
     );
   }
 
   String stringToDuration(String durationString) {
+
     log("duration string.....:$durationString");
     List<String> durationParts = durationString.split(':');
     if (durationParts.length >= 3) {

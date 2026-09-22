@@ -33,7 +33,7 @@ VideoResponse _$VideoResponseFromJson(Map<String, dynamic> json, bool isFromAudi
           _$VideoOrientationEnumMap, json['video_orientation']),
       bookmarked: json['is_bookmark'] as bool?,
       thumbnailImageUrlSrc: json['thumbnail_image_url'] as String?,
-      videoUrlSrc: json['video_url'] as String?,
+      videoUrlSrc: isFromAudio ? json['audio_url'] as String? : json['video_url'] as String?,
       image: json['image'] == null
           ? null
           : MediaResponse.fromJson(json['image'] as Map<String, dynamic>),

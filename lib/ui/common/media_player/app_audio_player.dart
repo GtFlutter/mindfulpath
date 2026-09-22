@@ -54,15 +54,17 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
   void initState() {
     super.initState();
     _initializeAudio();
-  }
-
-  void _initializeAudio() {
-    // Start playing from the beginning
-    _audioPlayer.audioCache.clearAll();
-    _audioPlayer.setSourceDeviceFile(widget.audioUrl, mimeType: 'audio/mp3');
-    lastSecond = 0;
-    _audioPlayer.seek(Duration.zero);
-    _audioPlayer.play(UrlSource(widget.audioUrl, mimeType: "audio/mp3"));
+    if (mounted) {
+      final videoNotifier = ref.read(videoProvider);
+      if (!videoNotifier.isAudioFileAvailable && _audioPlayer.state == PlayerState.playing) {
+        _audioPlayer.stop();
+      }
+      ref.listen<VideoNotifier>(videoProvider, (previous, next) {
+        if (!next.isAudioFileAvailable && _audioPlayer.state == PlayerState.playing) {
+          _audioPlayer.stop();
+        }
+      });
+    }
   }
 
   @override
@@ -74,45 +76,26 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
     }
   }
 
-  @override
-  Future<void> deactivate() async {
-    // TODO: implement deactivate
-    _audioPlayer.stop();
-    _audioPlayer.dispose();
-    // ref.read(dashboardProvider).storeVideoWatchedTime(widget.audioId, Duration(seconds: lastSecond), true);
-    final watchedDuration = Duration(seconds: lastSecond);
-    log("offline or not--->$_isOfflineFile----${widget.categoryId}");
+  void _initializeAudio() {
+    _audioPlayer.audioCache.clearAll();
     if (_isOfflineFile) {
-      // 🔹 Store locally if playing from downloaded file
-      LocalAnalyticsStore.addWatchTime(
-        isAudio: true,
-        seconds: lastSecond,
-        date: DateTime.now(),
-        categoryId: widget.categoryId,  // or pass actual category id if available
-        videoId: widget.audioId,
-      );
-      /// 🔹 Immediately read back & print to check
-      final all = await LocalAnalyticsStore.getAllWatchTime();
-      print("---- Local Audio Analytics ----");
-      print("All data: ${jsonEncode(all)}");
-
-      // 🔹 Example: today's data
-      final today = "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
-      final categoryKey = (widget.categoryId ?? 1).toString();
-      final audioKey = (widget.audioId ?? 0).toString();
-      final seconds = all["audio"]?[today]?[categoryKey]?[audioKey] ?? 0;
-
-      print("Audio ID $audioKey watch time today: $seconds seconds");
-    } else {
-      // 🔹 Store online via API if streaming from URL
-      ref.read(dashboardProvider).storeVideoWatchedTime(widget.audioId, watchedDuration, true);
+      _audioPlayer.setSourceDeviceFile(widget.audioUrl, mimeType: 'audio/mp3');
     }
+    lastSecond = 0;
+    _audioPlayer.seek(Duration.zero);
+    _audioPlayer.play(UrlSource(widget.audioUrl, mimeType: "audio/mp3"));
+  }
 
+  @override
+  void deactivate() {
+    _audioPlayer.stop();
     super.deactivate();
   }
 
   @override
   void dispose() {
+    _audioPlayer.stop();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -167,15 +150,14 @@ class _AppAudioPlayerState extends ConsumerState<AppAudioPlayer> {
               child: OutlinedIconButton.icon(
                 icon: Icon(Icons.arrow_back_ios_rounded, size: widget.style.scaleX(15)),
                 appStyle: widget.style,
-                onTap: () {
-                  log("back called");
-                  log("dsfdsdsfdsfdsf======>${ref.read(videoProvider).isAudioFileAvailable}");
-                  ref.read(videoProvider.notifier).deactivateAudioPlayer();
-                  ref.read(offlineVideoProvider.notifier).deactivateAudioPlayer();
-                  log("dsfdsdsfdsfdsf======>${ref.read(videoProvider).isAudioFileAvailable}");
-                  // ref.read(dashboardProvider).storeVideoWatchedTime(widget.audioId, Duration(seconds: lastSecond), true);
-                  setState(() {});
-                },
+                  onTap: () {
+                    log("back called");
+                    _audioPlayer.stop();
+                    ref.read(videoProvider.notifier).deactivateAudioPlayer();
+                    ref.read(offlineVideoProvider.notifier).deactivateAudioPlayer();
+                    log("dsfdsdsfdsfdsf======>${ref.read(videoProvider).isAudioFileAvailable}");
+                    setState(() {});
+                  },
               ),
             ),
           ),

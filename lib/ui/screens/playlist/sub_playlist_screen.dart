@@ -139,7 +139,8 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
       setState(() {});
     }
     void playVideo(PlaylistVideoList model, int index) {
-      print('------------****${model.video!.videoUrl}');
+      print('------------****${model.video?.videoUrl}');
+      final videoUrl = model.video?.videoUrlSrc ?? "";
       ref.read(videoProvider).playVideo(
           DetailedVideoModel(
             video: DIModel(
@@ -153,7 +154,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                 videoType: ResourceType.paid),
           ),
           index: index,
-          isAudioFile: model.video!.videoUrlSrc!.split('.').last.contains('mp3'));
+          isAudioFile: videoUrl.split('.').last.contains('mp3'));
     }
 
     return Scaffold(
@@ -371,7 +372,7 @@ class _SubPlayListScreenState extends ConsumerState<SubPlayListScreen> {
                                                         },
                                                         onRemovePress: () async {
                                                           await playlistP.removeFromPlaylist(
-                                                              (model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), model.video!.videoUrlSrc!.split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
+                                                              (model.playlistId ?? 0).toString(), (model.video?.id ?? 0).toString(), (model.video?.videoUrlSrc ?? "").split('.').last.contains('mp3')); // TODO ::: CHANGES REQUIRED
                                                           playlistP.getPlaylistDetails(model.playlistId ?? 0, showProgress: true);
                                                         },
                                                         index: index,
